@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+namespace Sypets\Brofix\Task;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -14,8 +15,6 @@ declare(strict_types=1);
  *
  * The TYPO3 project - inspiring people to share!
  */
-
-namespace TYPO3\CMS\Linkvalidator\Task;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Localization\LanguageService;
@@ -33,11 +32,11 @@ use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
 class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvider
 {
     /**
-     * Default language file of the extension linkvalidator
+     * Default language file of the extension brofix
      *
      * @var string
      */
-    protected $languageFile = 'LLL:EXT:linkvalidator/Resources/Private/Language/locallang.xlf';
+    protected $languageFile = 'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf';
 
     /**
      * Render additional information fields within the scheduler backend.
@@ -46,53 +45,45 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
      * @param ValidatorTask|null $task The task object being edited. Null when adding a task!
      * @param SchedulerModuleController $schedulerModule Reference to the BE module of the Scheduler
      * @return array Additional fields
-     * @see AdditionalFieldProviderInterface::getAdditionalFields
+     * @see AdditionalFieldProviderInterface->getAdditionalFields
      */
     public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $schedulerModule): array
     {
         $additionalFields = [];
         $currentSchedulerModuleAction = $schedulerModule->getCurrentAction();
-        $lang = $this->getLanguageService();
 
         if (empty($taskInfo['configuration'])) {
             if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['configuration'] = $taskInfo['linkvalidator']['configuration'];
+                $taskInfo['configuration'] = $taskInfo['brofix']['configuration'];
             } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
-                $taskInfo['configuration'] = $task->getConfiguration();
+                $taskInfo['configuration'] = $task->getOverrideTsConfigString();
             } else {
-                $taskInfo['configuration'] = $task->getConfiguration();
+                $taskInfo['configuration'] = $task->getOverrideTsConfigString();
             }
         }
+
         if (empty($taskInfo['depth'])) {
             if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['depth'] = $taskInfo['linkvalidator']['depth'];
+                $taskInfo['depth'] = $taskInfo['brofix']['depth'];
             } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
                 $taskInfo['depth'] = $task->getDepth();
             } else {
                 $taskInfo['depth'] = $task->getDepth();
             }
         }
+
         if (empty($taskInfo['page'])) {
             if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['page'] = $taskInfo['linkvalidator']['page'];
+                $taskInfo['page'] = $taskInfo['brofix']['page'];
             } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
                 $taskInfo['page'] = $task->getPage();
             } else {
                 $taskInfo['page'] = $task->getPage();
-            }
-        }
-        if (empty($taskInfo['languages'])) {
-            if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['languages'] = $taskInfo['linkvalidator']['languages'];
-            } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
-                $taskInfo['languages'] = $task->getLanguages();
-            } else {
-                $taskInfo['languages'] = $task->getLanguages();
             }
         }
         if (empty($taskInfo['email'])) {
             if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['email'] = $taskInfo['linkvalidator']['email'];
+                $taskInfo['email'] = $taskInfo['brofix']['email'];
             } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
                 $taskInfo['email'] = $task->getEmail();
             } else {
@@ -101,28 +92,31 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
         }
         if (empty($taskInfo['emailOnBrokenLinkOnly'])) {
             if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['emailOnBrokenLinkOnly'] = $taskInfo['linkvalidator']['emailOnBrokenLinkOnly'] ?: 1;
+                $taskInfo['emailOnBrokenLinkOnly'] = $taskInfo['brofix']['emailOnBrokenLinkOnly'] ?: 1;
             } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
                 $taskInfo['emailOnBrokenLinkOnly'] = $task->getEmailOnBrokenLinkOnly();
             } else {
                 $taskInfo['emailOnBrokenLinkOnly'] = $task->getEmailOnBrokenLinkOnly();
             }
         }
-        if (empty($taskInfo['emailTemplateName'])) {
+        if (empty($taskInfo['emailTemplateFile'])) {
             if ($currentSchedulerModuleAction->equals(Action::ADD)) {
-                $taskInfo['emailTemplateName'] = $taskInfo['linkvalidator']['emailTemplateName'] ?: '';
+                $taskInfo['emailTemplateFile'] = $taskInfo['brofix']['emailTemplateFile'] ?: 'EXT:brofix/Resources/Private/Templates/mailtemplate.html';
             } elseif ($currentSchedulerModuleAction->equals(Action::EDIT)) {
-                $taskInfo['emailTemplateName'] = $task->getEmailTemplateName();
+                $taskInfo['emailTemplateFile'] = $task->getEmailTemplateFile();
             } else {
-                $taskInfo['emailTemplateName'] = $task->getEmailTemplateName();
+                $taskInfo['emailTemplateFile'] = $task->getEmailTemplateFile();
             }
         }
+
+        // page
         $fieldId = 'task_page';
-        $fieldCode = '<input type="number" min="0" class="form-control" name="tx_scheduler[linkvalidator][page]" id="'
+        $fieldCode = '<input type="number" min="0" class="form-control" name="tx_scheduler[brofix][page]" id="'
             . $fieldId
             . '" value="'
-            . htmlspecialchars((string)$taskInfo['page'])
+            . htmlspecialchars((string)($taskInfo['page'] ?? ''))
             . '">';
+        $lang = $this->getLanguageService();
         $label = $lang->sL($this->languageFile . ':tasks.validate.page');
         $pageTitle = '';
         if (!empty($taskInfo['page'])) {
@@ -132,11 +126,12 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
             'browser' => 'page',
             'pageTitle' => $pageTitle,
             'code' => $fieldCode,
-            'cshTable' => 'linkvalidator',
+            'label' => $label,
+            'cshKey' => 'brofix',
             'cshLabel' => $fieldId,
-            'label' => $label
         ];
-        // input for depth
+
+        // depth
         $fieldId = 'task_depth';
         $fieldValueArray = [
             '0' => $lang->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0'),
@@ -146,11 +141,10 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
             '4' => $lang->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4'),
             '999' => $lang->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi')
         ];
-        /** @var array<string, string> $fieldValueArray */
-        $fieldCode = '<select class="form-select" name="tx_scheduler[linkvalidator][depth]" id="' . $fieldId . '">';
+        $fieldCode = '<select class="form-control" name="tx_scheduler[brofix][depth]" id="' . $fieldId . '">';
         foreach ($fieldValueArray as $depth => $label) {
             $fieldCode .= "\t" . '<option value="' . htmlspecialchars((string)$depth) . '"'
-                . (($depth === $taskInfo['depth']) ? ' selected="selected"' : '') . '>'
+                . (($depth == $taskInfo['depth']) ? ' selected="selected"' : '') . '>'
                 . $label
                 . '</option>';
         }
@@ -158,77 +152,87 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
         $label = $lang->sL($this->languageFile . ':tasks.validate.depth');
         $additionalFields[$fieldId] = [
             'code' => $fieldCode,
-            'cshKey' => 'linkvalidator',
+            'label' => $label,
+            'cshKey' => 'brofix',
             'cshLabel' => $fieldId,
-            'label' => $label
         ];
-        $fieldId = 'task_languages';
-        $fieldCode = '<input class="form-control" type="text"  name="tx_scheduler[linkvalidator][languages]" '
-            . 'id="'
-            . $fieldId
-            . '" value="'
-            . htmlspecialchars((string)$taskInfo['languages'])
-            . '">';
-        $label = $lang->sL($this->languageFile . ':tasks.validate.languages');
-        $additionalFields[$fieldId] = [
-            'code' => $fieldCode,
-            'cshKey' => 'linkvalidator',
-            'cshLabel' => $fieldId,
-            'label' => $label
-        ];
+
+        // tsconfig
         $fieldId = 'task_configuration';
-        $fieldCode = '<textarea class="form-control" name="tx_scheduler[linkvalidator][configuration]" id="'
+        $fieldCode = '<textarea class="form-control" name="tx_scheduler[brofix][configuration]" id="'
             . $fieldId
             . '" >'
-            . htmlspecialchars((string)$taskInfo['configuration'])
+            . htmlspecialchars($taskInfo['configuration'] ?? '')
             . '</textarea>';
         $label = $lang->sL($this->languageFile . ':tasks.validate.conf');
         $additionalFields[$fieldId] = [
             'code' => $fieldCode,
-            'cshKey' => 'linkvalidator',
+            'label' => $label,
+            'cshKey' => 'brofix',
             'cshLabel' => $fieldId,
-            'label' => $label
         ];
+
+        // email recipient
         $fieldId = 'task_email';
-        $fieldCode = '<textarea class="form-control" rows="5" cols="50" name="tx_scheduler[linkvalidator][email]" id="'
+        $fieldCode = '<textarea class="form-control" rows="5" cols="50" name="tx_scheduler[brofix][email]" id="'
             . $fieldId
             . '">'
-            . htmlspecialchars((string)$taskInfo['email'])
+            . htmlspecialchars($taskInfo['email'] ?? '')
             . '</textarea>';
         $label = $lang->sL($this->languageFile . ':tasks.validate.email');
         $additionalFields[$fieldId] = [
             'code' => $fieldCode,
-            'cshKey' => 'linkvalidator',
+            'label' => $label,
+            'cshKey' => 'brofix',
             'cshLabel' => $fieldId,
-            'label' => $label
         ];
+
+        // checkbox - email on broken links only
         $fieldId = 'task_emailOnBrokenLinkOnly';
-        $fieldCode = '<div class="form-check">'
-            . '<input type="checkbox" class="form-check-input" name="tx_scheduler[linkvalidator][emailOnBrokenLinkOnly]" id="'
-            . $fieldId . '" ' . ((bool)$taskInfo['emailOnBrokenLinkOnly'] ? 'checked="checked"' : '')
-            . '></div>';
+        $fieldCode = '<div class="checkbox"><label>'
+            . '<input type="checkbox" name="tx_scheduler[brofix][emailOnBrokenLinkOnly]" id="' . $fieldId . '" '
+            . (($taskInfo['emailOnBrokenLinkOnly'] ?? false) ? 'checked="checked"' : '')
+            . '></label></div>';
         $label = $lang->sL($this->languageFile . ':tasks.validate.emailOnBrokenLinkOnly');
         $additionalFields[$fieldId] = [
             'code' => $fieldCode,
-            'cshKey' => 'linkvalidator',
+            'label' => $label,
+            'cshKey' => 'brofix',
             'cshLabel' => $fieldId,
-            'label' => $label
         ];
-        $fieldId = 'task_emailTemplateName';
-        $fieldCode = '<input class="form-control" type="text"  name="tx_scheduler[linkvalidator][emailTemplateName]" '
+
+        // template
+        $fieldId = 'task_emailTemplateFile';
+        $fieldCode = '<input class="form-control" type="text"  name="tx_scheduler[brofix][emailTemplateFile]" '
             . 'id="'
             . $fieldId
             . '" value="'
-            . htmlspecialchars((string)$taskInfo['emailTemplateName'])
+            . htmlspecialchars($taskInfo['emailTemplateFile'] ?? '')
             . '">';
-        $label = $lang->sL($this->languageFile . ':tasks.validate.emailTemplateName');
+        $label = $lang->sL($this->languageFile . ':tasks.validate.emailTemplateFile');
         $additionalFields[$fieldId] = [
             'code' => $fieldCode,
-            'cshKey' => 'linkvalidator',
+            'label' => $label,
+            'cshKey' => 'brofix',
             'cshLabel' => $fieldId,
-            'label' => $label
         ];
         return $additionalFields;
+    }
+
+    /**
+     * Mark current value as selected by returning the "selected" attribute
+     *
+     * @param array $configurationArray Array of configuration
+     * @param string $currentValue Value of selector object
+     * @return string Html fragment for a selected option or empty
+     */
+    protected function getSelectedState(array $configurationArray, $currentValue)
+    {
+        $selected = '';
+        if (in_array($currentValue, $configurationArray, true)) {
+            $selected = 'selected="selected" ';
+        }
+        return $selected;
     }
 
     /**
@@ -239,13 +243,18 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
      * @param SchedulerModuleController $schedulerModule Reference to the BE module of the Scheduler
      * @return bool TRUE if validation was ok (or selected class is not relevant), FALSE otherwise
      */
-    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $schedulerModule): bool
+    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $schedulerModule)
     {
         $isValid = true;
+        // @todo add validation to validate the $submittedData['configuration']
+        // @todo which is normally a comma separated string
         $lang = $this->getLanguageService();
-        $email = (string)($submittedData['linkvalidator']['email'] ?? '');
-        if ($email !== '') {
-            $emailList = GeneralUtility::trimExplode((strpos($email, ',') !== false) ? ',' : LF, $email);
+        if (!empty($submittedData['brofix']['email'])) {
+            if (strpos($submittedData['brofix']['email'], ',') !== false) {
+                $emailList = GeneralUtility::trimExplode(',', $submittedData['brofix']['email']);
+            } else {
+                $emailList = GeneralUtility::trimExplode(LF, $submittedData['brofix']['email']);
+            }
             foreach ($emailList as $emailAdd) {
                 if (!GeneralUtility::validEmail($emailAdd)) {
                     $isValid = false;
@@ -257,15 +266,15 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
             }
         }
 
-        $row = BackendUtility::getRecord('pages', (int)$submittedData['linkvalidator']['page'], '*', '', false);
-        if ($row === null) {
+        $row = BackendUtility::getRecord('pages', (int)$submittedData['brofix']['page'], '*', '', false);
+        if (empty($row)) {
             $isValid = false;
             $this->addMessage(
                 $lang->sL($this->languageFile . ':tasks.validate.invalidPage'),
                 FlashMessage::ERROR
             );
         }
-        if ((int)$submittedData['linkvalidator']['depth'] < 0) {
+        if ($submittedData['brofix']['depth'] < 0) {
             $isValid = false;
             $this->addMessage(
                 $lang->sL($this->languageFile . ':tasks.validate.invalidDepth'),
@@ -282,16 +291,19 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
      * @param array $submittedData Array containing the data submitted by the user
      * @param AbstractTask $task Reference to the current task object
      */
-    public function saveAdditionalFields(array $submittedData, AbstractTask $task): void
+    public function saveAdditionalFields(array $submittedData, AbstractTask $task)
     {
-        $task
-            ->setDepth((int)$submittedData['linkvalidator']['depth'])
-            ->setPage((int)$submittedData['linkvalidator']['page'])
-            ->setLanguages($submittedData['linkvalidator']['languages'])
-            ->setEmail($submittedData['linkvalidator']['email'])
-            ->setEmailOnBrokenLinkOnly((bool)($submittedData['linkvalidator']['emailOnBrokenLinkOnly'] ?? false))
-            ->setConfiguration($submittedData['linkvalidator']['configuration'])
-            ->setEmailTemplateName($submittedData['linkvalidator']['emailTemplateName']);
+        /** @var ValidatorTask $task */
+        $task->setDepth($submittedData['brofix']['depth']);
+        $task->setPage($submittedData['brofix']['page']);
+        $task->setEmail($submittedData['brofix']['email']);
+        if ($submittedData['brofix']['emailOnBrokenLinkOnly']) {
+            $task->setEmailOnBrokenLinkOnly(1);
+        } else {
+            $task->setEmailOnBrokenLinkOnly(0);
+        }
+        $task->setOverrideTsConfigString($submittedData['brofix']['configuration']);
+        $task->setEmailTemplateFile($submittedData['brofix']['emailTemplateFile']);
     }
 
     /**
@@ -300,15 +312,19 @@ class ValidatorTaskAdditionalFieldProvider extends AbstractAdditionalFieldProvid
      * @param int $pageId
      * @return string Page title or empty string
      */
-    private function getPageTitle(int $pageId): string
+    private function getPageTitle($pageId)
     {
-        return (string)(BackendUtility::getRecord('pages', $pageId, 'title', '', false)['title'] ?? '');
+        $page = BackendUtility::getRecord('pages', $pageId, 'title', '', false);
+        if ($page === null) {
+            return '';
+        }
+        return $page['title'];
     }
 
     /**
      * @return LanguageService
      */
-    protected function getLanguageService(): LanguageService
+    protected function getLanguageService()
     {
         return $GLOBALS['LANG'];
     }

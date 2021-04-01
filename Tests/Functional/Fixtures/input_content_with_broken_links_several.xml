@@ -3,6 +3,7 @@
     <pages>
         <uid>1</uid>
         <pid>0</pid>
+        <doktype>0</doktype>
     </pages>
     <!-- external -->
     <tt_content>
@@ -10,12 +11,14 @@
         <pid>1</pid>
         <bodytext>&lt;p&gt;&lt;a href=&quot;https://sfsfsfsfdfsfsdfsf/sfdsfsds&quot;&gt;link&lt;/a&gt;&lt;/p&gt;</bodytext>
         <CType>textmedia</CType>
+        <colPos>0</colPos>
     </tt_content>
     <tt_content>
         <uid>2</uid>
         <pid>1</pid>
         <bodytext>&lt;p&gt;&lt;a href=&quot;https://sfsfsfsfdfsfsdfsf/sfdsfsds&quot;&gt;link&lt;/a&gt;&lt;/p&gt;</bodytext>
         <CType>textmedia</CType>
+        <colPos>0</colPos>
     </tt_content>
 
     <!-- page -->
@@ -24,12 +27,14 @@
         <pid>1</pid>
         <bodytext>&lt;p&gt;&lt;a href=&quot;t3://page?uid=85&quot;&gt;broken link&lt;/a&gt;&lt;/p&gt;</bodytext>
         <CType>textmedia</CType>
+        <colPos>0</colPos>
     </tt_content>
     <tt_content>
         <uid>4</uid>
         <pid>1</pid>
         <bodytext>&lt;p&gt;&lt;a href=&quot;t3://page?uid=8555555&quot;&gt;broken link&lt;/a&gt;&lt;/p&gt;</bodytext>
         <CType>textmedia</CType>
+        <colPos>0</colPos>
     </tt_content>
 
     <!-- file -->
@@ -38,12 +43,14 @@
         <pid>1</pid>
         <bodytext>&lt;p&gt;&lt;a href=&quot;t3://file?uid=88&quot;&gt;broken link&lt;/a&gt;&lt;/p&gt;</bodytext>
         <CType>textmedia</CType>
+        <colPos>0</colPos>
     </tt_content>
     <tt_content>
         <uid>6</uid>
         <pid>1</pid>
         <bodytext>&lt;p&gt;&lt;a href=&quot;t3://file?uid=8888888&quot;&gt;broken link&lt;/a&gt;&lt;/p&gt;</bodytext>
         <CType>textmedia</CType>
+        <colPos>0</colPos>
     </tt_content>
 
 </dataset>

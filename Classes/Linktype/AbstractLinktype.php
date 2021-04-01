@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+namespace Sypets\Brofix\Linktype;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -12,32 +15,76 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-
-namespace TYPO3\CMS\Linkvalidator\Linktype;
-
+use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Localization\LanguageService;
 
-/**
- * This class provides Check Base plugin implementation
- */
 abstract class AbstractLinktype implements LinktypeInterface
 {
+
+    /**
+     * Flag used int checkLink() $flags
+     * All CHECK_LINK_FLAG_ flags can be combined
+     * with bitwise OR (|)
+     *
+     * @var int
+     */
+    public const CHECK_LINK_FLAG_NO_CRAWL_DELAY = 1;
+
+    /**
+     * If this flag is set, we do not use result from cache if URL is invalid.
+     * This results in URLs with errors always getting rechecked
+     */
+    public const CHECK_LINK_FLAG_NO_CACHE_ON_ERROR = 2;
+
+    /**
+     * Do not get result from cache. Always recheck URL (but write it to cache)
+     */
+    public const CHECK_LINK_FLAG_NO_CACHE = 4;
+
+    /**
+     * If synchronous checking is performed (in contrast to asynchronous checking
+     * in the background), the objective is usually to do
+     * a faster check - e.g. always retrieve from link target cache and
+     * possibly use a longer expires time for that.
+     *
+     * Synchronous checking is currently used for On-the-fly checking after editing
+     * a record and returning to list of broken links. This will most likely change
+     * in the future, as it is clunky.
+     *
+     * @var int
+     */
+    public const CHECK_LINK_FLAG_SYNCHRONOUS = 8;
+
+    /**
+     * @var Configuration
+     */
+    protected $configuration;
+
     /**
      * Contains parameters needed for the rendering of the error message
      *
-     * @var array
+     * @var ErrorParams
      */
-    protected $errorParams = [];
+    protected $errorParams;
+
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->configuration = $configuration;
+    }
+
+    public function initializeErrorParams(array $params = null): void
+    {
+        $this->errorParams = new ErrorParams($params);
+    }
 
     /**
-     * Function to override config of Linktype. Should be used only
-     * if necessary. Add additional configuration to TSconfig.
+     * Get the value of the private property errorParams
      *
-     * @param array $config
+     * @return ErrorParams All parameters needed for the rendering of the error message
      */
-    public function setAdditionalConfig(array $config): void
+    public function getErrorParams(): ErrorParams
     {
-        // do nothing by default
+        return $this->errorParams;
     }
 
     /**
@@ -48,7 +95,7 @@ abstract class AbstractLinktype implements LinktypeInterface
      * @param string $key Validator hook name
      * @return string Fetched type
      */
-    public function fetchType($value, $type, $key)
+    public function fetchType(array $value, string $type, string $key): string
     {
         if ($value['type'] == $key) {
             $type = $value['type'];
@@ -56,24 +103,19 @@ abstract class AbstractLinktype implements LinktypeInterface
         return $type;
     }
 
-    /**
-     * Set the value of the protected property errorParams
-     *
-     * @param array $value All parameters needed for the rendering of the error message
-     */
-    protected function setErrorParams($value)
+    public function getLastChecked(): int
     {
-        $this->errorParams = $value;
+        return \time();
     }
 
     /**
-     * Get the value of the private property errorParams
+     * Check if URL is being excluded.
      *
-     * @return array All parameters needed for the rendering of the error message
+     * @return bool
      */
-    public function getErrorParams()
+    public function isExcludeUrl(): bool
     {
-        return $this->errorParams;
+        return false;
     }
 
     /**
@@ -82,7 +124,19 @@ abstract class AbstractLinktype implements LinktypeInterface
      * @param array $row Broken link record
      * @return string Parsed broken url
      */
-    public function getBrokenUrl($row)
+    public function getBrokenUrl(array $row): string
+    {
+        return $row['url'];
+    }
+
+    /**
+     * Text to be displayed with the Link as anchor text
+     * (not the real anchor text of the Link.
+     * @param array $row
+     * @param array $additionalConfig
+     * @return string
+     */
+    public function getBrokenLinkText(array $row, array $additionalConfig = null): string
     {
         return $row['url'];
     }

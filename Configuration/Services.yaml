@@ -4,22 +4,19 @@ services:
     autoconfigure: true
     public: false
 
-  TYPO3\CMS\Linkvalidator\:
+  Sypets\Brofix\:
     resource: '../Classes/*'
-    # Tasks require EXT:scheduler to be installed, ignore for now.
+    # Tasks require EXT:scheduler to be installed, exclude for now.
     exclude: '../Classes/Task'
 
-  TYPO3\CMS\Linkvalidator\LinkAnalyzer:
+  Sypets\Brofix\LinkAnalyzer:
     public: true
 
-  TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository:
-    public: true
-
-  TYPO3\CMS\Linkvalidator\Result\LinkAnalyzerResult:
+  Sypets\Brofix\Repository\BrokenLinkRepository:
     public: true
 
   # EventListeners
-  TYPO3\CMS\Linkvalidator\EventListener\CheckBrokenRteLinkEventListener:
+  Sypets\Brofix\EventListener\CheckBrokenRteLinkEventListener:
     tags:
       - name: event.listener
         identifier: 'rte-check-link-external'

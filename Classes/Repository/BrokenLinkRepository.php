@@ -2,33 +2,370 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
+namespace Sypets\Brofix\Repository;
 
-namespace TYPO3\CMS\Linkvalidator\Repository;
-
+use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Linkvalidator\QueryRestrictions\EditableRestriction;
 
 /**
- * Repository for finding broken links that were detected previously.
+ * Handle database queries for table of broken links
+ *
+ * @internal
  */
-class BrokenLinkRepository
+class BrokenLinkRepository implements LoggerAwareInterface
 {
-    protected const TABLE = 'tx_linkvalidator_link';
+    use LoggerAwareTrait;
+
+    protected const TABLE = 'tx_brofix_broken_links';
+
+    /**
+     * @var int
+     */
+    protected $maxBindParameters;
+
+    public function __construct()
+    {
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connection = $connectionPool->getConnectionForTable(static::TABLE);
+        $this->maxBindParameters = PlatformInformation::getMaxBindParameters($connection->getDatabasePlatform());
+    }
+
+    public function getMaxBindParameters(): int
+    {
+        return $this->maxBindParameters;
+    }
+
+    /**
+     * Prepare database query with pageList and keyOpt data.
+     *
+     * @param int[] $pageList Pages to check for broken links
+     * @param string[] $linkTypes Link types to validate
+     * @return Statement
+     */
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $orderBy = []): Statement
+    {
+        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        foreach (array_chunk($pageList, $max)
+                 as $pageIdsChunk) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getQueryBuilderForTable(self::TABLE);
+            $queryBuilder
+                ->select('*')
+                ->from(self::TABLE)
+                ->where(
+                    $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->in(
+                                'record_uid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            ),
+                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                        ),
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->in(
+                                'record_pid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            ),
+                            $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                        )
+                    )
+                );
+            if ($orderBy !== []) {
+                $values = array_shift($orderBy);
+                if ($values && is_array($values) && count($values) === 2) {
+                    $queryBuilder->orderBy($values[0], $values[1]);
+                    foreach ($orderBy as $values) {
+                        if (!is_array($values) || count($values) != 2) {
+                            break;
+                        }
+                        $queryBuilder->addOrderBy($values[0], $values[1]);
+                    }
+                }
+            }
+
+            if (!empty($linkTypes)) {
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->in(
+                        'link_type',
+                        $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+                    )
+                );
+            }
+
+            return $queryBuilder->execute();
+        }
+    }
+
+    public function hasPageBrokenLinks(int $pageId): bool
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable(self::TABLE);
+        $count = $queryBuilder
+            ->count('uid')
+            ->from(self::TABLE)
+            ->where(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->eq(
+                            'record_uid',
+                            $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+                        ),
+                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                    ),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->eq(
+                            'record_pid',
+                            $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+                        ),
+                        $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                    )
+                )
+            )
+            ->execute()
+            ->fetchColumn(0);
+        return $count !== 0;
+    }
+
+    /**
+     * Fill a marker array with the number of links found in a list of pages
+     *
+     * @param array $pageIds page uids
+     * @return array Marker array with the number of links found
+     */
+    public function getLinkCounts(array $pageIds, array $linkTypes = []): array
+    {
+        $markerArray = [];
+        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        foreach (array_chunk($pageIds, $max)
+                 as $pageIdsChunk) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getQueryBuilderForTable(self::TABLE);
+            $queryBuilder->getRestrictions()->removeAll();
+
+            $result = $queryBuilder->select('link_type')
+                ->addSelectLiteral($queryBuilder->expr()->count('uid', 'nbBrokenLinks'))
+                ->from(self::TABLE)
+                ->where(
+                    $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->in(
+                                'record_uid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            ),
+                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                        ),
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->in(
+                                'record_pid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            ),
+                            $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                        )
+                    )
+                )
+                ->groupBy('link_type')
+                ->execute();
+
+            while ($row = $result->fetch()) {
+                if (!isset($markerArray[$row['link_type']])) {
+                    $markerArray[$row['link_type']] = 0;
+                }
+                $markerArray[$row['link_type']] += (int)($row['nbBrokenLinks']);
+                if (!isset($markerArray['brokenlinkCount'])) {
+                    $markerArray['brokenlinkCount'] = 0;
+                }
+                $markerArray['brokenlinkCount'] += (int)($row['nbBrokenLinks']);
+            }
+        }
+        if ($linkTypes) {
+            // fill missing values
+            foreach ($linkTypes as $linkType) {
+                if (!isset($markerArray[$linkType])) {
+                    $markerArray[$linkType] = 0;
+                }
+                if (!isset($markerArray['brokenlinkCount'])) {
+                    $markerArray['brokenlinkCount'] = 0;
+                }
+            }
+        }
+        return $markerArray;
+    }
+
+    public function removeBrokenLinksForRecord(string $tableName, int $recordUid): int
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable(static::TABLE);
+        $constraints = [];
+
+        if ($tableName === 'pages') {
+            $constraints[] = $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq(
+                        'record_uid',
+                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'table_name',
+                        $queryBuilder->createNamedParameter('pages')
+                    )
+                ),
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq(
+                        'record_pid',
+                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                    ),
+                    $queryBuilder->expr()->neq(
+                        'table_name',
+                        $queryBuilder->createNamedParameter('pages')
+                    )
+                )
+            );
+        } else {
+            $constraints[] = $queryBuilder->expr()->eq(
+                'record_uid',
+                $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+            );
+            $constraints[] = $queryBuilder->expr()->eq(
+                'table_name',
+                $queryBuilder->createNamedParameter($tableName)
+            );
+        }
+
+        return $queryBuilder->delete(static::TABLE)
+            ->where(
+                ...$constraints
+            )
+            ->execute();
+    }
+
+    public function removeForRecordUrl(string $tableName, int $recordUid, string $url, string $linkType): int
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable(static::TABLE);
+
+        if ($tableName === 'pages') {
+            $constraints[] = $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq(
+                        'record_uid',
+                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'table_name',
+                        $queryBuilder->createNamedParameter('pages')
+                    )
+                ),
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq(
+                        'record_pid',
+                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                    ),
+                    $queryBuilder->expr()->neq(
+                        'table_name',
+                        $queryBuilder->createNamedParameter('pages')
+                    )
+                )
+            );
+        } else {
+            $constraints[] = $queryBuilder->expr()->eq(
+                'record_uid',
+                $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+            );
+            $constraints[] = $queryBuilder->expr()->eq(
+                'table_name',
+                $queryBuilder->createNamedParameter($tableName)
+            );
+        }
+        $constraints[] = $queryBuilder->expr()->like(
+            'url',
+            $queryBuilder->createNamedParameter($url)
+        );
+        $constraints[] = $queryBuilder->expr()->like(
+            'link_type',
+            $queryBuilder->createNamedParameter($linkType)
+        );
+
+        return $queryBuilder->delete(static::TABLE)
+            ->where(
+                ...$constraints
+            )
+            ->execute();
+    }
+
+    public function removeBrokenLinksForRecordBeforeTime(string $tableName, int $recordUid, int $time): void
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable(static::TABLE);
+
+        $queryBuilder->delete(static::TABLE)
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'record_uid',
+                    $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                ),
+                $queryBuilder->expr()->eq(
+                    'table_name',
+                    $queryBuilder->createNamedParameter($tableName)
+                ),
+                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
+            )
+            ->execute();
+    }
+
+    /**
+     * Remove all broken link records in list of broken links for these pages and
+     * link types.
+     *
+     * @param array $pageIds
+     * @param array $linkTypes
+     * @param int $time
+     * @param array $linkTypes
+     */
+    public function removeAllBrokenLinksForPagesBeforeTime(array $pageIds, array $linkTypes, int $time): void
+    {
+        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        foreach (array_chunk($pageIds, $max)
+                 as $pageIdsChunk) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getQueryBuilderForTable(self::TABLE);
+
+            $queryBuilder->delete(self::TABLE)
+                ->where(
+                    $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->in(
+                                'record_uid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            ),
+                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                        ),
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->in(
+                                'record_pid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            ),
+                            $queryBuilder->expr()->neq(
+                                'table_name',
+                                $queryBuilder->createNamedParameter('pages')
+                            )
+                        )
+                    ),
+                    $queryBuilder->expr()->in(
+                        'link_type',
+                        $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+                    ),
+                    $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
+                )
+                ->execute();
+        }
+    }
 
     /**
      * Check if linkTarget is in list of broken links.
@@ -37,7 +374,7 @@ class BrokenLinkRepository
      *   a page uid (for db links), a file reference (for file links), etc.
      * @return bool is the link target a broken link
      */
-    public function isLinkTargetBrokenLink(string $linkTarget): bool
+    public function isLinkTargetBrokenLink(string $linkTarget, string $linkType): bool
     {
         try {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -46,239 +383,161 @@ class BrokenLinkRepository
                 ->count('uid')
                 ->from(static::TABLE)
                 ->where(
-                    $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget))
+                    $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+                    $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
                 );
             return (bool)$queryBuilder
-                    ->execute()
-                    ->fetchColumn(0);
+                ->execute()
+                ->fetchColumn(0);
         } catch (TableNotFoundException $e) {
             return false;
         }
     }
 
-    /**
-     * Returns all broken links found on the page record and all records on a page (or multiple pages)
-     * grouped by the link_type.
+    /*
+     * Remove all broken links that match a link target.
      *
-     * @param int[] $pageIds
-     * @param array $searchFields [ table => [field1, field2, ...], ...]
-     * @return array
+     * @param string $linkTarget
+     * @param string $linkType
+     * @param string $matchBy
+     * @param int $excludeLinkTargetPid Storage pid of excluded link targets, -1 means to not consider the pid
+     * @return int
      */
-    public function getNumberOfBrokenLinksForRecordsOnPages(array $pageIds, array $searchFields): array
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
-        $queryBuilder->getRestrictions()->removeAll();
-        if (!$GLOBALS['BE_USER']->isAdmin()) {
-            $queryBuilder->getRestrictions()
-                ->add(GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder));
-        }
-        $statement = $queryBuilder->select('link_type')
-            ->addSelectLiteral($queryBuilder->expr()->count(static::TABLE . '.uid', 'amount'))
-            ->from(static::TABLE)
-            ->join(
-                static::TABLE,
-                'pages',
-                'pages',
-                $queryBuilder->expr()->eq('record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
-            )
-            ->where(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->in(
-                            'record_uid',
-                            $queryBuilder->createNamedParameter($pageIds, Connection::PARAM_INT_ARRAY)
-                        ),
-                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                    ),
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->in(
-                            'record_pid',
-                            $queryBuilder->createNamedParameter($pageIds, Connection::PARAM_INT_ARRAY)
-                        ),
-                        $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
-                    )
-                )
-            )
-            ->groupBy('link_type')
-            ->execute();
-
-        $result = [
-            'total' => 0
-        ];
-        while ($row = $statement->fetch()) {
-            $result[$row['link_type']] = $row['amount'];
-            $result['total']+= $row['amount'];
-        }
-        return $result;
-    }
-
-    public function setNeedsRecheckForRecord(int $recordUid, string $tableName): void
-    {
+    public function removeBrokenLinksForLinkTarget(
+        string $linkTarget,
+        string $linkType = 'external',
+        string $matchBy = ExcludeLinkTarget::MATCH_BY_EXACT,
+        int $excludeLinkTargetPid = -1
+    ): int {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable(static::TABLE);
 
-        $queryBuilder->update(static::TABLE)
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'record_uid',
-                    $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+        $constraints = [];
+
+        if ($matchBy === ExcludeLinkTarget::MATCH_BY_EXACT) {
+            $constraints[] = $queryBuilder->expr()->eq(
+                'url',
+                $queryBuilder->createNamedParameter($linkTarget)
+            );
+        } elseif ($matchBy === ExcludeLinkTarget::MATCH_BY_DOMAIN) {
+            $constraints[] = $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->like(
+                    'url',
+                    $queryBuilder->createNamedParameter('%://' . $linkTarget . '/%')
                 ),
-                $queryBuilder->expr()->eq(
-                    'table_name',
-                    $queryBuilder->createNamedParameter($tableName)
+                $queryBuilder->expr()->like(
+                    'url',
+                    $queryBuilder->createNamedParameter('%://' . $linkTarget)
                 )
-            )
-            ->set('needs_recheck', 1)
-            ->execute();
-    }
-
-    public function removeBrokenLinksForRecord(string $tableName, int $recordUid): void
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
-
-        $queryBuilder->delete(static::TABLE)
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'record_uid',
-                    $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
-                ),
-                $queryBuilder->expr()->eq(
-                    'table_name',
-                    $queryBuilder->createNamedParameter($tableName)
-                )
-            )
-            ->execute();
-    }
-
-    /**
-     * @param int[] $pageIds
-     * @param array<int,string> $linkTypes
-     */
-    public function removeAllBrokenLinksOfRecordsOnPageIds(array $pageIds, array $linkTypes): void
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
-
-        $queryBuilder->delete(static::TABLE)
-            ->where(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->in(
-                            'record_uid',
-                            $queryBuilder->createNamedParameter($pageIds, Connection::PARAM_INT_ARRAY)
-                        ),
-                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                    ),
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->in(
-                            'record_pid',
-                            $queryBuilder->createNamedParameter($pageIds, Connection::PARAM_INT_ARRAY)
-                        ),
-                        $queryBuilder->expr()->neq(
-                            'table_name',
-                            $queryBuilder->createNamedParameter('pages')
-                        )
-                    )
-                ),
-                $queryBuilder->expr()->in(
-                    'link_type',
-                    $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
-                )
-            )
-            ->execute();
-    }
-
-    /**
-     * Prepare database query with pageList and keyOpt data.
-     *
-     * This takes permissions of current BE user into account
-     *
-     * @param int[] $pageIds Pages to check for broken links
-     * @param string[] $linkTypes Link types to validate
-     * @param string[] $searchFields table => [fields1, field2, ...], ... : fields in which linkvalidator should
-     *   search for broken links
-     * @param int[] $languages Allowed languages
-     * @return array
-     */
-    public function getAllBrokenLinksForPages(
-        array $pageIds,
-        array $linkTypes,
-        array $searchFields = [],
-        array $languages = []
-    ): array {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(self::TABLE);
-        if (!$GLOBALS['BE_USER']->isAdmin()) {
-            $queryBuilder->getRestrictions()
-                ->add(GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder));
+            );
+        } else {
+            return 0;
         }
 
-        $constraints = [
-            $queryBuilder->expr()->orX(
-                $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->in(
-                        'record_uid',
-                        $queryBuilder->createNamedParameter($pageIds, Connection::PARAM_INT_ARRAY)
-                    ),
-                    $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                ),
-                $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->in(
-                        'record_pid',
-                        $queryBuilder->createNamedParameter($pageIds, Connection::PARAM_INT_ARRAY)
-                    ),
-                    $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
-                )
-            ),
-            $queryBuilder->expr()->in(
-                'link_type',
-                $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
-            )
-        ];
+        $constraints[] = $queryBuilder->expr()->eq(
+            'link_type',
+            $queryBuilder->createNamedParameter($linkType)
+        );
 
-        if ($languages !== []) {
-            $constraints[] = $queryBuilder->expr()->in(
-                'language',
-                $queryBuilder->createNamedParameter($languages, Connection::PARAM_INT_ARRAY)
+        if ($excludeLinkTargetPid !== -1) {
+            $constraints[] = $queryBuilder->expr()->eq(
+                'exclude_link_targets_pid',
+                $queryBuilder->createNamedParameter($excludeLinkTargetPid, \PDO::PARAM_INT)
             );
         }
 
-        $records = $queryBuilder
-            ->select(self::TABLE . '.*')
-            ->from(self::TABLE)
-            ->join(
-                'tx_linkvalidator_link',
-                'pages',
-                'pages',
-                $queryBuilder->expr()->eq('tx_linkvalidator_link.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
-            )
+        return (int)$queryBuilder->delete(static::TABLE)
             ->where(...$constraints)
-            ->orderBy('tx_linkvalidator_link.record_uid')
-            ->addOrderBy('tx_linkvalidator_link.uid')
-            ->execute()
-            ->fetchAll();
-        foreach ($records as &$record) {
-            $response = json_decode($record['url_response'], true);
-            // Fallback mechanism to still support the old serialized data, could be removed in TYPO3 v12 or later
-            if ($response === null) {
-                $response = unserialize($record['url_response'], ['allowed_classes' => false]);
-            }
-            $record['url_response'] = $response;
-        }
-        return $records;
+            ->execute();
     }
 
-    public function addBrokenLink($record, bool $isValid, array $errorParams = null): void
+    /**
+     * Update existing record or insert new
+     *
+     * @param array $record
+     */
+    public function insertOrUpdateBrokenLink(array $record): void
     {
-        $response = ['valid' => $isValid];
-        if ($errorParams) {
-            $response['errorParams'] = $errorParams;
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable(self::TABLE);
+        $count = (int)$queryBuilder->count('uid')
+            ->from(self::TABLE)
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'record_uid',
+                    $queryBuilder->createNamedParameter($record['record_uid'], \PDO::PARAM_INT)
+                ),
+                $queryBuilder->expr()->eq(
+                    'table_name',
+                    $queryBuilder->createNamedParameter($record['table_name'])
+                ),
+                $queryBuilder->expr()->eq(
+                    'field',
+                    $queryBuilder->createNamedParameter($record['field'])
+                ),
+                $queryBuilder->expr()->eq(
+                    'url',
+                    $queryBuilder->createNamedParameter($record['url'])
+                )
+            )
+            ->execute()
+            ->fetchColumn(0);
+        if ($count > 0) {
+            $identifier = [
+                'record_uid' => $record['record_uid'],
+                'table_name' => $record['table_name'],
+                'field' => $record['field'],
+                'url' => $record['url']
+            ];
+            $this->updateBrokenLink($record, $identifier);
+        } else {
+            $this->insertBrokenLink($record);
         }
-        $record['url_response'] = json_encode($response);
-        GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable(self::TABLE)
-            ->insert(self::TABLE, $record);
+    }
+
+    /**
+     * @param array $record
+     */
+    public function updateBrokenLink(array $record, array $identifier): int
+    {
+        $count = 0;
+        $record['tstamp'] = \time();
+        try {
+            $count = (int)GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getConnectionForTable(static::TABLE)
+                ->update(self::TABLE, $record, $identifier);
+        } catch (\Exception $e) {
+            // we catch exception here and log as error
+            $this->logger->error(
+                'insertBrokenLink: url_response='
+                . ($record['url_response'] ?? '')
+                . ', exception message=' . $e->getMessage()
+                . ', stack trace=' . $e->getTraceAsString()
+            );
+        }
+        return $count;
+    }
+
+    /**
+     * Insert new record
+     *
+     * @param array $record
+     */
+    public function insertBrokenLink(array $record): void
+    {
+        $record['tstamp'] = \time();
+        try {
+            GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getConnectionForTable(static::TABLE)
+                ->insert(self::TABLE, $record);
+        } catch (\Exception $e) {
+            // we catch exception here and log as error
+            $this->logger->error(
+                'insertBrokenLink: url_response='
+                . ($record['url_response'] ?? '')
+                . ', exception message=' . $e->getMessage()
+                . ', stack trace=' . $e->getTraceAsString()
+            );
+        }
     }
 }

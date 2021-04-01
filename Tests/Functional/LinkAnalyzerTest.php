@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Sypets\Brofix\Tests\Functional;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -15,20 +17,31 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace TYPO3\CMS\Linkvalidator\Tests\Functional;
-
-use Psr\EventDispatcher\EventDispatcherInterface;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Linkvalidator\LinkAnalyzer;
-use TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository;
+use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\LinkAnalyzer;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 class LinkAnalyzerTest extends FunctionalTestCase
 {
     protected $coreExtensionsToLoad = [
-        'seo',
-        'linkvalidator',
+        'backend',
+        'fluid',
+        'info',
+        'install',
+        'scheduler'
     ];
+
+    protected $testExtensionsToLoad = [
+        'typo3conf/ext/brofix',
+        'typo3conf/ext/page_callouts'
+    ];
+
+    /**
+     * @var Configuration
+     */
+    protected $configuration;
 
     /**
      * Set up for set up the backend user, initialize the language object
@@ -37,47 +50,73 @@ class LinkAnalyzerTest extends FunctionalTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $GLOBALS['LANG'] = LanguageService::create('default');
+
+        Bootstrap::initializeLanguageObject();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function initializeConfiguration(array $linkTypes = [], array $searchFields = [])
+    {
+        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
+        // load default values
+        $this->configuration->loadPageTsConfig(0);
+        $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');
+        $this->configuration->overrideTsConfigByString('mod.brofix.searchFields.pages = media,url');
+        if ($linkTypes) {
+            $this->configuration->setLinkTypes($linkTypes);
+        }
+        if ($searchFields) {
+            $this->configuration->setSearchFields($searchFields);
+        }
+    }
+
+    protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
+    {
+        $linkAnalyzer = new LinkAnalyzer();
+        $linkAnalyzer->init(
+            $this->configuration->getSearchFields(),
+            $pidList,
+            $this->configuration->getTsConfig()
+        );
+        return $linkAnalyzer;
     }
 
     public function findAllBrokenLinksDataProvider(): array
     {
+        $pidList1 = [1];
+
         return [
             'Test with one broken external link (not existing domain)' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_external.csv'
-                ],
-            'Test with one broken external link in pages:canonical_link' =>
-                [
-                    __DIR__ . '/Fixtures/input_page_with_broken_link_external_in_canonical_link.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_with_broken_link_external_in_canonical_link.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_external.csv'
                 ],
             'Test with one broken page link (not existing page)' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_page.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_page.csv'
                 ],
             'Test with one broken file link (not existing file)' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_file.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_file.csv'
                 ],
             'Test with several broken external, page and file links' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_links_several.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_links_several.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_links_several.csv'
                 ],
             'Test with several pages with broken external, page and file links' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_links_several_pages.xml',
                     [1, 2],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_links_several_pages.csv'
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_links_several_pages.csv'
                 ],
         ];
     }
@@ -86,53 +125,41 @@ class LinkAnalyzerTest extends FunctionalTestCase
      * @test
      * @dataProvider findAllBrokenLinksDataProvider
      */
-    public function getLinkStatisticsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
+    public function generateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
     {
-        $tsConfig = [
-            'searchFields' => [
-                'pages' => ['media', 'url', 'canonical_link'],
-                'tt_content' => ['bodytext', 'header_link', 'records']
-            ],
-            'linktypes' => 'db,file,external',
-            'checkhidden' => '0',
-        ];
-        $linkTypes = explode(',', $tsConfig['linktypes']);
-
-        $searchFields = $tsConfig['searchFields'];
-
+        // setup
+        $this->initializeConfiguration();
         $this->importDataSet($inputFile);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
-        $linkAnalyzer = new LinkAnalyzer(
-            $this->prophesize(EventDispatcherInterface::class)->reveal(),
-            new BrokenLinkRepository()
-        );
-        $linkAnalyzer->init($searchFields, $pidList, $tsConfig);
-        $linkAnalyzer->getLinkStatistics($linkTypes);
-
+        // assert
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
     public function findFindOnlyFileBrokenLinksDataProvider(): array
     {
+        $pidList1 = [1];
+
         return [
             // Tests with one broken link
             'Test with one broken external link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_none.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken page link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_none.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken file link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_file.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_file.csv'
                 ],
         ];
     }
@@ -143,51 +170,41 @@ class LinkAnalyzerTest extends FunctionalTestCase
      */
     public function getLinkStatisticsFindOnlyFileBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
     {
-        $tsConfig = [
-            'searchFields' => [
-                'pages' => ['media', 'url'],
-                'tt_content' => ['bodytext', 'header_link', 'records']
-            ],
-            'linktypes' => 'file',
-            'checkhidden' => '0',
-        ];
-        $linkTypes = explode(',', $tsConfig['linktypes']);
+        $linkTypes = ['file'];
 
-        $searchFields = $tsConfig['searchFields'];
-
+        // setup
         $this->importDataSet($inputFile);
+        $this->initializeConfiguration($linkTypes);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
-        $linkAnalyzer = new LinkAnalyzer(
-            $this->prophesize(EventDispatcherInterface::class)->reveal(),
-            new BrokenLinkRepository()
-        );
-        $linkAnalyzer->init($searchFields, $pidList, $tsConfig);
-        $linkAnalyzer->getLinkStatistics($linkTypes);
-
+        // assert
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
     public function findFindOnlyPageBrokenLinksDataProvider(): array
     {
+        $pidList1 = [1];
+
         return [
             // Tests with one broken link
             'Test with one broken external link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_none.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken page link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_page.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_page.csv'
                 ],
             'Test with one broken file link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_none.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
                 ],
         ];
     }
@@ -198,51 +215,41 @@ class LinkAnalyzerTest extends FunctionalTestCase
      */
     public function getLinkStatisticsFindOnlyPageBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
     {
-        $tsConfig = [
-            'searchFields' => [
-                'pages' => ['media', 'url'],
-                'tt_content' => ['bodytext', 'header_link', 'records']
-            ],
-            'linktypes' => 'db',
-            'checkhidden' => '0',
-        ];
-        $linkTypes = explode(',', $tsConfig['linktypes']);
+        $linkTypes = ['db'];
 
-        $searchFields = $tsConfig['searchFields'];
-
+        // setup
         $this->importDataSet($inputFile);
+        $this->initializeConfiguration($linkTypes);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
-        $linkAnalyzer = new LinkAnalyzer(
-            $this->prophesize(EventDispatcherInterface::class)->reveal(),
-            new BrokenLinkRepository()
-        );
-        $linkAnalyzer->init($searchFields, $pidList, $tsConfig);
-        $linkAnalyzer->getLinkStatistics($linkTypes);
-
+        // assert
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
     public function findFindOnlyExternalBrokenLinksDataProvider(): array
     {
+        $pidList1 = [1];
+
         return [
             // Tests with one broken link
             'Test with one broken external link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_external.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_external.csv'
                 ],
             'Test with one broken page link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_none.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken file link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
-                    [1],
-                    'EXT:linkvalidator/Tests/Functional/Fixtures/expected_output_content_with_broken_link_none.csv'
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
                 ],
         ];
     }
@@ -253,26 +260,70 @@ class LinkAnalyzerTest extends FunctionalTestCase
      */
     public function getLinkStatisticsFindOnlyExternalBrokenLinksInBodytext(string $inputFile, array $pidList, string $expectedOutputFile)
     {
-        $tsConfig = [
-            'searchFields' => [
-                'tt_content' => ['bodytext']
-            ],
-            'linktypes' => 'external',
-            'checkhidden' => '0',
-        ];
-        $linkTypes = explode(',', $tsConfig['linktypes']);
+        $linkTypes = ['external'];
 
-        $searchFields = $tsConfig['searchFields'];
-
+        // setup
         $this->importDataSet($inputFile);
+        $this->initializeConfiguration($linkTypes);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
-        $linkAnalyzer = new LinkAnalyzer(
-            $this->prophesize(EventDispatcherInterface::class)->reveal(),
-            new BrokenLinkRepository()
-        );
-        $linkAnalyzer->init($searchFields, $pidList, $tsConfig);
-        $linkAnalyzer->getLinkStatistics($linkTypes);
+        // assert
+        $this->assertCSVDataSet($expectedOutputFile);
+    }
 
+    public function checkContentByTypeDataProvider(): array
+    {
+        $pidList1 = [1];
+
+        return [
+            'Test with one broken link in tt_content.bodytext and CType=header. Expected: no broken links' =>
+                [
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_in_bodytext_type_header.xml',
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                ],
+            'Test with one broken link in pages.url and doktype=1. Expected: no broken links' =>
+                [
+                    __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_1.xml',
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                ],
+            'Test with one broken link in pages.url and doktype=3. Expected: 1 broken link' =>
+                [
+                    __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_3.xml',
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_page_with_broken_link_url.csv'
+                ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider checkContentByTypeDataProvider
+     */
+    public function getLinkStatisticsCheckOnlyContentByType(string $inputFile, array $pidList, string $expectedOutputFile)
+    {
+        $searchFields = [
+            'tt_content' => [
+                'bodytext'
+            ],
+            'pages' => [
+                'url'
+            ]
+        ];
+
+        $linkTypes = [
+            'external'
+        ];
+
+        // setup
+        $this->importDataSet($inputFile);
+        $this->initializeConfiguration($linkTypes, $searchFields);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+
+        // assert
         $this->assertCSVDataSet($expectedOutputFile);
     }
 }

@@ -1,49 +1,62 @@
 {
-	"name": "typo3/cms-linkvalidator",
-	"type": "typo3-cms-framework",
-	"description": "Link Validator checks the links in your website for validity. It can validate all kinds of links: internal, external and file links. Scheduler is supported to run Link Validator via Cron including the option to send status mails, if broken links were detected.",
-	"homepage": "https://typo3.org",
+	"name": "sypets/brofix",
+	"type": "typo3-cms-extension",
+	"description": "Broken Link Fixer",
 	"license": ["GPL-2.0-or-later"],
-	"authors": [{
-		"name": "TYPO3 Core Team",
-		"email": "typo3cms@typo3.org",
-		"role": "Developer"
-	}],
-	"support": {
-		"chat": "https://typo3.org/help",
-		"docs": "https://docs.typo3.org/c/typo3/cms-linkvalidator/master/en-us",
-		"issues": "https://forge.typo3.org",
-		"source": "https://github.com/TYPO3/TYPO3.CMS"
-	},
+	"authors": [
+		{
+			"name": "Sybille Peters",
+			"email": "sypets@gmx.de",
+			"role": "Developer"
+		}
+	],
 	"config": {
-		"sort-packages": true
+		"sort-packages": true,
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin"
 	},
 	"require": {
-		"typo3/cms-core": "11.2.*@dev",
-		"typo3/cms-info": "11.2.*@dev"
+		"php": "^7.3||^7.4",
+		"sypets/page-callouts": "^1.0.0",
+		"typo3/cms-backend": "^9.5.23 || ^10.4.0",
+		"typo3/cms-core": "^9.5.23 || ^10.4.0",
+		"typo3/cms-fluid": "^9.5.23 || ^10.4.0",
+		"typo3/cms-info": "^9.5.23 || ^10.4.0",
+		"typo3/cms-scheduler": "^9.5.23 || ^10.4.0"
+	},
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^2.17.3",
+		"phpunit/phpunit": "^8",
+		"typo3/testing-framework": "^6.7.1"
 	},
 	"suggest": {
-		"typo3/cms-scheduler": "Regular checks of links"
 	},
 	"conflict": {
 		"typo3/cms": "*"
 	},
 	"extra": {
-		"branch-alias": {
-			"dev-master": "11.2.x-dev"
-		},
 		"typo3/cms": {
-			"extension-key": "linkvalidator"
+			"extension-key": "brofix",
+			"cms-package-dir": "{$vendor-dir}/typo3/cms",
+			"web-dir": ".Build/Web"
+		},
+		"branch-alias": {
+			"dev-master": "1.x-dev"
 		}
 	},
 	"autoload": {
 		"psr-4": {
-			"TYPO3\\CMS\\Linkvalidator\\": "Classes/"
+			"Sypets\\Brofix\\": "Classes/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"TYPO3\\CMS\\Linkvalidator\\Tests\\": "Tests/"
+			"Sypets\\Brofix\\Tests\\": "Tests/"
 		}
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
+		]
 	}
 }

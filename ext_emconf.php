@@ -1,23 +1,27 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'Link Validator',
-    'description' => 'Link Validator checks the links in your website for validity. It can validate all kinds of links: internal, external and file links. Scheduler is supported to run Link Validator via Cron including the option to send status mails, if broken links were detected.',
+    'title' => 'Broken link fixer',
+    'description' => '',
     'category' => 'module',
-    'author' => 'TYPO3 Core Team',
-    'author_email' => 'typo3cms@typo3.org',
+    'author' => 'Sybille Peters',
+    'author_email' => 'sypets@gmx.de',
     'author_company' => '',
-    'state' => 'stable',
+    'state' => 'beta',
+    'uploadfolder' => 0,
+    'createDirs' => '',
     'clearCacheOnLoad' => 0,
-    'version' => '11.2.0',
+    'version' => '1.0.0',
     'constraints' => [
         'depends' => [
-            'typo3' => '11.2.0',
-            'info' => '11.2.0',
+            'typo3' => '9.5.23-10.4.99',
+            'info' => '9.5.23-10.4.99',
+            'scheduler' => '9.5.23-10.4.99',
+            'page_callouts' => '1.0.0-1.90.99'
         ],
         'conflicts' => [],
         'suggests' => [
-            'scheduler' => ''
+
         ],
     ],
 ];

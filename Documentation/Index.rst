@@ -1,14 +1,13 @@
 .. include:: Includes.txt
 
-
 .. _start:
 
-=============
-Linkvalidator
-=============
+=================
+Broken Link Fixer
+=================
 
 :Extension key:
-      linkvalidator
+      brofix
 
 :Version:
       |release|
@@ -16,44 +15,43 @@ Linkvalidator
 :Language:
       en
 
-:Description:
-      Linkvalidator checks the links in your website for validity. It
-      can validate all kinds of links: internal, external and file
-      links. Scheduler is supported to run Linkvalidator via Cron
-      including the option to send status mails, if broken links were
-      detected.
-
-:Keywords:
-      link validation, linkvalidator
-
 :Copyright:
-      2000-2021
+      Since 2000
 
 :Author:
-      TYPO3 CMS Core Development Team
+      Sybille Peters et al. (see :ref:`credits`)
 
 :License:
       Open Content License available from `www.opencontent.org/opl.shtml
       <http://www.opencontent.org/opl.shtml>`_
 
-:Rendered:
-      |today|
+----
+
+Broken Link Fixer checks the links in your website, generates a report
+and makes it possible to directly edit records with broken links from
+the report in the backend.
+
+It can check all kinds of links: Links to pages, records, external
+(URLs) and file links. Scheduler is supported to run a task
+to find broken links. It is possible to send a status mail
+if broken links were detected.
+
+----
 
 The content of this document is related to TYPO3, a GNU/GPL CMS/Framework
-available from `typo3.org <https://typo3.org/>`_
+available from `www.typo3.org <http://www.typo3.org/>`_
 
+----
 
-**Table of Contents**
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
    :titlesonly:
-   :glob:
 
    Introduction/Index
-   Editors/Index
-   Administration/Index
+   Glossary/Index
+   Installation/Index
    Configuration/Index
-   LargeSites/Index
-   Targets
+   HowItWorks/Index
+   Sitemap
 

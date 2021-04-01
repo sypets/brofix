@@ -1,17 +1,17 @@
 <?php
 
-defined('TYPO3') or die();
+defined('TYPO3_MODE') or die();
 
 // Add module
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
     'web_info',
-    \TYPO3\CMS\Linkvalidator\Report\LinkValidatorReport::class,
-    '',
-    'LLL:EXT:linkvalidator/Resources/Private/Language/locallang.xlf:mod_linkvalidator'
+    \Sypets\Brofix\View\BrofixReport::class,
+    null,
+    'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:mod_brofix'
 );
 
 // Initialize Context Sensitive Help (CSH)
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'linkvalidator',
-    'EXT:linkvalidator/Resources/Private/Language/Module/locallang_csh.xlf'
+    'brofix',
+    'EXT:brofix/Resources/Private/Language/Module/locallang_csh.xlf'
 );

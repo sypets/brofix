@@ -1,54 +1,68 @@
-mod.linkvalidator {
+mod.brofix {
+	searchFields {
+		pages = media,url
+		tt_content = bodytext,header_link,records
+	}
+	# do not check these ctypes in tt_content elements (comma separated)
+	excludeCtype = html
 
-  # specify fields to be crawled
-  searchFields {
-    pages = media,url
-    tt_content = bodytext,header_link,records
-  }
+	linktypes = db,file,external
 
-  # specify link types to be crawled
-  linktypes = db,file,external
+	checkhidden = 0
+
+	# 1: links to hidden records are reported as errors
+	reportHiddenRecords = 1
 
   linktypesConfig {
-    external {
-
-      # User-Agent string is filled with information about the crawling site
-      httpAgentName = TYPO3 Linkvalidator
-      httpAgentUrl =
-      httpAgentEmail =
-
-      headers {
-
+      external {
+        headers {
+          # !!! fill out User-Agent reasonably with at least a working URL and / or email,
+          # e.g.
+          # your vendorname is GrateSturff, URL is https://gratesturff.com/imprint.html
+          # User-Agent = Mozilla/5.0 (compatible; GrateSturff using Brofix link checker/1.0.0; +https://gratesturff.com/imprint.html
+          #
+          User-Agent =
+          Accept = */*
+          Accept-Language = *
+          Accept-Encoding = *
+        }
+        timeout = 10
+        redirects = 5
       }
-
-      method = HEAD
-
-      range = 0-4048
-
-      # This is the total timeout of the request in
-      # seconds.
-      # If set, this overrides the timeout in $GLOBALS['TYPO3_CONF_VARS']['HTTP']['timeout'].
-      # which defaults to 0.
-      #
-      # WARNING:
-      #   A value 0 means no timeout, which may mean that the request never ends
-      #   and can also result in scheduler tasks to run indefinitely.
-      timeout = 20
-    }
   }
 
-  checkhidden = 0
-  showCheckLinkTab = 1
-  # recheck | setNeedsRecheck
-  actionAfterEditRecord = recheck
-  mail {
-    fromname = Linkvalidator
-    fromemail = Linkvalidator@example.com
-    replytoname =
-    replytoemail =
-    subject = TYPO3 Linkvalidator report
+  excludeLinkTarget {
+    storagePid = 0
+    # allowed link types, e.g. external,db
+    allowed = external
   }
 
-  # @deprecated in TYPO3 11, remove in TYPO3 12
-  linkhandler.reportHiddenRecords = 0
+  linkTargetCache {
+    # 6 days : typically used for full recheck
+    expiresLow = 518400
+    # 7 days : typically use for on-the-fly checking
+    expiresHigh = 604800
+  }
+
+  crawlDelay {
+    ms = 5000
+    nodelay =
+  }
+
+  report {
+    docsurl =
+  }
+
+	mail {
+	   # @todo: add emailRecipients (can currently only be set in scheduler task)
+		fromname =
+		fromemail =
+		replytoname =
+		replytoemail =
+		subject =
+	}
+
+	custom {
+	   # add custom configuration here
+	}
 }

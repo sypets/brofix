@@ -15,18 +15,19 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace TYPO3\CMS\Linkvalidator\EventListener;
+namespace Sypets\Brofix\EventListener;
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent;
+use Sypets\Brofix\Repository\BrokenLinkRepository;
+//use TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository;
 
 /**
- * Event listeners to identify if a link is broken. For external URLs, the linkvalidator
- * is used (not in real-time but from the database), for pages this is handled via a check to the database
- * record.
+ * Event listeners to identify if a link is broken. For external URLs, the database is queried), for pages
+ * this is handled via a direct check to the database record  in pages.
+ *
+ * @todo add use and type hints for TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent once support for
+ *   TYPO3 9 is dropped.
  */
 final class CheckBrokenRteLinkEventListener
 {
@@ -40,57 +41,68 @@ final class CheckBrokenRteLinkEventListener
         $this->brokenLinkRepository = $brokenLinkRepository;
     }
 
-    public function checkExternalLink(BrokenLinkAnalysisEvent $event): void
+    // public function checkExternalLink(BrokenLinkAnalysisEvent $event): void
+    public function checkExternalLink($event): void
     {
-        if ($event->getLinkType() !== LinkService::TYPE_URL) {
-            return;
-        }
-        $url = (string)($event->getLinkData()['url'] ?? '');
-        if (!empty($url)) {
-            if ($this->brokenLinkRepository->isLinkTargetBrokenLink($url)) {
-                $event->markAsBrokenLink('External link is broken');
+        if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
+            if ($event->getLinkType() !== LinkService::TYPE_URL) {
+                return;
             }
+            $url = (string)($event->getLinkData()['url'] ?? '');
+            if (!empty($url)
+                && $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'external')) {
+                $event->markAsBrokenLink('Broken link');
+            }
+            $event->markAsCheckedLink();
         }
-        $event->markAsCheckedLink();
     }
 
-    public function checkPageLink(BrokenLinkAnalysisEvent $event): void
+    // public function checkPageLink(BrokenLinkAnalysisEvent $event): void
+    public function checkPageLink($event): void
     {
-        if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
-            return;
-        }
-        $hrefInformation = $event->getLinkData();
-        if ($hrefInformation['pageuid'] !== 'current') {
-            $pageRecord = BackendUtility::getRecord('pages', $hrefInformation['pageuid']);
-            // Page does not exist
-            if (!is_array($pageRecord)) {
-                $event->markAsBrokenLink('Page with ID ' . htmlspecialchars($hrefInformation['pageuid']) . ' not found');
+        if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
+            if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
+                return;
             }
+            $hrefInformation = $event->getLinkData();
+            $url = $hrefInformation['pageuid'] ?? '';
+            if ($url != '' && $url !== 'current') {
+                $fragment = $hrefInformation['fragment'] ?? '';
+                if ($fragment !== '') {
+                    $url .= '#c' . $fragment;
+                }
+                if ($this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'db')) {
+                    $event->markAsBrokenLink('Broken link');
+                }
+            }
+            $event->markAsCheckedLink();
         }
-        $event->markAsCheckedLink();
     }
 
-    public function checkFileLink(BrokenLinkAnalysisEvent $event): void
+    // public function checkFileLink(BrokenLinkAnalysisEvent $event): void
+    public function checkFileLink($event): void
     {
-        if ($event->getLinkType() !== LinkService::TYPE_FILE) {
-            return;
-        }
-        $event->markAsCheckedLink();
+        if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
+            if ($event->getLinkType() !== LinkService::TYPE_FILE) {
+                return;
+            }
+            $event->markAsCheckedLink();
 
-        $hrefInformation = $event->getLinkData();
-        $file = $hrefInformation['file'] ?? null;
-        if (!$file instanceof FileInterface) {
-            $event->markAsBrokenLink('File link is broken');
-            return;
-        }
+            $hrefInformation = $event->getLinkData();
+            $file = $hrefInformation['file'] ?? null;
+            if (!$file instanceof FileInterface) {
+                $event->markAsBrokenLink('Broken link');
+                return;
+            }
 
-        if (!$file->hasProperty('uid') || (int)$file->getProperty('uid') === 0) {
-            $event->markAsBrokenLink('File link is broken');
-            return;
-        }
+            if (!$file->hasProperty('uid') || (int)$file->getProperty('uid') === 0) {
+                $event->markAsBrokenLink('Broken link');
+                return;
+            }
 
-        if ($this->brokenLinkRepository->isLinkTargetBrokenLink('file:' . $file->getProperty('uid'))) {
-            $event->markAsBrokenLink('File with ID ' . $file->getProperty('uid') . ' not found');
+            if ($this->brokenLinkRepository->isLinkTargetBrokenLink('file:' . $file->getProperty('uid'), 'file')) {
+                $event->markAsBrokenLink('Broken link');
+            }
         }
     }
 }
