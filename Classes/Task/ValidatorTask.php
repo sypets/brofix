@@ -371,7 +371,7 @@ class ValidatorTask extends AbstractTask
             );
         }
         if (!empty($pageIds)) {
-            $processor->init($searchFields, $pageIds, $this->configuration->getTsConfig());
+            $processor->init($searchFields, $pageIds, $this->configuration);
             if (!empty($this->email)) {
                 $oldLinkCounts = $this->brokenLinkRepository->getLinkCounts($pageIds);
             }
