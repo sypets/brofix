@@ -29,8 +29,7 @@ class ExcludeLinkTargetTest extends FunctionalTestCase
         'backend',
         'fluid',
         'info',
-        'install',
-        'scheduler'
+        'install'
     ];
 
     protected $testExtensionsToLoad = [

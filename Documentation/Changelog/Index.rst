@@ -31,7 +31,7 @@ GUI: broken link report
    *  Show a short date format for "last checked" (only hours and minutes, not the date if timestamp is today)
 
 *  Sorting: It is now possible to sort by page / element, content type, URL or error type
-*  "Check links" tab was removed: Checking is only done via scheduler and on-the-fly (automatically)
+*  "Check links" tab was removed
 *  All links types are always displayed, no need to check checkboxes
 *  In the report, the broken links of the just edited record are displayed in a different color. This makes
    it easier to keep track if jumping back and forth from the edit form to the list of broken links.

@@ -37,8 +37,8 @@ It includes the following features:
   header fields and text fields of content elements.
   It can be configured to check any field you like (via :ref:`TSconfig <configuration>`).
 
-- The TYPO3 scheduler is fully supported to run checks
-  automatically. This also generates an email report which is sent via email.
+- A console command can be setup to check
+  automatically. This can also generate an email report which is sent via email.
 
 - Broken Link Fixer is extendable. It provides hooks to check special types
   of links or override how the checking of external, file and page

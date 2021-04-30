@@ -1,0 +1,9 @@
+<f:layout name="SystemEmail" />
+<f:section name="Title">Broken links report</f:section>
+<f:section name="Subject"><f:if condition="{subject}"><f:then>{subject}</f:then><f:else>Broken links report</f:else></f:if> "{stats.pageTitle}" [{pageId}]: {stats.countBrokenLinks}</f:section>
+<f:section name="Main">
+    Broken links for "{stats.pageTitle}" [{pageId}] <br/><br/>
+
+    <f:render partial="BrokenLinksGraphics" arguments="{stats: stats}" />
+    <f:render partial="BrokenLinksStatsTable" arguments="{depth: depth, stats: stats}" />
+</f:section>

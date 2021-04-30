@@ -13,7 +13,7 @@ false positives
 on-the-fly checking
    "On-the-fly" checking means almost immediate link checking as soon as
    the record is saved. This is in contrast to periodic link checking via
-   the scheduler.
+   the console command.
 
 stale links
    These are links, where the link status is "stale", meaning it may be

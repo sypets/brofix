@@ -17,6 +17,7 @@ namespace Sypets\Brofix;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
@@ -87,8 +88,15 @@ class LinkAnalyzer implements LoggerAwareInterface
      * Statistics
      *
      * @var array
+     *
+     * @deprecated
      */
     protected $stats;
+
+    /**
+     * @var CheckLinksStatistics
+     */
+    protected $statistics;
 
     /**
      * Fill hookObjectsArr with different link types and possible XClasses.
@@ -100,6 +108,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->contentRepository = $contentRepository ?: GeneralUtility::makeInstance(ContentRepository::class);
+
         // Hook to handle own checks
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
             $this->hookObjectsArr[$key] = GeneralUtility::makeInstance($className);
@@ -113,6 +122,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $this->searchFields = $searchField ?: $this->configuration->getSearchFields();
         $this->pids = $pidList;
+        $this->statistics = new CheckLinksStatistics();
 
         foreach ($this->hookObjectsArr as $key => $value) {
             $value->setConfiguration($this->configuration);
@@ -333,7 +343,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $this->debug("checkLinks: after checking $url");
 
                 if ($hookObj->isExcludeUrl()) {
-                    $this->stats['isExcludedUrl'] += 1;
+                    $this->statistics->incrementCountExcludedLinks();
                 }
 
                 // Broken link found
@@ -347,7 +357,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
-                    $this->stats['count_broken_links'] += 1;
+                    $this->statistics->incrementCountBrokenLinks();
                 } elseif (GeneralUtility::_GP('showalllinks')) {
                     $response = ['valid' => true];
                     $record['url_response'] = json_encode($response) ?: '';
@@ -372,14 +382,8 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
 
         $checkStart = \time();
-
-        $this->stats = [
-            'starttime' => $checkStart,
-            'count_pages' => count($this->pids),
-            'count_links' => 0,
-            'count_broken_links' => 0,
-            'isExcludedUrl' => 0,
-        ];
+        $this->statistics->initialize();
+        $this->statistics->setCountPages((int)count($this->pids));
 
         // Traverse all configured tables
         foreach ($this->searchFields as $table => $fields) {
@@ -452,7 +456,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 while ($row = $result->fetch()) {
                     $results = [];
                     $this->findLinksForRecord($results, $table, $fields, $row);
-                    $this->stats['count_links'] += $this->countLinks($results);
+                    $this->statistics->addCountLinks($this->countLinks($results));
                     $this->checkLinks($results, $linkTypes);
                 }
             }
@@ -460,7 +464,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         // remove all broken links for pages / linktypes before this check
         $this->brokenLinkRepository->removeAllBrokenLinksForPagesBeforeTime($this->pids, $linkTypes, $checkStart);
 
-        $this->calculateStats();
+        $this->statistics->calculateStats();
     }
 
     /**
@@ -487,28 +491,6 @@ class LinkAnalyzer implements LoggerAwareInterface
         return array_merge($defaultFields, $selectFields);
     }
 
-    protected function calculateStats(): void
-    {
-        $this->stats['endtime'] = \time();
-        // number of links actually checked
-        $this->stats['count_links_checked'] = ($this->stats['count_links']) - ($this->stats['isExcludedUrl']);
-        if (($this->stats['isExcludedUrl'] ?? 0)
-            && ($this->stats['count_links'] ?? 0)
-        ) {
-            $this->stats['percent_excluded_links'] = (float)($this->stats['isExcludedUrl'] / $this->stats['count_links'] * 100);
-        } else {
-            $this->stats['percent_excluded_links'] = 0;
-        }
-        // omit the excluded links from this count to get the actual percentage of broken links in checked links
-        if (($this->stats['count_links_checked'] ?? 0)
-            && ($this->stats['count_broken_links'] ?? 0)
-        ) {
-            $this->stats['percent_broken_links'] = (float)($this->stats['count_broken_links'] / $this->stats['count_links_checked'] * 100);
-        } else {
-            $this->stats['percent_broken_links'] =  0;
-        }
-    }
-
     protected function countLinks(array $links): int
     {
         $count = 0;
@@ -518,9 +500,9 @@ class LinkAnalyzer implements LoggerAwareInterface
         return $count;
     }
 
-    public function getStatistics(): array
+    public function getStatistics(): CheckLinksStatistics
     {
-        return $this->stats;
+        return $this->statistics;
     }
 
     /**
