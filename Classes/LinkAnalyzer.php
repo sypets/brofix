@@ -64,11 +64,9 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected $hookObjectsArr = [];
 
     /**
-     * The currently active TSConfig. Will be passed to the init function.
-     *
-     * @var array
+     * @var Configuration
      */
-    protected $tsConfig = [];
+    protected $configuration;
 
     /**
      * @var BrokenLinkRepository
@@ -97,13 +95,11 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository = null,
-        Configuration $configuration = null,
         ContentRepository $contentRepository = null
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->contentRepository = $contentRepository ?: GeneralUtility::makeInstance(ContentRepository::class);
-        $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         // Hook to handle own checks
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
             $this->hookObjectsArr[$key] = GeneralUtility::makeInstance($className);
@@ -112,19 +108,9 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
     }
 
-    /**
-    * Store all the needed configuration values in class variables
-    *
-    * @param array  $searchField List of fields in which to search for links
-    * @param int[] $pidList     List of comma separated page uids in which to search for links
-    * @param array  $tsConfig    The currently active TSconfig.
-    *
-    * @todo use Configuration instead of TSconfig
-    */
-    public function init(array $searchField, array $pidList, array $tsConfig)
+    public function init(array $searchField, array $pidList, Configuration $configuration = null)
     {
-        $this->tsConfig = $tsConfig;
-        $this->configuration->setTsConfig($tsConfig);
+        $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $this->searchFields = $searchField ?: $this->configuration->getSearchFields();
         $this->pids = $pidList;
 

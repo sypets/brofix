@@ -477,7 +477,7 @@ class BrofixReport
             $this->pageList = [];
         }
         $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
-        $this->linkAnalyzer->init($this->searchFields, $this->pageList, $this->configuration->getTsConfig());
+        $this->linkAnalyzer->init($this->searchFields, $this->pageList, $this->configuration);
     }
 
     /**

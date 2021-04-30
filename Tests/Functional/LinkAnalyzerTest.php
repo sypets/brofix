@@ -78,7 +78,7 @@ class LinkAnalyzerTest extends FunctionalTestCase
         $linkAnalyzer->init(
             $this->configuration->getSearchFields(),
             $pidList,
-            $this->configuration->getTsConfig()
+            $this->configuration
         );
         return $linkAnalyzer;
     }
