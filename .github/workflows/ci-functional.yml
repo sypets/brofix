@@ -1,0 +1,31 @@
+# Configuration for running GitHub actions
+#  based on EXT:enetcache: .github/workflows/tests.yml
+#    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
+#  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
+
+# run all tests that should be run with various databases
+
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+
+  testsuite:
+    name: Functional tests on all DBs
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php: [ '7.2', '7.3', '7.4' ]
+        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
+        db: [ 'mariadb', 'mssql', 'postgres', 'sqlite' ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Composer
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
+      - name: Functional tests with ${{ matrix.db }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d ${{ matrix.db }} -s functional
+
