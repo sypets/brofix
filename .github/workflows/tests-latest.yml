@@ -10,7 +10,7 @@ on: [push, pull_request]
 jobs:
 
   testsuite:
-    name: Some checks which should run only with latest version
+    name: Some checks which should run only with latest version (CGL)
     runs-on: ubuntu-20.04
     strategy:
       matrix:

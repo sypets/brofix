@@ -3,19 +3,22 @@
 #    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
 #  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
 
-name: Basic CI
+# run all tests that should be run with various databases
+
+name: CI (with all DBs)
 
 on: [push, pull_request]
 
 jobs:
 
   testsuite:
-    name: Basic tests on min / max versions (lint, unit)
+    name: Tests on min / max versions and all DBs (functional)
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
+        db: [ 'mariadb', 'mssql', 'postgres', 'sqlite' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,11 +26,6 @@ jobs:
       - name: Composer
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
-      - name: Composer validate
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
+      - name: Functional tests with ${{ matrix.db }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d ${{ matrix.db }} -s functional
 
-      - name: Lint PHP
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
-
-      - name: Unit tests
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
