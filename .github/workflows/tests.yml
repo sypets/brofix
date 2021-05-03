@@ -10,7 +10,7 @@ on: [push, pull_request]
 jobs:
 
   testsuite:
-    name: all tests
+    name: Tests on min / max versions
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -25,9 +25,6 @@ jobs:
 
       - name: Composer validate
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
-
-      - name: cgl
-        run: Build/Scripts/runTests.sh -s cgl -v -n
 
       - name: Lint PHP
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
