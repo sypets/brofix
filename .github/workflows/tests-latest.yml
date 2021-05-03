@@ -3,7 +3,7 @@
 #    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
 #  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
 
-name: CI
+name: CI (latest)
 
 on: [push, pull_request]
 
