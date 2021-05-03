@@ -21,14 +21,17 @@ Please adhere to the TYPO3 core coding Guidelines.
 
 Use .editorconfig in this directory.
 
-You can check for cgl violations with Build/Scripts/cglFixMyCommit.sh, see
-available command line options
+You can check for (and automatically fix) cgl violations.
+
+Check in .github/workflows for how to run the tests, e.g.
+run this once. It will setup the .Build directory and create composer.lock:
 
 ```
-Build/Scripts/runTests.sh -h
+Build/Scripts/runTests.sh -p 7.4 -s composerInstallMax
 ```
 
-If there is some problem, use runTests.sh with the -v option (for verbose).
+
+Use runTests.sh with the -v option (for verbose).
 
 Check all PHP files (dry-run, do not fix):
 
@@ -42,3 +45,14 @@ Check **and fix** CGL in PHP files:
 Build/Scripts/cglFixMyCommit.sh -s cgl -v
 ```
 
+See all options:
+
+```
+Build/Scripts/runTests.sh -h
+```
+
+Cleanup:
+
+```
+rm -rf .Build;rm composer.lock;composer config --unset platform.php;composer config --unset platform
+```

@@ -1,0 +1,27 @@
+# Configuration for running GitHub actions
+#  based on EXT:enetcache: .github/workflows/tests.yml
+#    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
+#  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
+
+name: CI (latest)
+
+on: [push, pull_request]
+
+jobs:
+
+  testsuite:
+    name: Some checks which should run only with latest version
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+        minMax: [ 'composerInstallMax' ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Composer
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
+      - name: cgl
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
