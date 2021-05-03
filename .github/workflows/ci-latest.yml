@@ -3,13 +3,13 @@
 #    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
 #  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
 
-name: CGL
+name: CI (latest)
 
 on: [push, pull_request]
 
 jobs:
 
-  testsuite:
+  cgl:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
