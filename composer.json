@@ -16,7 +16,7 @@
 		"bin-dir": ".Build/bin"
 	},
 	"require": {
-		"php": "^7.3||^7.4",
+		"php": "^7.2 || ^7.3 || ^7.4",
 		"sypets/page-callouts": "^1.0.0",
 		"typo3/cms-backend": "^9.5.23 || ^10.4.0",
 		"typo3/cms-core": "^9.5.23 || ^10.4.0",
