@@ -10,11 +10,6 @@ TSconfig reference
 
 See :ref:`setupQuickstart` for an introduction.
 
-.. contents::
-   :local:
-   :depth: 1
-
-
 You can set the following options in the TSconfig for a page (e.g. the
 root page) and override them in user or groups TSconfig. You must
 prefix them with mod.brofix, e.g.
