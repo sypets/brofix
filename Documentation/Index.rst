@@ -51,7 +51,7 @@ available from `www.typo3.org <http://www.typo3.org/>`_
    Introduction/Index
    Glossary/Index
    Installation/Index
-   Configuration/Index
+   Setup/Index
    HowItWorks/Index
    Sitemap
 
