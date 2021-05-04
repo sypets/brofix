@@ -38,7 +38,7 @@ It includes the following features:
   It can be configured to check any field you like (via :ref:`TSconfig <configuration>`).
 
 - A console command can be setup to check
-  automatically. This can also generate an email report which is sent via email.
+  automatically. This can also generate a report which is sent via email.
 
 - Broken Link Fixer is extendable. It provides hooks to check special types
   of links or override how the checking of external, file and page

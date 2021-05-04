@@ -1,11 +1,11 @@
 .. include:: /Includes.txt
 
 
-.. _configurationQuickstart:
+.. _setupQuickstart:
 
-==========
-Quickstart
-==========
+================
+Setup quickstart
+================
 
 Steps
 =====
@@ -16,7 +16,7 @@ Steps
 
    Give your backend users  / user groups permission to the "Info" module. You may want to disable access
    to the Log and TSconfig, see
-   :ref:`mod.web_info.menu.function <tsconfig:pageblindingfunctionmenuoptions-webinfo>`.
+   :ref:`mod.web_info.menu.function <t3tsconfig:pageblindingfunctionmenuoptions-webinfo>`.
 
    Give backend users / user groups permission to the table :sql:`tx_brofix_exclude_link_target`, if they should
    be able to add URLs to the list of URLs not to be checked. (This requires a certain
@@ -29,7 +29,7 @@ Steps
 
    It is recommended to set this in your site package and have it apply to the entire
    installation. Alternatively, set it in the page TSconfig of the start page of each
-   site. See :ref:`tsconfig-example` on this page or at the :ref:`reference <tsconfigRef>`.
+   site. See :ref:`tsconfigMinimal` on this page or in the :ref:`reference <tsconfigRef>`.
 
 #. Setup global configuration
 
@@ -42,14 +42,16 @@ Steps
 #. Check mail sending
 
    If an email should be sent on every link check performed via the console
-   command, it is a good idea if email sending works.
+   command, it is a good idea to check if email sending is setup correctly
+   and works.
 
    Go to Environment > Test Mail Setup
 
-#. Setup the console command brofix:checkLinks
+#. Setup the console command `brofix:checkLinks`
 
-   This will use the settings from the configuration and use all start pages
-   that have a site configuration.
+   This will use the settings from the TSconfig configuration.
+   If no start pages are supplied as arguments, all start pages
+   that have a site configuration are used.
 
    You can run the console command from the command line (or cron).
 

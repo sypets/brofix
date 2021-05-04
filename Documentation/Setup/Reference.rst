@@ -2,50 +2,18 @@
 
 
 .. _configurationReference:
+.. _tsconfigRef:
 
-=======================
-Configuration reference
-=======================
+==================
+TSconfig reference
+==================
 
-See :ref:`configurationQuickstart` for an introduction.
+See :ref:`setupQuickstart` for an introduction.
 
 .. contents::
    :local:
    :depth: 1
 
-Editor permissions
-==================
-
-Give your editors permission to the "Info" module. You may want to disable access
-to the Log and TSconfig.
-
-Console command
-===============
-
-Set up the console command "
-
-
-Global Configuration
-====================
-
-Broken Link Fixer uses the HTTP request library (based on Guzzle) shipped with TYPO3.
-Please have a look in the :ref:`Global Configuration <t3coreapi:typo3ConfVars>`,
-particularly at the HTTP settings.
-
-
-TSconfig example
-================
-
-You can find the default configuration in
-:file:`EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig`.
-
-Check out the minimal configuration in :ref:`tsconfigMinimal`.
-
-
-.. _tsconfigRef:
-
-TSconfig reference
-==================
 
 You can set the following options in the TSconfig for a page (e.g. the
 root page) and override them in user or groups TSconfig. You must

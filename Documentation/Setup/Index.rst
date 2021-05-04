@@ -2,10 +2,11 @@
 
 
 .. _configuration:
+.. _setup:
 
-=============
-Configuration
-=============
+=====
+Setup
+=====
 
 .. toctree::
    :maxdepth: 1

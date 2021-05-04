@@ -30,7 +30,7 @@ Checking external URLs has the following problems:
    mechanism for on-the-fly checking is problematic, because we want to obtain
    the results immediately.
 
-For this reason, the following principles are used:
+For this reason, the following mechanisms are used:
 
 *  The results of external link checking is cached. This means, if an
    URL is checked more than once before the cache expires, the results
@@ -57,7 +57,7 @@ False positives
 ===============
 
 It is a known problem, that the automatic checking does not always yield the correct
-result. This is rare but may happend for a handful of different URLs in your site.
+result. This is rare but may happen for a handful of different URLs in your site.
 
 As a workaround, it is possible to add a specific URL or specific domain to an exclude
 list. In this case, the URL will be treated as if valid. It will no longer show up in
@@ -69,5 +69,5 @@ list of broken links.
 Recommendations
 ===============
 
-*  Make sure the link target cache is filled - see :ref:`tsconfigLinkTargetCacheExpires`.
+Make sure the link target cache is filled - see :ref:`tsconfigLinkTargetCacheExpires`.
 
