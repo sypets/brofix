@@ -36,8 +36,8 @@ GUI: broken link report
 *  In the report, the broken links of the just edited record are displayed in a different color. This makes
    it easier to keep track if jumping back and forth from the edit form to the list of broken links.
 *  Show an informational message if no page is selected in the page tree.
-*  Reload list immediatedly, if form was changed. Since there is currently only a select list, it
-   not make sense to have to click a button additionally to changing the value in the select field.
+*  Reload list immediately, if form was changed. Since there is currently only a select list, it
+   does not make sense to have to click a button additionally to changing the value in the select field.
 
 Link checking
 
