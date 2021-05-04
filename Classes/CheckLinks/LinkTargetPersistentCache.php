@@ -20,10 +20,8 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * This class implements a link target cache using the caching framework.
- * The cache will not be persistent.
- *
- * This class is currently not being used. See LinkTargetPersistentCache.
+ * This class implements a persistent link target cache using
+ * a database table.
  */
 class LinkTargetPersistentCache extends AbstractLinkTargetCache
 {
