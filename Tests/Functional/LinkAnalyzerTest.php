@@ -29,8 +29,7 @@ class LinkAnalyzerTest extends FunctionalTestCase
         'backend',
         'fluid',
         'info',
-        'install',
-        'scheduler'
+        'install'
     ];
 
     protected $testExtensionsToLoad = [

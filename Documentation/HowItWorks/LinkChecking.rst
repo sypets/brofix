@@ -6,14 +6,12 @@
 Link checking
 =================
 
-This page explains how the link checking is done. This may be helpful
-when using Broken Link Fixer to fix broken links, but also when
-configuring it and setting up the scheduler.
+This page explains how the link checking is done.
 
 How link checking is done
 ==========================
 
-The link checking is done via the scheduler and when returning to the
+The link checking is done via the console command and when returning to the
 list of broken links after editing a record.
 
 In general, we try to avoid excessive checking, especially when it comes
@@ -39,14 +37,14 @@ For this reason, the following principles are used:
    from the cache are used.
 *  A crawl delay is used: If several URLs of one domain is checked, we
    wait at least this amount of time before the next request (this is
-   only done when checking via the scheduler, not for on-the-fly checking).
+   only done when checking via the console command, not for on-the-fly checking).
 
 .. _linkCheckingOnTheFly::
 
 When link checking is done
 ==========================
 
-1. Via the scheduler task, a full link check is performed
+1. Via console command, a full link check is performed
 2. "on-the-fly" checking: When editing a record via the list of broken links, a
    recheck is performed when returning to the list. This only checks the links in the edited record.
 

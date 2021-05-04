@@ -6,12 +6,13 @@ defined('TYPO3_MODE') or die();
     "@import 'EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig'"
 );
 
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Sypets\Brofix\Task\ValidatorTask::class] = [
-    'extension' => 'brofix',
-    'title' => 'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:tasks.validate.name',
-    'description' => 'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:tasks.validate.description',
-    'additionalFields' => \Sypets\Brofix\Task\ValidatorTaskAdditionalFieldProvider::class
-];
+if (!isset($GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths'][901])) {
+    $GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths'][901] = 'EXT:brofix/Resources/Private/Templates/Email';
+}
+
+if (!isset($GLOBALS['TYPO3_CONF_VARS']['MAIL']['partialRootPaths'][901])) {
+    $GLOBALS['TYPO3_CONF_VARS']['MAIL']['partialRootPaths'][901] = 'EXT:brofix/Resources/Private/Partials';
+}
 
 if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'])) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] = [];

@@ -55,13 +55,11 @@ class Configuration
      * Get the brofix modTSconfig for a page
      *
      * @param int $page Uid of the page
-     * @return array $modTsConfig mod.brofix TSconfig array
      * @throws \Exception
      */
-    public function loadPageTsConfig(int $page): array
+    public function loadPageTsConfig(int $page): void
     {
-        $this->tsConfig = BackendUtility::getPagesTSconfig($page)['mod.']['brofix.'] ?? [];
-        return $this->tsConfig;
+        $this->setTsConfig(BackendUtility::getPagesTSconfig($page)['mod.']['brofix.'] ?? []);
     }
 
     /**
@@ -223,32 +221,77 @@ class Configuration
         return $this->tsConfig['docsurl'] ?? '';
     }
 
-    public function getMailFromName(): string
+    public function getMailSendOnCheckLinks(): bool
     {
-        $fromname = $this->tsConfig['mail.']['fromname'] ?? '';
-        if ($fromname === '') {
-            $fromname = MailUtility::getSystemFromName();
-        }
-        return $fromname;
+        return (bool)($this->tsConfig['mail.']['sendOnCheckLinks'] ?? true);
     }
 
-    public function getMailFromEmail(): string
+    /**
+     * Get check depth (number of page recursion levels)
+     *
+     * @return int
+     */
+    public function getDepth(): int
     {
-        $fromemail = $this->tsConfig['mail.']['fromemail'] ?? '';
+        return (int)($this->tsConfig['depth'] ?? 999);
+    }
+
+    public function setDepth(int $depth): void
+    {
+        $this->tsConfig['depth'] = $depth;
+    }
+
+    public function setMailRecipients(string $recipients): void
+    {
+        $this->tsConfig['mail.']['recipients'] = $recipients;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getMailRecipients(): array
+    {
+        $recipients = trim($this->tsConfig['mail.']['recipients'] ?? '');
+        if ($recipients === '') {
+            return [];
+        }
+        return explode(',', $recipients);
+    }
+
+    public function getMailTemplate(): string
+    {
+        return $this->tsConfig['mail.']['template'] ?? 'CheckLinksResults';
+    }
+
+    /**
+     * From email address and optionally name, in the format:
+     *
+     * 'Name <email-address>' (with name)
+     * or 'email-address' (without name)
+     *
+     * @see RFC5322 https://tools.ietf.org/html/rfc5322
+     *
+     * @return string
+     */
+    public function getMailFrom(): string
+    {
+        if (($this->tsConfig['mail.']['from'] ?? '') !== '') {
+            return $this->tsConfig['mail.']['from'];
+        }
+        $fromname = MailUtility::getSystemFromName() ?: '';
+        $fromemail = MailUtility::getSystemFromAddress() ?: '';
         if ($fromemail === '') {
-            $fromemail = MailUtility::getSystemFromAddress();
+            return '';
         }
-        return $fromemail;
+        return $fromname === '' ? $fromemail : $fromname . ' <' . $fromemail . '>';
     }
 
-    public function getMailreplytoName(): string
+    public function getMailReplyTo(): string
     {
-        return $this->tsConfig['mail.']['replytoname'] ?? '';
-    }
-
-    public function getMailreplytoEmail(): string
-    {
-        return $this->tsConfig['mail.']['replytoemail'] ?? '';
+        if (($this->tsConfig['mail.']['replyto'] ?? '') !== '') {
+            return $this->tsConfig['mail.']['replyto'];
+        }
+        return MailUtility::getSystemReplyTo()[0] ?? '';
     }
 
     public function getMailSubject(): string

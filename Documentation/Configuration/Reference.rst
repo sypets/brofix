@@ -7,6 +7,8 @@
 Configuration reference
 =======================
 
+See :ref:`configurationQuickstart` for an introduction.
+
 .. contents::
    :local:
    :depth: 1
@@ -17,13 +19,19 @@ Editor permissions
 Give your editors permission to the "Info" module. You may want to disable access
 to the Log and TSconfig.
 
-Scheduler task
-==============
+Console command
+===============
 
-Set up a scheduler task "Broken Link Fixer" to regularly check for broken links.
+Set up the console command "
 
 
-.. _tsconfig-example:
+Global Configuration
+====================
+
+Broken Link Fixer uses the HTTP request library (based on Guzzle) shipped with TYPO3.
+Please have a look in the :ref:`Global Configuration <t3coreapi:typo3ConfVars>`,
+particularly at the HTTP settings.
+
 
 TSconfig example
 ================
@@ -31,31 +39,7 @@ TSconfig example
 You can find the default configuration in
 :file:`EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig`.
 
-.. code-block:: typoscript
-
-   # check links in this additional table + field
-   mod.brofix.searchFields.tx_news_domain_model_news =  bodytext
-
-   mod.brofix.mail.fromname = TYPO3 Administrator
-   mod.brofix.mail.fromname = no_reply@mydomain.com
-   mod.brofix.mail.replytoname = Your name
-   mod.brofix.mail.replytoemail = youremail@domain.org
-   mod.brofix.mail.subject = TYPO3 Broken Link Fixer report - example.com
-
-   # !!! required: fill out User-Agent reasonably with at least a working URL and / or email,
-   # e.g.
-   # your vendorname is GrateSturff, URL is https://gratesturff.com/imprint.html
-   mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; GrateSturff LinkChecker/1.1; +https://gratesturff.com/imprint.html
-
-   # optional: adjust timeout
-   mod.brofix.linktypesConfig.external.timeout = 10
-   # optional: follow up to 5 redirects - if more redirects are found this is counted as error
-   mod.brofix.linktypesConfig.external.redirects = 5
-
-   # optional: adjust pid - use a page of type system folder
-   mod.brofix.excludeLinkTarget.storagePid = 0
-   # allowed link types for exclude list, set to empty to deactivate or use csv values
-   mod.brofix.excludeLinkTarget.allowed = external,db
+Check out the minimal configuration in :ref:`tsconfigMinimal`.
 
 
 .. _tsconfigRef:
@@ -113,7 +97,7 @@ searchFields.[table]
          *  `pages.media`
 
 
-   Examples
+   Example
       Only check for `bodytext` in `tt_content`:
 
       .. code-block:: typoscript
@@ -204,6 +188,27 @@ reportHiddenRecords
    Default
       1
 
+
+.. _tsconfigDepth:
+
+depth
+-----
+
+**optional**
+
+.. container:: table-row
+
+   Property
+      depth
+
+   Data type
+      int
+
+   Description
+      Default depth when checking with console command
+
+   Default
+      999 (for infinite)
 
 .. _tsconfigUserAgent:
 
@@ -297,7 +302,7 @@ timeout
       int
 
    Description
-      Timeout for HTTP request. It is recommended to leave the default value and not change this.
+      Timeout for HTTP request.
 
    Default
       10
@@ -315,7 +320,7 @@ redirects
 
    Description
       Number of redirects to follow. If more redirects are necessary to reach the destination final URL,
-      this is handled as broken link. It is recommended to leave the default value and not change this.
+      this is handled as broken link.
 
    Default
       5
@@ -334,16 +339,20 @@ excludeLinkTarget.storagePid
       int
 
    Description
-      The pid of the storage folder which contains the excluded link target records. If you want to
-      enable editors to add URLs to list of excluded URLs, you must change this. Create a central
-      folder to store the excluded URLs.
+      The pid of the storage folder which contains the excluded link target
+      records. If you want to enable editors to add URLs to list of excluded
+      URLs, you must change this (it must be != 0).
+
+      Create a central folder to store the excluded URLs or create one for each
+      site.
 
       .. hint::
 
-         Excluded link targets (=URLs) are treated as valid URLs. This can be used for the **rare** case
-         that an URL is detected as broken, but is not broken. This may be the case for some sites
-         which require a link, but also for common sites where the automatic link checking mechanism
-         yields false results.
+         Excluded link targets (=URLs) are treated as valid URLs. This can be
+         used for the **rare** case that an URL is detected as broken, but is
+         not broken. This may be the case for some sites which require login
+         credentials, but also for common sites where the automatic link
+         checking mechanism yields false results.
 
    Default
       0
@@ -361,8 +370,9 @@ excludeLinkTarget.allowed
       string
 
    Description
-      Allowed link types which can be excluded. By default, it is only possible to exclude external
-      URLs. If you would like to make this available for page links to, add db, e.g.
+      Allowed link types which can be excluded. By default, it is only possible
+      to exclude external URLs. If you would like to make this available for
+      page links to, add db, e.g.
 
       .. code-block:: typoscript
 
@@ -392,30 +402,39 @@ linkTargetCache.expiresLow
       int
 
    Description
-      When the link target cache expires in seconds. Whenever an external URL is checked or rechecked,
-      the link target cache is used. Once the cache expires, the URL must be checked again.
+      When the link target cache expires in seconds. Whenever an external URL
+      is checked or rechecked, the link target cache is used. Once the cache
+      expires, the URL must be checked again.
 
-      The value means that the information for external URLs is retained for that time without having to
-      access the external site. Making a request to the external site may take several seconds and is
-      non-deterministic. This is important for :ref:`on-the-fly <linkCheckingOnTheFly>` rechecking.
-      The downside is that the information may no longer be up-to-date (e.g. the URL will now work,
-      but is still displayed as broken).
+      The value means that the information for external URLs is retained for
+      that time without having to access the external site. Making a request
+      to the external site may take several seconds and is non-deterministic.
+      This is important for :ref:`on-the-fly <linkCheckingOnTheFly>` rechecking.
+      The downside is that the information may no longer be up-to-date (e.g.
+      the URL will now work, but is still displayed as broken).
 
-      As a rule of thumb, use the interval for full checking (e.g. 1 day for once a day checking) and
-      multiply that with a factor of 1 to 10 for expiresLow. Add another interval for expiresHigh.
+      2 different values are used for expiresLow and expiresHigh so that the
+      target will usually not expire on on-the-fly checking which would lead
+      to delays.
 
-      The interval for expiresLow will be used for full checking via the scheduler.
+      As a rule of thumb, use the interval for full checking (e.g. 1 day for
+      once a day checking) and multiply that with a factor of 1 to 10 for
+      expiresLow. Add another interval for expiresHigh.
+
+      The interval for expiresLow will be used for full checking via the
+      console command.
 
       .. code-block:: typoscript
 
          # checking links daily, use 7 as factor:
-         # (1 day * 7 * (seconds per day)) - (1 hour * seconds per hour)
-         #  1 * 7 * 24*60*60 - 1*60*60
-         # the result is "7 days minus 1 hour"
-         expires = 601200
+         #  1 day * 7 * (seconds per day)
+         #  1 * 7 * 24*60*60
+         linkTargetCache.expiresLow = 604800
+         #  1 * 8 * 24*60*60
+         linkTargetCache.expiresHigh = 691200
 
    Default
-      518400 (6 days)
+      604800 (7 days)
 
 
 linkTargetCache.expiresHigh
@@ -433,7 +452,7 @@ linkTargetCache.expiresHigh
       See :ref:`tsconfigLinkTargetCacheExpires` for description
 
    Default
-      604800 (7 days)
+      691200 (8 days)
 
 
 crawlDelay.ms
@@ -448,28 +467,27 @@ crawlDelay.ms
       int
 
    Description
-      The **minimum** number of milliseconds that must have passed between checking 2 URL for the
-      same domain.
+      The **minimum** number of milliseconds that must have passed between
+      checking 2 URL for the same domain.
 
-      If the required time has already passed since an URL of the same domain was last checked,
-      the wait is not performed.
+      If the required time has already passed since an URL of the same domain
+      was last checked, the wait is not performed.
 
-      This helps to prevent that external sites are bombarded with requests from our site.
+      This helps to prevent that external sites are bombarded with requests from
+      our site.
 
       .. note::
 
-         Currently, a wait is not performed if URLs are redirected because this is handled
-         internally by Guzzle.
+         Currently, a wait is not performed for every URL if URLs are redirected
+         because this is handled internally by Guzzle.
 
-      This is a pragmatic approach to make sure that a minimum delay is used when checking URLs
-      of the same site. As a site may have multiple domains or several domains will be used by
-      the same site, this will not always get the desired result, but it is a "good enough" approach.
+      This is a pragmatic approach to make sure that a minimum delay is used
+      when checking URLs of the same site. As a site may have multiple domains
+      or several domains may be used by the same site, this will not always get
+      the desired result, but it is a "good enough" approach.
 
-      If you increase this, the link checking via scheduler may take a little longer, which should
-      not be a problem, if you check regularly. It is recommended to increase but not decrease this.
-
-      This will not be used for :ref:`on-the-fly <linkCheckingOnTheFly>` checking, only for
-      checking via the scheduler task.
+      This will not be used for :ref:`on-the-fly <linkCheckingOnTheFly>`
+      checking, only for checking via the console command task.
 
       .. code-block:: typoscript
 
@@ -524,84 +542,118 @@ report.docsurl
    Default
       empty
 
-.. _tsconfigMailFomname:
 
-mail.fromname
+.. _tsconfigSendOnCheckLinks:
+
+mail.sendOnCheckLinks
+---------------------
+
+.. container:: table-row
+
+   Property
+      mail.sendOnCheckLinks
+
+   Data type
+      int
+
+   Description
+      Enable setting an email when the brofix:checkLinks console command
+      is excecuted. This can be overridden via the command line arguments.
+
+   Default
+      0
+
+
+.. _tsconfigMailRecipients:
+
+mail.recipients
+---------------
+
+*required*
+
+.. container:: table-row
+
+   Property
+      mail.recipients
+
+   Data type
+      string
+
+   Description
+      Set the recipient email address(es) of the report mail sent by the
+      console command.
+
+   Example
+
+      .. code-block:: tsconfig
+
+         mod.brofix.mail.recipients = Sender <sender@example.org>, Sender2 <sender2@example.org>
+
+   Default
+      This is empty by default.
+      :php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']` and
+      :php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress']`
+      is used if this is empty.
+
+
+
+.. _tsconfigMailFrom:
+
+mail.from
 -------------
 
+*required*
+
 .. container:: table-row
 
    Property
-      mail.fromname
+      mail.from
 
    Data type
       string
 
    Description
-      Set the from name of the report mail sent by the scheduler task.
+      Set the from name of the report mail sent by the console command.
+
+   Example
+
+      .. code-block:: tsconfig
+
+         mod.brofix.mail.from = Sender <sender@example.org>
 
    Default
-      Install Tool
+      This is empty by default.
+      :php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']`
+      is used if this is empty.
 
-      *defaultMailFromName*
 
-.. _tsconfigMailFromemail:
+.. _tsconfigMailReplyto:
 
-mail.fromemail
---------------
-
-.. container:: table-row
-
-   Property
-      mail.fromemail
-
-   Data type
-      string
-
-   Description
-      Set the from email of the report mail sent by the scheduler task.
-
-   Default
-      Install Tool
-
-      *defaultMailFromAddress*
-
-.. _tsconfigMailReplytoname:
-
-mail.replytoname
+mail.replyto
 ----------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      mail.replytoname
+      mail.replyto
 
    Data type
       string
 
    Description
-      Set the replyto name of the report mail sent by the cron script.
+      Set the replyto email name of the report mail sent by the cron script.
 
-.. _tsconfigMailReplytoemail:
-
-mail.replytoemail
------------------
-
-.. container:: table-row
-
-   Property
-      mail.replytoemail
-
-   Data type
-      string
-
-   Description
-      Set the replyto email of the report mail sent by the cron script.
 
 .. _tsconfigMailSubject:
 
 mail.subject
 ------------
+
+*optional*
+
+If this is not set explicitly, a subject will be auto-generated.
 
 .. container:: table-row
 
@@ -612,14 +664,33 @@ mail.subject
       string
 
    Description
-      Set the subject of the report mail sent by the cron script.
+      Set the subject of the report mail.
 
    Default
-      TYPO3 Broken Link Fixer report
+      empty, auto-generated
 
-Global Configuration
-====================
+.. _tsconfigMailTemplate:
 
-Broken Link Fixer uses the HTTP request library (based on Guzzle) shipped with TYPO3.
-Please have a look in the :ref:`Global Configuration <t3coreapi:typo3ConfVars>`,
-particularly at the HTTP settings.
+mail.template
+-------------
+
+*optional*
+
+Always uses the default template CheckLinksResults if not supplied.
+
+.. container:: table-row
+
+   Property
+      mail.template
+
+   Data type
+      string
+
+   Description
+      Set the template name of the report mail. If
+      $GLOBALS['TYPO3_CONF_VARS']['MAIL']['format'] equals 'both',
+      CheckLinksResults.html and CheckLinksResults.txt must exist.
+
+   Default
+      empty, auto-generated
+

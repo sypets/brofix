@@ -1,0 +1,15 @@
+<f:layout name="SystemEmail" />
+<f:section name="Title">Broken links report</f:section>
+<f:section name="Subject"><f:if condition="{subject}"><f:then>{subject}</f:then><f:else>Broken links report</f:else></f:if> "{stats.pageTitle}" [{pageId}]: {stats.countBrokenLinks}</f:section>
+<f:section name="Main">
+Percent broken links       : {stats.percentBrokenLinks}%
+Number of broken links     : {stats.countBrokenLinks}
+Total links checked        : {stats.countLinksChecked}
+
+Number of pages checked    : {stats.countPages}
+Depth                      : <f:if condition="{depth} == 999"><f:then>infinite</f:then><f:else>{depth}</f:else></f:if>
+
+Excluded links not checked : {stats.countExcludedLinks}
+Percent links not checked  : <f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%
+</f:section>
+

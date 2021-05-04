@@ -10,6 +10,8 @@ mod.brofix {
 
 	checkhidden = 0
 
+	depth = 999
+
 	# 1: links to hidden records are reported as errors
 	reportHiddenRecords = 1
 
@@ -18,8 +20,7 @@ mod.brofix {
         headers {
           # !!! fill out User-Agent reasonably with at least a working URL and / or email,
           # e.g.
-          # your vendorname is GrateSturff, URL is https://gratesturff.com/imprint.html
-          # User-Agent = Mozilla/5.0 (compatible; GrateSturff using Brofix link checker/1.0.0; +https://gratesturff.com/imprint.html
+          # User-Agent = Mozilla/5.0 (compatible; Site link checker; +https://gratesturff.com/imprint.html)
           #
           User-Agent =
           Accept = */*
@@ -38,10 +39,10 @@ mod.brofix {
   }
 
   linkTargetCache {
-    # 6 days : typically used for full recheck
-    expiresLow = 518400
-    # 7 days : typically use for on-the-fly checking
-    expiresHigh = 604800
+    # 7 days : typically used for full recheck
+    expiresLow = 604800
+    # 8 days : typically use for on-the-fly checking
+    expiresHigh = 691200
   }
 
   crawlDelay {
@@ -54,12 +55,12 @@ mod.brofix {
   }
 
 	mail {
-	   # @todo: add emailRecipients (can currently only be set in scheduler task)
-		fromname =
-		fromemail =
-		replytoname =
-		replytoemail =
+    sendOnCheckLinks = 1
+	  recipients =
+		from =
+		replyto =
 		subject =
+		template = CheckLinksResults
 	}
 
 	custom {
