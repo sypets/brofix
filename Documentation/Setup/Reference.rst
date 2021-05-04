@@ -193,7 +193,7 @@ User-Agent
       checking external URLs. It should contain a working URL with
       contact information.
 
-      code-block:: tsconfig
+      .. code-block:: tsconfig
 
          linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Mysite LinkChecker/1.1; +https://mysite.com/imprint.html
 
@@ -547,7 +547,6 @@ mail.recipients
       console command.
 
    Example
-
       .. code-block:: tsconfig
 
          mod.brofix.mail.recipients = Sender <sender@example.org>, Sender2 <sender2@example.org>
@@ -579,7 +578,6 @@ mail.from
       Set the from name of the report mail sent by the console command.
 
    Example
-
       .. code-block:: tsconfig
 
          mod.brofix.mail.from = Sender <sender@example.org>
