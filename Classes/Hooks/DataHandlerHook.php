@@ -78,10 +78,6 @@ final class DataHandlerHook
             && $table === ExcludeLinkTarget::TABLE
             && (isset($changedValues['link_type']) || isset($changedValues['linktarget']) || isset($changedValues['match']))
             ) {
-            // @todo is this the best way to get the record?
-            // $dataHandler->checkValue_currentRecord: this will return the record before the change
-            // $dataHandler->datamap[$table][$id]:this will not pass the pid
-
             if ($status === 'update') {
                 // because we are not sure we can get all record values from DataHandler, we do a new
                 // query here (which is also what is customary in the core)

@@ -41,7 +41,6 @@ final class CheckBrokenRteLinkEventListener
         $this->brokenLinkRepository = $brokenLinkRepository;
     }
 
-    // public function checkExternalLink(BrokenLinkAnalysisEvent $event): void
     public function checkExternalLink($event): void
     {
         if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
@@ -57,7 +56,6 @@ final class CheckBrokenRteLinkEventListener
         }
     }
 
-    // public function checkPageLink(BrokenLinkAnalysisEvent $event): void
     public function checkPageLink($event): void
     {
         if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
@@ -79,7 +77,6 @@ final class CheckBrokenRteLinkEventListener
         }
     }
 
-    // public function checkFileLink(BrokenLinkAnalysisEvent $event): void
     public function checkFileLink($event): void
     {
         if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {

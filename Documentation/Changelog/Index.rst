@@ -41,6 +41,7 @@ GUI: broken link report
 
 Link checking
 
+*  Use console command instead of scheduler task
 *  Previously, all records in the broken links table (of currently to be checked pages) were
    removed at the beginning of the check. This resulted in inconsistent results, especially
    during checks which took longer than just a few minutes. Now, the records are not removed,
