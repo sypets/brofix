@@ -53,5 +53,6 @@ available from `www.typo3.org <http://www.typo3.org/>`_
    Installation/Index
    Setup/Index
    HowItWorks/Index
+   Changelog/Index
    Sitemap
 
