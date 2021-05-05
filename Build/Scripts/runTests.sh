@@ -79,7 +79,7 @@ Options:
             - 8.0: use PHP 8.0
 
     -e "<phpunit options>"
-        Only with -s functional|unit
+        Only with -s functional|unit|phpstan
         Additional options to send to phpunit tests.
         For phpunit, options starting with "--" must be added after options starting with "-".
         Example -e "-v --filter canRetrieveValueWithGP" to enable verbose output AND filter tests

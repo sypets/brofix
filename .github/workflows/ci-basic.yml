@@ -30,7 +30,7 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
 
       - name: phpstan
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -c ../Build/phpstan-${{ matrix.minMax }}.neon
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan_${{ matrix.minMax }}.neon"
 
       - name: Unit tests
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
