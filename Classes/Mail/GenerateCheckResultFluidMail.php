@@ -17,6 +17,7 @@ namespace Sypets\Brofix\Mail;
  */
 
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mime\Address;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
@@ -49,15 +50,17 @@ class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
             );
         }
 
-        $from = $config->getMailFrom();
+        $from = $config->getMailFromEmail();
         if ($from === '') {
             throw new MissingConfigurationException(
                 'Missing configuration for email sender (Tsconfig: mod.brofix.mail.from)'
             );
         }
 
+        // to: can be Address|string or ...array in Symfony\Component\Mime\Email
         $fluidEmail->to(...$recipients)
-            ->from($from)
+            // from: can be Address|string in Symfony\Component\Mime\Email
+            ->from(new Address($from, $config->getMailFromName()))
             ->format($GLOBALS['TYPO3_CONF_VARS']['MAIL']['format'] ?? 'both')
             ->setTemplate($config->getMailTemplate())
             ->assign('stats', $stats)
@@ -65,7 +68,7 @@ class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
             ->assign('subject', $config->getMailSubject())
             ->assign('pageId', $pageId);
 
-        $replyTo = $config->getMailReplyTo();
+        $replyTo = $config->getMailReplyToEmail();
         if ($replyTo !== '') {
             $fluidEmail->setReplyTo($replyTo);
         }
