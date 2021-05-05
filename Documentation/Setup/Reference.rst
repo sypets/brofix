@@ -544,12 +544,14 @@ mail.recipients
 
    Description
       Set the recipient email address(es) of the report mail sent by the
-      console command.
+      console command. Can be several, separated by comma.
+
+      Use only email addresses, not a format like `Sender2 <sender2@example.org>`
 
    Example
       .. code-block:: tsconfig
 
-         mod.brofix.mail.recipients = Sender <sender@example.org>, Sender2 <sender2@example.org>
+         mod.brofix.mail.recipients = sender@example.org
 
    Default
       This is empty by default.
@@ -561,7 +563,7 @@ mail.recipients
 
 .. _tsconfigMailFrom:
 
-mail.from
+mail.fromname
 -------------
 
 *required*
@@ -580,17 +582,44 @@ mail.from
    Example
       .. code-block:: tsconfig
 
-         mod.brofix.mail.from = Sender <sender@example.org>
+         mod.brofix.mail.from = Sender
 
    Default
       This is empty by default.
       :php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']`
       is used if this is empty.
 
+mail.fromemail
+--------------
+
+*required*
+
+.. container:: table-row
+
+   Property
+      mail.from
+
+   Data type
+      string
+
+   Description
+      Set the from email of the report mail sent by the console command.
+
+   Example
+      .. code-block:: tsconfig
+
+         mod.brofix.mail.from = sender@example.org
+
+   Default
+      This is empty by default.
+      :php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromEmail']`
+      is used if this is empty.
+
+
 
 .. _tsconfigMailReplyto:
 
-mail.replyto
+mail.replytoemail
 ----------------
 
 *optional*
@@ -598,13 +627,29 @@ mail.replyto
 .. container:: table-row
 
    Property
-      mail.replyto
+      mail.replytoemail
 
    Data type
       string
 
    Description
-      Set the replyto email name of the report mail sent by the cron script.
+      Set the replyto email of the report mail sent by the cron script.
+
+mail.replytoname
+----------------
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mail.replytoma,e
+
+   Data type
+      string
+
+   Description
+      Set the replyto name of the report mail sent by the cron script.
 
 
 .. _tsconfigMailSubject:

@@ -57,8 +57,10 @@ mod.brofix {
 	mail {
     sendOnCheckLinks = 1
 	  recipients =
-		from =
-		replyto =
+		fromname =
+		fromemail =
+		replytoname =
+		replytoemail =
 		subject =
 		template = CheckLinksResults
 	}

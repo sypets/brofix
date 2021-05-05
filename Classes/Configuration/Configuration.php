@@ -246,12 +246,29 @@ class Configuration
     }
 
     /**
-     * @return array<string>
+     * @return array
+     *
+     * Example:
+     *
+     * [
+     *      'email@from',
+     *      'email2@from' => 'From name',
+     * ]
      */
     public function getMailRecipients(): array
     {
         $recipients = trim($this->tsConfig['mail.']['recipients'] ?? '');
         if ($recipients === '') {
+            if ($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] ?? '') {
+                $fromAddress = $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] ?? '';
+                $fromName = $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName'] ?? '';
+                if ($fromName) {
+                    return [
+                        $fromAddress => $fromName
+                    ];
+                }
+                return [$fromAddress];
+            }
             return [];
         }
         return explode(',', $recipients);
@@ -263,34 +280,64 @@ class Configuration
     }
 
     /**
-     * From email address and optionally name, in the format:
-     *
-     * 'Name <email-address>' (with name)
-     * or 'email-address' (without name)
-     *
-     * @see RFC5322 https://tools.ietf.org/html/rfc5322
+     * From email address. Returns only the email address.
      *
      * @return string
      */
-    public function getMailFrom(): string
+    public function getMailFromEmail(): string
     {
+        if (($this->tsConfig['mail.']['fromemail'] ?? '') !== '') {
+            return $this->tsConfig['mail.']['fromemail'];
+        }
         if (($this->tsConfig['mail.']['from'] ?? '') !== '') {
-            return $this->tsConfig['mail.']['from'];
+            // this is deprecated
+            return explode(' ', $this->tsConfig['mail.']['from'])[0];
         }
-        $fromname = MailUtility::getSystemFromName() ?: '';
-        $fromemail = MailUtility::getSystemFromAddress() ?: '';
-        if ($fromemail === '') {
-            return '';
-        }
-        return $fromname === '' ? $fromemail : $fromname . ' <' . $fromemail . '>';
+        return MailUtility::getSystemFromAddress() ?: '';
     }
 
-    public function getMailReplyTo(): string
+    /**
+     * From Name
+     *
+     * @return string
+     */
+    public function getMailFromName(): string
     {
-        if (($this->tsConfig['mail.']['replyto'] ?? '') !== '') {
-            return $this->tsConfig['mail.']['replyto'];
+        if (($this->tsConfig['mail.']['fromname'] ?? '') !== '') {
+            return $this->tsConfig['mail.']['fromname'];
         }
-        return MailUtility::getSystemReplyTo()[0] ?? '';
+        return MailUtility::getSystemFromName() ?: '';
+    }
+
+    public function getMailReplyToEmail(): string
+    {
+        if (($this->tsConfig['mail.']['replytoemail'] ?? '') !== '') {
+            return $this->tsConfig['mail.']['replytoemail'];
+        }
+        if (($this->tsConfig['mail.']['replyto'] ?? '') !== '') {
+            // this is deprecated
+            return explode(' ', $this->tsConfig['mail.']['replyto'])[0];
+        }
+        // @todo use MailUtility::getSystemReplyTo()
+        // getSystemReplyto returns an array of email addresses, can be in format
+        // 'name <email@from>'
+        return '';
+    }
+
+    /**
+     * From Name
+     *
+     * @return string
+     */
+    public function getMailReplyToName(): string
+    {
+        if (($this->tsConfig['mail.']['replytoname'] ?? '') !== '') {
+            return $this->tsConfig['mail.']['replytoname'];
+        }
+        // @todo use MailUtility::getSystemReplyTo()
+        // getSystemReplyto returns an array of email addresses, can be in format
+        // 'name <email@from>'
+        return '';
     }
 
     public function getMailSubject(): string
