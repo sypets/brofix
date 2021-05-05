@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -124,13 +122,6 @@ final class DataHandlerHook
         }
     }
 
-    /**
-     * @param string $status
-     * @param string $table
-     * @param int $id
-     * @param array $changedValues contains changed values (not all values)
-     * @param array $row - new values
-     */
     private function removeBrokenLinkRecordsForExcludedLinkTarget(array $row): bool
     {
         if ($row === []

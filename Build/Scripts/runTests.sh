@@ -59,6 +59,7 @@ Options:
             - cglGit: test and fix latest committed patch for CGL compliance
             - cglAll: test and fix all core php files
             - lint: PHP linting
+            - phpstan: phpstan tests
             - unit (default): PHP unit tests
             - functional: functional tests
 
@@ -78,7 +79,7 @@ Options:
             - 8.0: use PHP 8.0
 
     -e "<phpunit options>"
-        Only with -s functional|unit
+        Only with -s functional|unit|phpstan
         Additional options to send to phpunit tests.
         For phpunit, options starting with "--" must be added after options starting with "-".
         Example -e "-v --filter canRetrieveValueWithGP" to enable verbose output AND filter tests
@@ -299,6 +300,12 @@ case ${TEST_SUITE} in
     lint)
         setUpDockerComposeDotEnv
         docker-compose run lint
+        SUITE_EXIT_CODE=$?
+        docker-compose down
+        ;;
+    phpstan)
+        setUpDockerComposeDotEnv
+        docker-compose run phpstan
         SUITE_EXIT_CODE=$?
         docker-compose down
         ;;

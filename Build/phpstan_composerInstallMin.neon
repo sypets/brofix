@@ -1,0 +1,17 @@
+# used phpstan.neon from TYPO3 core as basis
+# for TYPO3 v9
+
+parameters:
+    tmpDir: %currentWorkingDirectory%/var/cache/phpstan
+    parallel:
+        # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
+        maximumNumberOfProcesses: 5
+    level: 2
+    paths:
+        - %currentWorkingDirectory%/../Classes
+    scanDirectories:
+          - %currentWorkingDirectory%/Web/typo3/sysext
+    excludes_analyse:
+        - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
+        - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultFluidMail.php
+

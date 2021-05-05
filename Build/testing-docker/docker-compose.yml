@@ -297,6 +297,21 @@ services:
         find . -name \\*.php ! -path "./.Build/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null
       "
 
+  phpstan:
+    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    user: ${HOST_UID}
+    volumes:
+      - ${CORE_ROOT}:${CORE_ROOT}
+    working_dir: ${ROOT_DIR}/.Build
+    command: >
+      /bin/sh -c "
+        if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
+          set -x
+        fi
+        mkdir -p .cache
+        bin/phpstan analyse --no-progress --no-interaction --memory-limit 4G ${EXTRA_TEST_OPTIONS} ${TEST_FILE}
+      "
+
   unit:
     image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}

@@ -30,7 +30,7 @@ interface LinktypeInterface
      *
      * @param string $url Url to check
      * @param array $softRefEntry The soft reference entry which builds the context of that url
-     * @param $flags can be a combination of flags, see flags defined in AbstractLinktype, e.g.
+     * @param int $flags can be a combination of flags, see flags defined in AbstractLinktype, e.g.
      *   e.g. AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY
      * @return bool true on success
      */
@@ -49,14 +49,14 @@ interface LinktypeInterface
     /**
      * Get the value of the private property errorParams.
      *
-     * @return array All parameters needed for the rendering of the error message
+     * @return ErrorParams All parameters needed for the rendering of the error message
      */
     public function getErrorParams(): ErrorParams;
 
     /**
      * Generate the localized error message from the error params saved from the parsing
      *
-     * @param array $errorParams All parameters needed for the rendering of the error message
+     * @param ErrorParams $errorParams All parameters needed for the rendering of the error message
      * @return string Validation error message
      */
     public function getErrorMessage(ErrorParams $errorParams = null): string;

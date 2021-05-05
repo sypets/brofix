@@ -31,6 +31,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class RteHtmlParserWithBrokenLinkHook extends RteHtmlParser
 {
+    /**
+     * @var object|BrokenLinkRepository
+     */
+    protected $brokenLinkRepository;
+
     public function __construct()
     {
         $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);

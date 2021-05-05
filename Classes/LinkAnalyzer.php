@@ -133,8 +133,9 @@ class LinkAnalyzer implements LoggerAwareInterface
      * Recheck the URL (without using link target cache). If valid, remove existing broken links records.
      * If still invalid, check if link still exists in record. If not, remove from list of broken links.
      *
-     * @param string $url
-     * @return Number of broken link records removed
+     * @param string $message
+     * @param array $record
+     * @return int Number of broken link records removed
      *
      * @todo make message more flexible, broken link records could get removed or changed
      */
@@ -336,7 +337,6 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $url = $entryValue['substr']['tokenValue'];
                 }
                 $record['url'] = $url;
-                $this->linkCounts[$table]++;
 
                 $this->debug("checkLinks: before checking $url");
                 $checkUrl = $hookObj->checkLink($url, $entryValue, $mode);
@@ -517,13 +517,13 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function findLinksForRecord(array &$results, $table, array $fields, array $record, bool $checkIfEditable = true)
     {
+        $idRecord = (int)($record['uid'] ?? 0);
         try {
             list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
 
             // Put together content of all relevant fields
             /** @var HtmlParser $htmlParser */
             $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
-            $idRecord = (int)($record['uid']);
 
             if ($checkIfEditable) {
                 // check if the field to be checked will be rendered in FormEngine

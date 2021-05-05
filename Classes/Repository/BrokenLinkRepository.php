@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -47,10 +46,11 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @param int[] $pageList Pages to check for broken links
      * @param string[] $linkTypes Link types to validate
-     * @return Statement
+     * @return array
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $orderBy = []): Statement
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $orderBy = []): array
     {
+        $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageList, $max)
                  as $pageIdsChunk) {
@@ -99,8 +99,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
-            return $queryBuilder->execute();
+            $resuls = array_merge($results, $queryBuilder->execute()->fetchAll());
         }
+        return $results;
     }
 
     public function hasPageBrokenLinks(int $pageId): bool

@@ -21,28 +21,23 @@ use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
 use TYPO3\CMS\Core\Mail\FluidEmail;
-use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 
-class GenerateCheckResultMail
+/**
+ * Send mail with Fluid (requires TYPO3 10!)
+ */
+class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
 {
     /**
-     * @var Mailer
+     * @param Configuration $config
+     * @param CheckLinksStatistics $stats
+     * @param int $pageId
+     * @return bool
+     * @throws MissingConfigurationException
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
-    protected $mailer;
-
-    /**
-     * @var string
-     */
-    protected $messageId;
-
-    public function __construct(Mailer $mailer = null)
-    {
-        $this->mailer = $mailer ?: GeneralUtility::makeInstance(Mailer::class);
-    }
-
-    public function generateMail(Configuration $config, CheckLinksStatistics $stats, int $pageId)
+    public function generateMail(Configuration $config, CheckLinksStatistics $stats, int $pageId): bool
     {
         $templatePaths = new TemplatePaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']);
         $fluidEmail = GeneralUtility::makeInstance(FluidEmail::class, $templatePaths);
@@ -84,11 +79,9 @@ class GenerateCheckResultMail
         /**
          * @var SentMessage
          */
-        $this->messageId = $this->mailer->getSentMessage()->getMessageId();
-    }
+        $sentMessage = $this->mailer->getSentMessage();
+        $this->messageId = $sentMessage->getMessageId();
 
-    public function getMessageId(): string
-    {
-        return $this->messageId;
+        return true;
     }
 }
