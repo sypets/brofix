@@ -1,0 +1,10 @@
+# default phpstan configuration, will use Build/phpstan_composerInstallMax.neon
+# will check for TYPO3 10
+#  (in this case there is some code specific for 9 which will not get checked)
+
+
+includes:
+    # this assumes we have composer dependencies for TYPO3 10
+    # if you want to check for 9, use phpstan_composerInstallMin.neon
+    - Build/phpstan_composerInstallMax.neon
+

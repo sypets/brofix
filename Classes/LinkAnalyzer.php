@@ -302,7 +302,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $GLOBALS['TCA'][$table]['ctrl']['label'],
                     $entryValue['row'][$GLOBALS['TCA'][$table]['ctrl']['label']] ?? '',
                     0,
-                    0,
+                    false,
                     false,
                     $row['uid'],
                     false

@@ -1,0 +1,8 @@
+# baseline: this ignores some errors
+#  the goal is to fix all problems that can be fixed and remove the error messages from this file
+
+# create:
+# 1. Increase level in phpstan.neon
+# 2. cd .Build; bin/phpstan analyze  --configuration ../Build/phpstan_composerInstallMax.neon ../Classes --generate-baseline
+# 3. add content of phpstan-baseline.neon in .Build dir to his file
+

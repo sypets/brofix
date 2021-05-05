@@ -4,5 +4,6 @@
 /.gitignore export-ignore
 /composer.lock export-ignore
 /Build export-ignore
+/phpstan.neon
 /Resources/Private/TypeScript/ export-ignore
 /Tests/ export-ignore

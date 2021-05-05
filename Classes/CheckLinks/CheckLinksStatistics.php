@@ -70,7 +70,7 @@ class CheckLinksStatistics
     {
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->checkStartTime = \time();
         $this->countExcludedLinks = 0;
@@ -104,22 +104,22 @@ class CheckLinksStatistics
         }
     }
 
-    public function incrementCountExcludedLinks()
+    public function incrementCountExcludedLinks(): void
     {
         $this->countExcludedLinks++;
     }
 
-    public function incrementCountBrokenLinks()
+    public function incrementCountBrokenLinks(): void
     {
         $this->countBrokenLinks++;
     }
 
-    public function addCountLinks(int $count)
+    public function addCountLinks(int $count): void
     {
         $this->countLinks += $count;
     }
 
-    public function setCountPages(int $count)
+    public function setCountPages(int $count): void
     {
         $this->countPages = $count;
     }

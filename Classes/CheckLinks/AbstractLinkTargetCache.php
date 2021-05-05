@@ -31,12 +31,4 @@ abstract class AbstractLinkTargetCache implements LinkTargetCacheInterface
         $this->expire = $expire;
     }
 
-    protected function setData(string $linkTarget, string $linkType, array $urlResponse): array
-    {
-        return [
-            'url' => $linkTarget,
-            'linkType' => $linkType,
-            'urlResponse' => $urlResponse
-        ];
-    }
 }

@@ -81,7 +81,7 @@ class Configuration
             foreach ($parseObj->errors as $errorInfo) {
                 $parseErrorMessage .= $errorInfo[0] . '<br />';
             }
-            throw new \Exception($parseErrorMessage, '1295476989');
+            throw new \Exception($parseErrorMessage);
         }
         $tsConfig = $parseObj->setup;
         $overrideTs = $tsConfig['mod.']['brofix.'];
