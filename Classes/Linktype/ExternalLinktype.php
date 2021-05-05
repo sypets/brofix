@@ -301,7 +301,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             */
         } catch (TooManyRedirectsException $e) {
             $this->errorParams->setErrorType(self::ERROR_TYPE_TOO_MANY_REDIRECTS);
-            $this->errorParams->setException($e->getMessage());
+            $this->errorParams->setExceptionMsg($e->getMessage());
             $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
         } catch (ClientException | ServerException $e) {
             // ClientException - A GuzzleHttp\Exception\ClientException is thrown for 400 level errors if the http_errors request option is set to true.
