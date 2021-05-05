@@ -99,7 +99,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
-            $resuls = array_merge($results, $queryBuilder->execute()->fetchAll());
+            $results = array_merge($results, $queryBuilder->execute()->fetchAll());
         }
         return $results;
     }
