@@ -47,8 +47,13 @@ class GenerateCheckResultPlainMail extends AbstractGenerateCheckResultMail
 
         // @todo handle format html / text or both
         // @todo use template $config->getMailTemplate()
-        $body = 'Number of broken links:' . $stats->getCountBrokenLinks() . "\n";
-        $body .= 'Total checked links:' . $stats->getCountLinksChecked() . "\n";
+        $body =  'Number of broken links  :' . $stats->getCountBrokenLinks() . "\n";
+        $body .= 'Total checked links     :' . $stats->getCountLinksChecked() . "\n";
+        $body .= 'Percent broken links    :' . $stats->getPercentBrokenLinks() . "\n\n";
+        $body .= 'Number of pages checked :' . $stats->getCountPages() .  "\n";
+        $body .= 'Checked depth           :' . $config->getDepth() .  "\n\n";
+        $body .= 'Number of links excluded:' . $stats->getCountExcludedLinks() . "\n";
+        $body .= 'Percent links excluded  :' . $stats->getPercentExcludedLinks() . "\n";
 
         $subject = $config->getMailSubject() ?: 'Broken link report for ';
         $subject .= '"' . $stats->getPageTitle() . '" [' . $pageId . ']: ' . $stats->getCountBrokenLinks();
