@@ -70,5 +70,4 @@ class GenerateCheckResultPlainMail extends AbstractGenerateCheckResultMail
 
         return $mail->isSent();
     }
-
 }

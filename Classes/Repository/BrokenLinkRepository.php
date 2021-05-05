@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
