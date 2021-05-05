@@ -50,8 +50,8 @@ class GenerateCheckResultPlainMail extends AbstractGenerateCheckResultMail
         $body = 'Number of broken links:' . $stats->getCountBrokenLinks() . "\n";
         $body .= 'Total checked links:' . $stats->getCountLinksChecked() . "\n";
 
-        $subject = $config->getMailSubject() ?: 'Broken link report';
-        $subject .= $stats->getPageTitle() . '[' . $pageId . ']: ' . $stats->getCountBrokenLinks();
+        $subject = $config->getMailSubject() ?: 'Broken link report for ';
+        $subject .= '"' . $stats->getPageTitle() . '" [' . $pageId . ']: ' . $stats->getCountBrokenLinks();
 
         $mail->setTo(...$recipients)
             ->setFrom($from)
