@@ -189,8 +189,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      *
      * @param string $origUrl The URL to check
      * @param array $softRefEntry The soft reference entry which builds the context of that URL
-     * @param $flags can be a combination of flags defined in AbstractLinktype CHECK_LINK_FLAG_*
-     * @return bool TRUE on success or FALSE on error
+     * @param int $flags can be a combination of flags defined in AbstractLinktype CHECK_LINK_FLAG_*
+     * @return bool true on success or false on error
      * @throws \InvalidArgumentException
      */
     public function checkLink(string $origUrl, array $softRefEntry, int $flags = 0): bool
@@ -301,7 +301,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             */
         } catch (TooManyRedirectsException $e) {
             $this->errorParams->setErrorType(self::ERROR_TYPE_TOO_MANY_REDIRECTS);
-            $this->errorParams->setException($e->getMessage());
+            $this->errorParams->setExceptionMsg($e->getMessage());
             $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
         } catch (ClientException | ServerException $e) {
             // ClientException - A GuzzleHttp\Exception\ClientException is thrown for 400 level errors if the http_errors request option is set to true.
@@ -436,6 +436,10 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     public function fetchType(array $value, string $type, string $key): string
     {
+        if (($value['tokenValue'] ?? '') === '') {
+            return $type;
+        }
+
         preg_match_all('/((?:http|https))(?::\\/\\/)(?:[^\\s<>]+)/i', $value['tokenValue'], $urls, PREG_PATTERN_ORDER);
         if (!empty($urls[0][0])) {
             $type = 'external';

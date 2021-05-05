@@ -68,7 +68,6 @@ class ExcludeLinkTarget
      *
      * @param string $url - check if this URL is in exclude list
      * @param string $linkType
-     * @param int $storagePid - if 0, use all, otherwise only use excluded link targets in this pid.
      * @return bool
      */
     public function isExcluded(string $url, string $linkType='external'): bool

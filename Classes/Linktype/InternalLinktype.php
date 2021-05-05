@@ -83,6 +83,7 @@ class InternalLinktype extends AbstractLinktype
         $this->initializeErrorParams();
 
         $contentUid = 0;
+        $pageUid = 0;
         $this->responseContent = true;
 
         // Only check pages records. Content elements will also be checked
@@ -356,7 +357,7 @@ class InternalLinktype extends AbstractLinktype
             }
         }
         if (isset($errorPage) && isset($errorContent)) {
-            $response = $errorPage . LF . $errorContent;
+            $response = $errorPage . ',' . $errorContent;
         } elseif (isset($errorPage)) {
             $response = $errorPage;
         } elseif (isset($errorContent)) {

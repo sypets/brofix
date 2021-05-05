@@ -30,9 +30,10 @@ interface LinkTargetCacheInterface
      *
      * @param string $linkTarget
      * @param string $linkType
+     * @param int $expire (optional, default is 0, in that case uses $this->expire)
      * @return array
      */
-    public function getUrlResponseForUrl(string $linkTarget, string $linkType): array;
+    public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): array;
 
     public function setResult(string $linkTarget, string $linkType, array $urlResponse): void;
 

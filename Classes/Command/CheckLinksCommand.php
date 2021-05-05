@@ -24,7 +24,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
-use Sypets\Brofix\Mail\GenerateCheckResultMail;
+use Sypets\Brofix\Mail\GenerateCheckResultMailInterface;
+use Sypets\Brofix\Mail\GenerateCheckResultPlainMail;
+use Sypets\Brofix\Mail\GenerateCheckResultFluidMail;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -53,9 +55,19 @@ class CheckLinksCommand extends Command
     protected $statistics;
 
     /**
-     * @var GenerateCheckResultMail
+     * @var object|Configuration
      */
-    protected $mail;
+    protected $configuration;
+
+    /**
+     * @var object|BrokenLinkRepository
+     */
+    protected $brokenLinkRepository;
+
+    /**
+     * @var object|PagesRepository
+     */
+    protected $pagesRepository;
 
     public function __construct(string $name = null)
     {
@@ -64,7 +76,6 @@ class CheckLinksCommand extends Command
         $this->configuration = GeneralUtility::makeInstance(Configuration::class);
         $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
-        $this->generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultMail::class);
         $this->statistics = [];
     }
 
@@ -141,7 +152,20 @@ class CheckLinksCommand extends Command
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
-                $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+                // @todo check can be removed once support for 9 is dropped
+                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode('.', \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version())[0])) < 10) {
+                    /**
+                     * @var GenerateCheckResultMailInterface
+                     */
+                    $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultPlainMail::class);
+                } else {
+                    // FluidEmail - only for TYPO3 10
+                    /**
+                     * @var GenerateCheckResultMailInterface
+                     */
+                    $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
+                }
+                $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
             }
         }
 
@@ -174,8 +198,7 @@ class CheckLinksCommand extends Command
         $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
         if ($pageRow === null) {
             throw new \InvalidArgumentException(
-                sprintf($this->getLanguageService()->sL($this->languageFile . ':tasks.error.invalidPageUid'), $pageUid),
-                1502800555
+                sprintf('Invalid page uid passed as argument: %d', $pageUid)
             );
         }
 
@@ -211,13 +234,5 @@ class CheckLinksCommand extends Command
         }
 
         return true;
-    }
-
-    /**
-     * @return LanguageService|null
-     */
-    protected function getLanguageService(): ?LanguageService
-    {
-        return $GLOBALS['LANG'] ?? null;
     }
 }

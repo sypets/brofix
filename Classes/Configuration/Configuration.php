@@ -76,8 +76,7 @@ class Configuration
         $parseObj = GeneralUtility::makeInstance(TypoScriptParser::class);
         $parseObj->parse($tsConfigString);
         if (!empty($parseObj->errors)) {
-            $languageService = $this->getLanguageService();
-            $parseErrorMessage = $languageService->sL($this->languageFile . ':tasks.error.invalidTSconfig')
+            $parseErrorMessage = 'Invalid TSconfig'
                 . '<br />';
             foreach ($parseObj->errors as $errorInfo) {
                 $parseErrorMessage .= $errorInfo[0] . '<br />';
@@ -175,7 +174,7 @@ class Configuration
     public function getUserAgent(): string
     {
         return $this->tsConfig['linktypesConfig.']['external.']['headers.']['User-Agent'] ??
-            'Mozilla/5.0 (compatible; using Brofix link checker/ ' . $this->getMailFromEmail();
+            'Mozilla/5.0 (compatible; using Brofix link checker/ ' . (MailUtility::getSystemFromAddress() ?: '');
     }
 
     public function getLinktypesConfigExternalTimeout(): int

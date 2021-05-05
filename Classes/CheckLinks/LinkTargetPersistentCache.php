@@ -69,6 +69,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      *
      * @param string $linkTarget
      * @param string $linkType
+     * @param int $expire (optional, default is 0, in that case uses $this->expire)
      * @return array returns URL response as array or empty array if no entry
      */
     public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): array

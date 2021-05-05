@@ -23,6 +23,7 @@ use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -31,6 +32,7 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
@@ -497,7 +499,7 @@ class BrofixReport
         $totalCount = 0;
         // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
-        if ($this->id > 0 && (!$rootLineHidden || (bool)$this->configuration->isCheckHidden())) {
+        if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
                 // todo: do we need to pass this, was already handled when checking links?
@@ -505,7 +507,7 @@ class BrofixReport
                 self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
             if ($brokenLinks) {
-                $totalCount =  $brokenLinks->rowCount();
+                $totalCount =  count($brokenLinks);
             }
             foreach ($brokenLinks as $row) {
                 $items[] = $this->renderTableRow($row['table_name'], $row);
@@ -756,8 +758,8 @@ class BrofixReport
     /**
      * Slightly modified version of BackendUtility::getRecordPath()
      *
-     * @param $uid
-     * @param $titleLimit
+     * @param int $uid
+     * @param int $titleLimit
      * @return array returns Page title, rootline
      */
     protected function getPagePath(int $uid, int $titleLimit = 0): array
