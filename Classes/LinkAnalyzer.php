@@ -517,8 +517,8 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function findLinksForRecord(array &$results, $table, array $fields, array $record, bool $checkIfEditable = true)
     {
+        $idRecord = (int)($record['uid'] ?? 0);
         try {
-            $idRecord = (int)($record['uid'] ?? 0);
             list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
 
             // Put together content of all relevant fields
