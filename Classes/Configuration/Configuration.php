@@ -71,7 +71,7 @@ class Configuration
      *
      * @todo Create specific exception
      */
-    public function overrideTsConfigByString(string $tsConfigString)
+    public function overrideTsConfigByString(string $tsConfigString): void
     {
         $parseObj = GeneralUtility::makeInstance(TypoScriptParser::class);
         $parseObj->parse($tsConfigString);
@@ -97,7 +97,7 @@ class Configuration
     }
 
     /**
-     * @param array $searchFields, e.g.
+     * @param array<string,array<string>> $searchFields, e.g.
      *   [
      *      'tt_content' => ['bodytext', 'media']
      *   ]
@@ -134,6 +134,9 @@ class Configuration
         return explode(',', (string)($this->tsConfig['excludeCtype'] ?? ''));
     }
 
+    /**
+     * @param array<int,string> $linkTypes
+     */
     public function setLinkTypes(array $linkTypes): void
     {
         $this->tsConfig['linktypes'] = implode(',', $linkTypes);

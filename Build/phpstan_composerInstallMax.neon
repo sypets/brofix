@@ -2,9 +2,9 @@
 
 
 includes:
-    - phpstan.neon
+  - phpstan.neon
 
 parameters:
-    excludes_analyse:
-        - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
-        - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultPlainMail.php
+  excludes_analyse:
+    - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
+    - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultPlainMail.php

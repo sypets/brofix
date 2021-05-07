@@ -31,6 +31,10 @@ max_line_length = 80
 [*.{yaml,yml}]
 indent_size = 2
 
+# .neon
+[*.neon]
+indent_size = 2
+
 # package.json
 [package.json]
 indent_size = 2

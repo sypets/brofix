@@ -1,15 +1,15 @@
 # basic configuration
 
 includes:
-    - phpstan-baseline.neon
+  - phpstan-baseline.neon
 
 parameters:
-    tmpDir: %currentWorkingDirectory%/var/cache/phpstan
-    parallel:
-        # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
-        maximumNumberOfProcesses: 5
-    level: 5
-    paths:
-        - %currentWorkingDirectory%/../Classes
-    scanDirectories:
-          - %currentWorkingDirectory%/Web/typo3/sysext
+  tmpDir: %currentWorkingDirectory%/var/cache/phpstan
+  parallel:
+    # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
+    maximumNumberOfProcesses: 5
+  level: 6
+  paths:
+    - %currentWorkingDirectory%/../Classes
+  scanDirectories:
+    - %currentWorkingDirectory%/Web/typo3/sysext

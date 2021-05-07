@@ -1,10 +1,10 @@
 # specific configuration for checking for TYPO3 9
 
 includes:
-    - phpstan.neon
+  - phpstan.neon
 
 parameters:
-    excludes_analyse:
-        - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
-        - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultFluidMail.php
-        - %currentWorkingDirectory%/../Classes/EventListener/CheckBrokenRteLinkEventListener.php
+  excludes_analyse:
+    - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
+    - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultFluidMail.php
+    - %currentWorkingDirectory%/../Classes/EventListener/CheckBrokenRteLinkEventListener.php
