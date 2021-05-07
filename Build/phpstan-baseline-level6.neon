@@ -115,26 +115,6 @@ parameters:
       count: 1
       path: ../Classes/Configuration/Configuration.php
 
-
-
-  # due to support for TYPO3 9
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkExternalLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
-      count: 1
-      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkFileLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
-      count: 1
-      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkPageLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
-      count: 1
-      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
-
-
-
     -
       message: "#^Method Sypets\\\\Brofix\\\\FormEngine\\\\FieldShouldBeChecked\\:\\:compile\\(\\) has parameter \\$result with no value type specified in iterable type array\\.$#"
       count: 1
@@ -156,11 +136,6 @@ parameters:
       path: ../Classes/Hooks/PageCalloutsHook.php
 
     -
-      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeLinks\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeLinks\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
@@ -176,11 +151,6 @@ parameters:
       path: ../Classes/LinkAnalyzer.php
 
     -
-      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeTypoLinks\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeTypoLinks\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
@@ -192,11 +162,6 @@ parameters:
 
     -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeTypoLinks\\(\\) has parameter \\$results with no value type specified in iterable type array\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:checkLinks\\(\\) has no return typehint specified\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
 
@@ -231,11 +196,6 @@ parameters:
       path: ../Classes/LinkAnalyzer.php
 
     -
-      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:findLinksForRecord\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:findLinksForRecord\\(\\) has parameter \\$fields with no value type specified in iterable type array\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
@@ -251,22 +211,12 @@ parameters:
       path: ../Classes/LinkAnalyzer.php
 
     -
-      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:generateBrokenLinkRecords\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:getSelectFields\\(\\) has parameter \\$selectFields with no value type specified in iterable type array\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
 
     -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:getSelectFields\\(\\) return type has no value type specified in iterable type array\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:init\\(\\) has no return typehint specified\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
 
@@ -287,11 +237,6 @@ parameters:
 
     -
       message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:recheckUrl\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
-      count: 1
-      path: ../Classes/LinkAnalyzer.php
-
-    -
-      message: "#^Property Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:\\$contentRepository has no typehint specified\\.$#"
       count: 1
       path: ../Classes/LinkAnalyzer.php
 
@@ -551,27 +496,7 @@ parameters:
       path: ../Classes/View/BrofixReport.php
 
     -
-      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:getSettingsFromQueryParameters\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/View/BrofixReport.php
-
-    -
       message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:getVariablesForTableHeader\\(\\) return type has no value type specified in iterable type array\\.$#"
-      count: 1
-      path: ../Classes/View/BrofixReport.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:init\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/View/BrofixReport.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:initialize\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: ../Classes/View/BrofixReport.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:initializeLinkAnalyzer\\(\\) has no return typehint specified\\.$#"
       count: 1
       path: ../Classes/View/BrofixReport.php
 
@@ -582,11 +507,6 @@ parameters:
 
     -
       message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:renderTableRow\\(\\) return type has no value type specified in iterable type array\\.$#"
-      count: 1
-      path: ../Classes/View/BrofixReport.php
-
-    -
-      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:resolveSiteLanguages\\(\\) has no return typehint specified\\.$#"
       count: 1
       path: ../Classes/View/BrofixReport.php
 
@@ -624,4 +544,21 @@ parameters:
       message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$searchFields type has no value type specified in iterable type array\\.$#"
       count: 1
       path: ../Classes/View/BrofixReport.php
+
+
+  # due to support for TYPO3 9
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkExternalLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
+      count: 1
+      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkFileLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
+      count: 1
+      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkPageLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
+      count: 1
+      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
 

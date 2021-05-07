@@ -36,7 +36,7 @@ class FieldShouldBeChecked implements FormDataGroupInterface
      * @return array Result filled with data
      * @throws \UnexpectedValueException
      */
-    public function compile(array $result)
+    public function compile(array $result): array
     {
         $orderedProviderList = GeneralUtility::makeInstance(OrderedProviderList::class);
         $orderedProviderList->setProviderList(

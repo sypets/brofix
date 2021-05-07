@@ -264,7 +264,7 @@ class BrofixReport
      *
      * @param InfoModuleController $pObj A reference to the parent (calling) object
      */
-    public function init($pObj)
+    public function init(InfoModuleController $pObj): void
     {
         $this->pObj = $pObj;
         $this->id = (int)GeneralUtility::_GP('id');
@@ -299,7 +299,7 @@ class BrofixReport
     /**
      * Checks for incoming GET/POST parameters to update the module settings
      */
-    protected function getSettingsFromQueryParameters()
+    protected function getSettingsFromQueryParameters(): void
     {
         $this->currentRecord = [];
 
@@ -364,7 +364,7 @@ class BrofixReport
      *
      * @return string Module content
      */
-    public function main()
+    public function main(): string
     {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->getSettingsFromQueryParameters();
@@ -442,7 +442,7 @@ class BrofixReport
     /**
      * Initializes the Module
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $linkType => $className) {
             $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
@@ -468,7 +468,7 @@ class BrofixReport
     /**
      * Updates the table of stored broken links
      */
-    protected function initializeLinkAnalyzer()
+    protected function initializeLinkAnalyzer(): void
     {
         $considerHidden = $this->configuration->isCheckHidden();
         $depth = $this->depth;
@@ -487,7 +487,7 @@ class BrofixReport
      *
      * @return StandaloneView
      */
-    protected function createViewForBrokenLinksTab()
+    protected function createViewForBrokenLinksTab(): StandaloneView
     {
         $view = $this->createView('ReportTab');
         $view->assign('depth', $this->depth);
@@ -593,7 +593,7 @@ class BrofixReport
      * @param array $row Record row to be processed
      * @return array HTML of the rendered row
      */
-    protected function renderTableRow($table, array $row)
+    protected function renderTableRow($table, array $row): array
     {
         $languageService = $this->getLanguageService();
         $variables = [];
@@ -750,8 +750,6 @@ class BrofixReport
         $lastCheckTimeUrl = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['last_check_url']);
         $variables['lastcheck_url'] = (($currentDate != $lastcheckDateUrl) ? $lastcheckDateUrl . ' ' : '') . $lastCheckTimeUrl;
 
-        // todo: remove or handle "needs recheck" better
-        //$variables['needs_recheck'] = (bool)$row['needs_recheck'];
         return $variables;
     }
 
@@ -785,7 +783,6 @@ class BrofixReport
     protected function isShowRecordIds(): bool
     {
         return true;
-        //return (bool) ($this->getBackendUser()->isAdmin() && $GLOBALS['TYPO3_CONF_VARS']['BE']['debug']);
     }
 
     protected function getLanguageSplitLabel(string $label): string
@@ -812,7 +809,7 @@ class BrofixReport
      * @param int $pageId
      * @throws SiteNotFoundException
      */
-    protected function resolveSiteLanguages(int $pageId)
+    protected function resolveSiteLanguages(int $pageId): void
     {
         $site = GeneralUtility::makeInstance(SiteMatcher::class)->matchByPageId($pageId);
         $this->siteLanguages = $site->getAvailableLanguages($this->getBackendUser(), true, $pageId);
