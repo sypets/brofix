@@ -82,7 +82,7 @@ class CheckLinksCommand extends Command
     /**
      * Configure the command by defining the name, options and arguments
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Check links')
             ->addOption('start-pages', 'p', InputOption::VALUE_REQUIRED, 'Page id(s). Separate with , if several are used, e.g. "1,23". If none are given, the configured site start pages are used.')
@@ -97,7 +97,7 @@ class CheckLinksCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
         $this->io->title($this->getDescription());
@@ -173,7 +173,7 @@ class CheckLinksCommand extends Command
         return 0;
     }
 
-    protected function writeln(string $message)
+    protected function writeln(string $message): void
     {
         if ($this->verbose) {
             $this->io->writeln($message);

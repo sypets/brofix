@@ -325,8 +325,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             // * couple you to a specific handler, but can give more debug information
             // * when needed.
             $handlerContext = $e->getHandlerContext();
-            if ($handlerContext['errno'] ?? 0 && (strncmp(
-                $this->errorParams['exception'],
+            if ((($handlerContext['errno'] ?? 0) !== 0) && (strncmp(
+                $this->errorParams->getExceptionMsg(),
                 'cURL error',
                 strlen('cURL error')
             ) === 0)) {
@@ -436,11 +436,12 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     public function fetchType(array $value, string $type, string $key): string
     {
-        if (($value['tokenValue'] ?? '') === '') {
+        $tokenValue = $value['tokenValue'] ?? '';
+        if ($tokenValue === '' || !is_string($tokenValue)) {
             return $type;
         }
 
-        preg_match_all('/((?:http|https))(?::\\/\\/)(?:[^\\s<>]+)/i', $value['tokenValue'], $urls, PREG_PATTERN_ORDER);
+        preg_match_all('/((?:http|https))(?::\\/\\/)(?:[^\\s<>]+)/i', $tokenValue, $urls, PREG_PATTERN_ORDER);
         if (!empty($urls[0][0])) {
             $type = 'external';
         }

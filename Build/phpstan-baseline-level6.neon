@@ -1,0 +1,564 @@
+# baseline: this ignores some errors
+#  the goal is to fix all problems that can be fixed and remove the error messages from this file
+
+# create:
+# 1. Increase level in phpstan.neon
+# 2. cd .Build; bin/phpstan analyze  --configuration ../Build/phpstan_composerInstallMax.neon ../Classes --generate-baseline
+# 3. add content of phpstan-baseline.neon in .Build dir to his file
+
+parameters:
+  ignoreErrors:
+
+  #arrays with non-specific types
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\ExcludeLinkTarget\\:\\:getByUid\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/ExcludeLinkTarget.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\LinkTargetCacheInterface\\:\\:getUrlResponseForUrl\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/LinkTargetCacheInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\LinkTargetCacheInterface\\:\\:setResult\\(\\) has parameter \\$urlResponse with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/LinkTargetCacheInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\LinkTargetPersistentCache\\:\\:getUrlResponseForUrl\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/LinkTargetPersistentCache.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\LinkTargetPersistentCache\\:\\:insert\\(\\) has parameter \\$urlResponse with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/LinkTargetPersistentCache.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\LinkTargetPersistentCache\\:\\:setResult\\(\\) has parameter \\$urlResponse with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/LinkTargetPersistentCache.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\CheckLinks\\\\LinkTargetPersistentCache\\:\\:update\\(\\) has parameter \\$urlResponse with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/LinkTargetPersistentCache.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Command\\\\CheckLinksCommand\\:\\:checkPageLinks\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Command/CheckLinksCommand.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:__construct\\(\\) has parameter \\$tsConfig with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getCrawlDelayNodelay\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getCustom\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getExcludeLinkTargetAllowedTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getExcludedCtypes\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getLinkTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getLinktypesConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getLinktypesConfigExternalHeaders\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getMailRecipients\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getSearchFields\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:getTsConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:setTsConfig\\(\\) has parameter \\$tsConfig with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\Configuration\\\\Configuration\\:\\:\\$tsConfig type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Configuration/Configuration.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\FormEngine\\\\FieldShouldBeChecked\\:\\:compile\\(\\) has parameter \\$result with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/FormEngine/FieldShouldBeChecked.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\FormEngine\\\\FieldShouldBeChecked\\:\\:compile\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/FormEngine/FieldShouldBeChecked.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Hooks\\\\PageCalloutsHook\\:\\:addMessages\\(\\) has parameter \\$pageInfo with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Hooks/PageCalloutsHook.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Hooks\\\\PageCalloutsHook\\:\\:addMessages\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Hooks/PageCalloutsHook.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeLinks\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeLinks\\(\\) has parameter \\$resultArray with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeLinks\\(\\) has parameter \\$results with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeTypoLinks\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeTypoLinks\\(\\) has parameter \\$resultArray with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:analyzeTypoLinks\\(\\) has parameter \\$results with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:checkLinks\\(\\) has parameter \\$links with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:countLinks\\(\\) has parameter \\$links with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:emitBeforeAnalyzeRecordSignal\\(\\) has parameter \\$fields with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:emitBeforeAnalyzeRecordSignal\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:emitBeforeAnalyzeRecordSignal\\(\\) has parameter \\$results with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:emitBeforeAnalyzeRecordSignal\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:findLinksForRecord\\(\\) has parameter \\$fields with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:findLinksForRecord\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:findLinksForRecord\\(\\) has parameter \\$results with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:getSelectFields\\(\\) has parameter \\$selectFields with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:getSelectFields\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:init\\(\\) has parameter \\$pidList with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:init\\(\\) has parameter \\$searchField with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:recheckLinks\\(\\) has parameter \\$linkTypes with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:recheckUrl\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:\\$pids type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:\\$searchFields type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\LinkAnalyzer\\:\\:\\$stats type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/LinkAnalyzer.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\AbstractLinktype\\:\\:fetchType\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/AbstractLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\AbstractLinktype\\:\\:getBrokenLinkText\\(\\) has parameter \\$additionalConfig with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/AbstractLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\AbstractLinktype\\:\\:getBrokenLinkText\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/AbstractLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\AbstractLinktype\\:\\:getBrokenUrl\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/AbstractLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\AbstractLinktype\\:\\:initializeErrorParams\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/AbstractLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:__construct\\(\\) has parameter \\$errorParams with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:addCustom\\(\\) has parameter \\$custom with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:getCustom\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:initialize\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:setCustom\\(\\) has parameter \\$custom with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:toArray\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\Linktype\\\\ErrorParams\\:\\:\\$custom type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ErrorParams.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ExternalLinktype\\:\\:checkLink\\(\\) has parameter \\$softRefEntry with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ExternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ExternalLinktype\\:\\:fetchType\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ExternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\ExternalLinktype\\:\\:requestUrl\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ExternalLinktype.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\Linktype\\\\ExternalLinktype\\:\\:\\$lastCheckedDomainTimestamps type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/ExternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\FileLinktype\\:\\:checkLink\\(\\) has parameter \\$softRefEntry with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/FileLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\FileLinktype\\:\\:fetchType\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/FileLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\FileLinktype\\:\\:getBrokenLinkText\\(\\) has parameter \\$additionalConfig with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/FileLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\FileLinktype\\:\\:getBrokenLinkText\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/FileLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\FileLinktype\\:\\:getBrokenUrl\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/FileLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\InternalLinktype\\:\\:checkLink\\(\\) has parameter \\$softRefEntry with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/InternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\InternalLinktype\\:\\:getBrokenLinkText\\(\\) has parameter \\$additionalConfig with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/InternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\InternalLinktype\\:\\:getBrokenLinkText\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/InternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\InternalLinktype\\:\\:getBrokenUrl\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/InternalLinktype.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\LinktypeInterface\\:\\:checkLink\\(\\) has parameter \\$softRefEntry with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/LinktypeInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\LinktypeInterface\\:\\:fetchType\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/LinktypeInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\LinktypeInterface\\:\\:getBrokenLinkText\\(\\) has parameter \\$additionalConfig with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/LinktypeInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\LinktypeInterface\\:\\:getBrokenLinkText\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/LinktypeInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Linktype\\\\LinktypeInterface\\:\\:getBrokenUrl\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Linktype/LinktypeInterface.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:getBrokenLinks\\(\\) has parameter \\$orderBy with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:getBrokenLinks\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:getLinkCounts\\(\\) has parameter \\$linkTypes with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:getLinkCounts\\(\\) has parameter \\$pageIds with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:getLinkCounts\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:insertBrokenLink\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:insertOrUpdateBrokenLink\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:removeAllBrokenLinksForPagesBeforeTime\\(\\) has parameter \\$linkTypes with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:removeAllBrokenLinksForPagesBeforeTime\\(\\) has parameter \\$pageIds with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:updateBrokenLink\\(\\) has parameter \\$identifier with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\BrokenLinkRepository\\:\\:updateBrokenLink\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\ContentRepository\\:\\:getRowForUid\\(\\) has parameter \\$fields with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/ContentRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\ContentRepository\\:\\:getRowForUid\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/ContentRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\PagesRepository\\:\\:getAllSubpagesForPage\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/PagesRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\PagesRepository\\:\\:getPageList\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/PagesRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\Repository\\\\PagesRepository\\:\\:getRootLineIsHidden\\(\\) has parameter \\$pageInfo with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/Repository/PagesRepository.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:constructBackendUri\\(\\) has parameter \\$additionalQueryParameters with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:getPagePath\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:getVariablesForTableHeader\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:renderTableRow\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:renderTableRow\\(\\) return type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$currentRecord type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$defaultFlashMessageQueue type has no value type specified in iterable type TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessageQueue\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$linkTypes type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$pageList type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$pageRecord type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$pidList type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+    -
+      message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$searchFields type has no value type specified in iterable type array\\.$#"
+      count: 1
+      path: ../Classes/View/BrofixReport.php
+
+
+  # due to support for TYPO3 9
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkExternalLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
+      count: 1
+      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkFileLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
+      count: 1
+      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
+
+    -
+      message: "#^Method Sypets\\\\Brofix\\\\EventListener\\\\CheckBrokenRteLinkEventListener\\:\\:checkPageLink\\(\\) has parameter \\$event with no typehint specified\\.$#"
+      count: 1
+      path: ../Classes/EventListener/CheckBrokenRteLinkEventListener.php
+

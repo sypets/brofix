@@ -1,5 +1,8 @@
 <?php
 
+// @todo
+//declare(strict_types=1);
+
 namespace Sypets\Brofix;
 
 /*
@@ -34,6 +37,8 @@ use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Handles link checking
@@ -75,7 +80,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected $brokenLinkRepository;
 
     /**
-     * ContentRepository
+     * @var ContentRepository
      */
     protected $contentRepository;
 
@@ -117,7 +122,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
     }
 
-    public function init(array $searchField, array $pidList, Configuration $configuration = null)
+    public function init(array $searchField, array $pidList, Configuration $configuration = null): void
     {
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $this->searchFields = $searchField ?: $this->configuration->getSearchFields();
@@ -144,7 +149,6 @@ class LinkAnalyzer implements LoggerAwareInterface
         $message = '';
         $url = $record['url'];
         $linkType = $record['linkType'];
-        //if ($linkType === 'external' && $this->hookObjectsArr['external'] ?? false) {
         if ($this->hookObjectsArr[$linkType] ?? false) {
             $hookObj = $this->hookObjectsArr[$linkType];
             // get fresh result for URL
@@ -153,7 +157,12 @@ class LinkAnalyzer implements LoggerAwareInterface
             $result = $hookObj->checkLink($url, [], $mode);
             if ($result === true) {
                 // URL is ok, remove broken link records
-                $count = $this->brokenLinkRepository->removeBrokenLinksForLinkTarget($url, $linkType, ExcludeLinkTarget::MATCH_BY_EXACT, -1);
+                $count = $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
+                    $url,
+                    $linkType,
+                    ExcludeLinkTarget::MATCH_BY_EXACT,
+                    -1
+                );
                 $message = sprintf(
                     $this->getLanguageService()->getLL('list.recheck.url.ok.removed'),
                     $url,
@@ -167,7 +176,13 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $results = [];
                 $selectFields = $this->getSelectFields($record['table'], [$record['field']]);
                 $row = $this->contentRepository->getRowForUid($uid, $record['table'], $selectFields);
-                $this->findLinksForRecord($results, $record['table'], [$record['field']], $row, true);
+                $this->findLinksForRecord(
+                    $results,
+                    $record['table'],
+                    [$record['field']],
+                    $row,
+                    true
+                );
                 $urls = [];
                 foreach ($results[$linkType] ?? [] as $entryValue) {
                     $pageWithAnchor = $entryValue['pageAndAnchor'];
@@ -181,7 +196,12 @@ class LinkAnalyzer implements LoggerAwareInterface
 
                 if (!in_array($url, $urls)) {
                     // url not in record, remove broken link record
-                    $count = $this->brokenLinkRepository->removeForRecordUrl($record['table'], $uid, $url, $linkType);
+                    $count = $this->brokenLinkRepository->removeForRecordUrl(
+                        $record['table'],
+                        $uid,
+                        $url,
+                        $linkType
+                    );
                     $message = sprintf(
                         $this->getLanguageService()->getLL('list.recheck.url.notok.removed'),
                         $url,
@@ -254,8 +274,6 @@ class LinkAnalyzer implements LoggerAwareInterface
         if (!$row) {
             // missing record: remove existing links
             $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
-            // was already removed in DataHandler hook
-            //$this->brokenLinkRepository->removeBrokenLinksForRecord($table, $recordUid);
             return true;
         }
         if ($beforeEditedTimestamp && isset($row['timestamp']) && $beforeEditedTimestamp >= (int)$row['timestamp']) {
@@ -284,7 +302,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array $links
      * @param array<int,string> $linkTypes
      */
-    protected function checkLinks(array $links, array $linkTypes, int $mode = 0)
+    protected function checkLinks(array $links, array $linkTypes, int $mode = 0): void
     {
         foreach ($this->hookObjectsArr as $key => $hookObj) {
             if (!is_array($links[$key]) || (!in_array($key, $linkTypes, true))) {
@@ -302,17 +320,13 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $GLOBALS['TCA'][$table]['ctrl']['label'],
                     $entryValue['row'][$GLOBALS['TCA'][$table]['ctrl']['label']] ?? '',
                     0,
-                    0,
+                    false,
                     false,
                     $row['uid'],
                     false
                 );
                 $headline = trim($headline);
-                /*
-                if ($headline === '') {
-                    $headline = BackendUtility::getNoRecordTitle(false);
-                }
-                */
+
                 $record['headline'] = $headline;
 
                 if (isset($GLOBALS['TCA'][$table]['ctrl']['languageField'])
@@ -375,7 +389,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array<int,string> $linkTypes List of link types to check (corresponds to hook object)
      * @param bool $considerHidden Defines whether to look into hidden fields
      */
-    public function generateBrokenLinkRecords(array $linkTypes = [], $considerHidden = false)
+    public function generateBrokenLinkRecords(array $linkTypes = [], $considerHidden = false): void
     {
         if (empty($linkTypes) || empty($this->pids)) {
             return;
@@ -515,8 +529,13 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param bool $checkIfEditable should check if field is editable, this can be skipped if the information
      *        is already available (for performance reasons)
      */
-    public function findLinksForRecord(array &$results, $table, array $fields, array $record, bool $checkIfEditable = true)
-    {
+    public function findLinksForRecord(
+        array &$results,
+        $table,
+        array $fields,
+        array $record,
+        bool $checkIfEditable = true
+    ): void {
         $idRecord = (int)($record['uid'] ?? 0);
         try {
             list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
@@ -554,7 +573,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
 
                 $conf = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
-                $valueField = htmlspecialchars_decode($record[$field]);
+                $valueField = htmlspecialchars_decode((string)($record[$field]));
 
                 // Check if a TCA configured field has soft references defined (see TYPO3 Core API document)
                 if (!$conf['softref'] || (string)$valueField === '') {
@@ -621,7 +640,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param string $field The current field
      * @param string $table The current table
      */
-    protected function analyzeLinks(array $resultArray, array &$results, array $record, $field, $table)
+    protected function analyzeLinks(array $resultArray, array &$results, array $record, string $field, string $table): void
     {
         foreach ($resultArray['elements'] as $element) {
             $r = $element['subst'];
@@ -658,8 +677,14 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param string $field The current field
      * @param string $table The current table
      */
-    protected function analyzeTypoLinks(array $resultArray, array &$results, $htmlParser, array $record, $field, $table)
-    {
+    protected function analyzeTypoLinks(
+        array $resultArray,
+        array &$results,
+        $htmlParser,
+        array $record,
+        $field,
+        $table
+    ): void {
         $currentR = [];
         $linkTags = $htmlParser->splitIntoBlock('a,link', $resultArray['content']);
         $idRecord = $record['uid'];
@@ -676,12 +701,13 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
 
                 // Type of referenced record
-                if (strpos($r['recordRef'], 'pages') !== false) {
+                if (isset($r['recordRef']) && strpos($r['recordRef'], 'pages') !== false) {
                     $currentR = $r;
                     // Contains number of the page
                     $referencedRecordType = $r['tokenValue'];
                     $wasPage = true;
-                } elseif (strpos($r['recordRef'], 'tt_content') !== false && (isset($wasPage) && $wasPage === true)) {
+                } elseif (isset($r['recordRef']) && strpos($r['recordRef'], 'tt_content') !== false
+                    && (isset($wasPage) && $wasPage === true)) {
                     $referencedRecordType = $referencedRecordType . '#c' . $r['tokenValue'];
                     $wasPage = false;
                 } else {
@@ -717,7 +743,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array $fields Array of fields to analyze
      * @return array
      */
-    protected function emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields)
+    protected function emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields): array
     {
         return $this->getSignalSlotDispatcher()->dispatch(
             self::class,
@@ -727,40 +753,36 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
-     * @return \TYPO3\CMS\Extbase\SignalSlot\Dispatcher
+     * @return Dispatcher
      */
     protected function getSignalSlotDispatcher()
     {
-        return $this->getObjectManager()->get(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
+        return $this->getObjectManager()->get(Dispatcher::class);
     }
 
     /**
-     * @return \TYPO3\CMS\Extbase\Object\ObjectManager
+     * @return ObjectManager
      */
-    protected function getObjectManager()
+    protected function getObjectManager(): ObjectManager
     {
-        return GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
+        return GeneralUtility::makeInstance(ObjectManager::class);
     }
 
     /**
      * @return LanguageService
      */
-    protected function getLanguageService()
+    protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
     }
 
     protected function debug(string $message): void
     {
-        if ($this->logger) {
-            $this->logger->debug($message);
-        }
+        $this->logger->debug($message);
     }
 
     protected function error(string $message): void
     {
-        if ($this->logger) {
-            $this->logger->error($message);
-        }
+        $this->logger->error($message);
     }
 }

@@ -73,7 +73,7 @@ class LinkAnalyzerTest extends FunctionalTestCase
 
     protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
     {
-        $linkAnalyzer = new LinkAnalyzer();
+        $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
         $linkAnalyzer->init(
             $this->configuration->getSearchFields(),
             $pidList,
