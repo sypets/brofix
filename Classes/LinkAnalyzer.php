@@ -752,15 +752,11 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     protected function debug(string $message): void
     {
-        if ($this->logger) {
-            $this->logger->debug($message);
-        }
+        $this->logger->debug($message);
     }
 
     protected function error(string $message): void
     {
-        if ($this->logger) {
-            $this->logger->error($message);
-        }
+        $this->logger->error($message);
     }
 }
