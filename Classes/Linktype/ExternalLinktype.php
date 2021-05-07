@@ -326,7 +326,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             // * when needed.
             $handlerContext = $e->getHandlerContext();
             if ((($handlerContext['errno'] ?? 0) !== 0) && (strncmp(
-                $this->errorParams['exception'],
+                $this->errorParams->getExceptionMsg(),
                 'cURL error',
                 strlen('cURL error')
             ) === 0)) {
