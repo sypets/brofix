@@ -97,8 +97,13 @@ abstract class AbstractLinktype implements LinktypeInterface
      */
     public function fetchType(array $value, string $type, string $key): string
     {
-        if ($value['type'] == $key) {
-            $type = $value['type'];
+        $newType = $value['type'] ?? '';
+        if ($newType === '' || !is_string($newType)) {
+            return $type;
+        }
+
+        if ($newType === $key) {
+            $type = $newType;
         }
         return $type;
     }

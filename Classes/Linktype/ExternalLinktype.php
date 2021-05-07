@@ -436,11 +436,12 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     public function fetchType(array $value, string $type, string $key): string
     {
-        if (($value['tokenValue'] ?? '') === '') {
+        $tokenValue = $value['tokenValue'] ?? '';
+        if ($tokenValue === '' || !is_string($tokenValue)) {
             return $type;
         }
 
-        preg_match_all('/((?:http|https))(?::\\/\\/)(?:[^\\s<>]+)/i', $value['tokenValue'], $urls, PREG_PATTERN_ORDER);
+        preg_match_all('/((?:http|https))(?::\\/\\/)(?:[^\\s<>]+)/i', $tokenValue, $urls, PREG_PATTERN_ORDER);
         if (!empty($urls[0][0])) {
             $type = 'external';
         }
