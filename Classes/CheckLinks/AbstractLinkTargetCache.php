@@ -30,5 +30,4 @@ abstract class AbstractLinkTargetCache implements LinkTargetCacheInterface
     {
         $this->expire = $expire;
     }
-
 }
