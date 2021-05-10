@@ -8,4 +8,4 @@ Automatic checking can be configured via console command.
 
 * [Documentation](https://docs.typo3.org/p/sypets/brofix/master/en-us/)
 * [Repository](https://github.com/sypets/brofix)
-* [Packagist](https://docs.typo3.org/p/sypets/brofix)
+* [Packagist](https://packagist.org/packages/sypets/brofix)
