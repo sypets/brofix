@@ -50,6 +50,12 @@ class CheckLinksCommand extends Command
     protected $dryRun;
 
     /**
+     * @var int -1: means use default (from configuration),
+     *   1 means send email, 0 means do not send
+     */
+    protected $sendEmail;
+
+    /**
      * @var CheckLinksStatistics[]
      */
     protected $statistics;
@@ -110,7 +116,14 @@ class CheckLinksCommand extends Command
                 '',
                 InputOption::VALUE_NONE,
                 'Do not execute link checking and do not send email, just show what would get checked.'
-            );
+            )
+            ->addOption(
+                'send-email',
+                'e',
+                InputOption::VALUE_OPTIONAL,
+                'Send email (override configuration). 1: send, 0: do not send'
+            )
+        ;
     }
 
     /**
@@ -124,18 +137,23 @@ class CheckLinksCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
 
         $options = $input->getOptions();
+
+        $this->dryRun = $options['dry-run'] ?? false;
+        if ($this->dryRun) {
+            $this->io->writeln('Dry run is activated, do not check and do not send email');
+        }
+
+        $this->sendEmail = (int) ($options['send-email'] ?? -1);
+        if ($this->sendEmail === 0) {
+            $this->io->writeln('Do not send email.');
+        }
+
         $startPageString = (string)($input->getOption('start-pages') ?? '');
         if ($startPageString !== '') {
             $startPages = explode(',', $startPageString);
         } else {
             $startPages = [];
         }
-        $this->dryRun = $options['dry-run'] ?? false;
-
-        if ($this->dryRun) {
-            $this->io->writeln('Dry run is activated, do not check and do not send email');
-        }
-
         if ($startPages === []) {
             /** @var SiteFinder $siteFinder */
             $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
@@ -146,7 +164,6 @@ class CheckLinksCommand extends Command
             }
             $this->io->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
         }
-
         if ($startPages === []) {
             $this->io->error('No pages to check ... abort');
             // @todo can be changed to return Command::FAILURE when TYPO3 v9 support is dropped
@@ -163,6 +180,7 @@ class CheckLinksCommand extends Command
                 continue;
             }
 
+            // set configuration via command line arguments
             $this->configuration->loadPageTsConfig($pageId);
             if (isset($options['depth'])) {
                 $depth = (int)$options['depth'];
@@ -173,7 +191,34 @@ class CheckLinksCommand extends Command
             if (isset($options['to'])) {
                 $this->configuration->setMailRecipients($options['to']);
             }
+            if ($this->sendEmail === 0) {
+                $this->configuration->setMailSendOnCheckLinks(0);
+            }
 
+            // show configuration
+            if ($this->configuration->getMailSendOnCheckLinks()) {
+                $this->io->writeln('Configuration: Send mail: true');
+                $this->io->writeln('Configuration: Email recipients: '
+                    . implode(',', $this->configuration->getMailRecipients()));
+                $this->io->writeln('Configuration: Email sender (email address): '
+                    . $this->configuration->getMailFromEmail());
+                $this->io->writeln('Configuration: Email sender (name): '
+                    . $this->configuration->getMailFromName());
+                if ($this->configuration->getMailReplyToEmail()) {
+                    $this->io->writeln('Configuration: Email replyTo (email address): '
+                        . $this->configuration->getMailReplyToEmail());
+                    if ($this->configuration->getMailReplyToName()) {
+                        $this->io->writeln('Configuration: Email replyTo (name): '
+                            . $this->configuration->getMailReplyToName());
+                    }
+                }
+                $this->io->writeln('Configuration: Email template: '
+                    . $this->configuration->getMailTemplate());
+            } else {
+                $this->io->writeln('Configuration: Send mail: false');
+            }
+
+            // check links
             $result = $this->checkPageLinks($pageId, $options);
 
             if ($this->dryRun) {

@@ -228,6 +228,11 @@ class Configuration
         return (bool)($this->tsConfig['mail.']['sendOnCheckLinks'] ?? true);
     }
 
+    public function setMailSendOnCheckLinks(int $value): void
+    {
+        $this->tsConfig['mail.']['sendOnCheckLinks'] = $value;
+    }
+
     /**
      * Get check depth (number of page recursion levels)
      *
