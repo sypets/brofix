@@ -45,11 +45,6 @@ class CheckLinksCommand extends Command
     protected $io;
 
     /**
-     * @var bool
-     */
-    protected $verbose;
-
-    /**
      * @var CheckLinksStatistics[]
      */
     protected $statistics;
@@ -113,7 +108,6 @@ class CheckLinksCommand extends Command
         } else {
             $startPages = [];
         }
-        $this->verbose = (bool)($options['verbose'] ?? false);
 
         if ($startPages === []) {
             /** @var SiteFinder $siteFinder */
@@ -123,7 +117,7 @@ class CheckLinksCommand extends Command
             foreach ($sites as $site) {
                 $startPages[] = $site->getRootPageId();
             }
-            $this->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
+            $this->io->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
         }
 
         if ($startPages === []) {
@@ -141,7 +135,10 @@ class CheckLinksCommand extends Command
 
             $this->configuration->loadPageTsConfig($pageId);
             if (isset($options['depth'])) {
-                $this->configuration->setDepth((int)$options['depth']);
+                $depth = (int)$options['depth'];
+                $this->configuration->setDepth($depth);
+            } else {
+                $depth = 999;
             }
             if (isset($options['to'])) {
                 $this->configuration->setMailRecipients($options['to']);
@@ -154,9 +151,10 @@ class CheckLinksCommand extends Command
             }
 
             $stats = $this->statistics[$pageId];
-            $this->writeln(sprintf(
-                'Result for "%s": number of broken links=%d',
+            $this->io->writeln(sprintf(
+                'Result for page "%s" (and %s depth): number of broken links=%d',
                 $stats->getPageTitle(),
+                (string) ($depth === 999 ? 'infinite' : $depth),
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
@@ -184,13 +182,6 @@ class CheckLinksCommand extends Command
         return 0;
     }
 
-    protected function writeln(string $message): void
-    {
-        if ($this->verbose) {
-            $this->io->writeln($message);
-        }
-    }
-
     /**
      * Validate all links for a page (and possibly its subpages) based on the task configuration.
      *
@@ -213,7 +204,10 @@ class CheckLinksCommand extends Command
             );
         }
 
-        $this->writeln(sprintf('Checking start page "%s" [%d], depth: %s', $pageRow['title'], $pageUid, $depth === 999 ? 'infinite' : $depth));
+        $this->io->writeln(
+            sprintf('Checking start page "%s" [%d], depth: %s', $pageRow['title'],
+                $pageUid, $depth === 999 ? 'infinite' : $depth)
+        );
 
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($pageRow);
 
@@ -226,12 +220,12 @@ class CheckLinksCommand extends Command
                 $checkHidden
             );
         } else {
-            if ($this->verbose) {
-                $this->io->warning(
-                    sprintf('Will not check hidden page: %s [%d]', $pageRow['title'] ?? '', $pageUid)
-                );
-            }
-            return false;
+          $this->io->warning(
+              sprintf('Will not check hidden pages or children of hidden pages, rootline is hidden: %s [%d]',
+                  $pageRow['title'] ?? '', $pageUid
+              )
+          );
+          return false;
         }
         if (!empty($pageIds)) {
             /** @var LinkAnalyzer $linkAnalyzer */
