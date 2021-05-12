@@ -139,8 +139,6 @@ class CheckLinksCommand extends Command
                 continue;
             }
 
-            print "\nstartPage=$pageId\n";
-
             $this->configuration->loadPageTsConfig($pageId);
             if (isset($options['depth'])) {
                 $this->configuration->setDepth((int)$options['depth']);
