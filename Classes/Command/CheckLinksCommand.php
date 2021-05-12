@@ -176,7 +176,8 @@ class CheckLinksCommand extends Command
         if ($startPages === []) {
             // @extensionScannerIgnoreLine problem with ->error()
             $this->io->error('No pages to check ... abort');
-            return Command::FAILURE;
+            // @todo use constant Command::FAILURE (not available in earlier Symfony versions)
+            return 1;
         }
 
         $this->depth = (int)($input->getOption('depth') ?: -1);
@@ -261,7 +262,8 @@ class CheckLinksCommand extends Command
             }
         }
 
-        return Command::SUCCESS;
+        // @todo use constant Command::SUCCESS (not available in earlier Symfony versions)
+        return 0;
     }
 
     /**
