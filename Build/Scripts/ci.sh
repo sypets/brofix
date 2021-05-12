@@ -5,11 +5,11 @@
 # abort on error
 set -e
 
-echo "cgl"
-Build/Scripts/runTests.sh -p 7.4 -s cgl -n
-
 echo "composer install"
 Build/Scripts/runTests.sh -p 7.4 -s composerInstallMax
+
+echo "cgl"
+Build/Scripts/runTests.sh -p 7.4 -s cgl -n
 
 echo "composer validate"
 Build/Scripts/runTests.sh -p 7.4 -s composerValidate
@@ -25,3 +25,5 @@ Build/Scripts/runTests.sh -p 7.4 -s unit
 
 echo "functional tests"
 Build/Scripts/runTests.sh -p 7.4 -d mariadb -s functional
+
+echo "done"

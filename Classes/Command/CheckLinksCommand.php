@@ -26,14 +26,12 @@ use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Mail\GenerateCheckResultFluidMail;
 use Sypets\Brofix\Mail\GenerateCheckResultMailInterface;
-use Sypets\Brofix\Mail\GenerateCheckResultPlainMail;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * @internal This class is for internal use inside this extension only.
@@ -149,7 +147,7 @@ class CheckLinksCommand extends Command
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $this->dryRun = (bool) ($input->getOption('dry-run') ?: false);
+        $this->dryRun = (bool)($input->getOption('dry-run') ?: false);
         if ($this->dryRun) {
             $this->io->writeln('Dry run is activated, do not check and do not send email');
         }
@@ -181,7 +179,7 @@ class CheckLinksCommand extends Command
             return Command::FAILURE;
         }
 
-        $this->depth = (int) ($input->getOption('depth') ?: -1);
+        $this->depth = (int)($input->getOption('depth') ?: -1);
         $this->sendTo = $input->getOption('to') ?: '';
 
         foreach ($startPages as $pageId) {
@@ -253,9 +251,9 @@ class CheckLinksCommand extends Command
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
-                 /**
-                 * @var GenerateCheckResultMailInterface
-                 */
+                /**
+                * @var GenerateCheckResultMailInterface
+                */
                 $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
             } else {

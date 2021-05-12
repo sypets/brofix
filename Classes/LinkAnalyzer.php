@@ -37,8 +37,6 @@ use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Handles link checking
@@ -538,8 +536,6 @@ class LinkAnalyzer implements LoggerAwareInterface
     ): void {
         $idRecord = (int)($record['uid'] ?? 0);
         try {
-            list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
-
             // Put together content of all relevant fields
             /** @var HtmlParser $htmlParser */
             $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
@@ -734,49 +730,6 @@ class LinkAnalyzer implements LoggerAwareInterface
             $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['link_title'] = $title;
             $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['pageAndAnchor'] = $referencedRecordType;
         }
-    }
-
-    /**
-     * Emits a signal before the record is analyzed
-     *
-     * @param array $results Array of broken links
-     * @param array $record Record to analyze
-     * @param string $table Table name of the record
-     * @param array $fields Array of fields to analyze
-     * @return array
-     *
-     * @todo convert to PSR-14 events, signal/slot is deprecated
-     * @deprecated signal/slot is deprecated
-     */
-    protected function emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields): array
-    {
-        return $this->getSignalSlotDispatcher()->dispatch(
-            self::class,
-            'beforeAnalyzeRecord',
-            [$results, $record, $table, $fields, $this]
-        );
-    }
-
-    /**
-     * @return Dispatcher
-     *
-     * @todo convert to PSR-14 events, signal/slot is deprecated
-     * @deprecated signal/slot is deprecated
-
-     */
-    protected function getSignalSlotDispatcher()
-    {
-        return $this->getObjectManager()->get(Dispatcher::class);
-    }
-
-    /**
-     * @return ObjectManager
-     *
-     * @deprecated
-     */
-    protected function getObjectManager(): ObjectManager
-    {
-        return GeneralUtility::makeInstance(ObjectManager::class);
     }
 
     /**
