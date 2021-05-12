@@ -498,6 +498,7 @@ class BrofixReport
         $items = [];
         $totalCount = 0;
         // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
+        // @extensionScannerIgnoreLine problem with getRootLineIsHidden
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(

@@ -615,6 +615,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
             }
         } catch (DatabaseDefaultLanguageException $e) {
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->error(
                 "analyzeRecord: table=$table, uid=$idRecord, DatabaseDefaultLanguageException:"
                 . $e->getMessage()
@@ -622,6 +623,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 . $e->getTraceAsString()
             );
         } catch (\Exception | \Throwable $e) {
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->error(
                 "analyzeRecord: table=$table, uid=$idRecord, exception="
                 . $e->getMessage()
@@ -742,6 +744,9 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param string $table Table name of the record
      * @param array $fields Array of fields to analyze
      * @return array
+     *
+     * @todo convert to PSR-14 events, signal/slot is deprecated
+     * @deprecated signal/slot is deprecated
      */
     protected function emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields): array
     {
@@ -754,6 +759,10 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     /**
      * @return Dispatcher
+     *
+     * @todo convert to PSR-14 events, signal/slot is deprecated
+     * @deprecated signal/slot is deprecated
+
      */
     protected function getSignalSlotDispatcher()
     {
@@ -762,6 +771,8 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     /**
      * @return ObjectManager
+     *
+     * @deprecated
      */
     protected function getObjectManager(): ObjectManager
     {
@@ -783,6 +794,7 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     protected function error(string $message): void
     {
+        // @extensionScannerIgnoreLine problem with ->error()
         $this->logger->error($message);
     }
 }

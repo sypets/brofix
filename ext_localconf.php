@@ -22,13 +22,6 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['db'] = \Sypets\B
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['file'] = \Sypets\Brofix\Linktype\FileLinktype::class;
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['external'] = \Sypets\Brofix\Linktype\ExternalLinktype::class;
 
-// XCLASS: Use only in v9, v10 is using EventListener for BrokenLinkAnalysisEvent
-if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode('.', \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version())[0])) < 10) {
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][TYPO3\CMS\Core\Html\RteHtmlParser::class] = [
-        'className' => Sypets\Brofix\Xclass\RteHtmlParserWithBrokenLinkHook::class
-    ];
-}
-
 // for link checking, do not perform user permission checks, only check if field is editable
 // permission checks are done when reading records from tx_brofix_broken_links for report
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [

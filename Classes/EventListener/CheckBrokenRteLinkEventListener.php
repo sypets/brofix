@@ -18,16 +18,13 @@ declare(strict_types=1);
 namespace Sypets\Brofix\EventListener;
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
-//use TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent;
+use TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Core\Resource\FileInterface;
 
 /**
  * Event listeners to identify if a link is broken. For external URLs, the database is queried), for pages
  * this is handled via a direct check to the database record  in pages.
- *
- * @todo add use and type hints for TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent once support for
- *   TYPO3 9 is dropped.
  */
 final class CheckBrokenRteLinkEventListener
 {
@@ -43,7 +40,7 @@ final class CheckBrokenRteLinkEventListener
 
     public function checkExternalLink($event): void
     {
-        if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
+        if (get_class($event) === BrokenLinkAnalysisEvent::class) {
             if ($event->getLinkType() !== LinkService::TYPE_URL) {
                 return;
             }
@@ -58,7 +55,7 @@ final class CheckBrokenRteLinkEventListener
 
     public function checkPageLink($event): void
     {
-        if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
+        if (get_class($event) === BrokenLinkAnalysisEvent::class) {
             if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
                 return;
             }
@@ -79,7 +76,7 @@ final class CheckBrokenRteLinkEventListener
 
     public function checkFileLink($event): void
     {
-        if (get_class($event) === 'TYPO3\\CMS\\Core\\Html\\Event\\BrokenLinkAnalysisEvent') {
+        if (get_class($event) === BrokenLinkAnalysisEvent::class) {
             if ($event->getLinkType() !== LinkService::TYPE_FILE) {
                 return;
             }
