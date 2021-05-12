@@ -85,10 +85,14 @@ class CheckLinksCommand extends Command
     protected function configure(): void
     {
         $this->setDescription('Check links')
-            ->addOption('start-pages', 'p', InputOption::VALUE_REQUIRED, 'Page id(s). Separate with , if several are used, e.g. "1,23". If none are given, the configured site start pages are used.')
-            ->addOption('depth', 'd', InputOption::VALUE_REQUIRED, 'Depth, default is 999, where 999 means infinite depth.')
-            ->addOption('to', 't', InputOption::VALUE_REQUIRED, 'Email recipients')
-        ;
+            ->addOption('start-pages', 'p', InputOption::VALUE_REQUIRED,
+                'Page id(s) to start with. Separate with , if several are used, e.g. "1,23".' .
+                'If none are given, the configured site start pages are used.')
+            ->addOption('depth', 'd', InputOption::VALUE_REQUIRED,
+                'Page recursion depth (how many levels of pages to check, starting with the start pages).' .
+                'Default is 999, where 999 means infinite depth. If none is given, TSconfig mod.brofix.depth is used')
+            ->addOption('to', 't', InputOption::VALUE_REQUIRED,
+                'Email address of recipient. If none is given, TSconfig mod.brofix.mail.recipients is used.');
     }
 
     /**
