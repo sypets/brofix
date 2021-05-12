@@ -12,6 +12,7 @@ Changelog
 
 - Add --send-email and --dry-run option to command controller
 - Add more output to command controller
+- Fix formatting of floats in email
 
 > 1.0.0
 =======
