@@ -144,7 +144,13 @@ class CheckLinksCommand extends Command
             if (isset($options['to'])) {
                 $this->configuration->setMailRecipients($options['to']);
             }
-            $this->checkPageLinks($pageId, $options);
+            if (!$this->checkPageLinks($pageId, $options)
+                || !isset($this->statistics[$pageId])
+            ) {
+                $this->io->warning(sprintf('No result for checking %d ... abort', $pageId));
+                continue;
+            }
+
             $stats = $this->statistics[$pageId];
             $this->writeln(sprintf(
                 'Result for "%s": number of broken links=%d',
@@ -153,7 +159,8 @@ class CheckLinksCommand extends Command
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 // @todo check can be removed once support for 9 is dropped
-                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode('.', \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version())[0])) < 10) {
+                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode('.',
+                        \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version())[0])) < 10) {
                     /**
                      * @var GenerateCheckResultMailInterface
                      */
