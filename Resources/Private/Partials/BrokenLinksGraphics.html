@@ -33,7 +33,7 @@
     <desc id="desc"></desc>
     <g class="bars">
         <rect class="backgroundBar" fill='#ddd' width='100%' height='25' y='5'></rect>;
-        <rect fill='yellow' width='{stats.percentBrokenLinks}%' height='25' y='5'></rect>
+        <rect fill='yellow' width='{stats.percentBrokenLinks -> f:format.number(decimals: '2', decimalSeparator: '.')}%' height='25' y='5'></rect>
     </g>
     <g class='markers'>
         <rect fill='darkgrey' x='24%' y='0' width='1' height='35'></rect>
@@ -47,6 +47,6 @@
         <text fill='#0074d9' x='75%' y='60'>75%</text>
     </g>
     <g>
-        <text class='result' y='80%' x='20%'>{stats.percentBrokenLinks}%</text>
+        <text class='result' y='80%' x='20%'>{stats.percentBrokenLinks -> f:format.number(decimals: '2', decimalSeparator: '.')}%</text>
     </g>
 </svg>
