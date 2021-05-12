@@ -33,6 +33,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * @internal This class is for internal use inside this extension only.
@@ -47,7 +48,13 @@ class CheckLinksCommand extends Command
     /**
      * @var bool
      */
-    protected $verbose;
+    protected $dryRun;
+
+    /**
+     * @var int -1: means use default (from configuration),
+     *   1 means send email, 0 means do not send
+     */
+    protected $sendEmail;
 
     /**
      * @var CheckLinksStatistics[]
@@ -85,9 +92,38 @@ class CheckLinksCommand extends Command
     protected function configure(): void
     {
         $this->setDescription('Check links')
-            ->addOption('start-pages', 'p', InputOption::VALUE_REQUIRED, 'Page id(s). Separate with , if several are used, e.g. "1,23". If none are given, the configured site start pages are used.')
-            ->addOption('depth', 'd', InputOption::VALUE_REQUIRED, 'Depth, default is 999, where 999 means infinite depth.')
-            ->addOption('to', 't', InputOption::VALUE_REQUIRED, 'Email recipients')
+            ->addOption(
+                'start-pages',
+                'p',
+                InputOption::VALUE_REQUIRED,
+                'Page id(s) to start with. Separate with , if several are used, e.g. "1,23".' .
+                'If none are given, the configured site start pages are used.'
+            )
+            ->addOption(
+                'depth',
+                'd',
+                InputOption::VALUE_REQUIRED,
+                'Page recursion depth (how many levels of pages to check, starting with the start pages).' .
+                'Default is 999, where 999 means infinite depth. If none is given, TSconfig mod.brofix.depth is used'
+            )
+            ->addOption(
+                'to',
+                't',
+                InputOption::VALUE_REQUIRED,
+                'Email address of recipient. If none is given, TSconfig mod.brofix.mail.recipients is used.'
+            )
+            ->addOption(
+                'dry-run',
+                '',
+                InputOption::VALUE_NONE,
+                'Do not execute link checking and do not send email, just show what would get checked.'
+            )
+            ->addOption(
+                'send-email',
+                'e',
+                InputOption::VALUE_OPTIONAL,
+                'Send email (override configuration). 1: send, 0: do not send'
+            )
         ;
     }
 
@@ -100,17 +136,25 @@ class CheckLinksCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $this->io->title($this->getDescription());
 
         $options = $input->getOptions();
+
+        $this->dryRun = $options['dry-run'] ?? false;
+        if ($this->dryRun) {
+            $this->io->writeln('Dry run is activated, do not check and do not send email');
+        }
+
+        $this->sendEmail = (int)($options['send-email'] ?? -1);
+        if ($this->sendEmail === 0) {
+            $this->io->writeln('Do not send email.');
+        }
+
         $startPageString = (string)($input->getOption('start-pages') ?? '');
         if ($startPageString !== '') {
             $startPages = explode(',', $startPageString);
         } else {
             $startPages = [];
         }
-        $this->verbose = (bool)($options['verbose'] ?? false);
-
         if ($startPages === []) {
             /** @var SiteFinder $siteFinder */
             $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
@@ -119,9 +163,8 @@ class CheckLinksCommand extends Command
             foreach ($sites as $site) {
                 $startPages[] = $site->getRootPageId();
             }
-            $this->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
+            $this->io->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
         }
-
         if ($startPages === []) {
             $this->io->error('No pages to check ... abort');
             // @todo can be changed to return Command::FAILURE when TYPO3 v9 support is dropped
@@ -129,22 +172,61 @@ class CheckLinksCommand extends Command
         }
 
         foreach ($startPages as $pageId) {
+            $this->io->title('Start checking page ' . $pageId);
+
             $pageId = (int)$pageId;
             if ($pageId <= 0) {
                 $this->io->warning('Page id ' . $pageId . ' not allowed ... skipping');
                 continue;
             }
 
-            print "\nstartPage=$pageId\n";
-
+            // set configuration via command line arguments
             $this->configuration->loadPageTsConfig($pageId);
             if (isset($options['depth'])) {
-                $this->configuration->setDepth((int)$options['depth']);
+                $depth = (int)$options['depth'];
+                $this->configuration->setDepth($depth);
+            } else {
+                $depth = 999;
             }
             if (isset($options['to'])) {
                 $this->configuration->setMailRecipients($options['to']);
             }
-            if (!$this->checkPageLinks($pageId, $options)
+            if ($this->sendEmail === 0) {
+                $this->configuration->setMailSendOnCheckLinks(0);
+            }
+
+            // show configuration
+            if ($this->configuration->getMailSendOnCheckLinks()) {
+                $this->io->writeln('Configuration: Send mail: true');
+                $this->io->writeln('Configuration: Email recipients: '
+                    . implode(',', $this->configuration->getMailRecipients()));
+                $this->io->writeln('Configuration: Email sender (email address): '
+                    . $this->configuration->getMailFromEmail());
+                $this->io->writeln('Configuration: Email sender (name): '
+                    . $this->configuration->getMailFromName());
+                if ($this->configuration->getMailReplyToEmail()) {
+                    $this->io->writeln('Configuration: Email replyTo (email address): '
+                        . $this->configuration->getMailReplyToEmail());
+                    if ($this->configuration->getMailReplyToName()) {
+                        $this->io->writeln('Configuration: Email replyTo (name): '
+                            . $this->configuration->getMailReplyToName());
+                    }
+                }
+                $this->io->writeln('Configuration: Email template: '
+                    . $this->configuration->getMailTemplate());
+            } else {
+                $this->io->writeln('Configuration: Send mail: false');
+            }
+
+            // check links
+            $result = $this->checkPageLinks($pageId, $options);
+
+            if ($this->dryRun) {
+                $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
+                continue;
+            }
+
+            if (!$result
                 || !isset($this->statistics[$pageId])
             ) {
                 $this->io->warning(sprintf('No result for checking %d ... abort', $pageId));
@@ -152,16 +234,17 @@ class CheckLinksCommand extends Command
             }
 
             $stats = $this->statistics[$pageId];
-            $this->writeln(sprintf(
-                'Result for "%s": number of broken links=%d',
+            $this->io->writeln(sprintf(
+                'Result for page "%s" (and %s depth): number of broken links=%d',
                 $stats->getPageTitle(),
+                (string)($depth === 999 ? 'infinite' : $depth),
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 // @todo check can be removed once support for 9 is dropped
-                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode(
+                if (((int)(GeneralUtility::intExplode(
                     '.',
-                    \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version()
+                    VersionNumberUtility::getCurrentTypo3Version()
                 )[0])) < 10) {
                     /**
                      * @var GenerateCheckResultMailInterface
@@ -175,18 +258,13 @@ class CheckLinksCommand extends Command
                     $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 }
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+            } else {
+                $this->io->writeln('Do not send mail, because sending was deactivated.');
             }
         }
 
         // @todo can be changed to return  Command::SUCCESS once support for TYPO3 v9 is dropped
         return 0;
-    }
-
-    protected function writeln(string $message): void
-    {
-        if ($this->verbose) {
-            $this->io->writeln($message);
-        }
     }
 
     /**
@@ -198,7 +276,7 @@ class CheckLinksCommand extends Command
      * @return bool
      * @throws \InvalidArgumentException
      */
-    protected function checkPageLinks(int $pageUid, array $options): bool
+    protected function checkPageLinks(int $pageUid, array $options = []): bool
     {
         $depth = $this->configuration->getDepth();
         $searchFields = $this->configuration->getSearchFields();
@@ -211,7 +289,18 @@ class CheckLinksCommand extends Command
             );
         }
 
-        $this->writeln(sprintf('Checking start page "%s" [%d], depth: %s', $pageRow['title'], $pageUid, $depth === 999 ? 'infinite' : $depth));
+        $this->io->writeln(
+            sprintf(
+                'Checking start page "%s" [%d], depth: %s',
+                $pageRow['title'],
+                $pageUid,
+                $depth === 999 ? 'infinite' : $depth
+            )
+        );
+
+        if ($this->dryRun) {
+            return true;
+        }
 
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($pageRow);
 
@@ -224,11 +313,13 @@ class CheckLinksCommand extends Command
                 $checkHidden
             );
         } else {
-            if ($this->verbose) {
-                $this->io->warning(
-                    sprintf('Will not check hidden page: %s [%d]', $pageRow['title'] ?? '', $pageUid)
-                );
-            }
+            $this->io->warning(
+                sprintf(
+                    'Will not check hidden pages or children of hidden pages, rootline is hidden: %s [%d]',
+                    $pageRow['title'] ?? '',
+                    $pageUid
+                )
+            );
             return false;
         }
         if (!empty($pageIds)) {

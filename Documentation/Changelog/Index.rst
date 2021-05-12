@@ -6,6 +6,18 @@
 Changelog
 =========
 
+
+1.0.4
+=====
+
+- Add --send-email and --dry-run option to command controller
+- Add more output to command controller
+
+> 1.0.0
+=======
+
+- bug fixing
+
 1.0.0
 =====
 
