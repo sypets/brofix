@@ -45,6 +45,11 @@ class CheckLinksCommand extends Command
     protected $io;
 
     /**
+     * @var bool
+     */
+    protected $dryRun;
+
+    /**
      * @var CheckLinksStatistics[]
      */
     protected $statistics;
@@ -80,14 +85,32 @@ class CheckLinksCommand extends Command
     protected function configure(): void
     {
         $this->setDescription('Check links')
-            ->addOption('start-pages', 'p', InputOption::VALUE_REQUIRED,
+            ->addOption(
+                'start-pages',
+                'p',
+                InputOption::VALUE_REQUIRED,
                 'Page id(s) to start with. Separate with , if several are used, e.g. "1,23".' .
-                'If none are given, the configured site start pages are used.')
-            ->addOption('depth', 'd', InputOption::VALUE_REQUIRED,
+                'If none are given, the configured site start pages are used.'
+            )
+            ->addOption(
+                'depth',
+                'd',
+                InputOption::VALUE_REQUIRED,
                 'Page recursion depth (how many levels of pages to check, starting with the start pages).' .
-                'Default is 999, where 999 means infinite depth. If none is given, TSconfig mod.brofix.depth is used')
-            ->addOption('to', 't', InputOption::VALUE_REQUIRED,
-                'Email address of recipient. If none is given, TSconfig mod.brofix.mail.recipients is used.');
+                'Default is 999, where 999 means infinite depth. If none is given, TSconfig mod.brofix.depth is used'
+            )
+            ->addOption(
+                'to',
+                't',
+                InputOption::VALUE_REQUIRED,
+                'Email address of recipient. If none is given, TSconfig mod.brofix.mail.recipients is used.'
+            )
+            ->addOption(
+                'dry-run',
+                '',
+                InputOption::VALUE_NONE,
+                'Do not execute link checking and do not send email, just show what would get checked.'
+            );
     }
 
     /**
@@ -99,7 +122,6 @@ class CheckLinksCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $this->io->title($this->getDescription());
 
         $options = $input->getOptions();
         $startPageString = (string)($input->getOption('start-pages') ?? '');
@@ -107,6 +129,11 @@ class CheckLinksCommand extends Command
             $startPages = explode(',', $startPageString);
         } else {
             $startPages = [];
+        }
+        $this->dryRun = $options['dry-run'] ?? false;
+
+        if ($this->dryRun) {
+            $this->io->writeln('Dry run is activated, do not check and do not send email');
         }
 
         if ($startPages === []) {
@@ -127,6 +154,9 @@ class CheckLinksCommand extends Command
         }
 
         foreach ($startPages as $pageId) {
+
+            $this->io->title('Start checking page ' . $pageId);
+
             $pageId = (int)$pageId;
             if ($pageId <= 0) {
                 $this->io->warning('Page id ' . $pageId . ' not allowed ... skipping');
@@ -143,10 +173,22 @@ class CheckLinksCommand extends Command
             if (isset($options['to'])) {
                 $this->configuration->setMailRecipients($options['to']);
             }
-            if (!$this->checkPageLinks($pageId, $options)
+
+            $result = $this->checkPageLinks($pageId, $options);
+
+            if ($this->dryRun) {
+                continue;
+            }
+
+            if (!$result
                 || !isset($this->statistics[$pageId])
             ) {
                 $this->io->warning(sprintf('No result for checking %d ... abort', $pageId));
+                continue;
+            }
+            
+            if ($this->dryRun) {
+                $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
                 continue;
             }
 
@@ -175,6 +217,8 @@ class CheckLinksCommand extends Command
                     $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 }
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+            } else {
+                $this->io->writeln('Do not send mail, because sending was deactivated.');
             }
         }
 
@@ -191,7 +235,7 @@ class CheckLinksCommand extends Command
      * @return bool
      * @throws \InvalidArgumentException
      */
-    protected function checkPageLinks(int $pageUid, array $options): bool
+    protected function checkPageLinks(int $pageUid, array $options = []): bool
     {
         $depth = $this->configuration->getDepth();
         $searchFields = $this->configuration->getSearchFields();
@@ -205,9 +249,17 @@ class CheckLinksCommand extends Command
         }
 
         $this->io->writeln(
-            sprintf('Checking start page "%s" [%d], depth: %s', $pageRow['title'],
-                $pageUid, $depth === 999 ? 'infinite' : $depth)
+            sprintf(
+                'Checking start page "%s" [%d], depth: %s',
+                $pageRow['title'],
+                $pageUid,
+                $depth === 999 ? 'infinite' : $depth
+            )
         );
+
+        if ($this->dryRun) {
+            return true;
+        }
 
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($pageRow);
 
@@ -220,12 +272,14 @@ class CheckLinksCommand extends Command
                 $checkHidden
             );
         } else {
-          $this->io->warning(
-              sprintf('Will not check hidden pages or children of hidden pages, rootline is hidden: %s [%d]',
-                  $pageRow['title'] ?? '', $pageUid
+            $this->io->warning(
+                sprintf(
+                  'Will not check hidden pages or children of hidden pages, rootline is hidden: %s [%d]',
+                  $pageRow['title'] ?? '',
+                  $pageUid
               )
-          );
-          return false;
+            );
+            return false;
         }
         if (!empty($pageIds)) {
             /** @var LinkAnalyzer $linkAnalyzer */
