@@ -13,3 +13,7 @@ parameters:
     - %currentWorkingDirectory%/../Classes
   scanDirectories:
     - %currentWorkingDirectory%/Web/typo3/sysext
+
+  excludes_analyse:
+    - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
+    - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultPlainMail.php

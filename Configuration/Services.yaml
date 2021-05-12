@@ -6,8 +6,6 @@ services:
 
   Sypets\Brofix\:
     resource: '../Classes/*'
-    # Tasks require EXT:scheduler to be installed, exclude for now.
-    exclude: '../Classes/Task'
 
   Sypets\Brofix\LinkAnalyzer:
     public: true

@@ -37,8 +37,6 @@ use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Handles link checking
@@ -538,8 +536,6 @@ class LinkAnalyzer implements LoggerAwareInterface
     ): void {
         $idRecord = (int)($record['uid'] ?? 0);
         try {
-            list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
-
             // Put together content of all relevant fields
             /** @var HtmlParser $htmlParser */
             $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
@@ -615,6 +611,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
             }
         } catch (DatabaseDefaultLanguageException $e) {
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->error(
                 "analyzeRecord: table=$table, uid=$idRecord, DatabaseDefaultLanguageException:"
                 . $e->getMessage()
@@ -622,6 +619,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 . $e->getTraceAsString()
             );
         } catch (\Exception | \Throwable $e) {
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->error(
                 "analyzeRecord: table=$table, uid=$idRecord, exception="
                 . $e->getMessage()
@@ -735,40 +733,6 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
-     * Emits a signal before the record is analyzed
-     *
-     * @param array $results Array of broken links
-     * @param array $record Record to analyze
-     * @param string $table Table name of the record
-     * @param array $fields Array of fields to analyze
-     * @return array
-     */
-    protected function emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields): array
-    {
-        return $this->getSignalSlotDispatcher()->dispatch(
-            self::class,
-            'beforeAnalyzeRecord',
-            [$results, $record, $table, $fields, $this]
-        );
-    }
-
-    /**
-     * @return Dispatcher
-     */
-    protected function getSignalSlotDispatcher()
-    {
-        return $this->getObjectManager()->get(Dispatcher::class);
-    }
-
-    /**
-     * @return ObjectManager
-     */
-    protected function getObjectManager(): ObjectManager
-    {
-        return GeneralUtility::makeInstance(ObjectManager::class);
-    }
-
-    /**
      * @return LanguageService
      */
     protected function getLanguageService(): LanguageService
@@ -783,6 +747,7 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     protected function error(string $message): void
     {
+        // @extensionScannerIgnoreLine problem with ->error()
         $this->logger->error($message);
     }
 }

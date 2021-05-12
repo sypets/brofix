@@ -509,6 +509,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->update(self::TABLE, $record, $identifier);
         } catch (\Exception $e) {
             // we catch exception here and log as error
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->logger->error(
                 'insertBrokenLink: url_response='
                 . ($record['url_response'] ?? '')
@@ -533,6 +534,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->insert(self::TABLE, $record);
         } catch (\Exception $e) {
             // we catch exception here and log as error
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->logger->error(
                 'insertBrokenLink: url_response='
                 . ($record['url_response'] ?? '')

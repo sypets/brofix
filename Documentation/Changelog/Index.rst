@@ -6,6 +6,11 @@
 Changelog
 =========
 
+2.0.0
+=====
+
+- Support for TYPO3 9 was dropped
+
 
 1.0.4
 =====

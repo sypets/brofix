@@ -26,14 +26,12 @@ use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Mail\GenerateCheckResultFluidMail;
 use Sypets\Brofix\Mail\GenerateCheckResultMailInterface;
-use Sypets\Brofix\Mail\GenerateCheckResultPlainMail;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * @internal This class is for internal use inside this extension only.
@@ -49,6 +47,16 @@ class CheckLinksCommand extends Command
      * @var bool
      */
     protected $dryRun;
+
+    /**
+     * @var int
+     */
+    protected $depth;
+
+    /**
+     * @var string
+     */
+    protected $sendTo;
 
     /**
      * @var int -1: means use default (from configuration),
@@ -132,19 +140,19 @@ class CheckLinksCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $options = $input->getOptions();
-
-        $this->dryRun = $options['dry-run'] ?? false;
+        $this->dryRun = (bool)($input->getOption('dry-run') ?: false);
         if ($this->dryRun) {
             $this->io->writeln('Dry run is activated, do not check and do not send email');
         }
 
-        $this->sendEmail = (int)($options['send-email'] ?? -1);
+        $this->sendEmail = (int)($input->getOption('send-email') ?? -1);
         if ($this->sendEmail === 0) {
             $this->io->writeln('Do not send email.');
         }
@@ -166,10 +174,14 @@ class CheckLinksCommand extends Command
             $this->io->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
         }
         if ($startPages === []) {
+            // @extensionScannerIgnoreLine problem with ->error()
             $this->io->error('No pages to check ... abort');
-            // @todo can be changed to return Command::FAILURE when TYPO3 v9 support is dropped
+            // @todo use constant Command::FAILURE (not available in earlier Symfony versions)
             return 1;
         }
+
+        $this->depth = (int)($input->getOption('depth') ?: -1);
+        $this->sendTo = $input->getOption('to') ?: '';
 
         foreach ($startPages as $pageId) {
             $this->io->title('Start checking page ' . $pageId);
@@ -182,14 +194,13 @@ class CheckLinksCommand extends Command
 
             // set configuration via command line arguments
             $this->configuration->loadPageTsConfig($pageId);
-            if (isset($options['depth'])) {
-                $depth = (int)$options['depth'];
-                $this->configuration->setDepth($depth);
-            } else {
-                $depth = 999;
+            if ($this->depth !== -1) {
+                $this->configuration->setDepth($this->depth);
             }
-            if (isset($options['to'])) {
-                $this->configuration->setMailRecipients($options['to']);
+            $depth = $this->configuration->getDepth();
+
+            if ($this->sendTo !== '') {
+                $this->configuration->setMailRecipients($this->sendTo);
             }
             if ($this->sendEmail === 0) {
                 $this->configuration->setMailSendOnCheckLinks(0);
@@ -219,7 +230,7 @@ class CheckLinksCommand extends Command
             }
 
             // check links
-            $result = $this->checkPageLinks($pageId, $options);
+            $result = $this->checkPageLinks($pageId);
 
             if ($this->dryRun) {
                 $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
@@ -241,29 +252,17 @@ class CheckLinksCommand extends Command
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
-                // @todo check can be removed once support for 9 is dropped
-                if (((int)(GeneralUtility::intExplode(
-                    '.',
-                    VersionNumberUtility::getCurrentTypo3Version()
-                )[0])) < 10) {
-                    /**
-                     * @var GenerateCheckResultMailInterface
-                     */
-                    $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultPlainMail::class);
-                } else {
-                    // FluidEmail - only for TYPO3 10
-                    /**
-                     * @var GenerateCheckResultMailInterface
-                     */
-                    $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
-                }
+                /**
+                * @var GenerateCheckResultMailInterface
+                */
+                $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
             } else {
                 $this->io->writeln('Do not send mail, because sending was deactivated.');
             }
         }
 
-        // @todo can be changed to return  Command::SUCCESS once support for TYPO3 v9 is dropped
+        // @todo use constant Command::SUCCESS (not available in earlier Symfony versions)
         return 0;
     }
 
@@ -276,7 +275,7 @@ class CheckLinksCommand extends Command
      * @return bool
      * @throws \InvalidArgumentException
      */
-    protected function checkPageLinks(int $pageUid, array $options = []): bool
+    protected function checkPageLinks(int $pageUid): bool
     {
         $depth = $this->configuration->getDepth();
         $searchFields = $this->configuration->getSearchFields();
