@@ -143,7 +143,7 @@ class CheckLinksCommand extends Command
             $this->io->writeln('Dry run is activated, do not check and do not send email');
         }
 
-        $this->sendEmail = (int) ($options['send-email'] ?? -1);
+        $this->sendEmail = (int)($options['send-email'] ?? -1);
         if ($this->sendEmail === 0) {
             $this->io->writeln('Do not send email.');
         }
@@ -171,7 +171,6 @@ class CheckLinksCommand extends Command
         }
 
         foreach ($startPages as $pageId) {
-
             $this->io->title('Start checking page ' . $pageId);
 
             $pageId = (int)$pageId;
@@ -231,7 +230,7 @@ class CheckLinksCommand extends Command
                 $this->io->warning(sprintf('No result for checking %d ... abort', $pageId));
                 continue;
             }
-            
+
             if ($this->dryRun) {
                 $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
                 continue;
@@ -241,7 +240,7 @@ class CheckLinksCommand extends Command
             $this->io->writeln(sprintf(
                 'Result for page "%s" (and %s depth): number of broken links=%d',
                 $stats->getPageTitle(),
-                (string) ($depth === 999 ? 'infinite' : $depth),
+                (string)($depth === 999 ? 'infinite' : $depth),
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
@@ -319,10 +318,10 @@ class CheckLinksCommand extends Command
         } else {
             $this->io->warning(
                 sprintf(
-                  'Will not check hidden pages or children of hidden pages, rootline is hidden: %s [%d]',
-                  $pageRow['title'] ?? '',
-                  $pageUid
-              )
+                    'Will not check hidden pages or children of hidden pages, rootline is hidden: %s [%d]',
+                    $pageRow['title'] ?? '',
+                    $pageUid
+                )
             );
             return false;
         }
