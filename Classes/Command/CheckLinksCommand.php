@@ -33,6 +33,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * @internal This class is for internal use inside this extension only.
@@ -221,6 +222,7 @@ class CheckLinksCommand extends Command
             $result = $this->checkPageLinks($pageId, $options);
 
             if ($this->dryRun) {
+                $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
                 continue;
             }
 
@@ -228,11 +230,6 @@ class CheckLinksCommand extends Command
                 || !isset($this->statistics[$pageId])
             ) {
                 $this->io->warning(sprintf('No result for checking %d ... abort', $pageId));
-                continue;
-            }
-
-            if ($this->dryRun) {
-                $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
                 continue;
             }
 
@@ -245,9 +242,9 @@ class CheckLinksCommand extends Command
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 // @todo check can be removed once support for 9 is dropped
-                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode(
+                if (((int)(GeneralUtility::intExplode(
                     '.',
-                    \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version()
+                    VersionNumberUtility::getCurrentTypo3Version()
                 )[0])) < 10) {
                     /**
                      * @var GenerateCheckResultMailInterface
