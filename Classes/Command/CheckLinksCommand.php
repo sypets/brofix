@@ -159,8 +159,10 @@ class CheckLinksCommand extends Command
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 // @todo check can be removed once support for 9 is dropped
-                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode('.',
-                        \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version())[0])) < 10) {
+                if (((int)(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode(
+                    '.',
+                    \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version()
+                )[0])) < 10) {
                     /**
                      * @var GenerateCheckResultMailInterface
                      */
