@@ -18,7 +18,7 @@ echo "lint"
 Build/Scripts/runTests.sh -p 7.4 -s lint
 
 echo "phpstan"
-Build/Scripts/runTests.sh -p 7.4 -s phpstan -e "-c ../Build/phpstan_composerInstallMax.neon"
+Build/Scripts/runTests.sh -p 7.4 -s phpstan -e "-c ../Build/phpstan.neon"
 
 echo "Unit tests"
 Build/Scripts/runTests.sh -p 7.4 -s unit
