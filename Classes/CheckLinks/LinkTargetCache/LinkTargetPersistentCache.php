@@ -93,7 +93,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             return [];
         }
         $urlResponse = json_decode($row['url_response'], true);
-        $urlResponse['lastChecked'] = $row['last_check'];
+        $urlResponse['lastChecked'] = (int)$row['last_check'];
         return $urlResponse;
     }
 
