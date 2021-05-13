@@ -46,7 +46,7 @@ mod.brofix {
   }
 
   crawlDelay {
-    ms = 5000
+    seconds = 5
     nodelay =
   }
 

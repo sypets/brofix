@@ -24,9 +24,10 @@ use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Sypets\Brofix\CheckLinks\CrawlDelay;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\CheckLinks\LinkTargetCacheInterface;
-use Sypets\Brofix\CheckLinks\LinkTargetPersistentCache;
+use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetCacheInterface;
+use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -70,13 +71,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     protected $excludeLinkTarget;
 
     /**
-     * Timestamps when an URL from the domain was last accessed.
-     *
-     * @var array
-     */
-    protected $lastCheckedDomainTimestamps = [];
-
-    /**
      * @var string
      */
     protected $domain = '';
@@ -86,69 +80,29 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected $linkTargetCache;
 
+    /**
+     * @var CrawlDelay
+     */
+    protected $crawlDelay;
+
     public function __construct(
         RequestFactory $requestFactory = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
-        LinkTargetCacheInterface $linkTargetCache = null
+        LinkTargetCacheInterface $linkTargetCache = null,
+        CrawlDelay $crawlDelay = null
     ) {
         $this->initializeErrorParams();
         $this->requestFactory = $requestFactory ?: GeneralUtility::makeInstance(RequestFactory::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
         $this->linkTargetCache = $linkTargetCache ?: GeneralUtility::makeInstance(LinkTargetPersistentCache::class);
+        $this->crawlDelay = $crawlDelay ?: GeneralUtility::makeInstance(CrawlDelay::class);
     }
 
     public function setConfiguration(Configuration $configuration): void
     {
         parent::setConfiguration($configuration);
         $this->excludeLinkTarget->setExcludeLinkTargetsPid($this->configuration->getExcludeLinkTargetStoragePid());
-    }
-
-    /**
-     * Make sure there is a delay between checks of the same domain
-     *
-     * @param string $url
-     */
-    protected function crawlDelay(string $url): void
-    {
-        $crawlDelayMs = $this->configuration->getCrawlDelayMs();
-        $noCrawlDelay = $this->configuration->getCrawlDelayNodelay();
-
-        $this->logger->debug('crawlDelay BEGIN: url=' . $url);
-
-        if ($this->domain === '' || in_array($this->domain, $noCrawlDelay)) {
-            $this->logger->debug('crawlDelay skip url=' . $url);
-            return;
-        }
-        $lastTimestamp = $this->lastCheckedDomainTimestamps[ $this->domain] ?? 0;
-        $current = round(microtime(true) * 1000);
-        $this->logger->debug('crawlDelay BEGIN: domain=' . $this->domain . ", lastTimestamp=$lastTimestamp, current=$current url=" . $url);
-        if (($current - $lastTimestamp) >= $crawlDelayMs) {
-            // no delay necessary
-            $this->logger->debug('crawlDelay No delay necessary url=' . $url);
-            $this->lastCheckedDomainTimestamps[$this->domain] = $current;
-            return;
-        }
-        // delay necessary
-        $wait = (int)($crawlDelayMs - ($current-$lastTimestamp));
-        if ($wait > 0) {
-            $this->logger->debug("crawlDelay: sleep for $wait ms url=" . $url);
-            usleep($wait);
-        }
-    }
-
-    /**
-     * Store time for last check of this URL - used for crawlDelay.
-     *
-     * @param string $url
-     */
-    protected function setLastCheckedTime(string $url): void
-    {
-        if ($this->domain === '') {
-            return;
-        }
-        $current = round(microtime(true) * 1000);
-        $this->lastCheckedDomainTimestamps[$this->domain] = $current;
-        $this->logger->debug('crawlDelay: done url=' . $url);
+        $this->crawlDelay->setConfiguration($this->configuration);
     }
 
     /**
@@ -176,11 +130,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected function insertIntoLinkTargetCache(string $url, bool $isValid): void
     {
-        $urlResponse = [
-            'valid' => $isValid,
-            'errorParams' => $this->errorParams->toArray(),
-            'lastChecked' => $this->lastChecked
-        ];
+        $urlResponse = $this->linkTargetCache->generateUrlResponse($isValid, $this->errorParams);
         $this->linkTargetCache->setResult($url, 'external', $urlResponse);
     }
 
@@ -251,7 +201,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         $url = $this->preprocessUrl($origUrl);
         if (!empty($url)) {
             if (($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY) === 0) {
-                $this->crawlDelay($url);
+                $delayed = $this->crawlDelay->crawlDelay($this->domain);
+                $this->logger->debug('crawl delay=' . $delayed . ' for URL=' . $url);
             }
 
             $isValidUrl = $this->requestUrl($url, 'HEAD', $options);
@@ -260,7 +211,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 $options['headers']['Range'] = 'bytes=0-4048';
                 $isValidUrl = $this->requestUrl($url, 'GET', $options);
             }
-            $this->setLastCheckedTime($url);
+            $this->crawlDelay->setLastCheckedTime($this->domain);
         }
         $this->lastChecked = \time();
         $this->insertIntoLinkTargetCache($url, $isValidUrl);

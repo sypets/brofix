@@ -17,7 +17,7 @@ namespace Sypets\Brofix\Tests\Unit\Linktype;
  */
 
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\CheckLinks\LinkTargetPersistentCache;
+use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ExternalLinktype;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;

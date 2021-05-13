@@ -104,6 +104,7 @@ class Configuration
      */
     public function setSearchFields(array $searchFields): void
     {
+        unset($this->tsConfig['searchFields.']);
         foreach ($searchFields as $table => $fields) {
             $this->tsConfig['searchFields.'][$table] = implode(',', $fields);
         }
@@ -208,9 +209,33 @@ class Configuration
         return (int)($this->tsConfig['linkTargetCache.']['expiresLow'] ?? 518400);
     }
 
+    /**
+     * @return int
+     *
+     * @deprecated Use getCrawlDelaySeconds. Accuracy is only by seconds.
+     */
     public function getCrawlDelayMs(): int
     {
-        return (int)($this->tsConfig['crawlDelay.']['ms'] ?? 5000);
+        trigger_error(
+            'Method "getCrawlDelayMs" is deprecated since brofix version 2.0.0, should use getCrawlDelaySeconds',
+            E_USER_DEPRECATED
+        );
+
+        if (isset($this->tsConfig['crawlDelay.']['seconds'])) {
+            return (int)($this->tsConfig['crawlDelay.']['seconds'] * 1000);
+        }
+        if (isset($this->tsConfig['crawlDelay.']['ms'])) {
+            return (int)($this->tsConfig['crawlDelay.']['ms']);
+        }
+        return 5000;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCrawlDelaySeconds(): int
+    {
+        return (int)($this->tsConfig['crawlDelay.']['seconds'] ?? 5);
     }
 
     public function getCrawlDelayNodelay(): array

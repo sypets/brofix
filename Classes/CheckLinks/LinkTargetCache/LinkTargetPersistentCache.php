@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace Sypets\Brofix\CheckLinks;
+namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -93,7 +93,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             return [];
         }
         $urlResponse = json_decode($row['url_response'], true);
-        $urlResponse['last_check'] = $row['last_check'];
+        $urlResponse['lastChecked'] = (int)$row['last_check'];
         return $urlResponse;
     }
 

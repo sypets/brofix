@@ -19,31 +19,19 @@ namespace Sypets\Brofix\Tests\Unit\Linktype;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\CheckLinks\LinkTargetPersistentCache;
+use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ExternalLinktype;
+use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Http\RequestFactory;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class ExternalLinktypeTest extends UnitTestCase
+class ExternalLinktypeTest extends AbstractUnitTest
 {
     protected function setUp(): void
     {
         parent::setUp();
-        $GLOBALS['LANG'] = $this->buildLanguageServiceProphecy()->reveal();
-    }
-
-    private function buildLanguageServiceProphecy(): ObjectProphecy
-    {
-        $languageServiceProphecy = $this->prophesize(LanguageService::class);
-        $languageServiceProphecy
-            ->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
-        $languageServiceProphecy->getLL(Argument::any())->willReturn('translation string');
-        return $languageServiceProphecy;
+        $this->inializeLanguageServiceProphecy();
     }
 
     /**

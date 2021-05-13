@@ -266,6 +266,11 @@ class CheckLinksCommand extends Command
         return 0;
     }
 
+    public function getStatistics(int $pageUid): CheckLinksStatistics
+    {
+        return $this->statistics[$pageUid];
+    }
+
     /**
      * Validate all links for a page (and possibly its subpages) based on the task configuration.
      *

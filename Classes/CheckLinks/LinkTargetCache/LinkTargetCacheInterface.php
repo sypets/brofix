@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace Sypets\Brofix\CheckLinks;
+namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -16,9 +16,20 @@ namespace Sypets\Brofix\CheckLinks;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\Linktype\ErrorParams;
+
 interface LinkTargetCacheInterface
 {
     public function setExpire(int $expire): void;
+
+    /**
+     * Generate UrlResponse array from arguments.
+     *
+     * @param bool $isValid
+     * @param ErrorParams $errorParams
+     * @return array
+     */
+    public function generateUrlResponse(bool $isValid, ErrorParams $errorParams): array;
 
     /**
      * Check if url exists in link cache (and is not expired)

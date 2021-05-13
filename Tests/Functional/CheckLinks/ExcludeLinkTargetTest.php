@@ -18,59 +18,10 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks;
  */
 
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\Configuration\Configuration;
-use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
 
-class ExcludeLinkTargetTest extends FunctionalTestCase
+class ExcludeLinkTargetTest extends AbstractFunctionalTest
 {
-    protected $coreExtensionsToLoad = [
-        'backend',
-        'fluid',
-        'info',
-        'install'
-    ];
-
-    protected $testExtensionsToLoad = [
-        'typo3conf/ext/brofix',
-        'typo3conf/ext/page_callouts'
-    ];
-
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /**
-     * Set up for set up the backend user, initialize the language object
-     * and creating the Export instance
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Bootstrap::initializeLanguageObject();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function initializeConfiguration(array $linkTypes = [], array $searchFields = [])
-    {
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        // load default values
-        $this->configuration->loadPageTsConfig(0);
-        $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');
-        $this->configuration->overrideTsConfigByString('mod.brofix.searchFields.pages = media,url');
-        if ($linkTypes) {
-            $this->configuration->setLinkTypes($linkTypes);
-        }
-        if ($searchFields) {
-            $this->configuration->setSearchFields($searchFields);
-        }
-    }
-
     public function isExcludedDataProvider(): array
     {
         return [
@@ -99,7 +50,6 @@ class ExcludeLinkTargetTest extends FunctionalTestCase
     {
         // setup
         $this->importDataSet($inputFile);
-        $this->initializeConfiguration();
         $excludeLinkTarget = new ExcludeLinkTarget();
         $excludeLinkTarget->setExcludeLinkTargetsPid($this->configuration->getExcludeLinkTargetStoragePid());
         $result = $excludeLinkTarget->isExcluded($url, $linkType);
