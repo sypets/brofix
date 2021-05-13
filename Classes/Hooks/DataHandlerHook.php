@@ -47,10 +47,14 @@ final class DataHandlerHook
     ) {
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
-        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
     }
 
     /**
+     * 1. If an ExcludeLinkTarget record is changed or created
+     * 2. If a pages or tt_content changes hidden status
+     *
+     * ... remove the corresponding broken link records.
+     *
      * @param string $status
      * @param string $table
      * @param $id
@@ -91,35 +95,17 @@ final class DataHandlerHook
             && ($changedValues['hidden'] ?? false)
             && (($changedValues['t3ver_stage'] ?? 0) === 0)) {
             // page / content has changed state to hidden: delete broken link records
-            $numDeleted = $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
-            if ($numDeleted > 0) {
-                $message = sprintf(
-                    $this->getLanguageService()->getLL('broken_links_removed'),
-                    $numDeleted,
-                    $id
-                );
-                $title = '';
-                $this->createFlashMessage($message, $title);
-            }
+            $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
         }
     }
 
     /*
-     * cmd Datahandler hook
+     * If records get deleted, remove corresponding broken link records
      */
     public function processCmdmap_deleteAction($table, $id, $recordToDelete, $recordWasDeleted, $dataHandler)
     {
         $id = (int)$id;
-        $numDeleted = $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
-        if ($numDeleted > 0) {
-            $message =  sprintf(
-                $this->getLanguageService()->getLL('broken_links_removed'),
-                $numDeleted,
-                $id
-            );
-            $title = '';
-            $this->createFlashMessage($message, $title);
-        }
+        $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
     }
 
     private function removeBrokenLinkRecordsForExcludedLinkTarget(array $row): bool
@@ -133,44 +119,12 @@ final class DataHandlerHook
             return false;
         }
 
-        $numDeleted = $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
+        $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
             $row['linktarget'],
             $row['link_type'],
             $row['match'],
             (int)($row['pid'] ?? 0)
         );
-        if ($numDeleted > 0) {
-            $message =  sprintf(
-                $this->getLanguageService()->getLL('broken_links_removed'),
-                $numDeleted,
-                $row['linktarget']
-            );
-            $title = $this->getLanguageService()->getLL('exclude_list');
-            $this->createFlashMessage($message, $title);
-        }
         return true;
-    }
-
-    private function createFlashMessage(string $message, $title, int $status = FlashMessage::OK): void
-    {
-        $flashMessage = GeneralUtility::makeInstance(
-            FlashMessage::class,
-            $message,
-            $title,
-            $status,
-            false
-        );
-
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-        $defaultFlashMessageQueue->enqueue($flashMessage);
-    }
-
-    /**
-     * @return LanguageService
-     */
-    private function getLanguageService()
-    {
-        return $GLOBALS['LANG'];
     }
 }
