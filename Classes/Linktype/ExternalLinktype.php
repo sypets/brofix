@@ -25,8 +25,8 @@ use GuzzleHttp\Exception\TooManyRedirectsException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\CheckLinks\LinkTargetCacheInterface;
-use Sypets\Brofix\CheckLinks\LinkTargetPersistentCache;
+use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetCacheInterface;
+use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -176,11 +176,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected function insertIntoLinkTargetCache(string $url, bool $isValid): void
     {
-        $urlResponse = [
-            'valid' => $isValid,
-            'errorParams' => $this->errorParams->toArray(),
-            'lastChecked' => $this->lastChecked
-        ];
+        $urlResponse = $this->linkTargetCache->generateUrlResponse($isValid, $this->errorParams);
         $this->linkTargetCache->setResult($url, 'external', $urlResponse);
     }
 
