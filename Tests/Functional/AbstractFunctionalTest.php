@@ -59,10 +59,10 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
      */
     protected function initializeConfiguration()
     {
+        $tsConfigPath = GeneralUtility::getFileAbsFileName('EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig');
         $this->configuration = GeneralUtility::makeInstance(Configuration::class);
         // load default values
-        $filename = __DIR__ . '../../../Configuration/TsConfig/Page/pagetsconfig.tsconfig';
-        $this->configuration->overrideTsConfigByString(file_get_contents($filename));
+        $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
         $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');
     }
 
