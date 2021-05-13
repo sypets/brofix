@@ -9,7 +9,9 @@ Changelog
 1.0.5
 =====
 
-- bugfix: Do not use FlashMessages in DataHandler hook
+- [BUGFIX] Do not use FlashMessages in DataHandler hook
+- [BUGFIX] Do not delete broken link records for hidden exclude link targets
+  records (via DataHandler)
 
 1.0.4
 =====
