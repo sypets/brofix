@@ -17,7 +17,6 @@ namespace Sypets\Brofix\Tests\Unit\Configuration;
  */
 
 use Sypets\Brofix\CheckLinks\CrawlDelay;
-use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -47,7 +46,7 @@ class CrawlDelayTest extends AbstractUnitTest
         $subject = $this->initializeCrawlDelay();
         $subject->setConfiguration($this->configuration);
         $result = $subject->crawlDelay('example.org');
-        $this->assertEquals(0, $result, 'Result should be 0 (no crawl delay)');
+        self::assertEquals(0, $result, 'Result should be 0 (no crawl delay)');
     }
 
     /**
@@ -62,7 +61,7 @@ class CrawlDelayTest extends AbstractUnitTest
         $subject->setConfiguration($this->configuration);
         $subject->crawlDelay('example.org');
         $result = $subject->crawlDelay('example.com');
-        $this->assertEquals(0, $result, 'Result should be 0 (no crawl delay)');
+        self::assertEquals(0, $result, 'Result should be 0 (no crawl delay)');
     }
 
     /**
@@ -80,7 +79,10 @@ class CrawlDelayTest extends AbstractUnitTest
 
         $subject->crawlDelay($domain);
         $result = $subject->crawlDelay($domain);
-        $this->assertEquals($expected, $result,
-            'Result should be the same value as expected delay');
+        self::assertEquals(
+            $expected,
+            $result,
+            'Result should be the same value as expected delay'
+        );
     }
 }

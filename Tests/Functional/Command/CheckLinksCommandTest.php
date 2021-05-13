@@ -19,12 +19,9 @@ namespace Sypets\Brofix\Tests\Functional\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
 use Sypets\Brofix\Command\CheckLinksCommand;
-use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
 use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 
 class CheckLinksCommandTest extends AbstractFunctionalTest
 {
@@ -55,13 +52,15 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         $tester = new CommandTester($command);
         $result = $tester->execute([], []);
 
-        $this->assertEquals(1, $result,
-            'Test should return 1 if no startpages passed as arguments and no sites configured');
+        self::assertEquals(
+            1,
+            $result,
+            'Test should return 1 if no startpages passed as arguments and no sites configured'
+        );
     }
 
     /**
      * @test
-     *
      */
     public function checkLinksCommandChecksLinksMissingEmailException()
     {
@@ -94,7 +93,7 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         $tester = new CommandTester($command);
         $result = $tester->execute($parameters, []);
 
-        $this->assertEquals(0, $result, 'Console command should return 0 if no errors.');
+        self::assertEquals(0, $result, 'Console command should return 0 if no errors.');
     }
 
     /**
@@ -113,8 +112,11 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         $tester->execute($parameters, []);
         $stats = $command->getStatistics(1);
 
-        $this->assertEquals($stats->getCountPages(), 1,
-            'The number of pages checked should be 1.');
+        self::assertEquals(
+            $stats->getCountPages(),
+            1,
+            'The number of pages checked should be 1.'
+        );
     }
 
     /**
@@ -133,7 +135,6 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         $tester->execute($parameters, []);
         $stats = $command->getStatistics(1);
 
-        $this->assertEquals($stats->getCountBrokenLinks(), 1);
+        self::assertEquals($stats->getCountBrokenLinks(), 1);
     }
-
 }

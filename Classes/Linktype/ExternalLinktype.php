@@ -105,7 +105,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         $this->crawlDelay->setConfiguration($this->configuration);
     }
 
-
     /**
      * @param string $url
      * @return bool

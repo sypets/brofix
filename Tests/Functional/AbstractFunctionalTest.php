@@ -17,7 +17,6 @@ namespace Sypets\Brofix\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -65,5 +64,4 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
         $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
         $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');
     }
-
 }

@@ -223,11 +223,11 @@ class Configuration
 
         if (isset($this->tsConfig['crawlDelay.']['seconds'])) {
             return (int)($this->tsConfig['crawlDelay.']['seconds'] * 1000);
-        } elseif (isset($this->tsConfig['crawlDelay.']['ms'])) {
-            return (int)($this->tsConfig['crawlDelay.']['ms']);
-        } else {
-            return 5000;
         }
+        if (isset($this->tsConfig['crawlDelay.']['ms'])) {
+            return (int)($this->tsConfig['crawlDelay.']['ms']);
+        }
+        return 5000;
     }
 
     /**

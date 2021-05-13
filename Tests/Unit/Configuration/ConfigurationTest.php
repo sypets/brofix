@@ -16,8 +16,8 @@ namespace Sypets\Brofix\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ConfigurationTest extends AbstractUnitTest
 {
@@ -55,8 +55,11 @@ class ConfigurationTest extends AbstractUnitTest
         $this->configuration->overrideTsConfigByString($tsconfig);
 
         $actualResult = $this->configuration->getSearchFields();
-        $this->assertEquals($expectedSearchFields, $actualResult,
-            'Setting searchFields as string returns correct result');
+        self::assertEquals(
+            $expectedSearchFields,
+            $actualResult,
+            'Setting searchFields as string returns correct result'
+        );
     }
 
     /**
@@ -77,10 +80,12 @@ class ConfigurationTest extends AbstractUnitTest
         $this->configuration->setSearchFields($expectedSearchFields);
 
         $actualResult = $this->configuration->getSearchFields();
-        $this->assertEquals($expectedSearchFields, $actualResult,
-            'Setting searchFields as string returns correct result');
+        self::assertEquals(
+            $expectedSearchFields,
+            $actualResult,
+            'Setting searchFields as string returns correct result'
+        );
     }
-
 
     public function getExcludedCtypesIsCorrectDefault()
     {
@@ -90,7 +95,7 @@ class ConfigurationTest extends AbstractUnitTest
 
         $ctypes = $this->configuration->getExcludedCtypes();
 
-        $this->assertEquals($expected, $ctypes, 'Default excluded ctypes');
+        self::assertEquals($expected, $ctypes, 'Default excluded ctypes');
     }
 
     /**
@@ -101,8 +106,10 @@ class ConfigurationTest extends AbstractUnitTest
         $email = $this->configuration->getMailFromEmail();
 
         // expected, actual, message
-        self::assertTrue(GeneralUtility::validEmail($email),
-            'getMailFromEmail() should return valid email by default');
+        self::assertTrue(
+            GeneralUtility::validEmail($email),
+            'getMailFromEmail() should return valid email by default'
+        );
     }
 
     /**
@@ -114,8 +121,11 @@ class ConfigurationTest extends AbstractUnitTest
         $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] = 'system@example.org';
 
         // expected, actual, message
-        self::assertEquals($email, $this->configuration->getMailFromEmail(),
-            'getMailFromEmail() should return empty string by default');
+        self::assertEquals(
+            $email,
+            $this->configuration->getMailFromEmail(),
+            'getMailFromEmail() should return empty string by default'
+        );
     }
 
     public function getMailFromEmailReturnsCorrectTsconfig()
@@ -125,8 +135,11 @@ class ConfigurationTest extends AbstractUnitTest
         $this->configuration->overrideTsConfigByString('mod.brofix.mail.fromemail = ' . $emailExpected);
         $emailActual = $this->configuration->getMailFromEmail();
 
-        self::assertEquals($emailExpected, $emailActual,
-            'getMailFromEmail() should return valid email by default');
+        self::assertEquals(
+            $emailExpected,
+            $emailActual,
+            'getMailFromEmail() should return valid email by default'
+        );
     }
 
     /**
@@ -134,8 +147,11 @@ class ConfigurationTest extends AbstractUnitTest
      */
     public function getMailFromNameIsCorrectDefault()
     {
-        self::assertEquals('', $this->configuration->getMailFromName(),
-            'getMailFromName() should return empty string by default');
+        self::assertEquals(
+            '',
+            $this->configuration->getMailFromName(),
+            'getMailFromName() should return empty string by default'
+        );
     }
 
     public function getMailFromNameReturnsCorrectTsconfig()
@@ -145,8 +161,11 @@ class ConfigurationTest extends AbstractUnitTest
         $this->configuration->overrideTsConfigByString('mod.brofix.mail.fromname = ' . $nameExpected);
         $nameActual = $this->configuration->getMailFromName();
 
-        self::assertEquals($nameExpected, $nameActual,
-            'getMailFromName() should return valid email by default');
+        self::assertEquals(
+            $nameExpected,
+            $nameActual,
+            'getMailFromName() should return valid email by default'
+        );
     }
 
     /**
@@ -155,8 +174,11 @@ class ConfigurationTest extends AbstractUnitTest
     public function getMailRecipientsIsCorrectDefault()
     {
         // expected, actual, message
-        self::assertEquals([], $this->configuration->getMailRecipients(),
-            'getMailRecipients() should return empty array by default');
+        self::assertEquals(
+            [],
+            $this->configuration->getMailRecipients(),
+            'getMailRecipients() should return empty array by default'
+        );
     }
 
     /**
@@ -170,8 +192,11 @@ class ConfigurationTest extends AbstractUnitTest
         $this->configuration->overrideTsConfigByString('mod.brofix.mail.recipients = ' . $email);
 
         // expected, actual, message
-        self::assertEquals($valueExpected, $this->configuration->getMailRecipients(),
-            'getMailRecipients() should return correct value');
+        self::assertEquals(
+            $valueExpected,
+            $this->configuration->getMailRecipients(),
+            'getMailRecipients() should return correct value'
+        );
     }
 
     /**

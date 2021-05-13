@@ -47,11 +47,10 @@ class CrawlDelay
         $this->noCrawlDelayDomains = $config->getCrawlDelayNodelay();
     }
 
-
     /**
      * Make sure there is a delay between checks of the same domain
      *
-     * @param string $url
+     * @param string $domain
      *
      * @return int returns number of microseconds waited
      */
@@ -70,11 +69,10 @@ class CrawlDelay
             // wait now
             sleep($wait);
             return $wait;
-        } else {
-            // no delay necessary
-            $this->lastCheckedDomainTimestamps[$domain] = $current;
-            return 0;
         }
+        // no delay necessary
+        $this->lastCheckedDomainTimestamps[$domain] = $current;
+        return 0;
     }
 
     /**

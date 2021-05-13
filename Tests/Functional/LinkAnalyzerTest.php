@@ -22,7 +22,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LinkAnalyzerTest extends AbstractFunctionalTest
 {
-
     protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
     {
         $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);

@@ -27,7 +27,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function  hasEntryForUrlReturnsFalse()
+    public function hasEntryForUrlReturnsFalse()
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -35,7 +35,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
         $subject = new LinkTargetPersistentCache();
         $result = $subject->hasEntryForUrl($url, $type);
 
-        $this->assertEquals(false, $result, 'Empty cache should not have entry for url');
+        self::assertFalse($result, 'Empty cache should not have entry for url');
     }
 
     /**
@@ -49,9 +49,8 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
         $subject = new LinkTargetPersistentCache();
         $result = $subject->getUrlResponseForUrl($url, $type);
 
-        $this->assertEquals([], $result, 'Empty cache should return empty array for url');
+        self::assertEquals([], $result, 'Empty cache should return empty array for url');
     }
-
 
     /**
      * @test
@@ -71,11 +70,10 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
         $subject = new LinkTargetPersistentCache();
         $result = $subject->generateUrlResponse(true, $emptyErrorParams);
 
-        $this->assertEquals($expected, $result, 'generateUrlResponse returns correct result');
+        self::assertEquals($expected, $result, 'generateUrlResponse returns correct result');
     }
 
-
-        /**
+    /**
      * @test
      */
     public function removeRemovesEntry()
@@ -84,13 +82,13 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
         $type = 'external';
 
         $subject = new LinkTargetPersistentCache();
-        $urlResponse = $subject->generateUrlResponse(true, new ErrorParams);
+        $urlResponse = $subject->generateUrlResponse(true, new ErrorParams());
 
         $subject->setResult($url, $type, $urlResponse);
         $subject->remove($url, $type);
 
         $result = $subject->hasEntryForUrl($url, $type);
-        $this->assertEquals(false, $result, 'Entry should be removed');
+        self::assertFalse($result, 'Entry should be removed');
     }
 
     /**
@@ -116,7 +114,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
         // will contain time of check, ignore here
         unset($result['lastChecked']);
 
-        $this->assertEquals($expected, $result, 'generateUrlResponse returns correct result');
+        self::assertEquals($expected, $result, 'generateUrlResponse returns correct result');
     }
 
     /**
@@ -160,6 +158,6 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
         // will contain time of check, ignore here
         unset($result['lastChecked']);
 
-        $this->assertEquals($expected, $result, 'generateUrlResponse returns correct result');
+        self::assertEquals($expected, $result, 'generateUrlResponse returns correct result');
     }
 }
