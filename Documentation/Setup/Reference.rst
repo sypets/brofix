@@ -418,19 +418,19 @@ linkTargetCache.expiresHigh
       691200 (8 days)
 
 
-crawlDelay.ms
--------------
+crawlDelay.seconds
+------------------
 
 .. container:: table-row
 
    Property
-      crawlDelay.ms
+      crawlDelay.seconds
 
    Data type
       int
 
    Description
-      The **minimum** number of milliseconds that must have passed between
+      The **minimum** number of seconds that must have passed between
       checking 2 URL for the same domain.
 
       If the required time has already passed since an URL of the same domain
@@ -454,10 +454,10 @@ crawlDelay.ms
 
       .. code-block:: typoscript
 
-         crawlDelay.ms = 10000
+         crawlDelay.seconds = 10
 
    Default
-      1000
+      5
 
 
 crawlDelay.nodelay
