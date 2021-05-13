@@ -16,17 +16,11 @@ namespace Sypets\Brofix\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
+use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
 
-class ConfigurationTest extends UnitTestCase
+class ConfigurationTest extends AbstractUnitTest
 {
-
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
 
     /**
      * Set up for set up the backend user, initialize the language object
@@ -37,23 +31,6 @@ class ConfigurationTest extends UnitTestCase
         parent::setUp();
 
         $this->initializeConfiguration();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function initializeConfiguration()
-    {
-        $tsConfigPath = GeneralUtility::getFileAbsFileName(
-            'EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig'
-        );
-
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        // load default values
-        $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
-        $this->configuration->overrideTsConfigByString(
-            'mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)'
-        );
     }
 
     /**
