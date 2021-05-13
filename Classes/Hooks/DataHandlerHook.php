@@ -115,6 +115,8 @@ final class DataHandlerHook
             || (($row['link_type'] ?? '') === '')
             || (($row['match'] ?? '') === '')
             || (!isset($row['pid']))
+            // ignore if exclude record is hidden
+            || (($row['hidden'] ?? 0) === 1)
         ) {
             return false;
         }
