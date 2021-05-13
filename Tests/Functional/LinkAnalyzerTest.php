@@ -17,59 +17,11 @@ namespace Sypets\Brofix\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
-class LinkAnalyzerTest extends FunctionalTestCase
+class LinkAnalyzerTest extends AbstractFunctionalTest
 {
-    protected $coreExtensionsToLoad = [
-        'backend',
-        'fluid',
-        'info',
-        'install'
-    ];
-
-    protected $testExtensionsToLoad = [
-        'typo3conf/ext/brofix',
-        'typo3conf/ext/page_callouts'
-    ];
-
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /**
-     * Set up for set up the backend user, initialize the language object
-     * and creating the Export instance
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Bootstrap::initializeLanguageObject();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function initializeConfiguration(array $linkTypes = [], array $searchFields = [])
-    {
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        // load default values
-        $this->configuration->loadPageTsConfig(0);
-        $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');
-        $this->configuration->overrideTsConfigByString('mod.brofix.searchFields.pages = media,url');
-        if ($linkTypes) {
-            $this->configuration->setLinkTypes($linkTypes);
-        }
-        if ($searchFields) {
-            $this->configuration->setSearchFields($searchFields);
-        }
-    }
 
     protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
     {
@@ -127,7 +79,6 @@ class LinkAnalyzerTest extends FunctionalTestCase
     public function generateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
     {
         // setup
-        $this->initializeConfiguration();
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
@@ -173,7 +124,7 @@ class LinkAnalyzerTest extends FunctionalTestCase
 
         // setup
         $this->importDataSet($inputFile);
-        $this->initializeConfiguration($linkTypes);
+        $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
@@ -218,7 +169,7 @@ class LinkAnalyzerTest extends FunctionalTestCase
 
         // setup
         $this->importDataSet($inputFile);
-        $this->initializeConfiguration($linkTypes);
+        $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
@@ -263,7 +214,7 @@ class LinkAnalyzerTest extends FunctionalTestCase
 
         // setup
         $this->importDataSet($inputFile);
-        $this->initializeConfiguration($linkTypes);
+        $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
@@ -318,7 +269,8 @@ class LinkAnalyzerTest extends FunctionalTestCase
 
         // setup
         $this->importDataSet($inputFile);
-        $this->initializeConfiguration($linkTypes, $searchFields);
+        $this->configuration->setLinkTypes($linkTypes);
+        $this->configuration->setSearchFields($searchFields);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 

@@ -16,32 +16,11 @@ namespace Sypets\Brofix\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
-class ConfigurationTest extends FunctionalTestCase
+class ConfigurationTest extends AbstractFunctionalTest
 {
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->initializeConfiguration();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function initializeConfiguration()
-    {
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        $filename = __DIR__ . '../../../../Configuration/TsConfig/Page/pagetsconfig.tsconfig';
-        $this->configuration->overrideTsConfigByString(file_get_contents($filename));
-    }
 
     /**
      * @test
