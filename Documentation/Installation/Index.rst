@@ -12,7 +12,7 @@ Make sure you use the latest version supported by your TYPO3 version!
 
 .. code-block:: shell
 
-   composer require: sypets/brofix:^1.0.0
+   composer require: sypets/brofix
 
 If you are not using Composer, you can install Broken Link Fixer
 (brofix) in the Extension Manager.
