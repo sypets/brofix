@@ -6,6 +6,10 @@
 Changelog
 =========
 
+1.0.5
+=====
+
+- bugfix: Do not use FlashMessages in DataHandler hook
 
 1.0.4
 =====
