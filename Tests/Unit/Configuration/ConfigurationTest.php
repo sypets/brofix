@@ -59,6 +59,66 @@ class ConfigurationTest extends UnitTestCase
     /**
      * @test
      */
+    public function overrideSearchFieldsSetsCorrectValues(): void
+    {
+        $tsconfig = 'mod.brofix.searchFields.pages = url' . "\n" .
+            'mod.brofix.searchFields.sometable = somefield1,somefield2';
+
+        $expectedSearchFields = [
+            'pages' => [
+                'url'
+                ],
+            'sometable' => [
+                'somefield1',
+                'somefield2'
+            ]
+        ];
+
+        $this->configuration->setSearchFields([]);
+        $this->configuration->overrideTsConfigByString($tsconfig);
+
+        $actualResult = $this->configuration->getSearchFields();
+        $this->assertEquals($expectedSearchFields, $actualResult,
+            'Setting searchFields as string returns correct result');
+    }
+
+    /**
+     * @test
+     */
+    public function setSearchFieldsSetsCorrectValues(): void
+    {
+        $expectedSearchFields = [
+            'pages' => [
+                'url'
+            ],
+            'sometable' => [
+                'somefield1',
+                'somefield2'
+            ]
+        ];
+
+        $this->configuration->setSearchFields($expectedSearchFields);
+
+        $actualResult = $this->configuration->getSearchFields();
+        $this->assertEquals($expectedSearchFields, $actualResult,
+            'Setting searchFields as string returns correct result');
+    }
+
+
+    public function getExcludedCtypesIsCorrectDefault()
+    {
+        $expected = [
+            'html'
+        ];
+
+        $ctypes = $this->configuration->getExcludedCtypes();
+
+        $this->assertEquals($expected, $ctypes, 'Default excluded ctypes');
+    }
+
+    /**
+     * @test
+     */
     public function getMailFromEmailIsCorrectDefault()
     {
         $email = $this->configuration->getMailFromEmail();

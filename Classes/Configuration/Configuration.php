@@ -104,6 +104,7 @@ class Configuration
      */
     public function setSearchFields(array $searchFields): void
     {
+        unset($this->tsConfig['searchFields.']);
         foreach ($searchFields as $table => $fields) {
             $this->tsConfig['searchFields.'][$table] = implode(',', $fields);
         }
