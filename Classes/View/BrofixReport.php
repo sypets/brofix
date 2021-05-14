@@ -118,6 +118,15 @@ class BrofixReport
     protected $isAccessibleForCurrentUser = false;
 
     /**
+     * Current BE user has access to ExcludeLinkTarget storage. This will
+     * be required for each broken link record and should be calculated
+     * only once.
+     *
+     * @var bool
+     */
+    protected $currentUserHasPermissionsForExcludeLinkTargetStorage = false;
+
+    /**
      * Link validation class
      *
      * @var LinkAnalyzer
@@ -275,6 +284,10 @@ class BrofixReport
         $this->view = $this->createView('InfoModule');
         if (isset($this->id)) {
             $this->configuration->loadPageTsConfig($this->id);
+            $this->currentUserHasPermissionsForExcludeLinkTargetStorage
+                = $this->excludeLinkTarget->currentUserHasCreatePermissions(
+                    $this->configuration->getExcludeLinkTargetStoragePid()
+                );
         }
     }
 
@@ -658,7 +671,7 @@ class BrofixReport
         $excludeLinkTargetStoragePid = $this->configuration->getExcludeLinkTargetStoragePid();
         // show exclude link target button
         if (in_array($row['link_type'] ?? 'empty', $this->configuration->getExcludeLinkTargetAllowedTypes())
-            && $this->excludeLinkTarget->currentUserHasCreatePermissions($excludeLinkTargetStoragePid)
+            && $this->currentUserHasPermissionsForExcludeLinkTargetStorage
         ) {
             $requestUri = GeneralUtility::getIndpEnv('REQUEST_URI') .
                 '&id=' . $this->id .
