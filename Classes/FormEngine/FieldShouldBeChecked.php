@@ -32,8 +32,8 @@ class FieldShouldBeChecked implements FormDataGroupInterface
     /**
      * Compile form data
      *
-     * @param array $result Initialized result array
-     * @return array Result filled with data
+     * @param mixed[] $result Initialized result array
+     * @return mixed[] Result filled with data
      * @throws \UnexpectedValueException
      */
     public function compile(array $result): array

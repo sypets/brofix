@@ -49,14 +49,14 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Array of tables and fields to search for broken links
      *
-     * @var array
+     * @var array<string,array<string>>
      */
     protected $searchFields = [];
 
     /**
      * List of page uids (rootline downwards)
      *
-     * @var array
+     * @var array<string|int>
      */
     protected $pids = [];
 
@@ -88,15 +88,6 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected $formDataCompiler;
 
     /**
-     * Statistics
-     *
-     * @var array
-     *
-     * @deprecated
-     */
-    protected $stats;
-
-    /**
      * @var CheckLinksStatistics
      */
     protected $statistics;
@@ -120,6 +111,11 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
     }
 
+    /**
+     * @param array<string> $searchField
+     * @param array<string|int> $pidList
+     * @param Configuration|null $configuration
+     */
     public function init(array $searchField, array $pidList, Configuration $configuration = null): void
     {
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
@@ -137,7 +133,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * If still invalid, check if link still exists in record. If not, remove from list of broken links.
      *
      * @param string $message
-     * @param array $record
+     * @param mixed[] $record
      * @return int Number of broken link records removed
      *
      * @todo make message more flexible, broken link records could get removed or changed
@@ -248,7 +244,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      *
      * This will recheck all URLs in the record using link target cache.
      *
-     * @param array $linkTypes
+     * @param array<string> $linkTypes
      * @param int $recordUid uid of record to check
      * @param string $table
      * @param string $field
@@ -297,8 +293,8 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
-     * @param array $links
-     * @param array<int,string> $linkTypes
+     * @param mixed[] $links
+     * @param array<string> $linkTypes
      */
     protected function checkLinks(array $links, array $linkTypes, int $mode = 0): void
     {
@@ -483,6 +479,8 @@ class LinkAnalyzer implements LoggerAwareInterface
      * Return standard fields which should be selected
      *
      * @param string $table
+     * @param array<string> $selectFields
+     * @return array<string>
      */
     protected function getSelectFields(string $table, array $selectFields = []): array
     {
@@ -503,6 +501,10 @@ class LinkAnalyzer implements LoggerAwareInterface
         return array_merge($defaultFields, $selectFields);
     }
 
+    /**
+     * @param mixed[] $links
+     * @return int
+     */
     protected function countLinks(array $links): int
     {
         $count = 0;
@@ -520,10 +522,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Find all supported broken links for a specific record
      *
-     * @param array $results Array of broken links
+     * @param mixed[] $results Array of broken links
      * @param string $table Table name of the record
-     * @param array $fields Array of fields to analyze
-     * @param array $record Record to analyze
+     * @param array<string> $fields Array of fields to analyze
+     * @param mixed[] $record Record to analyze
      * @param bool $checkIfEditable should check if field is editable, this can be skipped if the information
      *        is already available (for performance reasons)
      */
@@ -632,9 +634,9 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Find all supported broken links for a specific link list
      *
-     * @param array $resultArray findRef parsed records
-     * @param array $results Array of broken links
-     * @param array $record UID of the current record
+     * @param mixed[] $resultArray findRef parsed records
+     * @param mixed[] $results Array of broken links
+     * @param mixed[] $record UID of the current record
      * @param string $field The current field
      * @param string $table The current table
      */
@@ -668,10 +670,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Find all supported broken links for a specific typoLink
      *
-     * @param array $resultArray findRef parsed records
-     * @param array $results Array of broken links
+     * @param mixed[] $resultArray findRef parsed records
+     * @param mixed[] $results Array of broken links
      * @param HtmlParser $htmlParser Instance of html parser
-     * @param array $record The current record
+     * @param mixed[] $record The current record
      * @param string $field The current field
      * @param string $table The current table
      */

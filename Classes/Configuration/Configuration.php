@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Configuration;
 
+use Symfony\Component\Mime\Address;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
@@ -35,10 +36,14 @@ use TYPO3\CMS\Core\Utility\MailUtility;
 class Configuration
 {
     /**
-     * @var array
+     * @var mixed[]
      */
     protected $tsConfig = [];
 
+    /**
+     * Configuration constructor.
+     * @param mixed[]|null $tsConfig
+     */
     public function __construct(array $tsConfig = null)
     {
         if ($tsConfig !== null) {
@@ -46,6 +51,9 @@ class Configuration
         }
     }
 
+    /**
+     * @param mixed[] $tsConfig
+     */
     public function setTsConfig(array $tsConfig): void
     {
         $this->tsConfig = $tsConfig;
@@ -91,6 +99,9 @@ class Configuration
         }
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getTsConfig(): array
     {
         return $this->tsConfig;
@@ -113,7 +124,7 @@ class Configuration
     /**
      * Get the list of fields to parse in modTSconfig
      *
-     * @return array $searchFields List of fields, e.g.
+     * @return array<string,array<string>> $searchFields List of fields, e.g.
      *   [
      *      'tt_content' => ['bodytext', 'media']
      *   ]
@@ -130,6 +141,9 @@ class Configuration
         return $searchFields ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getExcludedCtypes(): array
     {
         return explode(',', (string)($this->tsConfig['excludeCtype'] ?? ''));
@@ -143,6 +157,9 @@ class Configuration
         $this->tsConfig['linktypes'] = implode(',', $linkTypes);
     }
 
+    /**
+     * @return array<string>
+     */
     public function getLinkTypes(): array
     {
         return explode(',', $this->tsConfig['linktypes'] ?? 'external,db,file');
@@ -161,11 +178,18 @@ class Configuration
         return (bool)($this->tsConfig['reportHiddenRecords'] ?? true);
     }
 
+    /**
+     * @param string $linktype
+     * @return mixed[]
+     */
     public function getLinktypesConfig(string $linktype): array
     {
         return $this->tsConfig['linktypesConfig.'][$linktype . '.'] ?? [];
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getLinktypesConfigExternalHeaders(): array
     {
         $headers = $this->tsConfig['linktypesConfig.']['external.']['headers.'] ?? [];
@@ -196,6 +220,9 @@ class Configuration
         return (int)($this->tsConfig['excludeLinkTarget.']['storagePid'] ?? 0);
     }
 
+    /**
+     * @return array<string>
+     */
     public function getExcludeLinkTargetAllowedTypes(): array
     {
         return explode(',', $this->tsConfig['excludeLinkTarget.']['allowed'] ?? 'external');
@@ -238,6 +265,9 @@ class Configuration
         return (int)($this->tsConfig['crawlDelay.']['seconds'] ?? 5);
     }
 
+    /**
+     * @return array<string>
+     */
     public function getCrawlDelayNodelay(): array
     {
         return explode(',', $this->tsConfig['crawlDelay.']['nodelay'] ?? '');
@@ -273,38 +303,30 @@ class Configuration
         $this->tsConfig['depth'] = $depth;
     }
 
-    public function setMailRecipients(string $recipients): void
+    public function setMailRecipientsAsString(string $recipients): void
     {
         $this->tsConfig['mail.']['recipients'] = $recipients;
     }
 
     /**
-     * @return array
-     *
-     * Example:
-     *
-     * [
-     *      'email@from',
-     *      'email2@from' => 'From name',
-     * ]
+     * @return Address[]
      */
     public function getMailRecipients(): array
     {
+        $result = [];
         $recipients = trim($this->tsConfig['mail.']['recipients'] ?? '');
         if ($recipients === '') {
             if ($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] ?? '') {
                 $fromAddress = $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] ?? '';
                 $fromName = $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName'] ?? '';
-                if ($fromName) {
-                    return [
-                        $fromAddress => $fromName
-                    ];
-                }
-                return [$fromAddress];
+                $result[] =  new Address($fromAddress, $fromName);
             }
-            return [];
+        } else {
+            foreach (explode(',', $recipients) as $recipient) {
+                $result[] = Address::create($recipient);
+            }
         }
-        return explode(',', $recipients);
+        return $result;
     }
 
     public function getMailTemplate(): string
@@ -378,6 +400,9 @@ class Configuration
         return $this->tsConfig['mail.']['subject'] ?? '';
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getCustom(): array
     {
         return $this->tsConfig['custom.'] ?? [];

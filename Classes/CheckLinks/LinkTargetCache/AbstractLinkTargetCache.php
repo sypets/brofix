@@ -38,7 +38,7 @@ abstract class AbstractLinkTargetCache implements LinkTargetCacheInterface
      *
      * @param bool $isValid
      * @param ErrorParams $errorParams
-     * @return array
+     * @return array{'valid': bool, 'errorParams': array}
      */
     public function generateUrlResponse(bool $isValid, ErrorParams $errorParams): array
     {

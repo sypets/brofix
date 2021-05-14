@@ -70,7 +70,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      * @param string $linkTarget
      * @param string $linkType
      * @param int $expire (optional, default is 0, in that case uses $this->expire)
-     * @return array returns URL response as array or empty array if no entry
+     * @return mixed[] returns URL response as array or
+     *   empty array if no entry
      */
     public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): array
     {
@@ -99,6 +100,9 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
 
     /**
      * Insert result / update existing result
+     * @param string $linkTarget
+     * @param string $linkType
+     * @param mixed[] $urlResponse
      */
     public function setResult(string $linkTarget, string $linkType, array $urlResponse): void
     {
@@ -110,6 +114,12 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
         }
     }
 
+    /**
+     * @param string $linkTarget
+     * @param string $linkType
+     * @param mixed[] $urlResponse
+     * @param int $checkStatus
+     */
     protected function insert(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -128,6 +138,12 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             ->execute();
     }
 
+    /**
+     * @param string $linkTarget
+     * @param string $linkType
+     * @param mixed[] $urlResponse
+     * @param int $checkStatus
+     */
     protected function update(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)

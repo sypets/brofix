@@ -34,7 +34,7 @@ class FileLinktype extends AbstractLinktype
     /**
      * Type fetching method, based on the type that softRefParserObj returns
      *
-     * @param array $value Reference properties
+     * @param mixed[] $value Reference properties
      * @param string $type Current type
      * @param string $key Validator hook name
      * @return string fetched type
@@ -55,7 +55,7 @@ class FileLinktype extends AbstractLinktype
      * Checks a given URL + /path/filename.ext for validity
      *
      * @param string $url Url to check
-     * @param array $softRefEntry The soft reference entry which builds the context of the url
+     * @param mixed[] $softRefEntry The soft reference entry which builds the context of the url
      * @param int $flags see LinktypeInterface::checkLink(), not used here
      * @return bool TRUE on success or FALSE on error
      */
@@ -89,7 +89,7 @@ class FileLinktype extends AbstractLinktype
     /**
      * Construct a valid Url for browser output
      *
-     * @param array $row Broken link record
+     * @param mixed[] $row Broken link record
      * @return string Parsed broken url
      */
     public function getBrokenUrl(array $row): string
@@ -101,8 +101,8 @@ class FileLinktype extends AbstractLinktype
     /**
      * Text to be displayed with the Link as anchor text
      * (not the real anchor text of the Link.
-     * @param array $row
-     * @param array $additionalConfig
+     * @param mixed[] $row
+     * @param mixed[] $additionalConfig
      * @return string
      */
     public function getBrokenLinkText(array $row, array $additionalConfig = null): string

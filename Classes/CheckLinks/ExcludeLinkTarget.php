@@ -46,23 +46,6 @@ class ExcludeLinkTarget
         $this->excludeLinkTargetsPid = $pid;
     }
 
-    public function getByUid(int $uid): array
-    {
-        if ($uid === 0) {
-            return [];
-        }
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
-        return $queryBuilder
-            ->select('*')
-            ->from(static::TABLE)
-            ->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
-            )
-            ->execute()
-            ->fetch();
-    }
-
     /**
      * Check if an URL is in the exclude list
      *

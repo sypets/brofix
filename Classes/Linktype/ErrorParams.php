@@ -39,7 +39,7 @@ class ErrorParams
     protected $exceptionMsg;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     protected $custom;
 
@@ -48,11 +48,18 @@ class ErrorParams
      */
     protected $message;
 
+    /**
+     * ErrorParams constructor.
+     * @param mixed[]|null $errorParams
+     */
     public function __construct(array $errorParams = null)
     {
         $this->initialize($errorParams);
     }
 
+    /**
+     * @param mixed[]|null $params
+     */
     public function initialize(array $params = null): void
     {
         if ($params) {
@@ -140,7 +147,7 @@ class ErrorParams
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getCustom(): array
     {
@@ -148,7 +155,7 @@ class ErrorParams
     }
 
     /**
-     * @param array $custom
+     * @param mixed[] $custom
      */
     public function setCustom(array $custom): void
     {
@@ -156,7 +163,7 @@ class ErrorParams
     }
 
     /**
-     * @param array $custom
+     * @param mixed[] $custom
      */
     public function addCustom(array $custom): void
     {
@@ -179,6 +186,9 @@ class ErrorParams
         $this->message = $message;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function toArray(): array
     {
         return [

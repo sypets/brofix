@@ -38,65 +38,59 @@ final class CheckBrokenRteLinkEventListener
         $this->brokenLinkRepository = $brokenLinkRepository;
     }
 
-    public function checkExternalLink($event): void
+    public function checkExternalLink(BrokenLinkAnalysisEvent $event): void
     {
-        if (get_class($event) === BrokenLinkAnalysisEvent::class) {
-            if ($event->getLinkType() !== LinkService::TYPE_URL) {
-                return;
-            }
-            $url = (string)($event->getLinkData()['url'] ?? '');
-            if (!empty($url)
-                && $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'external')) {
-                $event->markAsBrokenLink('Broken link');
-            }
-            $event->markAsCheckedLink();
+        if ($event->getLinkType() !== LinkService::TYPE_URL) {
+            return;
         }
+        $url = (string)($event->getLinkData()['url'] ?? '');
+        if (!empty($url)
+            && $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'external')) {
+            $event->markAsBrokenLink('Broken link');
+        }
+        $event->markAsCheckedLink();
     }
 
-    public function checkPageLink($event): void
+    public function checkPageLink(BrokenLinkAnalysisEvent $event): void
     {
-        if (get_class($event) === BrokenLinkAnalysisEvent::class) {
-            if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
-                return;
-            }
-            $hrefInformation = $event->getLinkData();
-            $url = $hrefInformation['pageuid'] ?? '';
-            if ($url != '' && $url !== 'current') {
-                $fragment = $hrefInformation['fragment'] ?? '';
-                if ($fragment !== '') {
-                    $url .= '#c' . $fragment;
-                }
-                if ($this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'db')) {
-                    $event->markAsBrokenLink('Broken link');
-                }
-            }
-            $event->markAsCheckedLink();
+        if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
+            return;
         }
+        $hrefInformation = $event->getLinkData();
+        $url = $hrefInformation['pageuid'] ?? '';
+        if ($url != '' && $url !== 'current') {
+            $fragment = $hrefInformation['fragment'] ?? '';
+            if ($fragment !== '') {
+                $url .= '#c' . $fragment;
+            }
+            if ($this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'db')) {
+                $event->markAsBrokenLink('Broken link');
+            }
+        }
+        $event->markAsCheckedLink();
     }
 
-    public function checkFileLink($event): void
+    public function checkFileLink(BrokenLinkAnalysisEvent $event): void
     {
-        if (get_class($event) === BrokenLinkAnalysisEvent::class) {
-            if ($event->getLinkType() !== LinkService::TYPE_FILE) {
-                return;
-            }
-            $event->markAsCheckedLink();
+        if ($event->getLinkType() !== LinkService::TYPE_FILE) {
+            return;
+        }
+        $event->markAsCheckedLink();
 
-            $hrefInformation = $event->getLinkData();
-            $file = $hrefInformation['file'] ?? null;
-            if (!$file instanceof FileInterface) {
-                $event->markAsBrokenLink('Broken link');
-                return;
-            }
+        $hrefInformation = $event->getLinkData();
+        $file = $hrefInformation['file'] ?? null;
+        if (!$file instanceof FileInterface) {
+            $event->markAsBrokenLink('Broken link');
+            return;
+        }
 
-            if (!$file->hasProperty('uid') || (int)$file->getProperty('uid') === 0) {
-                $event->markAsBrokenLink('Broken link');
-                return;
-            }
+        if (!$file->hasProperty('uid') || (int)$file->getProperty('uid') === 0) {
+            $event->markAsBrokenLink('Broken link');
+            return;
+        }
 
-            if ($this->brokenLinkRepository->isLinkTargetBrokenLink('file:' . $file->getProperty('uid'), 'file')) {
-                $event->markAsBrokenLink('Broken link');
-            }
+        if ($this->brokenLinkRepository->isLinkTargetBrokenLink('file:' . $file->getProperty('uid'), 'file')) {
+            $event->markAsBrokenLink('Broken link');
         }
     }
 }

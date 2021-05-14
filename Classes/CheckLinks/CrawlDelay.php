@@ -30,14 +30,14 @@ class CrawlDelay
     protected $delaySeconds;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $noCrawlDelayDomains;
 
     /**
      * Timestamps when an URL from the domain was last accessed.
      *
-     * @var array
+     * @var array<string,int>
      */
     protected $lastCheckedDomainTimestamps = [];
 
@@ -60,6 +60,9 @@ class CrawlDelay
             // skip delay
             return 0;
         }
+        /**
+         * @var int
+         */
         $lastTimestamp = $this->lastCheckedDomainTimestamps[$domain] ?? 0;
         $current = \time();
 
