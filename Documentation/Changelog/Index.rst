@@ -6,6 +6,11 @@
 Changelog
 =========
 
+1.0.6
+=====
+
+* [BUGFIX] Fix Services.yaml (remove reference to non-existing classes)
+
 1.0.5
 =====
 
