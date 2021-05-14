@@ -36,8 +36,8 @@ final class PageCalloutsHook
     /**
      * Create flash message for showing information about broken links in page module
      *
-     * @param array $pageInfo
-     * @return array
+     * @param mixed[] $pageInfo
+     * @return array{'title'?: string, 'message'?: string, 'state'?: int}:
      */
     public function addMessages(array $pageInfo): array
     {

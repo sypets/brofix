@@ -200,7 +200,7 @@ class CheckLinksCommand extends Command
             $depth = $this->configuration->getDepth();
 
             if ($this->sendTo !== '') {
-                $this->configuration->setMailRecipients($this->sendTo);
+                $this->configuration->setMailRecipientsAsString($this->sendTo);
             }
             if ($this->sendEmail === 0) {
                 $this->configuration->setMailSendOnCheckLinks(0);
@@ -209,8 +209,15 @@ class CheckLinksCommand extends Command
             // show configuration
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 $this->io->writeln('Configuration: Send mail: true');
-                $this->io->writeln('Configuration: Email recipients: '
-                    . implode(',', $this->configuration->getMailRecipients()));
+                $recipients = $this->configuration->getMailRecipients();
+                $to = '';
+                foreach ($recipients as $recipient) {
+                    if ($to !== '') {
+                        $to .= ',';
+                    }
+                    $to .= $recipient->toString();
+                }
+                $this->io->writeln('Configuration: Email recipients: ' . $to);
                 $this->io->writeln('Configuration: Email sender (email address): '
                     . $this->configuration->getMailFromEmail());
                 $this->io->writeln('Configuration: Email sender (name): '

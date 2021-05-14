@@ -74,7 +74,7 @@ class InternalLinktype extends AbstractLinktype
      * Checks a given URL + /path/filename.ext for validity
      *
      * @param string $url Url to check as page-id or page-id#anchor (if anchor is present)
-     * @param array $softRefEntry: The soft reference entry which builds the context of that url
+     * @param mixed[] $softRefEntry: The soft reference entry which builds the context of that url
      * @param int $flags see LinktypeInterface::checkLink(), not used here
      * @return bool TRUE on success or FALSE on error
      */
@@ -372,7 +372,7 @@ class InternalLinktype extends AbstractLinktype
     /**
      * Constructs an URL for browser output
      *
-     * @param array $row Broken link record
+     * @param mixed[] $row Broken link record
      * @return string url
      */
     public function getBrokenUrl(array $row): string
@@ -391,7 +391,7 @@ class InternalLinktype extends AbstractLinktype
     /**
      * Text to be displayed with the Link as anchor text
      * (not the real anchor text of the Link.
-     * @param array $row
+     * @param mixed[] $row
      * @return string
      */
     public function getBrokenLinkText(array $row, array $additionalConfig = null): string

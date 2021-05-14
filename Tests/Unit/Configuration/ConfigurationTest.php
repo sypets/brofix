@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Symfony\Component\Mime\Address;
 use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -187,7 +188,7 @@ class ConfigurationTest extends AbstractUnitTest
     public function getMailRecipientsReturnsCorrectValue()
     {
         $email = 'system@example.org';
-        $valueExpected = [$email];
+        $valueExpected = [new Address($email)];
 
         $this->configuration->overrideTsConfigByString('mod.brofix.mail.recipients = ' . $email);
 
@@ -205,7 +206,10 @@ class ConfigurationTest extends AbstractUnitTest
     public function getMailRecipientsReturnsCorrectValuesMultiple()
     {
         $email = 'system@example.org,system2@example.org';
-        $valueExpected = explode(',', $email);
+        $valueExpected = [
+            new Address('system@example.org'),
+            new Address('system2@example.org')
+        ];
 
         $this->configuration->overrideTsConfigByString('mod.brofix.mail.recipients = ' . $email);
 

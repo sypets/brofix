@@ -33,6 +33,8 @@ class PagesRepository
      * @param string $permsClause Perms clause
      * @param bool $considerHidden Whether to consider hidden pages or not
      *
+     * @return mixed[]
+     *
      * @todo begin is never really used
      */
     public function getAllSubpagesForPage(int $id, int $depth, string $permsClause, bool $considerHidden = false): array
@@ -82,7 +84,12 @@ class PagesRepository
      * Generates an array of page uids from current pageUid.
      * List does include pageUid itself.
      *
-     * @return array
+     * @param int $id
+     * @param int $depth
+     * @param string $permsClause
+     * @param bool $considerHidden
+     *
+     * @return mixed[]
      */
     public function getPageList(int $id, int $depth, string $permsClause, bool $considerHidden = false): array
     {
@@ -105,7 +112,7 @@ class PagesRepository
     /**
      * Check if rootline contains a hidden page
      *
-     * @param array $pageInfo Array with uid, title, hidden, extendToSubpages from pages table
+     * @param mixed[] $pageInfo Array with uid, title, hidden, extendToSubpages from pages table
      * @return bool TRUE if rootline contains a hidden page, FALSE if not
      */
     public function getRootLineIsHidden(array $pageInfo)

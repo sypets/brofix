@@ -46,7 +46,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @param int[] $pageList Pages to check for broken links
      * @param string[] $linkTypes Link types to validate
-     * @return array
+     * @param array<array<string>> $orderBy
+     * @return mixed[]
      */
     public function getBrokenLinks(array $pageList, array $linkTypes, array $orderBy = []): array
     {
@@ -137,8 +138,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
     /**
      * Fill a marker array with the number of links found in a list of pages
      *
-     * @param array $pageIds page uids
-     * @return array Marker array with the number of links found
+     * @param array<string|int> $pageIds page uids
+     * @param array<string> $linkTypes
+     * @return mixed[] array with the number of links found
      */
     public function getLinkCounts(array $pageIds, array $linkTypes = []): array
     {
@@ -324,10 +326,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * Remove all broken link records in list of broken links for these pages and
      * link types.
      *
-     * @param array $pageIds
-     * @param array $linkTypes
+     * @param array<int|string> $pageIds
+     * @param array<string> $linkTypes
      * @param int $time
-     * @param array $linkTypes
      */
     public function removeAllBrokenLinksForPagesBeforeTime(array $pageIds, array $linkTypes, int $time): void
     {
@@ -455,7 +456,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     /**
      * Update existing record or insert new
      *
-     * @param array $record
+     * @param mixed[] $record
      */
     public function insertOrUpdateBrokenLink(array $record): void
     {
@@ -497,7 +498,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
     }
 
     /**
-     * @param array $record
+     * @param array<string,mixed> $record What to update: key => value pairs
+     * @param array<string,mixed> $identifier Update criteria (where-statement): key => value pairs
+     * @return int
+     * @see \TYPO3\CMS\Core\Database\Connection::update()
      */
     public function updateBrokenLink(array $record, array $identifier): int
     {
@@ -523,7 +527,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     /**
      * Insert new record
      *
-     * @param array $record
+     * @param mixed[] $record
      */
     public function insertBrokenLink(array $record): void
     {

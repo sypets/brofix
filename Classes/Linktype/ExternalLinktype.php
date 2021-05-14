@@ -138,7 +138,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      * Checks a given URL for validity
      *
      * @param string $origUrl The URL to check
-     * @param array $softRefEntry The soft reference entry which builds the context of that URL
+     * @param mixed[] $softRefEntry The soft reference entry which builds the context of that URL
      * @param int $flags can be a combination of flags defined in AbstractLinktype CHECK_LINK_FLAG_*
      * @return bool true on success or false on error
      * @throws \InvalidArgumentException
@@ -223,7 +223,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      *
      * @param string $url
      * @param string $method
-     * @param array $options
+     * @param mixed[] $options
      * @return bool
      */
     protected function requestUrl(string $url, string $method, array $options): bool
@@ -380,7 +380,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     /**
      * Get the external type from the softRefParserObj result
      *
-     * @param array $value Reference properties
+     * @param mixed[] $value Reference properties
      * @param string $type Current type
      * @param string $key Validator hook name
      * @return string Fetched type

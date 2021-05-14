@@ -27,7 +27,7 @@ interface LinkTargetCacheInterface
      *
      * @param bool $isValid
      * @param ErrorParams $errorParams
-     * @return array
+     * @return array{'valid': bool, 'errorParams': array}
      */
     public function generateUrlResponse(bool $isValid, ErrorParams $errorParams): array;
 
@@ -42,10 +42,15 @@ interface LinkTargetCacheInterface
      * @param string $linkTarget
      * @param string $linkType
      * @param int $expire (optional, default is 0, in that case uses $this->expire)
-     * @return array
+     * @return mixed[]
      */
     public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): array;
 
+    /**
+     * @param string $linkTarget
+     * @param string $linkType
+     * @param mixed[] $urlResponse
+     */
     public function setResult(string $linkTarget, string $linkType, array $urlResponse): void;
 
     public function remove(string $linkTarget, string $linkType): void;

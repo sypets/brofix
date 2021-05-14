@@ -106,7 +106,7 @@ class BrofixReport
     /**
      * Information about the current page record
      *
-     * @var array
+     * @var mixed[]
      */
     protected $pageRecord = [];
 
@@ -125,7 +125,7 @@ class BrofixReport
     protected $linkAnalyzer;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $linkTypes = [];
 
@@ -156,7 +156,7 @@ class BrofixReport
 
     /**
      * Information for last edited record
-     * @var array
+     * @var mixed[]
      */
     protected $currentRecord = [
         'uid'   => 0,
@@ -195,19 +195,14 @@ class BrofixReport
     protected $pObj;
 
     /**
-     * @var array
+     * @var array<string|int>
      */
     protected $pageList;
 
     /**
-     * @var array
+     * @var array<string,array<string>>
      */
     protected $searchFields = [];
-
-    /**
-     * @var array
-     */
-    protected $pidList;
 
     /**
      * @var BrokenLinkRepository
@@ -342,6 +337,12 @@ class BrofixReport
         $this->getBackendUser()->pushModuleData('web_info', $this->pObj->MOD_SETTINGS);
     }
 
+    /**
+     * @param array<string,mixed> $additionalQueryParameters
+     * @param string $route
+     * @return string
+     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     */
     protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_info'): string
     {
         $parameters = [
@@ -564,7 +565,7 @@ class BrofixReport
 
     /**
      * Sets variables for the Fluid Template of the table with the broken links
-     * @return array variables
+     * @return mixed[] variables
      */
     protected function getVariablesForTableHeader(): array
     {
@@ -591,8 +592,8 @@ class BrofixReport
      * Displays one line of the broken links table
      *
      * @param string $table Name of database table
-     * @param array $row Record row to be processed
-     * @return array HTML of the rendered row
+     * @param mixed[] $row Record row to be processed
+     * @return mixed[] HTML of the rendered row
      */
     protected function renderTableRow($table, array $row): array
     {
@@ -759,7 +760,7 @@ class BrofixReport
      *
      * @param int $uid
      * @param int $titleLimit
-     * @return array returns Page title, rootline
+     * @return mixed[] returns Page title, rootline
      */
     protected function getPagePath(int $uid, int $titleLimit = 0): array
     {

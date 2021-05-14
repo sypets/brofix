@@ -29,7 +29,7 @@ interface LinktypeInterface
      * Checks a given link for validity
      *
      * @param string $url Url to check
-     * @param array $softRefEntry The soft reference entry which builds the context of that url
+     * @param mixed[] $softRefEntry The soft reference entry which builds the context of that url
      * @param int $flags can be a combination of flags, see flags defined in AbstractLinktype, e.g.
      *   e.g. AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY
      * @return bool true on success
@@ -39,12 +39,17 @@ interface LinktypeInterface
     /**
      * Base type fetching method, based on the type that softRefParserObj returns.
      *
-     * @param array $value Reference properties
+     * @param mixed[] $value Reference properties
      * @param string $type Current type
      * @param string $key Validator hook name
      * @return string Fetched type
      */
     public function fetchType(array $value, string $type, string $key): string;
+
+    /**
+     * @param mixed[]|null $params
+     */
+    public function initializeErrorParams(array $params = null): void;
 
     /**
      * Get the value of the private property errorParams.
@@ -73,7 +78,7 @@ interface LinktypeInterface
     /**
      * Construct a valid Url for browser output
      *
-     * @param array $row Broken link record
+     * @param mixed[] $row Broken link record
      * @return string Parsed broken url
      */
     public function getBrokenUrl(array $row): string;
@@ -81,8 +86,8 @@ interface LinktypeInterface
     /**
      * Text to be displayed with the Link as anchor text
      * (not the real anchor text of the Link.
-     * @param array $row
-     * @param array $additionalConfig
+     * @param mixed[] $row
+     * @param mixed[] $additionalConfig
      * @return string
      */
     public function getBrokenLinkText(array $row, array $additionalConfig = null): string;

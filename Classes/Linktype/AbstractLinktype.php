@@ -72,6 +72,9 @@ abstract class AbstractLinktype implements LinktypeInterface
         $this->configuration = $configuration;
     }
 
+    /**
+     * @param mixed[]|null $params
+     */
     public function initializeErrorParams(array $params = null): void
     {
         $this->errorParams = new ErrorParams($params);
@@ -90,7 +93,7 @@ abstract class AbstractLinktype implements LinktypeInterface
     /**
      * Base type fetching method, based on the type that softRefParserObj returns
      *
-     * @param array $value Reference properties
+     * @param mixed[] $value Reference properties
      * @param string $type Current type
      * @param string $key Validator hook name
      * @return string Fetched type
@@ -126,7 +129,7 @@ abstract class AbstractLinktype implements LinktypeInterface
     /**
      * Construct a valid Url for browser output
      *
-     * @param array $row Broken link record
+     * @param mixed[] $row Broken link record
      * @return string Parsed broken url
      */
     public function getBrokenUrl(array $row): string
@@ -137,8 +140,8 @@ abstract class AbstractLinktype implements LinktypeInterface
     /**
      * Text to be displayed with the Link as anchor text
      * (not the real anchor text of the Link.
-     * @param array $row
-     * @param array $additionalConfig
+     * @param mixed[] $row
+     * @param mixed[] $additionalConfig
      * @return string
      */
     public function getBrokenLinkText(array $row, array $additionalConfig = null): string
