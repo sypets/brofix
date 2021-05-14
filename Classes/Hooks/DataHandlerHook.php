@@ -96,9 +96,7 @@ final class DataHandlerHook
         }
     }
 
-    /*
-     * If records get deleted, remove corresponding broken link records
-     */
+    // If records get deleted, remove corresponding broken link records
     public function processCmdmap_deleteAction($table, $id, $recordToDelete, $recordWasDeleted, $dataHandler)
     {
         $id = (int)$id;
