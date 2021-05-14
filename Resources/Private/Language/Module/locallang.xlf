@@ -93,6 +93,15 @@
 			<trans-unit id="list.no.headline" resname="list.no.headline">
 				<source>no headline</source>
 			</trans-unit>
+			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
+				<source>Broken link information may be stale.</source>
+			</trans-unit>
+			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.stale">
+				<source>Broken link information is most likely fresh.</source>
+			</trans-unit>
+			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.stale">
+				<source></source>
+			</trans-unit>
 
 			<!-- Error messages for email -->
 

@@ -79,3 +79,13 @@ Info > Brofix (Broken Link Fixer)
 #brofix-broken-links-table td:first-child {
     border-left: none;
 }
+
+#brofix-broken-links-table td span.freshness_fresh {
+    color: white;
+    background-color: #79a548;
+}
+
+#brofix-broken-links-table td span.freshness_stale {
+    color: white;
+    background-color: #c83c3c;
+}

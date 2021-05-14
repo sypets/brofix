@@ -756,14 +756,31 @@ class BrofixReport
         }
         $variables['linktext'] = $hookObj->getBrokenLinkText($row, $errorParams->getCustom());
 
-        // last check
+        // last check of record
         $currentDate =  date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], \time());
         $lastcheckDate = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['last_check']);
         $lastCheckTime = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['last_check']);
         $variables['lastcheck'] = (($currentDate != $lastcheckDate) ? $lastcheckDate . ' ' : '') . $lastCheckTime;
+
+        // last check of URL
         $lastcheckDateUrl = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['last_check_url']);
         $lastCheckTimeUrl = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['last_check_url']);
         $variables['lastcheck_url'] = (($currentDate != $lastcheckDateUrl) ? $lastcheckDateUrl . ' ' : '') . $lastCheckTimeUrl;
+
+        // determine if check is fresh or stale
+        $tstamp_field = $GLOBALS['TCA'][$row['table_name']]['ctrl']['tstamp'] ?? '';
+        $variables['freshness'] = 'unknown';
+        if ($tstamp_field) {
+            $result = BackendUtility::getRecord($row['table_name'], $row['record_uid'], $tstamp_field);
+            $tstamp = (int)($result['tstamp'] ?? 0);
+            $last_check = (int)($row['last_check']);
+
+            if ($tstamp > $last_check) {
+                $variables['freshness'] = 'stale';
+            } else {
+                $variables['freshness'] = 'fresh';
+            }
+        }
 
         return $variables;
     }

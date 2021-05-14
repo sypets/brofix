@@ -69,7 +69,7 @@
 							</f:else>
 						</f:if>
 					</th>
-					<th>{tableheadLastcheck}</th>
+					<th>{tableheadLastcheck} <core:icon identifier="actions-synchronize" /></th>
 					<th colspan="3">
 						<f:if condition="{orderBy} == 'url'">
 							<f:then>
@@ -121,7 +121,17 @@
 							{item.elementHeadline -> f:format.raw()} [{item.record_uid}]
 						</td>
 						<td>{item.elementIcon -> f:format.raw()}<span title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span></td>
-						<td>{item.lastcheck}</td>
+						<td title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.info.freshness.{item.freshness}')}">
+                            <span  class="freshness_{item.freshness}">{item.lastcheck}</span>
+                            <f:if condition="{item.freshness} == 'fresh'>">
+                                <f:then>
+                                    <core:icon identifier="actions-check"/>
+                                </f:then>
+                                <f:else if="{item.freshness} == 'stale'>">
+                                    <core:icon identifier="actions-document-synchronize"/>
+                                </f:else>
+                            </f:if>
+                        </td>
 						<td colspan="3">
 							<f:if condition="{item.linktarget}">
 								<f:then>
