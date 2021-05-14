@@ -84,8 +84,8 @@
 				<target>URL</target>
 			</trans-unit>
 			<trans-unit id="list.tableHead.linkmessage" resname="list.tableHead.linkmessage">
-				<source>Error message</source>
-				<target>Fehlermeldung</target>
+				<source>Error</source>
+				<target>Fehler</target>
 			</trans-unit>
 			<trans-unit id="list.tableHead.lastCheck" resname="list.tableHead.lastCheck">
 				<source>Last check</source>
