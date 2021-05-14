@@ -67,7 +67,7 @@
 				<source>Error</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.lastCheck" resname="list.tableHead.lastCheck">
-				<source>Last check</source>
+				<source>Checked</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.action" resname="list.tableHead.action">
 				<source>Action</source>
@@ -94,12 +94,12 @@
 				<source>no headline</source>
 			</trans-unit>
 			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
-				<source>Broken link information may be stale.</source>
+				<source>Broken link information may be outdated.</source>
 			</trans-unit>
-			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.stale">
-				<source>Broken link information is most likely fresh.</source>
+			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.fresh">
+				<source>Broken link information is most likely up to date.</source>
 			</trans-unit>
-			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.stale">
+			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.unknown">
 				<source></source>
 			</trans-unit>
 

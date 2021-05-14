@@ -88,8 +88,8 @@
 				<target>Fehler</target>
 			</trans-unit>
 			<trans-unit id="list.tableHead.lastCheck" resname="list.tableHead.lastCheck">
-				<source>Last check</source>
-				<target>Zuletzt geprüft</target>
+				<source>Checked</source>
+				<target>Geprüft</target>
 			</trans-unit>
 			<trans-unit id="list.tableHead.action" resname="list.tableHead.action">
 				<source>Action</source>
@@ -124,11 +124,11 @@
 				<target>keine Überschrift</target>
 			</trans-unit>
 			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
-				<source>Broken link information may be stale (outdated).</source>
+				<source>Broken link information may be outdated.</source>
 				<target>Information zum fehlerhaften Link kann veraltet sein.</target>
 			</trans-unit>
 			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.stale">
-				<source>Broken link information is most likely fresh (up to date).</source>
+				<source>Broken link information is most likely up to date.</source>
 				<target>Information zum fehlerhaften Link ist wahrscheinlich aktuell.</target>
 			</trans-unit>
 			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.stale">
