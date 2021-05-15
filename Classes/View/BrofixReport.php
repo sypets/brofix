@@ -680,9 +680,7 @@ class BrofixReport
         if (in_array($row['link_type'] ?? 'empty', $this->configuration->getExcludeLinkTargetAllowedTypes())
             && $this->currentUserHasPermissionsForExcludeLinkTargetStorage
         ) {
-            $requestUri = GeneralUtility::getIndpEnv('REQUEST_URI') .
-                '&id=' . $this->id .
-                '&depth=' . $this->depth;
+            $returnUrl = $this->constructBackendUri();
             $excludeUrl = (string)$uriBuilder->buildUriFromRoute('record_edit', [
                 'edit' => [
                     'tx_brofix_exclude_link_target' => [
@@ -695,7 +693,7 @@ class BrofixReport
                         'linktarget' => $row['url'],
                     ],
                 ],
-                'returnUrl' => $requestUri
+                'returnUrl' => $returnUrl
             ]);
             $variables['excludeUrl'] = $excludeUrl;
         }
