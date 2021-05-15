@@ -11,6 +11,8 @@ Changelog
 
 - Support for TYPO3 9 was dropped
 - bugfix: Do not use FlashMessages in DataHandler hook
+- several improvements in broken link list, including behaviour
+  of rechecking URLs and displaying information about last check
 
 
 1.0.4
