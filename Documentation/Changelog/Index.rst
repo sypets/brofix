@@ -11,9 +11,16 @@ Changelog
 
 - Support for TYPO3 9 was dropped
 - bugfix: Do not use FlashMessages in DataHandler hook
-- several improvements in broken link list, including behaviour
-  of rechecking URLs and displaying information about last check
-
+- several improvements in broken link list
+- It is now possible to recheck URLs from the GUI via a button.
+  This is configurable (report.recheckButton).
+- It is checked if record was edited after last check. In that case the
+  broken link information may be "stale" (outdated). This is shown in the
+  list along with the time of the last check.
+- The last check time of the URLs are shown as well. Since the check status
+  is cached, this may differ from the time when the record was last checked.
+  While this may be confusing (to show different values), it makes the behaviour
+  more transparent.
 
 1.0.4
 =====

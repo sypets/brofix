@@ -301,6 +301,7 @@ class BrofixReport
         $view->assign('currentPage', $this->id);
         $view->assign('depth', $this->depth);
         $view->assign('docsurl', $this->configuration->getTsConfig()['report.']['docsurl'] ?? '');
+        $view->assign('showRecheckButton', $this->depth <= $this->configuration->getRecheckButton());
         return $view;
     }
 
@@ -332,6 +333,10 @@ class BrofixReport
         $this->route =  GeneralUtility::_GP('route') ?? '';
         $this->token = GeneralUtility::_GP('token') ?? '';
         $this->action = GeneralUtility::_GP('action') ?? '';
+
+        if (GeneralUtility::_GP('updateLinkList') ?? '') {
+            $this->action = 'updateLinkList';
+        }
 
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy')
             ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? self::ORDER_BY_DEFAULT));
@@ -383,6 +388,12 @@ class BrofixReport
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->getSettingsFromQueryParameters();
         $this->initialize();
+
+        if ($this->action === 'updateLinkList') {
+            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+            // todo: localize this
+            $this->createFlashMessage($this->getLanguageService()->getLL('list.status.check.done'), '', FlashMessage::OK);
+        }
 
         if ($this->action === 'recheckUrl') {
             $message = '';
@@ -550,30 +561,40 @@ class BrofixReport
      */
     protected function createFlashMessagesForNoBrokenLinks(): void
     {
-        $message = GeneralUtility::makeInstance(
-            FlashMessage::class,
+        $this->createFlashMessage(
+            $this->getLanguageService()->getLL(
+                $this->depth > 0 ? 'list.no.broken.links' : 'list.no.broken.links.this.page'
+            ),
             '',
-            $this->getLanguageService()->getLL($this->depth > 0 ? 'list.no.broken.links' : 'list.no.broken.links.this.page'),
-            FlashMessage::OK,
-            false
+            FlashMessage::OK
         );
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('brofix');
-        $defaultFlashMessageQueue->enqueue($message);
     }
 
     protected function createFlashMessagesForRootPage(): void
     {
-        $message = GeneralUtility::makeInstance(
+        $this->createFlashMessage($this->getLanguageService()->getLL('list.rootpage'));
+    }
+
+    /**
+     * Generic convenience function for creating and enqueing a flash message
+     *
+     * @param string $message
+     * @param string $title
+     * @param int $type
+     * @throws \TYPO3\CMS\Core\Exception
+     */
+    protected function createFlashMessage(string $message, string $title = '', int $type = FlashMessage::INFO): void
+    {
+        $flashMessage = GeneralUtility::makeInstance(
             FlashMessage::class,
-            '',
-            $this->getLanguageService()->getLL('list.rootpage'),
-            FlashMessage::INFO,
+            $title,
+            $message,
+            $type,
             false
         );
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('brofix');
-        $defaultFlashMessageQueue->enqueue($message);
+        $defaultFlashMessageQueue->enqueue($flashMessage);
     }
 
     /**

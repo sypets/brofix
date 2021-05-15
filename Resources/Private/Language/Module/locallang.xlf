@@ -15,6 +15,12 @@
 			<trans-unit id="label_refresh" resname="label_refresh">
 				<source>Refresh display</source>
 			</trans-unit>
+			<trans-unit id="list.status.check.done" resname="list.header">
+				<source>Check links done</source>
+			</trans-unit>
+			<trans-unit id="list.action.check" resname="list.header">
+				<source>Check links</source>
+			</trans-unit>
 			<trans-unit id="list.header" resname="list.header">
 				<source>Broken links</source>
 			</trans-unit>

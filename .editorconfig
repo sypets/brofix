@@ -22,6 +22,10 @@ indent_size = 2
 [*.json]
 indent_style = tab
 
+# HTML / Fluid files
+[*.html]
+indent_style = tab
+
 # ReST-Files
 [*.rst]
 indent_size = 3

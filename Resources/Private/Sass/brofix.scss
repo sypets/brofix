@@ -31,6 +31,10 @@ Info > Brofix (Broken Link Fixer)
     clear: both;
 }
 
+div.brofix-brokenlink-list-form select.form-control {
+    margin-bottom: 5px;
+}
+
 #brofix-statistics-table {
     width: 230px;
     margin-top: 5px;

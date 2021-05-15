@@ -52,6 +52,7 @@ mod.brofix {
 
   report {
     docsurl =
+    recheckButton = 999
   }
 
 	mail {
