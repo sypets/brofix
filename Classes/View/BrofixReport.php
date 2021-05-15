@@ -654,18 +654,25 @@ class BrofixReport
             ]
         );
 
+        $variables['lastChecked'] = 0;
         // check if current record was recently checked
         if (isset($this->currentRecord['uid']) && isset($this->currentRecord['table']) && isset($this->currentRecord['field'])
             && $this->action === 'editField'
-        ) {
-            if ($row['record_uid'] == $this->currentRecord['uid']
-                && $row['table_name'] === $this->currentRecord['table']
-                && $row['field'] === $this->currentRecord['field']
+            && $row['record_uid'] == $this->currentRecord['uid']
+            && $row['table_name'] === $this->currentRecord['table']
+            && $row['field'] === $this->currentRecord['field']
             ) {
-                $variables['lastCheckedField'] = 1;
-            } else {
-                $variables['lastCheckedField'] = 0;
-            }
+            $variables['lastChecked'] = 1;
+        }
+
+        // check if current URL was recently checked
+        if ($this->action === 'recheckUrl'
+            && isset($this->currentRecord['url'])
+            && $this->currentRecord['url'] === $row['url']
+            && isset($this->currentRecord['linkType'])
+            && $this->currentRecord['linkType'] === $row['link_type']
+        ) {
+            $variables['lastChecked'] = 1;
         }
 
         $excludeLinkTargetStoragePid = $this->configuration->getExcludeLinkTargetStoragePid();
