@@ -278,6 +278,11 @@ class Configuration
         return $this->tsConfig['docsurl'] ?? '';
     }
 
+    public function getRecheckButton(): int
+    {
+        return (int)($this->tsConfig['report.']['recheckButton'] ?? -1);
+    }
+
     public function getMailSendOnCheckLinks(): bool
     {
         return (bool)($this->tsConfig['mail.']['sendOnCheckLinks'] ?? true);

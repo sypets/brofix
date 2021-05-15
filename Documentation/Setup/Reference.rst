@@ -505,6 +505,45 @@ report.docsurl
    Default
       empty
 
+report.recheckButton
+--------------------
+
+.. container:: table-row
+
+   Property
+      mod.brofix.report.recheckButton
+
+   Data type
+      int
+
+   Description
+      Whether to show button for rechecking links.
+
+      Deactivate the button:
+
+      .. code-block:: typoscript
+
+         mod.brofix.report.recheckButton = -1
+
+      Only check if depth=0 (current page) is selected:
+
+      .. code-block:: typoscript
+
+         mod.brofix.report.recheckButton = 0
+
+      Disable the page in User TSconfig (for a user or group):
+
+      .. code-block:: typoscript
+
+         page.mod.brofix.report.recheckButton = 0
+
+      If the current depth  <= recheckButton, the button will be displayed.
+      This makes it possible to not only control whether rechecking is
+      possible, but also the depth
+
+   Default
+      999 (always show button)
+
 
 .. _tsconfigSendOnCheckLinks:
 

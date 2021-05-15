@@ -19,6 +19,14 @@
 				<source>Refresh display</source>
 				<target>Anzeige aktualisieren</target>
 			</trans-unit>
+			<trans-unit id="list.status.check.done" resname="list.header">
+				<source>Check links done</source>
+				<target>Links prüfen - fertig!</target>
+			</trans-unit>
+			<trans-unit id="list.action.check" resname="list.header">
+				<source>Check links</source>
+				<target>Links prüfen</target>
+			</trans-unit>
 			<trans-unit id="list.header" resname="list.header">
 				<source>Broken links</source>
 				<target>Fehlerhafte Links</target>
