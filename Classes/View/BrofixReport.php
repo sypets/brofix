@@ -749,7 +749,7 @@ class BrofixReport
         // page title / uid / path
         $pageId = (int)($table === 'pages' ? $row['record_uid'] : $row['record_pid']);
         $variables['pageId'] = $pageId;
-        $path = $this->getPagePath($pageId, 50);
+        $path = $this->pagesRepository->getPagePath($pageId, 50);
         $variables['path'] = $path[1];
         $variables['pagetitle'] =  $path[0] ?? '';
 
@@ -809,35 +809,6 @@ class BrofixReport
         }
 
         return $variables;
-    }
-
-    /**
-     * Slightly modified version of BackendUtility::getRecordPath()
-     *
-     * @param int $uid
-     * @param int $titleLimit
-     * @return mixed[] returns Page title, rootline
-     *
-     * @todo Move this to PagesRepository
-     */
-    protected function getPagePath(int $uid, int $titleLimit = 0): array
-    {
-        $title = '';
-        $path = '';
-
-        // @todo this is really inefficient, because we only need the title
-        $data = BackendUtility::BEgetRootLine($uid, '', true);
-        foreach ($data as $record) {
-            if ($record['uid'] === 0) {
-                continue;
-            }
-            if ($title == '') {
-                $title = GeneralUtility::fixed_lgd_cs(strip_tags($record['title']), $titleLimit)
-                    ?? '[' . $record['uid'] . ']';
-            }
-            $path = '/' . strip_tags($record['title']) . $path;
-        }
-        return [$title, $path];
     }
 
     protected function isShowRecordIds(): bool

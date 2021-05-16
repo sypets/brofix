@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryHelper;
@@ -196,5 +197,32 @@ class PagesRepository
         }
 
         return $translatedPages;
+    }
+
+    /**
+     * Slightly modified version of BackendUtility::getRecordPath()
+     *
+     * @param int $uid
+     * @param int $titleLimit
+     * @return mixed[] returns Page title, rootline
+     */
+    public function getPagePath(int $uid, int $titleLimit = 0): array
+    {
+        $title = '';
+        $path = '';
+
+        // @todo this is really inefficient, because we only need the title
+        $data = BackendUtility::BEgetRootLine($uid, '', true);
+        foreach ($data as $record) {
+            if ($record['uid'] === 0) {
+                continue;
+            }
+            if ($title == '') {
+                $title = GeneralUtility::fixed_lgd_cs(strip_tags($record['title']), $titleLimit)
+                    ?? '[' . $record['uid'] . ']';
+            }
+            $path = '/' . strip_tags($record['title']) . $path;
+        }
+        return [$title, $path];
     }
 }
