@@ -759,8 +759,17 @@ class BrofixReport
         if ($response['valid']) {
             $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->getLL('list.msg.ok')) . '</span>';
         } else {
-            $linkMessage = '<span class="error">'
-                . nl2br(
+            $linkMessage = sprintf(
+                '<span class="error" title="%s">%s</span>',
+                nl2br(
+                    htmlspecialchars(
+                        $errorParams->getExceptionMsg(),
+                        ENT_QUOTES,
+                        'UTF-8',
+                        false
+                    )
+                ),
+                nl2br(
                 // Encode for output
                     htmlspecialchars(
                         $hookObj->getErrorMessage($errorParams),
@@ -769,7 +778,7 @@ class BrofixReport
                         false
                     )
                 )
-                . '</span>';
+            );
         }
         $variables['linkmessage'] = $linkMessage;
 
