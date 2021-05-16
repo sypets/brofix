@@ -6,13 +6,41 @@
 Link checking
 =================
 
-This page explains how the link checking is done.
+.. _linkCheckingOnTheFly::
 
-How link checking is done
+When link checking is done
 ==========================
 
-The link checking is done via the console command and when returning to the
-list of broken links after editing a record.
+#. Via console command, a full link check of the entire sites or specific pages
+   can be performed
+
+#. "on-the-fly" checking: When editing a record by pressing the blue "edit" action
+   button |edit_action_image| in the list of broken links, a recheck is performed
+   when returning to the list. This only checks the links in the edited field.
+
+#. If records or pages are deleted or set to inactive (hidden=1), the
+   corresponding broken link records are removed immediately.
+
+#. It is possible to manually start (re)checking by pressing the "Check links"
+   button |check_links_button_image| in the list. This will check all links on
+   the current page and subpages (depending on the selected depth, e.g. 2 levels).
+
+#. It is possible to recheck the current link by pressing the "Recheck URL"
+   button. |recheck_url_action_image| This is faster than the previous option and can
+   be useful, if only a few broken link records need to be rechecked.
+
+It is recommended to configure the console command to perform a full check
+regularly (e.g. once a day).
+
+Due to normal editing activity some of the broken link information can become
+outdated between the checks, which can be handled either with the "Recheck URL"
+button (for recheck for one broken link) or with the "Check links" button.
+
+The fifth option (Recheck URL) is the only action where the link target cache
+is not used. This can be used to refresh the information about the link target.
+
+Link target cache
+=================
 
 In general, we try to avoid excessive checking, especially when it comes
 to external URLs.
@@ -35,39 +63,50 @@ For this reason, the following mechanisms are used:
 *  The results of external link checking is cached. This means, if an
    URL is checked more than once before the cache expires, the results
    from the cache are used.
-*  A crawl delay is used: If several URLs of one domain is checked, we
-   wait at least this amount of time before the next request (this is
-   only done when checking via the console command, not for on-the-fly checking).
+*  Crawl delay, see next section.
 
-.. _linkCheckingOnTheFly::
+This has the drawback, that the broken link information may be outdated, because
+the link target has changed its status.
 
-When link checking is done
-==========================
+However, the advantages are that link checks are faster and less external link
+checking is performed.
 
-1. Via console command, a full link check is performed
-2. "on-the-fly" checking: When editing a record via the list of broken links, a
-   recheck is performed when returning to the list. This only checks the links in the edited record.
+If information about an external URL is outdated, the recheck URL
+button |recheck_url_action_image| can be used to refresh.
 
-Additionally, if records are deleted or set to deleted=1, the broken link records are
-removed immediately.
+This will recheck the URL and also update all other broken
+link records, if the link target status changed.
 
-.. _falsePositives:
+Crawl delay
+===========
 
-False positives
-===============
-
-It is a known problem, that the automatic checking does not always yield the correct
-result. This is rare but may happen for a handful of different URLs in your site.
-
-As a workaround, it is possible to add a specific URL or specific domain to an exclude
-list. In this case, the URL will be treated as if valid. It will no longer show up in
-the report. As soon as the URL is excluded, all existing broken link records are removed.
-Adding an URL to the exclude list can be conveniently done by clicking on a button in the
-list of broken links.
+If several URLs of one domain are checked, we wait at least this amount of
+time before the next request (this is only done when checking via the console
+command, not for on-the-fly checking).
 
 
-Recommendations
-===============
+.. _howItWorksExcludeLinkTargets:
 
-Make sure the link target cache is filled - see :ref:`tsconfigLinkTargetCacheExpires`.
+Exclude link targets
+====================
 
+It is a known problem, that the automatic checking does not always yield the
+correct result, specifically the link is shown as broken, but it works (e.g.
+by checking in the browser). These are known as "false positives". This is
+rare but may happen for a handful of different URLs in your site.
+
+As a workaround, it is possible to add a specific URL or specific domain to an
+exclude list. In this case, the URL will be treated as if valid. It will no
+longer show up in the report. As soon as the URL is excluded, all existing
+broken link records are removed. Adding an URL to the exclude list can be
+conveniently done by clicking on a button |exclude_link_target_action_image|
+in the list of broken links.
+
+
+.. |recheck_url_action_image| image:: ../_images/recheck_url_action.png
+
+.. |edit_action_image| image:: ../_images/edit_action.png
+
+.. |check_links_button_image| image:: ../_images/check_links_button.png
+
+.. |exclude_link_target_action_image| image:: ../_images/exclude_link_target.png

@@ -14,16 +14,17 @@ Steps
 
 #. Editor configuration
 
-   Give your backend users  / user groups permission to the "Info" module. You may want to disable access
-   to the Log and TSconfig, see
+   Give your backend users  / user groups permission to the "Info" module. You
+   may want to disable access to the Log and TSconfig, see
    :ref:`mod.web_info.menu.function <t3tsconfig:pageblindingfunctionmenuoptions-webinfo>`.
 
-   Give backend users / user groups permission to the table :sql:`tx_brofix_exclude_link_target`, if they should
-   be able to add URLs to the list of URLs not to be checked. (This requires a certain
+   Give backend users / user groups permission to the table
+   `tx_brofix_exclude_link_target`, if they should be able to add URLs to the
+   list of URLs not to be checked. (This requires a certain
    amount of prudence and understanding, otherwise this feature may be misused.)
 
    In this case, you must also set TSconfig :ref:`tsConfigExcludeLinkTargetStoragePid`
-   to a page of type system folder, to which the editors have access.
+   to a page of type system folder. The editors must have access to this page.
 
 #. Setup page tsconfig
 
@@ -43,7 +44,7 @@ Steps
 
    If an email should be sent on every link check performed via the console
    command, it is a good idea to check if email sending is setup correctly
-   and works.
+   and works. (Sending a mail is optional).
 
    Go to Environment > Test Mail Setup
 
@@ -55,9 +56,23 @@ Steps
 
    You can run the console command from the command line (or cron).
 
+   Do not execute link checking, just show what configuration is used:
+
    .. code-block:: shell
 
-       vendor/bin/typo3 brofix:checklinks --to webmaster@example.org -v
+       vendor/bin/typo3 brofix:checklinks --dry-run
+
+   If everything is already configured, you don't need any arguments:
+
+   .. code-block:: shell
+
+       vendor/bin/typo3 brofix:checklinks
+
+   Execute link checking, send an email to `webmaster@example.org`:
+
+   .. code-block:: shell
+
+       vendor/bin/typo3 brofix:checklinks --to webmaster@example.org
 
    .. code-block:: shell
 
@@ -78,9 +93,12 @@ Global configuration
 The global configuration affects not just brofix but the behaviour of
 other extensions as well.
 
-If mod.brofix.mail.sendOnCheckLinks is 1, an email will be sent. You can
-configure the following settings to set the recipient address globally (or
-you can set it via TSconfig):
+If mod.brofix.mail.sendOnCheckLinks is 1, an email will be sent. You
+can override this in the console command. If an email should be sent,
+you should configure the recipient and sender address.
+
+You can configure the following settings to set the from address globally (or
+you can set it specifically for brofix via :ref:`TSconfig <tsconfigMailFromEmail>`):
 
 .. code-block:: php
 
@@ -98,8 +116,8 @@ This determines whether an html mail is sent, a text mail or both:
 
 ----
 
-The template path is already added in this extension in :file:`ext_localconf.php`, but
-only if the slot 901 is still free:
+The template path is already added in this extension in :file:`ext_localconf.php`,
+but only if the slot 901 is still free:
 
 .. code-block:: php
 
