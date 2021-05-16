@@ -817,6 +817,8 @@ class BrofixReport
      * @param int $uid
      * @param int $titleLimit
      * @return mixed[] returns Page title, rootline
+     *
+     * @todo Move this to PagesRepository
      */
     protected function getPagePath(int $uid, int $titleLimit = 0): array
     {

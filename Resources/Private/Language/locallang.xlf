@@ -57,13 +57,13 @@
 			<trans-unit id="tasks.error.invalidPageUid" resname="tasks.error.invalidPageUid">
 				<source>The given page id %d is invalid!</source>
 			</trans-unit>
-			<trans-unit id="broken_links_found_for_page" resname="tasks.error.invalidPageUid">
-				<source>Broken Links found for this page</source>
+			<trans-unit id="broken_links_found_for_page" resname="broken_links_found_for_page">
+				<source>Broken links were found on this page</source>
 			</trans-unit>
-			<trans-unit id="go_to_info_modul" resname="tasks.error.invalidPageUid">
+			<trans-unit id="go_to_info_modul" resname="go_to_info_modul">
 				<source>Go to the Info module</source>
 			</trans-unit>
-			<trans-unit id="and_check_links" resname="tasks.error.invalidPageUid">
+			<trans-unit id="and_check_links" resname="and_check_links">
 				<source>and check links</source>
 			</trans-unit>
 		</body>
