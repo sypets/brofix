@@ -10,10 +10,17 @@ TSconfig reference
 
 See :ref:`setupQuickstart` for an introduction.
 
-You can set the following options in the TSconfig for a page (e.g. the
-root page) and override them in user or groups TSconfig. You must
-prefix them with mod.brofix, e.g.
-:ts:`mod.brofix.searchFields.pages = canonical_link`.
+"Optional" means that you do not need to set a value and can use the defaults.
+
+In most cases, you should set values for the following properties (see
+:ref:`minimalConfig`):
+
+*  :ref:`tsconfigUserAgent`
+*  :ref:`tsConfigExcludeLinkTargetStoragePid`
+*  :ref:`tsconfigMailRecipients`
+*  :ref:`tsconfigMailFromName`
+*  :ref:`tsconfigMailFromEmail`
+
 
 .. contents::
    :local:
@@ -22,12 +29,14 @@ prefix them with mod.brofix, e.g.
 .. _tsconfigSearchfields:
 
 searchFields.[table]
-------------------
+====================
+
+*optional*
 
 .. container:: table-row
 
    Property
-      searchFields.[table]
+      mod.brofix.searchFields.[table]
 
    Data type
       string
@@ -65,7 +74,14 @@ searchFields.[table]
 
       .. code-block:: typoscript
 
-         tt_content = bodytext
+         mod.brofix.searchFields.tt_content = bodytext
+
+      Add checks for news and calendarize events:
+
+      .. code-block:: typoscript
+
+         mod.brofix.searchFields.tx_news_domain_model_news = bodytext
+         mod.brofix.searchFields.tx_calendarize_domain_model_event = description
 
    Default
       .. code-block:: typoscript
@@ -77,12 +93,14 @@ searchFields.[table]
 .. _tsconfigexcludeCtype:
 
 excludeCtype
-------------
+============
+
+*optional*
 
 .. container:: table-row
 
    Property
-      excludeCtype
+      mod.brofix.excludeCtype
 
    Data type
       string
@@ -101,10 +119,12 @@ excludeCtype
 linktypes
 ---------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linktypes
+      mod.brofix.linktypes
 
    Data type
       string
@@ -132,10 +152,12 @@ linktypes
 reportHiddenRecords
 -------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      reportHiddenRecords
+      mod.brofix.reportHiddenRecords
 
    Data type
       int
@@ -157,12 +179,12 @@ reportHiddenRecords
 depth
 -----
 
-**optional**
+*optional*
 
 .. container:: table-row
 
    Property
-      depth
+      mod.brofix.depth
 
    Data type
       int
@@ -178,12 +200,12 @@ depth
 User-Agent
 ----------
 
-**required**
+*required*
 
 .. container:: table-row
 
    Property
-      linktypesConfig.external.headers.User-Agent
+      mod.brofix.linktypesConfig.external.headers.User-Agent
 
    Data type
       string
@@ -195,7 +217,7 @@ User-Agent
 
       .. code-block:: tsconfig
 
-         linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Mysite LinkChecker/1.1; +https://mysite.com/imprint.html
+         User-Agent = Mozilla/5.0 (compatible; Mysite LinkChecker/1.1; +https://mysite.com/imprint.html
 
    Default
       If not set, a default is automatically generated using the email address from Global Configuration
@@ -204,10 +226,12 @@ User-Agent
 Accept
 ------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linktypesConfig.external.headers.Accept
+      mod.brofix.linktypesConfig.external.headers.Accept
 
    Data type
       string
@@ -221,10 +245,12 @@ Accept
 Accept-Language
 ---------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linktypesConfig.external.headers.Accept
+      mod.brofix.linktypesConfig.external.headers.Accept
 
    Data type
       string
@@ -239,10 +265,12 @@ Accept-Language
 Accept-Encoding
 ---------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linktypesConfig.external.headers.Accept-Encoding
+      mod.brofix.linktypesConfig.external.headers.Accept-Encoding
 
    Data type
       string
@@ -256,10 +284,12 @@ Accept-Encoding
 timeout
 -------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linktypesConfig.external.timeout
+      mod.brofix.linktypesConfig.external.timeout
 
    Data type
       int
@@ -273,17 +303,19 @@ timeout
 redirects
 ---------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linktypesConfig.external.redirects
+      mod.brofix.linktypesConfig.external.redirects
 
    Data type
       int
 
    Description
-      Number of redirects to follow. If more redirects are necessary to reach the destination final URL,
-      this is handled as broken link.
+      Number of redirects to follow. If more redirects are necessary to reach
+      the destination final URL, this is handled as broken link.
 
    Default
       5
@@ -293,10 +325,13 @@ redirects
 excludeLinkTarget.storagePid
 ------------------------------
 
+*required* (if "exclude URL" functionality should be available for non-admin
+editors)
+
 .. container:: table-row
 
    Property
-      excludeLinkTarget.storagePid
+      mod.brofix.excludeLinkTarget.storagePid
 
    Data type
       int
@@ -309,13 +344,17 @@ excludeLinkTarget.storagePid
       Create a central folder to store the excluded URLs or create one for each
       site.
 
-      .. hint::
+      .. important::
 
-         Excluded link targets (=URLs) are treated as valid URLs. This can be
-         used for the **rare** case that an URL is detected as broken, but is
-         not broken. This may be the case for some sites which require login
-         credentials, but also for common sites where the automatic link
-         checking mechanism yields false results.
+         The storage pid is stored along with the broken link records. If
+         you change this value, you should start a complete recheck of broken
+         links to get this updated.
+
+      Excluded link targets (=URLs) are treated as valid URLs. This can be
+      used for the **rare** case that an URL is detected as broken, but is
+      not broken. This may be the case for some sites which require login
+      credentials, but also for common sites where the automatic link
+      checking mechanism yields false results.
 
    Default
       0
@@ -324,10 +363,12 @@ excludeLinkTarget.storagePid
 excludeLinkTarget.allowed
 -------------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      excludeLinkTarget.allowed
+      mod.brofix.excludeLinkTarget.allowed
 
    Data type
       string
@@ -335,13 +376,13 @@ excludeLinkTarget.allowed
    Description
       Allowed link types which can be excluded. By default, it is only possible
       to exclude external URLs. If you would like to make this available for
-      page links to, add db, e.g.
+      page links too, add additional link types, e.g.
 
       .. code-block:: typoscript
 
          allowed = external,db
 
-      You can set it to empty to disable the exclude URL functionality:
+      You can set it to empty to disable the "exclude URL" functionality:
 
       .. code-block:: typoscript
 
@@ -356,10 +397,12 @@ excludeLinkTarget.allowed
 linkTargetCache.expiresLow
 --------------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linkTargetCache.expiresLow
+      mod.brofix.linkTargetCache.expiresLow
 
    Data type
       int
@@ -370,15 +413,11 @@ linkTargetCache.expiresLow
       expires, the URL must be checked again.
 
       The value means that the information for external URLs is retained for
-      that time without having to access the external site. Making a request
-      to the external site may take several seconds and is non-deterministic.
-      This is important for :ref:`on-the-fly <linkCheckingOnTheFly>` rechecking.
-      The downside is that the information may no longer be up-to-date (e.g.
-      the URL will now work, but is still displayed as broken).
+      that time without having to access the external site.
 
       2 different values are used for expiresLow and expiresHigh so that the
-      target will usually not expire on on-the-fly checking which would lead
-      to delays.
+      target will usually not expire during the on-the-fly checking which would
+      lead to delays.
 
       As a rule of thumb, use the interval for full checking (e.g. 1 day for
       once a day checking) and multiply that with a factor of 1 to 10 for
@@ -403,10 +442,12 @@ linkTargetCache.expiresLow
 linkTargetCache.expiresHigh
 ---------------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      linkTargetCache.expiresHigh
+      mod.brofix.linkTargetCache.expiresHigh
 
    Data type
       int
@@ -421,10 +462,12 @@ linkTargetCache.expiresHigh
 crawlDelay.seconds
 ------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      crawlDelay.seconds
+      mod.brofix.crawlDelay.seconds
 
    Data type
       int
@@ -463,16 +506,18 @@ crawlDelay.seconds
 crawlDelay.nodelay
 ------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      crawlDelay.nodelay
+      mod.brofix.crawlDelay.nodelay
 
    Data type
       string
 
    Description
-      Do not use the crawlDelay.ms wait period for these domains
+      Do not use the crawlDelay.seconds wait period for these domains
 
 
       .. code-block:: typoscript
@@ -486,27 +531,33 @@ crawlDelay.nodelay
 report.docsurl
 --------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      report.docsurl
+      mod.brofix.report.docsurl
 
    Data type
       string
 
    Description
-      Add a URL to your internal documentation if you have this. This will
-      add an "i" button to the broken link report.
+      Add a documentation URL. This will add an "i" button to the broken link
+      report with a link to the documentation.
+
+      Add a link to the official documentation:
 
       .. code-block:: typoscript
 
-         report.docsurl = https://example.org/typo3/editors/brofix
+         report.docsurl = https://docs.typo3.org/p/sypets/brofix/master/en-us/Index.html
 
    Default
       empty
 
 report.recheckButton
 --------------------
+
+*optional*
 
 .. container:: table-row
 
@@ -550,20 +601,22 @@ report.recheckButton
 mail.sendOnCheckLinks
 ---------------------
 
+*optional*
+
 .. container:: table-row
 
    Property
-      mail.sendOnCheckLinks
+      mod.brofix.mail.sendOnCheckLinks
 
    Data type
       int
 
    Description
-      Enable setting an email when the brofix:checkLinks console command
-      is excecuted. This can be overridden via the command line arguments.
+      Enable sending an email when the brofix:checkLinks console command
+      is excecuted. This can be overridden via command line arguments (`-e`).
 
    Default
-      0
+      1
 
 
 .. _tsconfigMailRecipients:
@@ -576,7 +629,7 @@ mail.recipients
 .. container:: table-row
 
    Property
-      mail.recipients
+      mod.brofix.mail.recipients
 
    Data type
       string
@@ -584,8 +637,6 @@ mail.recipients
    Description
       Set the recipient email address(es) of the report mail sent by the
       console command. Can be several, separated by comma.
-
-      Use only email addresses, not a format like `Sender2 <sender2@example.org>`
 
    Example
       .. code-block:: tsconfig
@@ -599,18 +650,18 @@ mail.recipients
       is used if this is empty.
 
 
-
-.. _tsconfigMailFrom:
+.. _tsconfigMailFromName:
 
 mail.fromname
 -------------
 
-*required*
+*required* (unless set in
+:php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']`)
 
 .. container:: table-row
 
    Property
-      mail.from
+      mod.brofix.mail.from
 
    Data type
       string
@@ -628,15 +679,18 @@ mail.fromname
       :php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']`
       is used if this is empty.
 
+.. _tsconfigMailFromEmail:
+
 mail.fromemail
 --------------
 
-*required*
+*required* (unless set in
+:php:`$GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromEmail']`)
 
 .. container:: table-row
 
    Property
-      mail.from
+      mod.brofix.mail.from
 
    Data type
       string
@@ -666,13 +720,16 @@ mail.replytoemail
 .. container:: table-row
 
    Property
-      mail.replytoemail
+      mod.brofix.mail.replytoemail
 
    Data type
       string
 
    Description
       Set the replyto email of the report mail sent by the cron script.
+
+   Default
+      Empty
 
 mail.replytoname
 ----------------
@@ -682,7 +739,7 @@ mail.replytoname
 .. container:: table-row
 
    Property
-      mail.replytoma,e
+      mod.brofix.mail.replytoma,e
 
    Data type
       string
@@ -690,6 +747,8 @@ mail.replytoname
    Description
       Set the replyto name of the report mail sent by the cron script.
 
+   Default
+      Empty
 
 .. _tsconfigMailSubject:
 
@@ -703,7 +762,7 @@ If this is not set explicitly, a subject will be auto-generated.
 .. container:: table-row
 
    Property
-      mail.subject
+      mod.brofix.mail.subject
 
    Data type
       string
@@ -712,7 +771,7 @@ If this is not set explicitly, a subject will be auto-generated.
       Set the subject of the report mail.
 
    Default
-      empty, auto-generated
+      Empty, auto-generated
 
 .. _tsconfigMailTemplate:
 
@@ -726,7 +785,7 @@ Always uses the default template CheckLinksResults if not supplied.
 .. container:: table-row
 
    Property
-      mail.template
+      mod.brofix.mail.template
 
    Data type
       string
@@ -737,5 +796,5 @@ Always uses the default template CheckLinksResults if not supplied.
       CheckLinksResults.html and CheckLinksResults.txt must exist.
 
    Default
-      empty, auto-generated
+      CheckLinksResults
 
