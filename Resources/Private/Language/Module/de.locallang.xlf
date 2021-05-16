@@ -229,8 +229,8 @@
 				<target>Umleitungsschleife.  (%s: %s)</target>
 			</trans-unit>
 			<trans-unit id="list.report.externalerror" resname="list.report.externalerror">
-				<source>External Link returned HTTP error code (%s).</source>
-				<target>Allgemeiner Fehler (HTTP status code: %s)</target>
+				<source>HTTP status code=%s.</source>
+				<target>HTTP status code=%s.</target>
 			</trans-unit>
 			<trans-unit id="list.report.filenotexisting" resname="list.report.filenotexisting">
 				<source>File doesn't exist.</source>

@@ -337,8 +337,12 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             case self::ERROR_TYPE_HTTP_STATUS_CODE:
                 $message = $lang->getLL('list.report.error.httpstatus.' . $errno);
                 if (!$message) {
-                    // fall back to generic error message
-                    $message = sprintf($lang->getLL('list.report.externalerror'), $errorType);
+                    if ($errno !== 0) {
+                        // fall back to generic error message
+                        $message = sprintf($lang->getLL('list.report.externalerror'), (string)$errno);
+                    } else {
+                        $message = $exception;
+                    }
                 }
                 break;
 

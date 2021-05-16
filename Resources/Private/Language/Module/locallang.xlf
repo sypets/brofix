@@ -181,8 +181,9 @@
 			<trans-unit id="list.report.redirectloop" resname="list.report.redirectloop">
 				<source>A redirect loop occurred. (%s: %s)</source>
 			</trans-unit>
+			<!-- generic HTTP error -->
 			<trans-unit id="list.report.externalerror" resname="list.report.externalerror">
-				<source>External Link returned HTTP error code (%s).</source>
+				<source>HTTP status code=%s.</source>
 			</trans-unit>
 			<trans-unit id="list.report.filenotexisting" resname="list.report.filenotexisting">
 				<source>File doesn't exist.</source>
