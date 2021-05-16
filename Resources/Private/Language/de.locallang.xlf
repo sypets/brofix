@@ -76,15 +76,15 @@
 				<source>The given page id %d is invalid!</source>
 				<target>Die Seiten mit der id %d ist nicht gültig!</target>
 			</trans-unit>
-			<trans-unit id="broken_links_found_for_page" resname="tasks.error.invalidPageUid">
-				<source>Broken Links found for page</source>
-				<target>Fehlerhafte Links gefunden auf dieser Seite</target>
+			<trans-unit id="broken_links_found_for_page" resname="broken_links_found_for_page">
+				<source>Broken links were found on this page</source>
+				<target>Fehlerhafte Links auf dieser Seite gefunden</target>
 			</trans-unit>
-			<trans-unit id="go_to_info_modul" resname="tasks.error.invalidPageUid">
+			<trans-unit id="go_to_info_modul" resname="go_to_info_modul">
 				<source>Go to the Info module</source>
 				<target>Ins Info Modul wechseln</target>
 			</trans-unit>
-			<trans-unit id="and_check_links" resname="tasks.error.invalidPageUid">
+			<trans-unit id="and_check_links" resname="and_check_links">
 				<source>and check links</source>
 				<target>und Links prüfen</target>
 			</trans-unit>
