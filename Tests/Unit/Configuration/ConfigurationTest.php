@@ -88,7 +88,10 @@ class ConfigurationTest extends AbstractUnitTest
         );
     }
 
-    public function getExcludedCtypesIsCorrectDefault()
+    /**
+     * @test
+     */
+    public function getExcludedCtypesIsCorrectDefault(): void
     {
         $expected = [
             'html'
@@ -102,7 +105,7 @@ class ConfigurationTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function getMailFromEmailIsCorrectDefault()
+    public function getMailFromEmailIsCorrectDefault(): void
     {
         $email = $this->configuration->getMailFromEmail();
 
@@ -116,7 +119,7 @@ class ConfigurationTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function getMailFromEmailUsesSystemDefault()
+    public function getMailFromEmailUsesSystemDefault(): void
     {
         $email = 'system@example.org';
         $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] = 'system@example.org';
@@ -129,7 +132,7 @@ class ConfigurationTest extends AbstractUnitTest
         );
     }
 
-    public function getMailFromEmailReturnsCorrectTsconfig()
+    public function getMailFromEmailReturnsCorrectTsconfig(): void
     {
         $emailExpected = 'system@example.org';
 
@@ -146,7 +149,7 @@ class ConfigurationTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function getMailFromNameIsCorrectDefault()
+    public function getMailFromNameIsCorrectDefault(): void
     {
         self::assertEquals(
             '',
@@ -155,7 +158,11 @@ class ConfigurationTest extends AbstractUnitTest
         );
     }
 
-    public function getMailFromNameReturnsCorrectTsconfig()
+    /**
+     * @test
+     * @throws \Exception
+     */
+    public function getMailFromNameReturnsCorrectTsconfig(): void
     {
         $nameExpected = 'Webmaster';
 
@@ -172,7 +179,7 @@ class ConfigurationTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function getMailRecipientsIsCorrectDefault()
+    public function getMailRecipientsIsCorrectDefault(): void
     {
         // expected, actual, message
         self::assertEquals(
@@ -185,7 +192,7 @@ class ConfigurationTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function getMailRecipientsReturnsCorrectValue()
+    public function getMailRecipientsReturnsCorrectValue(): void
     {
         $email = 'system@example.org';
         $valueExpected = [new Address($email)];
@@ -203,7 +210,7 @@ class ConfigurationTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function getMailRecipientsReturnsCorrectValuesMultiple()
+    public function getMailRecipientsReturnsCorrectValuesMultiple(): void
     {
         $email = 'system@example.org,system2@example.org';
         $valueExpected = [

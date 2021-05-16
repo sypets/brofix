@@ -19,6 +19,7 @@ namespace Sypets\Brofix\Tests\Unit\Linktype;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Prophecy\ObjectProphecy;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ExternalLinktype;
@@ -37,7 +38,7 @@ class ExternalLinktypeTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function checkLinkWithExternalUrlNotFoundReturnsFalse()
+    public function checkLinkWithExternalUrlNotFoundReturnsFalse(): void
     {
         $httpMethod = 'GET';
         $options = $this->getRequestHeaderOptions($httpMethod);
@@ -67,7 +68,7 @@ class ExternalLinktypeTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function checkLinkWithExternalUrlNotFoundResultsNotFoundErrorType()
+    public function checkLinkWithExternalUrlNotFoundResultsNotFoundErrorType(): void
     {
         $httpMethod = 'GET';
         $options = $this->getRequestHeaderOptions($httpMethod);
@@ -96,10 +97,16 @@ class ExternalLinktypeTest extends AbstractUnitTest
         self::assertSame(404, $errorParams['errno']);
     }
 
-    private function instantiateExternalLinktype($requestFactoryProphecy = null)
+    /**
+     * @param ObjectProphecy<RequestFactory>|null $requestFactoryProphecy
+     * @return ExternalLinktype
+     */
+    private function instantiateExternalLinktype(ObjectProphecy $requestFactoryProphecy = null): ExternalLinktype
     {
         $requestFactoryProphecy = $requestFactoryProphecy ?: $this->prophesize(RequestFactory::class);
+
         $excludeLinkTargetProphecy = $this->prophesize(ExcludeLinkTarget::class);
+
         $linkTargetCacheProphycy = $this->prophesize(LinkTargetPersistentCache::class);
 
         return new ExternalLinktype(
@@ -109,14 +116,10 @@ class ExternalLinktypeTest extends AbstractUnitTest
         );
     }
 
-    private function getCookieJarProphecy(): CookieJar
-    {
-        $cookieJar = $this->prophesize(CookieJar::class);
-        $cookieJar = $cookieJar->reveal();
-        GeneralUtility::addInstance(CookieJar::class, $cookieJar);
-        return $cookieJar;
-    }
-
+    /**
+     * @param string $method
+     * @return mixed[]
+     */
     private function getRequestHeaderOptions(string $method): array
     {
         $options = [

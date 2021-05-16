@@ -24,6 +24,9 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctionalTest extends FunctionalTestCase
 {
+    /**
+     * @var array<string>
+     */
     protected $coreExtensionsToLoad = [
         'backend',
         'fluid',
@@ -31,6 +34,9 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
         'install'
     ];
 
+    /**
+     * @var array<string>
+     */
     protected $testExtensionsToLoad = [
         'typo3conf/ext/brofix',
         'typo3conf/ext/page_callouts'
@@ -56,7 +62,7 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
     /**
      * @throws \Exception
      */
-    protected function initializeConfiguration()
+    protected function initializeConfiguration(): void
     {
         $tsConfigPath = GeneralUtility::getFileAbsFileName('EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig');
         $this->configuration = GeneralUtility::makeInstance(Configuration::class);

@@ -27,7 +27,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function hasEntryForUrlReturnsFalse()
+    public function hasEntryForUrlReturnsFalse(): void
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -41,7 +41,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function getUrlResponseForUrlReturnsEmptyArray()
+    public function getUrlResponseForUrlReturnsEmptyArray(): void
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -55,7 +55,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function generateUrlResponseReturnsCorrectValue()
+    public function generateUrlResponseReturnsCorrectValue(): void
     {
         /**
          * @var ErrorParams
@@ -76,7 +76,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function removeRemovesEntry()
+    public function removeRemovesEntry(): void
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -94,7 +94,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function setEntrySetsCorrectValue()
+    public function setEntrySetsCorrectValue(): void
     {
         /**
          * @var ErrorParams
@@ -122,7 +122,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
      *
      * @test
      */
-    public function setEntrySetsCorrectValueToLastSet()
+    public function setEntrySetsCorrectValueToLastSet(): void
     {
         /**
          * @var ErrorParams

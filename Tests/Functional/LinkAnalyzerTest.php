@@ -22,6 +22,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LinkAnalyzerTest extends AbstractFunctionalTest
 {
+    /**
+     * @param array<string|int> $pidList
+     * @return LinkAnalyzer
+     */
     protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
     {
         $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
@@ -33,6 +37,9 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
         return $linkAnalyzer;
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function findAllBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
@@ -74,8 +81,13 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
     /**
      * @test
      * @dataProvider findAllBrokenLinksDataProvider
+     *
+     * @param string $inputFile
+     * @param array<string|int> $pidList
+     * @param string $expectedOutputFile
+     * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function generateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
+    public function generateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         // setup
         $this->importDataSet($inputFile);
@@ -86,6 +98,9 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function findFindOnlyFileBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
@@ -116,8 +131,13 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
     /**
      * @test
      * @dataProvider findFindOnlyFileBrokenLinksDataProvider
+     *
+     * @param string $inputFile
+     * @param array<string|int> $pidList
+     * @param string $expectedOutputFile
+     * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsFindOnlyFileBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
+    public function getLinkStatisticsFindOnlyFileBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['file'];
 
@@ -131,6 +151,9 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function findFindOnlyPageBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
@@ -161,8 +184,14 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
     /**
      * @test
      * @dataProvider findFindOnlyPageBrokenLinksDataProvider
+     *
+     * @param string $inputFile
+     * @param array<string|int> $pidList
+     * @param string $expectedOutputFile
+     *
+     * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsFindOnlyPageBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile)
+    public function getLinkStatisticsFindOnlyPageBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['db'];
 
@@ -176,6 +205,9 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function findFindOnlyExternalBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
@@ -206,8 +238,13 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
     /**
      * @test
      * @dataProvider findFindOnlyExternalBrokenLinksDataProvider
+     *
+     * @param string $inputFile
+     * @param array<string|int> $pidList
+     * @param string $expectedOutputFile
+     * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsFindOnlyExternalBrokenLinksInBodytext(string $inputFile, array $pidList, string $expectedOutputFile)
+    public function getLinkStatisticsFindOnlyExternalBrokenLinksInBodytext(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['external'];
 
@@ -221,6 +258,9 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
         $this->assertCSVDataSet($expectedOutputFile);
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function checkContentByTypeDataProvider(): array
     {
         $pidList1 = [1];
@@ -250,8 +290,14 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
     /**
      * @test
      * @dataProvider checkContentByTypeDataProvider
+     *
+     * @param string $inputFile
+     * @param array<string|int> $pidList
+     * @param string $expectedOutputFile
+     *
+     * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsCheckOnlyContentByType(string $inputFile, array $pidList, string $expectedOutputFile)
+    public function getLinkStatisticsCheckOnlyContentByType(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $searchFields = [
             'tt_content' => [

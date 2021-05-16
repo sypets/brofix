@@ -2,6 +2,7 @@
 
 includes:
   - phpstan-baseline-level6.neon
+  - ../.Build/vendor/jangregor/phpstan-prophecy/extension.neon
 
 parameters:
   tmpDir: %currentWorkingDirectory%/var/cache/phpstan
@@ -11,6 +12,7 @@ parameters:
   level: 6
   paths:
     - %currentWorkingDirectory%/../Classes
+    - %currentWorkingDirectory%/../Tests
   scanDirectories:
     - %currentWorkingDirectory%/Web/typo3/sysext
 

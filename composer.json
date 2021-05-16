@@ -25,9 +25,10 @@
 	},
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^2.18.6",
+		"jangregor/phpstan-prophecy": "^0.8.1",
+		"phpstan/phpstan": "^0.12.64",
 		"phpunit/phpunit": "^8.5.15",
-		"typo3/testing-framework": "^5.0.16 || ^6.8.0",
-		"phpstan/phpstan": "^0.12.64"
+		"typo3/testing-framework": "^5.0.16 || ^6.8.0"
 	},
 	"suggest": {
 	},
