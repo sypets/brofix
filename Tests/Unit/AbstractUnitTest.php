@@ -34,7 +34,7 @@ abstract class AbstractUnitTest extends UnitTestCase
     /**
      * @throws \Exception
      */
-    protected function initializeConfiguration()
+    protected function initializeConfiguration(): void
     {
         $tsConfigPath = GeneralUtility::getFileAbsFileName(
             'EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig'
@@ -48,16 +48,17 @@ abstract class AbstractUnitTest extends UnitTestCase
         );
     }
 
-    protected function inializeLanguageServiceProphecy()
+    protected function inializeLanguageServiceProphecy(): void
     {
         $GLOBALS['LANG'] = $this->buildLanguageServiceProphecy()->reveal();
     }
 
+    /**
+     * @return ObjectProphecy<LanguageService>
+     */
     protected function buildLanguageServiceProphecy(): ObjectProphecy
     {
         $languageServiceProphecy = $this->prophesize(LanguageService::class);
-        $languageServiceProphecy
-            ->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $languageServiceProphecy->getLL(Argument::any())->willReturn('translation string');
         return $languageServiceProphecy;
     }

@@ -22,6 +22,9 @@ use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
 
 class ExcludeLinkTargetTest extends AbstractFunctionalTest
 {
+    /**
+     * @return array<string,mixed[]>
+     */
     public function isExcludedDataProvider(): array
     {
         return [
@@ -46,7 +49,7 @@ class ExcludeLinkTargetTest extends AbstractFunctionalTest
      * @test
      * @dataProvider isExcludedDataProvider
      */
-    public function isExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult)
+    public function isExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult): void
     {
         // setup
         $this->importDataSet($inputFile);

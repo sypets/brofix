@@ -24,7 +24,10 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class ExternalLinktypePreprocessUrlTest extends UnitTestCase
 {
-    public function preprocessUrlsDataProvider()
+    /**
+     * @return \Generator<string,string[]>
+     */
+    public function preprocessUrlsDataProvider(): \Generator
     {
         // regression test for issue #92230: handle incomplete or faulty URLs gracefully
         yield 'faulty URL with mailto' => [
@@ -89,7 +92,7 @@ class ExternalLinktypePreprocessUrlTest extends UnitTestCase
      * @test
      * @dataProvider preprocessUrlsDataProvider
      */
-    public function preprocessUrlReturnsCorrectString(string $inputUrl, string $expectedResult)
+    public function preprocessUrlReturnsCorrectString(string $inputUrl, string $expectedResult): void
     {
         $subject = $this->instantiateExternalLinktype();
         $method = new \ReflectionMethod($subject, 'preprocessUrl');

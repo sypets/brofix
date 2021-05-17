@@ -28,8 +28,11 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function checkLinksCommandThrowsExceptionForNotExistingStartpage()
+    public function checkLinksCommandThrowsExceptionForNotExistingStartpage(): void
     {
+        /**
+         * @var CheckLinksCommand
+         */
         $command = GeneralUtility::makeInstance(CheckLinksCommand::class);
         $tester = new CommandTester($command);
 
@@ -46,8 +49,11 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
      *
      * @test
      */
-    public function checkLinksCommandReturnsCorrectResultForNoStartpages()
+    public function checkLinksCommandReturnsCorrectResultForNoStartpages(): void
     {
+        /**
+         * @var CheckLinksCommand
+         */
         $command = GeneralUtility::makeInstance(CheckLinksCommand::class);
         $tester = new CommandTester($command);
         $result = $tester->execute([], []);
@@ -62,13 +68,16 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function checkLinksCommandChecksLinksMissingEmailException()
+    public function checkLinksCommandChecksLinksMissingEmailException(): void
     {
         $parameters = [
             '--start-pages' => '1'
         ];
 
         $this->importDataSet(__DIR__ . '/Fixtures/input_content_with_broken_link_external.xml');
+        /**
+         * @var CheckLinksCommand
+         */
         $command = GeneralUtility::makeInstance(CheckLinksCommand::class);
         $tester = new CommandTester($command);
 
@@ -81,7 +90,7 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function checkLinksCommandChecksLinksWithNoSendEmailReturnsOk()
+    public function checkLinksCommandChecksLinksWithNoSendEmailReturnsOk(): void
     {
         $parameters = [
             '--start-pages' => '1',
@@ -89,6 +98,10 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         ];
 
         $this->importDataSet(__DIR__ . '/Fixtures/input_content_with_broken_link_external.xml');
+
+        /**
+         * @var CheckLinksCommand
+         */
         $command = GeneralUtility::makeInstance(CheckLinksCommand::class);
         $tester = new CommandTester($command);
         $result = $tester->execute($parameters, []);
@@ -99,7 +112,7 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function checkLinksCommandStatsNumberOfPages()
+    public function checkLinksCommandStatsNumberOfPages(): void
     {
         $parameters = [
             '--start-pages' => '1',
@@ -107,6 +120,10 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         ];
 
         $this->importDataSet(__DIR__ . '/Fixtures/input_content_with_broken_link_external.xml');
+
+        /**
+         * @var CheckLinksCommand
+         */
         $command = GeneralUtility::makeInstance(CheckLinksCommand::class);
         $tester = new CommandTester($command);
         $tester->execute($parameters, []);
@@ -122,7 +139,7 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
     /**
      * @test
      */
-    public function checkLinksCommandStatsNumberOfBrokenLinks()
+    public function checkLinksCommandStatsNumberOfBrokenLinks(): void
     {
         $parameters = [
             '--start-pages' => '1',
@@ -130,6 +147,10 @@ class CheckLinksCommandTest extends AbstractFunctionalTest
         ];
 
         $this->importDataSet(__DIR__ . '/Fixtures/input_content_with_broken_link_external.xml');
+
+        /**
+         * @var CheckLinksCommand
+         */
         $command = GeneralUtility::makeInstance(CheckLinksCommand::class);
         $tester = new CommandTester($command);
         $tester->execute($parameters, []);

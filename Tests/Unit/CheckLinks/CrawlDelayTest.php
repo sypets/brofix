@@ -41,7 +41,7 @@ class CrawlDelayTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function crawlDelayDoesNotDelayForNewDomain()
+    public function crawlDelayDoesNotDelayForNewDomain(): void
     {
         $subject = $this->initializeCrawlDelay();
         $subject->setConfiguration($this->configuration);
@@ -55,7 +55,7 @@ class CrawlDelayTest extends AbstractUnitTest
      *
      * @test
      */
-    public function crawlDelayDoesNotDelayForOtherDomain()
+    public function crawlDelayDoesNotDelayForOtherDomain(): void
     {
         $subject = $this->initializeCrawlDelay();
         $subject->setConfiguration($this->configuration);
@@ -70,7 +70,7 @@ class CrawlDelayTest extends AbstractUnitTest
      *
      * @test
      */
-    public function crawlDelayDoesDelayForDomainTwice()
+    public function crawlDelayDoesDelayForDomainTwice(): void
     {
         $domain = 'example.org';
         $subject = $this->initializeCrawlDelay();
