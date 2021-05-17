@@ -153,12 +153,20 @@ class InternalLinktype extends AbstractLinktype
             ->fetch();
 
         $customParams = [];
+
+        /**
+         * @var string
+         */
         $errorType = '';
+
+        /**
+         * @var int
+         */
         $errno = 0;
 
         if ($row) {
             if ($row['deleted'] == '1') {
-                $errorType = self::ERROR_ERRNO_DELETED;
+                $errorType = self::ERROR_TYPE_PAGE;
                 $errno = self::ERROR_ERRNO_DELETED;
 
                 $customParams = [
@@ -232,7 +240,15 @@ class InternalLinktype extends AbstractLinktype
         $this->responseContent = true;
 
         $customParams = [];
+
+        /**
+         * @var string
+         */
         $errorType = '';
+
+        /**
+         * @var int
+         */
         $errno = 0;
 
         // this content element exists
