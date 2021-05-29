@@ -42,7 +42,7 @@ Build/Scripts/runTests.sh -s cgl -n -v
 Check **and fix** CGL in PHP files:
 
 ```
-Build/Scripts/cglFixMyCommit.sh -s cgl -v
+Build/Scripts/runTests.sh -s cgl -v
 ```
 
 See all options:
@@ -55,4 +55,13 @@ Cleanup:
 
 ```
 rm -rf .Build;rm composer.lock;composer config --unset platform.php;composer config --unset platform
+```
+
+## yarn
+
+To build and minimize css files.
+
+```
+yarn install
+yarn build
 ```

@@ -1,0 +1,24 @@
+{
+	"name": "brofix",
+	"description": "Broken link fixer",
+	"repository": "https://github.com/sypets/brofix",
+	"author": "Sybille Peters",
+	"license": "GPL-2.0+",
+	"engines": {
+		"node": ">=14.15.0 <15.0.0",
+		"yarn": "^1.17.3"
+	},
+	"devDependencies": {
+		"grunt": "~1.3.0",
+		"grunt-postcss": "^0.9.0",
+		"grunt-sass": "^3.1.0",
+		"grunt-contrib-watch": "^1.0.0",
+		"node-sass": "^4.14.1",
+		"postcss-banner": "^3.0.2",
+		"postcss-clean": "^1.1.0"
+	},
+	"scripts": {
+		"build-css": "./node_modules/.bin/grunt css",
+		"build": "./node_modules/.bin/grunt build"
+	}
+}

@@ -2,8 +2,11 @@
 /.gitattributes export-ignore
 /.github
 /.gitignore export-ignore
+/.stylelintrc
 /composer.lock export-ignore
 /Build export-ignore
+/Gruntfile.js export-ignore
+/package.json export-ignore
 /phpstan.neon
 /Resources/Private/TypeScript/ export-ignore
 /Tests/ export-ignore
