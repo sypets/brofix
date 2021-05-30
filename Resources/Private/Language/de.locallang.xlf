@@ -7,74 +7,52 @@
 				<source>Broken link fixer</source>
 				<target>Links prüfen</target>
 			</trans-unit>
-			<trans-unit id="tasks.validate.name" resname="tasks.validate.name">
-				<source>Broken link fixer</source>
+
+			<!-- broken link list -->
+
+			<trans-unit id="list.header" resname="list.header">
+				<source>Broken links</source>
+				<target>Fehlerhafte Links</target>
+			</trans-unit>
+			<trans-unit id="label_refresh" resname="label_refresh">
+				<source>Refresh display</source>
+				<target>Anzeige aktualisieren</target>
+			</trans-unit>
+			<trans-unit id="label_refresh-link-list" resname="label_refresh-link-list">
+				<source>Refreshing link list, please stand by.</source>
+				<target>Linkliste wird aktualisiert.</target>
+			</trans-unit>
+			<trans-unit id="list.action.checkLinks" resname="list.action.checkLinks">
+				<source>Check links</source>
 				<target>Links prüfen</target>
 			</trans-unit>
-			<trans-unit id="tasks.validate.description" resname="tasks.validate.description">
-				<source>Search for broken links and store the result into the table tx_brofix_broken_links. The results will be displayed in the backend module.</source>
-				<target>Suche nach fehlerhaften Links und speichere die Ergebnisse in der Tabelle tx_brofix_broken_links. Die Ergebnisse werden im backend Modul angezeigt.</target>
+			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
+				<source>Broken link information may be outdated.</source>
+				<target>Information zum fehlerhaften Link kann veraltet sein.</target>
+			</trans-unit>
+			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.stale">
+				<source>Broken link information is most likely up to date.</source>
+				<target>Information zum fehlerhaften Link ist wahrscheinlich aktuell.</target>
+			</trans-unit>
+			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.stale">
+				<source></source>
 				<target></target>
 			</trans-unit>
-			<trans-unit id="tasks.validate.page" resname="tasks.validate.page">
-				<source>Start page (uid)</source>
-				<target>Startseite (uid)</target>
+			<trans-unit id="list.edit.field" resname="list.edit.field">
+				<source>Edit field containing this broken link</source>
+				<target>Editiere Feld, welches den fehlerhaften link enthält</target>
 			</trans-unit>
-			<trans-unit id="tasks.validate.depth" resname="tasks.validate.depth">
-				<source>Depth</source>
-				<target>Tiefe</target>
+			<trans-unit id="list.action.web_layout" resname="list.action.web_layout">
+				<source>Page layout</source>
+				<target>Seiten-Layout</target>
 			</trans-unit>
-			<trans-unit id="tasks.validate.conf" resname="tasks.validate.conf">
-				<source>Overwrite TSconfig</source>
-				<target>Überschreibe TSconfig</target>
+			<trans-unit id="list.action.recheckUrl" resname="list.action.recheckUrl">
+				<source>Recheck URL</source>
+				<target>URL neu prüfen</target>
 			</trans-unit>
-			<trans-unit id="tasks.validate.email" resname="tasks.validate.email">
-				<source>Send email report to</source>
-				<target>Schicke Ergebnisse per E-Mail an</target>
-			</trans-unit>
-			<trans-unit id="tasks.validate.emailOnBrokenLinkOnly" resname="tasks.validate.emailOnBrokenLinkOnly">
-				<source>Send email only if broken links were found</source>
-				<target>Sende email nur wenn fehlerhafte Links gefunden wurden</target>
-			</trans-unit>
-			<trans-unit id="tasks.validate.emailTemplateFile" resname="tasks.validate.emailTemplateFile">
-				<source>Email template file</source>
-				<target>Email template Datei</target>
-			</trans-unit>
-			<trans-unit id="tasks.validate.invalidEmail" resname="tasks.validate.invalidEmail">
-				<source>Invalid email format!</source>
-				<target>Fehlerhaftes E-Mail Format</target>
-			</trans-unit>
-			<trans-unit id="tasks.validate.invalidPage" resname="tasks.validate.invalidPage">
-				<source>Invalid page uid, please enter a valid page uid!</source>
-				<target>Ungültige SeitenID, bitte geben Sie eine gültige Seiten-ID ein!</target>
-			</trans-unit>
-			<trans-unit id="tasks.validate.invalidDepth" resname="tasks.validate.invalidDepth">
-				<source>There is no depth set, please set it to one of the offered values!</source>
-				<target>Tiefe ist nicht gesetzt, bitte auwählen!</target>
-			</trans-unit>
-			<trans-unit id="tasks.error.noSubject" resname="tasks.error.noSubject">
-				<source>No subject for the notification email</source>
-				<target>Betreff fehlt für die Benachrichtigungs-E-Mail.</target>
-			</trans-unit>
-			<trans-unit id="tasks.error.invalidToEmail" resname="tasks.error.invalidToEmail">
-				<source>Invalid format of one or more of the recipient email addresses!</source>
-				<target>Ungültiges Format für eine oder mehrere der Empfangs-Adressen (E-Mail)</target>
-			</trans-unit>
-			<trans-unit id="tasks.error.invalidFromEmail" resname="tasks.error.invalidFromEmail">
-				<source>Invalid format of the email address in the from header</source>
-				<target>Ungültiges Format für E-Mail Adressen (Absender=From)</target>
-			</trans-unit>
-			<trans-unit id="tasks.error.invalidTSconfig" resname="tasks.error.invalidTSconfig">
-				<source>Invalid TSconfig in the task configuration!</source>
-				<target>Ungültiges TSconfig in der Konfiguration des Scheduler task</target>
-			</trans-unit>
-			<trans-unit id="tasks.error.invalidEmailTemplateFile" resname="tasks.error.invalidEmailTemplateFile">
-				<source>The email template file is not existing!</source>
-				<target>E-Mail template Datei existiert nicht!</target>
-			</trans-unit>
-			<trans-unit id="tasks.error.invalidPageUid" resname="tasks.error.invalidPageUid">
-				<source>The given page id %d is invalid!</source>
-				<target>Die Seiten mit der id %d ist nicht gültig!</target>
+			<trans-unit id="list.action.excludeUrl" resname="list.action.excludeUrl">
+				<source>Permanently exclude this URL from URL checking</source>
+				<target>URL dauerhaft von Linkprüfung ausschließen</target>
 			</trans-unit>
 			<trans-unit id="broken_links_found_for_page" resname="broken_links_found_for_page">
 				<source>Broken links were found on this page</source>
@@ -82,7 +60,7 @@
 			</trans-unit>
 			<trans-unit id="go_to_info_modul" resname="go_to_info_modul">
 				<source>Go to the Info module</source>
-				<target>Ins Info Modul wechseln</target>
+				<target>Zum Info Modul wechseln</target>
 			</trans-unit>
 			<trans-unit id="and_check_links" resname="and_check_links">
 				<source>and check links</source>

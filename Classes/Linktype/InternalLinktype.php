@@ -365,7 +365,7 @@ class InternalLinktype extends AbstractLinktype
                             $custom['content']['wrongPage'] ?? '',
                             $custom['content']['rightPage'] ?? ''
                         ],
-                        $lang->getLL('list.report.contentmoved')
+                        $lang->getLL('list.report.error.contentmoved')
                     );
                     break;
                 default:

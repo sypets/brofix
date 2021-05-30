@@ -339,7 +339,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 if (!$message) {
                     if ($errno !== 0) {
                         // fall back to generic error message
-                        $message = sprintf($lang->getLL('list.report.externalerror'), (string)$errno);
+                        $message = sprintf($lang->getLL('list.report.error.httpstatus.general'), (string)$errno);
                     } else {
                         $message = $exception;
                     }
@@ -354,7 +354,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 }
                 if (!$message) {
                     // fallback to  generic error message and show exception
-                    $message = $lang->getLL('list.report.networkexception');
+                    $message = $lang->getLL('list.report.error.networkexception');
                     if ($exception !== '') {
                         $message .= ' ('
                             . $exception
@@ -365,14 +365,14 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
             case 'loop':
                 $message = sprintf(
-                    $lang->getLL('list.report.redirectloop'),
+                    $lang->getLL('list.report.error.redirectloop'),
                     $exception,
                     ''
                 );
                 break;
 
             case 'tooManyRedirects':
-                $message = $lang->getLL('list.report.tooManyRedirects');
+                $message = $lang->getLL('list.report.error.tooManyRedirects');
                 break;
 
             default:
