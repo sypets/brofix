@@ -32,9 +32,6 @@ These are links, where the broken link status is "stale", meaning it may be
 outdated. For example the broken link is still shown in the list
 while the record has already been updated and the broken link fixed.
 
-There are several reasons why the broken link information is outdated.
-A link is a connection between 2 points, the link source and
-
 .. _glossaryLinkSource:
 
 link source
