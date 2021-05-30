@@ -64,13 +64,19 @@ class BrofixReport
             ['language', 'DESC'],
             ['record_uid', 'DESC'],
         ],
-        'field' => [
+        'type' => [
             ['table_name', 'ASC'],
             ['field', 'ASC'],
         ],
-        'field_reverse' => [
+        'type_reverse' => [
             ['table_name', 'DESC'],
             ['field', 'DESC'],
+        ],
+        'last_check' => [
+            ['last_check', 'ASC']
+        ],
+        'last_check_reverse' => [
+            ['last_check', 'DESC']
         ],
         'url' => [
             ['link_type', 'ASC'],
@@ -81,11 +87,11 @@ class BrofixReport
             ['url', 'DESC'],
         ],
         // sort by error type
-        'errortype' => [
+        'error' => [
             ['link_type', 'ASC'],
             ['url_response', 'ASC']
         ],
-        'errortype_reverse' => [
+        'error_reverse' => [
             ['link_type', 'DESC'],
             ['url_response', 'DESC']
         ],
@@ -168,7 +174,7 @@ class BrofixReport
      * @var mixed[]
      */
     protected $currentRecord = [
-        'uid'   => 0,
+        'uid' => 0,
         'table' => '',
         'field' => '',
         'currentTime' => 0,
@@ -333,7 +339,7 @@ class BrofixReport
         }
         $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
 
-        $this->route =  GeneralUtility::_GP('route') ?? '';
+        $this->route = GeneralUtility::_GP('route') ?? '';
         $this->token = GeneralUtility::_GP('token') ?? '';
         $this->action = GeneralUtility::_GP('action') ?? '';
 
@@ -395,7 +401,11 @@ class BrofixReport
         if ($this->action === 'updateLinkList') {
             $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
             // todo: localize this
-            $this->createFlashMessage($this->getLanguageService()->getLL('list.status.check.done'), '', FlashMessage::OK);
+            $this->createFlashMessage(
+                $this->getLanguageService()->getLL('list.status.check.done'),
+                '',
+                FlashMessage::OK
+            );
         }
 
         if ($this->action === 'recheckUrl') {
@@ -476,7 +486,10 @@ class BrofixReport
             $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
         }
 
-        $this->pageRecord = BackendUtility::readPageAccess($this->id, $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW));
+        $this->pageRecord = BackendUtility::readPageAccess(
+            $this->id,
+            $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
+        );
         if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
             $this->isAccessibleForCurrentUser = true;
         }
@@ -519,8 +532,6 @@ class BrofixReport
     {
         $view = $this->createView('ReportTab');
         $view->assign('depth', $this->depth);
-        // Table header
-        $view->assignMultiple($this->getVariablesForTableHeader());
 
         $linkTypes = $this->linkTypes;
         $items = [];
@@ -536,7 +547,7 @@ class BrofixReport
                 self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
             if ($brokenLinks) {
-                $totalCount =  count($brokenLinks);
+                $totalCount = count($brokenLinks);
             }
             foreach ($brokenLinks as $row) {
                 $items[] = $this->renderTableRow($row['table_name'], $row);
@@ -556,6 +567,9 @@ class BrofixReport
             $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
         }
         $view->assign('sortActions', $sortActions);
+
+        // Table header
+        $view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
         return $view;
     }
 
@@ -602,27 +616,62 @@ class BrofixReport
 
     /**
      * Sets variables for the Fluid Template of the table with the broken links
+     * @param array<string,string> $sortActions
      * @return mixed[] variables
      */
-    protected function getVariablesForTableHeader(): array
+    protected function getVariablesForTableHeader(array $sortActions): array
     {
         $languageService = $this->getLanguageService();
-        $variables = [
-            'tableheadPath' => $languageService->getLL('list.tableHead.page'),
-            'tableheadElement' => $languageService->getLL('list.tableHead.element'),
-            //'tableheadElementType' => $languageService->getLL('list.tableHead.element.type'),
-            //'tableheadElementField' => $languageService->getLL('list.tableHead.element.field'),
-            //'tableheadHeadlink' => $languageService->getLL('list.tableHead.headlink'),
-            'tableheadLinktarget' => $languageService->getLL('list.tableHead.linktarget'),
-            'tableheadLinkmessage' => $languageService->getLL('list.tableHead.linkmessage'),
-            'tableheadLastcheck' => $languageService->getLL('list.tableHead.lastCheck'),
+
+        $headers = [
+            'page',
+            'element',
+            'type',
+            'last_check',
+            'url',
+            'error',
+            'last_check_url',
+            'action'
         ];
 
-        // Add CSH to the header of each column
-        foreach ($variables as $column => $label) {
-            $variables[$column] = BackendUtility::wrapInHelp('brofix', $column, $label);
+        $tableHeadData = [];
+
+        foreach ($headers as $key) {
+            $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
+            if (isset($sortActions[$key])) {
+                // sorting available, add url
+                if ($this->orderBy === $key) {
+                    $tableHeadData[$key]['url'] = $sortActions[$key . '_reverse'] ?? '';
+                } else {
+                    $tableHeadData[$key]['url'] = $sortActions[$key] ?? '';
+                }
+
+                // add icon only if this is the selected sort order
+                if ($this->orderBy === $key) {
+                    $tableHeadData[$key]['icon'] = 'status-status-sorting-asc';
+                } elseif ($this->orderBy === $key . '_reverse') {
+                    $tableHeadData[$key]['icon'] = 'status-status-sorting-desc';
+                }
+            }
         }
-        return $variables;
+
+        $tableHeaderHtml = [];
+        foreach ($tableHeadData as $key => $values) {
+            if (isset($values['url'])) {
+                $tableHeaderHtml[$key]['header'] = sprintf(
+                    '<a href="%s" style="text-decoration: underline;">%s</a>',
+                    $values['url'],
+                    $values['label']
+                );
+            } else {
+                $tableHeaderHtml[$key]['header'] = $values['label'];
+            }
+
+            if (($values['icon'] ?? '') !== '') {
+                $tableHeaderHtml[$key]['icon'] = $values['icon'];
+            }
+        }
+        return $tableHeaderHtml;
     }
 
     /**
@@ -685,7 +734,7 @@ class BrofixReport
             && $row['record_uid'] == $this->currentRecord['uid']
             && $row['table_name'] === $this->currentRecord['table']
             && $row['field'] === $this->currentRecord['field']
-            ) {
+        ) {
             $variables['lastChecked'] = 1;
         }
 
@@ -754,7 +803,7 @@ class BrofixReport
         $variables['pageId'] = $pageId;
         $path = $this->pagesRepository->getPagePath($pageId, 50);
         $variables['path'] = $path[1];
-        $variables['pagetitle'] =  $path[0] ?? '';
+        $variables['pagetitle'] = $path[0] ?? '';
 
         // error message
         $response = $response = json_decode($row['url_response'], true);
@@ -795,7 +844,7 @@ class BrofixReport
         $variables['linktext'] = $hookObj->getBrokenLinkText($row, $errorParams->getCustom());
 
         // last check of record
-        $currentDate =  date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], \time());
+        $currentDate = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], \time());
         $lastcheckDate = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['last_check']);
         $lastCheckTime = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['last_check']);
         $variables['lastcheck'] = (($currentDate != $lastcheckDate) ? $lastcheckDate . ' ' : '') . $lastCheckTime;

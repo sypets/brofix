@@ -15,58 +15,12 @@
 				<source>Show this level</source>
 				<target>Zeige diese Ebene</target>
 			</trans-unit>
-			<trans-unit id="label_refresh" resname="label_refresh">
-				<source>Refresh display</source>
-				<target>Anzeige aktualisieren</target>
-			</trans-unit>
-			<trans-unit id="list.status.check.done" resname="list.header">
+
+			<trans-unit id="list.status.check.done" resname="list.status.check.done">
 				<source>Check links done</source>
 				<target>Links prüfen - fertig!</target>
 			</trans-unit>
-			<trans-unit id="list.action.check" resname="list.header">
-				<source>Check links</source>
-				<target>Links prüfen</target>
-			</trans-unit>
-			<trans-unit id="list.header" resname="list.header">
-				<source>Broken links</source>
-				<target>Fehlerhafte Links</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.links.title" resname="list.header">
-				<source>Recheck links</source>
-				<target>Links neu prüfen</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.url.title" resname="list.header">
-				<source>Recheck URL</source>
-				<target>URL neu püfen</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.url.ok.removed" resname="list.header">
-				<source>URL %s was rechecked as valid. Removed %d broken link entries.</source>
-				<target>URL %s wurde neu geprüft und als nicht fehlerhaft befunden. %d Einträge f. fehlerhafte Links entfernt</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.url.notok.removed" resname="list.header">
-				<source>URL %s was rechecked as still invalid but no longer exists in record. Number of broken link entries removed: %d</source>
-				<target>URL %s wurde neu geprüft und immer noch als fehlerhaft befunden. URL ist jedoch nicht mehr im Inhalt enthalten. Anzahl Einträge entfernt: %d</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.url.notok.updated" resname="list.header">
-				<source>URL %s was rechecked as still invalid. Number of broken link entries updated: %d</source>
-				<target>URL %s wurde neu geprüft und immer noch als fehlerhaft befunden. Anzahl Einträge aktualisiert: %d</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.url" resname="list.header">
-				<source>URL %s was rechecked.</source>
-				<target>URL %s wurde neu geprüft.</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.message.checked" resname="list.header">
-				<source>Rechecked links for record: %s</source>
-				<target>Links neu geprüft für Element: %s</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.message.removed" resname="list.header">
-				<source>Record %s was deleted - removed broken links for record.</source>
-				<target>Element %s wurde entfernt - zugehörige fehlerhafte Links wurden aus der Liste entfernt.</target>
-			</trans-unit>
-			<trans-unit id="list.recheck.message.notchanged" resname="list.header">
-				<source>Record %s was not changed - no need to recheck</source>
-				<target>Element %s wurde nicht verändert - kein neu prüfen erforderlich</target>
-			</trans-unit>
+
 			<trans-unit id="list.tableHead.page" resname="list.tableHead.path">
 				<source>Page</source>
 				<target>Seite</target>
@@ -75,27 +29,23 @@
 				<source>Element</source>
 				<target>Element</target>
 			</trans-unit>
-			<trans-unit id="list.tableHead.element.field" resname="list.tableHead.element.field">
-				<source>Field</source>
-				<target>Feld</target>
-			</trans-unit>
-			<trans-unit id="list.tableHead.element.type" resname="list.tableHead.element.type">
+			<trans-unit id="list.tableHead.type" resname="list.tableHead.type">
 				<source>Type</source>
 				<target>Typ</target>
 			</trans-unit>
-			<trans-unit id="list.tableHead.headlink" resname="list.tableHead.headlink">
-				<source>Link</source>
-				<target>Link</target>
+			<trans-unit id="list.tableHead.last_check" resname="list.tableHead.last_check">
+				<source>Checked</source>
+				<target>Geprüft</target>
 			</trans-unit>
-			<trans-unit id="list.tableHead.linktarget" resname="list.tableHead.linktarget">
+			<trans-unit id="list.tableHead.url" resname="list.tableHead.url">
 				<source>URL</source>
 				<target>URL</target>
 			</trans-unit>
-			<trans-unit id="list.tableHead.linkmessage" resname="list.tableHead.linkmessage">
+			<trans-unit id="list.tableHead.error" resname="list.tableHead.error">
 				<source>Error</source>
 				<target>Fehler</target>
 			</trans-unit>
-			<trans-unit id="list.tableHead.lastCheck" resname="list.tableHead.lastCheck">
+			<trans-unit id="list.tableHead.last_check_url" resname="list.tableHead.last_check_url">
 				<source>Checked</source>
 				<target>Geprüft</target>
 			</trans-unit>
@@ -103,25 +53,48 @@
 				<source>Action</source>
 				<target>Aktion</target>
 			</trans-unit>
+
+
+
+			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
+				<source>Recheck links</source>
+				<target>Links neu prüfen</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.title" resname="list.recheck.url.title">
+				<source>Recheck URL</source>
+				<target>URL neu püfen</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.ok.removed" resname="list.recheck.url.ok.removed">
+				<source>URL %s was rechecked as valid. Removed %d broken link entries.</source>
+				<target>URL %s wurde neu geprüft und als nicht fehlerhaft befunden. %d Einträge f. fehlerhafte Links entfernt</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.notok.removed" resname="list.recheck.url.notok.removed">
+				<source>URL %s was rechecked as still invalid but no longer exists in record. Number of broken link entries removed: %d</source>
+				<target>URL %s wurde neu geprüft und immer noch als fehlerhaft befunden. URL ist jedoch nicht mehr im Inhalt enthalten. Anzahl Einträge entfernt: %d</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.notok.updated" resname="list.recheck.url.notok.updated">
+				<source>URL %s was rechecked as still invalid. Number of broken link entries updated: %d</source>
+				<target>URL %s wurde neu geprüft und immer noch als fehlerhaft befunden. Anzahl Einträge aktualisiert: %d</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.url" resname="list.recheck.url">
+				<source>URL %s was rechecked.</source>
+				<target>URL %s wurde neu geprüft.</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.message.checked" resname="list.recheck.message.checked">
+				<source>Rechecked links for record: %s</source>
+				<target>Links neu geprüft für Element: %s</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.message.removed" resname="list.recheck.message.removed">
+				<source>Record %s was deleted - removed broken links for record.</source>
+				<target>Element %s wurde entfernt - zugehörige fehlerhafte Links wurden aus der Liste entfernt.</target>
+			</trans-unit>
+			<trans-unit id="list.recheck.message.notchanged" resname="list.recheck.message.notchanged">
+				<source>Record %s was not changed - no need to recheck</source>
+				<target>Element %s wurde nicht verändert - kein neu prüfen erforderlich</target>
+			</trans-unit>
 			<trans-unit id="list.edit" resname="list.edit">
 				<source>Edit element containing this broken link</source>
 				<target>Editiere Element welches fehlerhaften Link enthält</target>
-			</trans-unit>
-			<trans-unit id="list.excludeUrl" resname="list.excludeUrl">
-				<source>Do not check this URL</source>
-				<target>Schließe URL von Linkprüfung aus</target>
-			</trans-unit>
-			<trans-unit id="list.checkNew" resname="list.checkNew">
-				<source>Recheck URL</source>
-				<target>URL neu prüfen</target>
-			</trans-unit>
-			<trans-unit id="list.action.web_layout" resname="list.checkNew">
-				<source>Page layout</source>
-				<target>Seiten-Layout</target>
-			</trans-unit>
-			<trans-unit id="list.edit.field" resname="list.edit.field">
-				<source>Edit field containing this broken link</source>
-				<target>Editiere Feld, welches den fehlerhaften link enthält</target>
 			</trans-unit>
 			<trans-unit id="list.field" resname="list.field">
 				<source>(Field: %s)</source>
@@ -131,18 +104,8 @@
 				<source>no headline</source>
 				<target>keine Überschrift</target>
 			</trans-unit>
-			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
-				<source>Broken link information may be outdated.</source>
-				<target>Information zum fehlerhaften Link kann veraltet sein.</target>
-			</trans-unit>
-			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.stale">
-				<source>Broken link information is most likely up to date.</source>
-				<target>Information zum fehlerhaften Link ist wahrscheinlich aktuell.</target>
-			</trans-unit>
-			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.stale">
-				<source></source>
-				<target></target>
-			</trans-unit>
+
+			<!-- link target error messages -->
 
 			<!-- Error messages for email -->
 
@@ -153,6 +116,10 @@
 
 			<!-- Error messages for pages -->
 
+			<trans-unit id="list.report.error.content.notexisting" resname="list.report.error.content.notexisting">
+				<source>Element does not exist.</source>
+				<target>Element existiert nicht.</target>
+			</trans-unit>
 			<trans-unit id="list.report.error.page.deleted" resname="list.report.error.page.deleted">
 				<source>Page is deleted.</source>
 				<target>Seite wurde gelöscht.</target>
@@ -168,13 +135,13 @@
 				<target>Seite existiert nicht. </target>
 			</trans-unit>
 
-			<trans-unit id="list.report.contentmoved" resname="list.report.contentmoved">
+			<trans-unit id="list.report.error.contentmoved" resname="list.report.error.contentmoved">
 				<source>Element '###title###' [###uid###] is not located on page ###wrongpage###, but on page ###rightpage###.</source>
 				<target>Element '###title###' [###uid###] existiert nicht auf Seite ###wrongpage###, sondern auf Seite ###rightpage###.</target>
 			</trans-unit>
 
 			<!-- deprecated -->
-			<trans-unit id="list.report.contentdeleted" resname="list.report.contentdeleted">
+			<trans-unit id="list.report.error.contentdeleted" resname="list.report.error.contentdeleted">
 				<source>Element '###title###' [###uid###] is deleted.</source>
 				<target>Element  '###title###' [###uid###] wurde gelöscht.</target>
 			</trans-unit>
@@ -193,11 +160,6 @@
 			<trans-unit id="list.report.contentnotexisting" resname="list.report.contentnotexisting">
 				<source>Element [###uid###] does not exist.</source>
 				<target>Element [###uid###] existiert nicht.</target>
-			</trans-unit>
-
-			<trans-unit id="list.report.error.content.notexisting" resname="list.report.error.content.notexisting">
-				<source>Element does not exist.</source>
-				<target>Element existiert nicht.</target>
 			</trans-unit>
 
 			<trans-unit id="list.report.rownotvisible" resname="list.report.rownotvisible">
@@ -224,18 +186,6 @@
 				<source>External link target not reachable.</source>
 				<target>Externe Seite ist nicht erreichbar.</target>
 			</trans-unit>
-			<trans-unit id="list.report.redirectloop" resname="list.report.redirectloop">
-				<source>A redirect loop occurred. (%s: %s)</source>
-				<target>Umleitungsschleife.  (%s: %s)</target>
-			</trans-unit>
-			<trans-unit id="list.report.externalerror" resname="list.report.externalerror">
-				<source>HTTP status code=%s.</source>
-				<target>HTTP status code=%s.</target>
-			</trans-unit>
-			<trans-unit id="list.report.filenotexisting" resname="list.report.filenotexisting">
-				<source>File doesn't exist.</source>
-				<target>Datei existiert nicht.</target>
-			</trans-unit>
 			<trans-unit id="list.report.url.file" resname="list.report.url.file">
 				<source>File</source>
 				<target>Datei</target>
@@ -248,38 +198,36 @@
 				<source>Element</source>
 				<target>Element</target>
 			</trans-unit>
-			<trans-unit id="list.report.timeout" resname="list.report.timeout">
-				<source>Operation timeout. The specified time-out period was reached according to the conditions.</source>
-				<target>Zeitüberschreitung. Der Zugriff auf die externe Seite hat die eingestellte Zeit überschritten.</target>
+
+
+			<!-- link target error messages: external -->
+			<trans-unit id="list.report.error.redirectloop" resname="list.report.error.redirectloop">
+				<source>A redirect loop occurred. (%s: %s)</source>
+				<target>Umleitungsschleife.  (%s: %s)</target>
 			</trans-unit>
-			<trans-unit id="list.report.couldnotresolvehost" resname="list.report.couldnotresolvehost">
-				<source>Could not resolve host. The given remote host was not resolved.</source>
-				<target>Konnte hostnamen nicht auflösen.</target>
+			<trans-unit id="list.report.error.file.notexisting" resname="list.report.error.file.notexisting">
+				<source>File doesn't exist.</source>
+				<target>Datei existiert nicht.</target>
 			</trans-unit>
-			<trans-unit id="list.report.errornetworkdata" resname="list.report.errornetworkdata">
-				<source>Failure with receiving network data.</source>
-				<target>Netzwerkfehler.</target>
-				<target></target>
-			</trans-unit>
-			<trans-unit id="list.report.httpexception" resname="list.report.httpexception">
-				<source>Exception: %s</source>
-				<target>Fehler: %s</target>
-			</trans-unit>
-			<trans-unit id="list.report.tooManyRedirects" resname="list.report.tooManyRedirects">
+			<trans-unit id="list.report.error.tooManyRedirects" resname="list.report.error.tooManyRedirects">
 				<source>Too many redirects.</source>
 				<target>Zu viele Umleitungen.</target>
 			</trans-unit>
-			<trans-unit id="list.report.networkexception" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.networkexception" resname="list.report.error.networkexception">
 				<source>Network error / invalid domain</source>
 				<target>Netzwerkfehler oder ungültige domain</target>
 			</trans-unit>
 
-			<!-- HTTP Status codes -->
-			<trans-unit id="list.report.error.httpstatus.400" resname="list.report.networkexception">
+			<!-- link target error messages: HTTP Status code -->
+			<trans-unit id="list.report.error.httpstatus.general" resname="list.report.error.httpstatus.general">
+				<source>HTTP status code=%s.</source>
+				<target>HTTP status code=%s.</target>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.400" resname="list.report.error.httpstatus.400">
 				<source>Bad request (400)</source>
 				<target>Die Anfrage ist fehlerhaft (400)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.401" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.httpstatus.401" resname="list.report.error.httpstatus.401">
 				<source>Unauthorized - probably a login is required (401)</source>
 				<target>Keine Authentifizierung - in der Regel login erforderlich (401)</target>
 			</trans-unit>
@@ -291,133 +239,126 @@
 				<source>The requested resource was not found (404)</source>
 				<target>Nicht gefunden (404)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.405" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.httpstatus.405" resname="list.report.error.httpstatus.405">
 				<source>Method not allowed (405)</source>
 				<target>Methode (GET, HEAD etc.) nicht verfügbar (405)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.406" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.httpstatus.406" resname="list.report.error.httpstatus.406">
 				<source>Not Acceptable (406)</source>
 				<target>Die angeforderte Ressource steht nicht in der gewünschten Form zur Verfügung (406)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.410" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.httpstatus.410" resname="list.report.error.httpstatus.410">
 				<source>The requested resource is no longer available (410)</source>
 				<target>Nicht mehr verfügbar (410)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.414" resname="list.report.pagenotfound404">
+			<trans-unit id="list.report.error.httpstatus.414" resname="list.report.error.httpstatus.414">
 				<source>URL too long (414)</source>
 				<target>URL zu lang (414)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.415" resname="list.report.pagenotfound404">
+			<trans-unit id="list.report.error.httpstatus.415" resname="list.report.error.httpstatus.415">
 				<source>Unsupported Media Type (415)</source>
 				<target>Nicht unterstütztes Medium (415)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.429" resname="list.report.pagenotfound404">
+			<trans-unit id="list.report.error.httpstatus.429" resname="list.report.error.httpstatus.429">
 				<source>Too Many Requests (429)</source>
 				<target>Zu viele Anfragen (429)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.451" resname="list.report.pagenotfound404">
+			<trans-unit id="list.report.error.httpstatus.451" resname="list.report.error.httpstatus.451">
 				<source>Unavailable For Legal Reasons (451)</source>
 				<target>Aus rechtlichen Gründen nicht verfügbar (451)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.500" resname="list.report.internalerror500">
+			<trans-unit id="list.report.error.httpstatus.500" resname="list.report.error.httpstatus.500">
 				<source>Internal Server Error (500)</source>
 				<target>Interner Server Fehler (500)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.httpstatus.503" resname="list.report.internalerror500">
+			<trans-unit id="list.report.error.httpstatus.503" resname="list.report.error.httpstatus.503">
 				<source>Service Unavailable (503)</source>
 				<target>Der Server steht vorrübergehend nicht zur Verfügung (503)</target>
 			</trans-unit>
 
 			<!-- libcurl error messages from https://curl.haxx.se/libcurl/c/libcurl-errors.html -->
 			<!-- ignoring various FTP errors here: 10 - 15, 17, 19  and other error that are unlikely -->
-			<trans-unit id="list.report.error.libcurl.1" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.1" resname="list.report.error.libcurl.1">
 				<source>Unsupported protocol.</source>
 				<target>Angegebene Protokoll wird nicht unterstützt.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.2" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.2" resname="list.report.error.libcurl.2">
 				<source>Initialization failed.</source>
 				<target>Initialisierung fehlgeschlagen.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.3" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.3" resname="list.report.error.libcurl.3">
 				<source>The URL was not properly formatted.</source>
 				<target>URL ist nicht korrekt formatiert.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.4" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.4" resname="list.report.error.libcurl.4">
 				<source>Feature not supported.</source>
 				<target>Feature wird nicht unterstützt.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.5" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.5" resname="list.report.error.libcurl.5">
 				<source>Couldn't resolve proxy.</source>
 				<target>Proxy konnte nicht aufgelöst werden.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.6" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.6" resname="list.report.error.libcurl.6">
 				<source>Couldn't resolve host.</source>
 				<target>Konnte Hostnamen nicht auflösen.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.7" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.7" resname="list.report.error.libcurl.7">
 				<source>Failed to connect to host or proxy.</source>
 				<target>Konnte nicht auf externen Host oder Proxy zugreifen.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.8" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.8" resname="list.report.error.libcurl.8">
 				<source>The remote server sent data that could not be parsed.</source>
 				<target>Fehler beim parsen der Antwort.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.9" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.9" resname="list.report.error.libcurl.9">
 				<source>Access denied.</source>
 				<target>Zugriff verweigert.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.16" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.16" resname="list.report.error.libcurl.16">
 				<source>Generic HTTP/2 error.</source>
 				<target>Allgemeiner HTTP/2 Fehler.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.18" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.18" resname="list.report.error.libcurl.18">
 				<source>A file transfer was shorter or larger than expected.</source>
 				<target>Fehler beim Dateitransfer.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.28" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.28" resname="list.report.error.libcurl.28">
 				<source>Timeout: The remote server possibly took too long to answer.</source>
 				<target>Zeitüberschreitung</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.35" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.35" resname="list.report.error.libcurl.35">
 				<source>Problem with SSL / TLS handshake.</source>
 				<target>Problem mit Verschlüsselung (SSL / TLS)</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.47" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.47" resname="list.report.error.libcurl.47">
 				<source>Too many redirects.</source>
 				<target>Zu viele Umleitungen.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.51" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.51" resname="list.report.error.libcurl.51">
 				<source>SSL / TLS certificate not OK.</source>
 				<target>SSL / TLS Zertifikat fehlerhaft.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.55" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.55" resname="list.report.error.libcurl.55">
 				<source>General network error. Send failed.</source>
 				<target>Netzwerkfehler: Fehler beim Senden.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.56" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.56" resname="list.report.error.libcurl.56">
 				<source>General network error. Receive failed.</source>
 				<target>Netzwerkfehler: Fehler beim Empfangen.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.60" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.60" resname="list.report.error.libcurl.60">
 				<source>SSL / TLS certificate not OK.</source>
 				<target>SSL / TLS Zertifikat fehlerhaft.</target>
 			</trans-unit>
-			<trans-unit id="list.report.error.libcurl.63" resname="list.report.networkexception">
+			<trans-unit id="list.report.error.libcurl.63" resname="list.report.error.libcurl.63">
 				<source>Maximum file size exceeded</source>
 				<target>Maximale Dateigröße wurde überschritten.</target>
 			</trans-unit>
+
 			<trans-unit id="list.msg.ok" resname="list.msg.ok">
 				<source>Ok</source>
 				<target>Ok</target>
 			</trans-unit>
-
-			<!-- deprecated: list.msg.lastRun -->
-			<trans-unit id="list.msg.lastRun" resname="list.msg.lastRun">
-				<source>%1$s %2$s</source>
-				<target>%1$s %2$s</target>
-			</trans-unit>
-
-
 			<trans-unit id="list.no.broken.links" resname="list.no.broken.links">
 				<source>No broken Links!</source>
 				<target>Keine fehlerhaften Links!</target>
@@ -438,10 +379,7 @@
 				<source>You do not have access to these listings.</source>
 				<target>Zugriff verweigert!</target>
 			</trans-unit>
-			<trans-unit id="label_refresh-link-list" resname="label_refresh-link-list">
-				<source>Refreshing link list, please stand by.</source>
-				<target>Linkliste wird aktualisiert.</target>
-			</trans-unit>
+
 			<trans-unit id="broken_links_removed" resname="broken_links_removed">
 				<source>%d broken link(s) removed from list for %s</source>
 				<target>%d fehlerhafte(r) Link(s) wurde entfernt für %s</target>

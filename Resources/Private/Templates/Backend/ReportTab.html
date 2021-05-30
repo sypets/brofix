@@ -1,7 +1,7 @@
 <f:layout name="TabContent"/>
 
 <f:section name="header">
-	<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.header"/>
+	<f:translate key="list.header" extensionName="Brofix">Broken links</f:translate>
 	<f:if condition="{pageTitle}">
 		&quot;{title}&quot;
 	</f:if>
@@ -16,39 +16,33 @@
 			<input type="hidden" name="orderBy" value="{orderBy}"/>
 			<br/>
 			<select id="brofix-list-select-pagedepth" name="depth" class="form-control input-sm">
-				<option value="0" {f:if(condition:
-				'{depth} == 0', then: 'selected')}>
+				<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0"/>
 				</option>
-				<option value="1" {f:if(condition:
-				'{depth} == 1', then: 'selected')}>
+				<option value="1" {f:if(condition:'{depth} == 1', then: 'selected')}>
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_1"/>
 				</option>
-				<option value="2" {f:if(condition:
-				'{depth} == 2', then: 'selected')}>
+				<option value="2" {f:if(condition:'{depth} == 2', then: 'selected')}>
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_2"/>
 				</option>
-				<option value="3" {f:if(condition:
-				'{depth} == 3', then: 'selected')}>
+				<option value="3" {f:if(condition:'{depth} == 3', then: 'selected')}>
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_3"/>
 				</option>
-				<option value="4" {f:if(condition:
-				'{depth} == 4', then: 'selected')}>
+				<option value="4" {f:if(condition:'{depth} == 4', then: 'selected')}>
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4"/>
 				</option>
-				<option value="999" {f:if(condition:
-				'{depth} == 999', then: 'selected')}>
+				<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
 				</option>
 			</select>
 			<br/>
 			<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"
-				   value="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:label_refresh')}"
-				   data-notification-message="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:label_refresh-link-list')}"/>
+				   value="{f:translate(key: 'label_refresh', extensionName: 'Brofix')}"
+				   data-notification-message="{f:translate(key: 'label_refresh-link-list', extensionName: 'Brofix')}"/>
 			<f:if condition="{showRecheckButton}">
 				<input type="submit" class="btn btn-default t3js-update-button" name="updateLinkList" id="updateLinkList"
-					   value="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.action.check')}"
-					   data-notification-message="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.action.check')} ..."/>
+					   value="{f:translate(key: 'list.action.checkLinks', extensionName: 'Brofix')}"
+					   data-notification-message="{f:translate(key: 'list.action.check', extensionName: 'Brofix')} ..."/>
 			</f:if>
 			<f:if condition="{docsurl}">
 				<f:link.external class="btn btn-default" uri="{docsurl}" target="_blank">
@@ -67,77 +61,40 @@
 				<thead>
 				<tr>
 					<th class="table-column-divider-end">
-						<f:if condition="{orderBy} == 'page'">
-							<f:then>
-								<a href="{sortActions.page_reverse}" title="Sort by page (descending)"
-								   style="text-decoration: underline;">{tableheadPath}</a>
-								<core:icon identifier="status-status-sorting-asc"/>
-							</f:then>
-							<f:else>
-								<a href="{sortActions.page}" title="Sort by page (ascending)"
-								   style="text-decoration: underline;">{tableheadPath}</a>
-								<f:if condition="{orderBy} == 'page_reverse'">
-									<core:icon identifier="status-status-sorting-desc"/>
-								</f:if>
-							</f:else>
+						<f:format.raw>{tableHeader.page.header}</f:format.raw>
+						<f:if condition="{tableHeader.page.icon}">
+							<core:icon identifier="{tableHeader.page.icon}"/>
 						</f:if>
 					</th>
-					<th>{tableheadElement}</th>
+					<th>{tableHeader.element.header}</th>
 					<th>
-						<f:if condition="{orderBy} == 'field'">
-							<f:then>
-								<a href="{sortActions.field_reverse}" title="Sort by field (descending)"
-								   style="text-decoration: underline;">
-									<f:translate
-										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element.type"/>
-								</a>
-								<core:icon identifier="status-status-sorting-asc"/>
-							</f:then>
-							<f:else>
-								<a href="{sortActions.field}" title="Sort by field (ascending)"
-								   style="text-decoration: underline;">
-									<f:translate
-										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element.type"/>
-								</a>
-								<f:if condition="{orderBy} == 'field_reverse'">
-									<core:icon identifier="status-status-sorting-desc"/>
-								</f:if>
-							</f:else>
+						<f:format.raw>{tableHeader.type.header}</f:format.raw>
+						<f:if condition="{tableHeader.type.icon}">
+							<core:icon identifier="{tableHeader.type.icon}"/>
 						</f:if>
 					</th>
-					<th class="table-column-divider-end">{tableheadLastcheck}</th>
+					<th class="table-column-divider-end">
+						<f:format.raw>{tableHeader.last_check.header}</f:format.raw>
+						<f:if condition="{tableHeader.last_check.icon}">
+							<core:icon identifier="{tableHeader.last_check.icon}"/>
+						</f:if>
+					</th>
 					<th colspan="2">
-						<f:if condition="{orderBy} == 'url'">
-							<f:then>
-								<a href="{sortActions.url_reverse}" title="Sort by url (descending)">{tableheadLinktarget}</a>
-								<core:icon identifier="status-status-sorting-asc"/>
-							</f:then>
-							<f:else>
-								<a href="{sortActions.url}" title="Sort by url (ascending)">{tableheadLinktarget}</a>
-								<f:if condition="{orderBy} == 'url_reverse'">
-									<core:icon identifier="status-status-sorting-desc"/>
-								</f:if>
-							</f:else>
+						<f:format.raw>{tableHeader.url.header}</f:format.raw>
+						<f:if condition="{tableHeader.url.icon}">
+							<core:icon identifier="{tableHeader.url.icon}"/>
 						</f:if>
 					</th>
 					<th>
-						<f:if condition="{orderBy} == 'errortype'">
-							<f:then>
-								<a href="{sortActions.errortype_reverse}" title="Sort by error type (descending)">{tableheadLinkmessage}</a>
-								<core:icon identifier="status-status-sorting-asc"/>
-							</f:then>
-							<f:else>
-								<a href="{sortActions.errortype}" title="Sort by error type (ascending)">{tableheadLinkmessage}</a>
-								<f:if condition="{orderBy} == 'errortype_reverse'">
-									<core:icon identifier="status-status-sorting-desc"/>
-								</f:if>
-							</f:else>
+						<f:format.raw>{tableHeader.error.header}</f:format.raw>
+						<f:if condition="{tableHeader.error.icon}">
+							<core:icon identifier="{tableHeader.error.icon}"/>
 						</f:if>
 					</th>
-					<th class="table-column-divider-end">{tableheadLastcheck}<br/> (URL)</th>
+					<th class="table-column-divider-end">
+						{tableHeader.last_check_url.header}<br/>(URL)
 					<th>
-						<f:translate
-							key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.action"/>
+						{tableHeader.action.header}
 					</th>
 				</tr>
 				</thead>
@@ -164,7 +121,7 @@
 					<td>{item.elementIcon -> f:format.raw()}<span
 						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span></td>
 					<td class="table-column-divider-end"
-						title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.info.freshness.{item.freshness}')}">
+						title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
 						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
 						<f:if condition="{item.freshness} == 'stale'>">
 								<core:icon identifier="actions-document-synchronize"/>
@@ -184,23 +141,23 @@
 					<td class="table-column-divider-end">{item.lastcheck_url}</td>
 					<td>
 						<a class="btn btn-primary" href="{item.editUrl}"
-						   title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.edit.field')}">
+						   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
 							<core:icon identifier="actions-open" size="small"/>
 						</a>
 						<f:be.link
-							title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.action.web_layout')}"
+							title="{f:translate(key: 'list.action.web_layout', extensionName:'Brofix')}"
 							class="btn btn-default" route="web_layout" parameters="{id:item.pageId}">
 							<core:icon identifier="actions-document-open"/>
 						</f:be.link>
 						<f:if condition="{item.recheckUrl}">
-							<a title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.checkNew')}"
+							<a title="{f:translate(key: 'list.action.recheckUrl', extensionName='Brofix')}"
 							   class="btn btn-default" href="{item.recheckUrl}">
 								<core:icon identifier="actions-synchronize"/>
 							</a>
 						</f:if>
 						<f:if condition="{item.excludeUrl}">
 							<a class="btn btn-default" href="{item.excludeUrl}"
-							   title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.excludeUrl')}">
+							   title="{f:translate(key: 'list.action.excludeUrl', extensionName='Brofix')}">
 								<core:icon identifier="mimetypes-x-exclude-link-target" size="small"/>
 							</a>
 						</f:if>
