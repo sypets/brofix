@@ -240,7 +240,7 @@ Accept
       HTTP request header "Accept". It is recommended to leave the default value and not change this.
 
    Default
-      */*
+      `*/*`
 
 Accept-Language
 ---------------
@@ -259,7 +259,7 @@ Accept-Language
       HTTP request header. It is recommended to leave the default value and not change this.
 
    Default
-      *
+      `*`
 
 
 Accept-Encoding
@@ -279,7 +279,7 @@ Accept-Encoding
       HTTP request header. It is recommended to leave the default value and not change this.
 
    Default
-      *
+      `*`
 
 timeout
 -------
