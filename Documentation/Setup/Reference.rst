@@ -568,32 +568,40 @@ report.recheckButton
       int
 
    Description
-      Whether to show button for rechecking links.
+      Whether to show the "Check links" button. By default, the button is
+      available for "admin" users, but not for regular editors.
 
-      Deactivate the button:
+      .. warning::
+
+         If activated, editors can start a checking of all pages and subpages
+         of inifinite level (if value is set to 999). This may put some load
+         on the system as it initiates a number of queries to the database.
+         It is recommended to be restrictive with this permission.
+
+      Deactivate the button for non-admin users (default):
 
       .. code-block:: typoscript
 
          mod.brofix.report.recheckButton = -1
 
-      Only check if depth=0 (current page) is selected:
+      Activate button if depth=0 (current page) is selected:
 
       .. code-block:: typoscript
 
          mod.brofix.report.recheckButton = 0
 
-      Disable the page in User TSconfig (for a user or group):
+      Enable the button in User TSconfig with depth "infinite" (for a user or group):
 
       .. code-block:: typoscript
 
-         page.mod.brofix.report.recheckButton = 0
+         page.mod.brofix.report.recheckButton = 999
 
       If the current depth  <= recheckButton, the button will be displayed.
-      This makes it possible to not only control whether rechecking is
+      This makes it possible to not only control whether checking is
       possible, but also the depth
 
    Default
-      999 (always show button)
+      -1 (do not show button for non-admin users)
 
 
 .. _tsconfigSendOnCheckLinks:

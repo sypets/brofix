@@ -301,7 +301,10 @@ class BrofixReport
         $view->assign('currentPage', $this->id);
         $view->assign('depth', $this->depth);
         $view->assign('docsurl', $this->configuration->getTsConfig()['report.']['docsurl'] ?? '');
-        $view->assign('showRecheckButton', $this->depth <= $this->configuration->getRecheckButton());
+        $view->assign(
+            'showRecheckButton',
+            $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
+        );
         return $view;
     }
 
