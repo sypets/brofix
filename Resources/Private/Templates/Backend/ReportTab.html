@@ -166,13 +166,8 @@
 					<td class="table-column-divider-end"
 						title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.info.freshness.{item.freshness}')}">
 						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
-						<f:if condition="{item.freshness} == 'fresh'>">
-							<f:then>
-								<core:icon identifier="actions-check"/>
-							</f:then>
-							<f:else if="{item.freshness} == 'stale'>">
+						<f:if condition="{item.freshness} == 'stale'>">
 								<core:icon identifier="actions-document-synchronize"/>
-							</f:else>
 						</f:if>
 					</td>
 					<td colspan="2">

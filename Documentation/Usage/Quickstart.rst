@@ -117,7 +117,6 @@ Columns in the table:
 
    *  if (possibly) outdated: red background and a recheck icon.
       |check_stale_image|
-   *  if not outdated: green background with checkmark. |check_fresh_image|
 
 
 .. figure:: ../_images/table2.png
@@ -155,8 +154,6 @@ Columns in the table:
       is not rechecked!
 
 .. |edit_action_image| image:: ../_images/edit_action.png
-
-.. |check_fresh_image| image:: ../_images/checked_fresh.png
 
 .. |check_stale_image| image:: ../_images/checked_stale.png
 
