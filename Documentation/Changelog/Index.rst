@@ -6,6 +6,22 @@
 Changelog
 =========
 
+2.0.2
+=====
+
+-  "Check links" button is always available for admins, but deactivated for
+   editors by default
+-  Change styling for "Last check" field if information is considered "fresh".
+
+2.0.1
+=====
+
+-  add "freshness" / "stale" information in "Last check" column in broken
+   link report
+-  add "Last check" time for the URL as well. Because of the "link target"
+   cache, the "last check" information for the field and the URL may differ.
+-  Add "Check links" button to report
+
 2.0.0
 =====
 
