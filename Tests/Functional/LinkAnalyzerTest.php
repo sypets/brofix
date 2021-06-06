@@ -29,11 +29,7 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
     protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
     {
         $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
-        $linkAnalyzer->init(
-            $this->configuration->getSearchFields(),
-            $pidList,
-            $this->configuration
-        );
+        $linkAnalyzer->init($pidList, $this->configuration);
         return $linkAnalyzer;
     }
 

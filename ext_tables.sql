@@ -9,6 +9,7 @@ CREATE TABLE tx_brofix_broken_links (
 	headline varchar(255) DEFAULT '' NOT NULL,
 	field varchar(255) DEFAULT '' NOT NULL,
 	table_name varchar(255) DEFAULT '' NOT NULL,
+	element_type varchar(255) DEFAULT '' NOT NULL,
 	link_title text,
 	url text,
 	url_response text,
