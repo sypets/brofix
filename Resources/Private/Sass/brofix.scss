@@ -63,8 +63,15 @@ div.brofix-brokenlink-list-form select.form-control {
     vertical-align: middle;
 }
 
+/* ------ broken links table ------------ */
+
 #brofix-broken-links-table {
     table-layout: fixed;
+    border: none;
+}
+
+#brofix-broken-links-table tr {
+    border: none;
 }
 
 #brofix-broken-links-table td {
@@ -96,7 +103,21 @@ div.brofix-brokenlink-list-form select.form-control {
     border-right: 6px white solid;
 }
 
-/** --- for small screens --- */
+@media (hover: hover) {
+
+    /** show action buttons only on hover - visually declutter */
+    #brofix-broken-links-table tr:hover td.action-column a {
+        visibility: visible;
+    }
+
+    #brofix-broken-links-table tr td.action-column a {
+        visibility: hidden;
+    }
+}
+
+
+
+/** --- for small screens: show table as card layout --- */
 
 @media screen and (max-width:920px) {
     #brofix-broken-links-table {
@@ -140,7 +161,7 @@ div.brofix-brokenlink-list-form select.form-control {
     }
 }
 
-/** --- for very small screens --- */
+/** --- for very small screens: hide optional columns --- */
 
 @media screen and (max-width:601px) {
     /** remove optional columns */
