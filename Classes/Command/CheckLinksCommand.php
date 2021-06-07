@@ -336,7 +336,7 @@ class CheckLinksCommand extends Command
         if (!empty($pageIds)) {
             /** @var LinkAnalyzer $linkAnalyzer */
             $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
-            $linkAnalyzer->init($searchFields, $pageIds, $this->configuration);
+            $linkAnalyzer->init($pageIds, $this->configuration);
             $linkAnalyzer->generateBrokenLinkRecords($linkTypes, $checkHidden);
 
             $stats = $linkAnalyzer->getStatistics();

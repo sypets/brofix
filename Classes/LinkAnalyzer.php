@@ -112,14 +112,13 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
-     * @param array<string> $searchField
      * @param array<string|int> $pidList
      * @param Configuration|null $configuration
      */
-    public function init(array $searchField, array $pidList, Configuration $configuration = null): void
+    public function init(array $pidList, Configuration $configuration = null): void
     {
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
-        $this->searchFields = $searchField ?: $this->configuration->getSearchFields();
+        $this->searchFields = $this->configuration->getSearchFields();
         $this->pids = $pidList;
         $this->statistics = new CheckLinksStatistics();
 
@@ -336,6 +335,10 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['link_type'] = $key;
                 $record['link_title'] = $entryValue['link_title'];
                 $record['field'] = $entryValue['field'];
+                $typeField = $GLOBALS['TCA'][$table]['ctrl']['type'] ?? false;
+                if ($entryValue['row'][$typeField] ?? false) {
+                    $record['element_type'] = $entryValue['row'][$typeField];
+                }
                 $record['exclude_link_targets_pid'] = $this->configuration->getExcludeLinkTargetStoragePid();
                 $pageWithAnchor = $entryValue['pageAndAnchor'];
                 if (!empty($pageWithAnchor)) {
@@ -498,7 +501,16 @@ class LinkAnalyzer implements LoggerAwareInterface
             $defaultFields[] = 'colPos';
             $defaultFields[] = 'CType';
         }
-        return array_merge($defaultFields, $selectFields);
+        foreach ($selectFields as $field) {
+            // field must have TCA configuration
+            if (!isset($GLOBALS['TCA'][$table]['columns'][$field])
+                && ($key = array_search($field, $selectFields)) !== false) {
+                unset($selectFields[$key]);
+            }
+        }
+        $selectFields = array_merge($defaultFields, $selectFields);
+
+        return $selectFields;
     }
 
     /**
@@ -744,12 +756,16 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     protected function debug(string $message): void
     {
-        $this->logger->debug($message);
+        if ($this->logger) {
+            $this->logger->debug($message);
+        }
     }
 
     protected function error(string $message): void
     {
-        // @extensionScannerIgnoreLine problem with ->error()
-        $this->logger->error($message);
+        if ($this->logger) {
+            // @extensionScannerIgnoreLine problem with ->error()
+            $this->logger->error($message);
+        }
     }
 }

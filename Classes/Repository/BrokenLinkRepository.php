@@ -42,14 +42,17 @@ class BrokenLinkRepository implements LoggerAwareInterface
     }
 
     /**
-     * Prepare database query with pageList and keyOpt data.
+     * Get broken links.
+     *
+     * Will only return broken links which the current user has edit access to.
      *
      * @param int[] $pageList Pages to check for broken links
      * @param string[] $linkTypes Link types to validate
+     * @param array<string,array<string>> $searchFields
      * @param array<array<string>> $orderBy
      * @return mixed[]
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $orderBy = []): array
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = []): array
     {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
@@ -57,21 +60,38 @@ class BrokenLinkRepository implements LoggerAwareInterface
                  as $pageIdsChunk) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getQueryBuilderForTable(self::TABLE);
+
+            if (!$GLOBALS['BE_USER']->isAdmin()) {
+                /**
+                 * @var EditableRestriction
+                 */
+                $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
+                $queryBuilder->getRestrictions()
+                    ->add($editableRestriction);
+            }
+
             $queryBuilder
-                ->select('*')
+                ->select(self::TABLE . '.*')
                 ->from(self::TABLE)
+                ->join(
+                    self::TABLE,
+                    'pages',
+                    'pages',
+                    // @todo record_pid is not always page id
+                    $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
+                )
                 ->where(
                     $queryBuilder->expr()->orX(
                         $queryBuilder->expr()->andX(
                             $queryBuilder->expr()->in(
-                                'record_uid',
+                                self::TABLE . '.record_uid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
                             $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
                         ),
                         $queryBuilder->expr()->andX(
                             $queryBuilder->expr()->in(
-                                'record_pid',
+                                self::TABLE . '.record_pid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
                             $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
@@ -86,7 +106,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                         if (!is_array($values) || count($values) != 2) {
                             break;
                         }
-                        $queryBuilder->addOrderBy($values[0], $values[1]);
+                        $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
                     }
                 }
             }
@@ -94,7 +114,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
             if (!empty($linkTypes)) {
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->in(
-                        'link_type',
+                        self::TABLE . '.link_type',
                         $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
                     )
                 );
@@ -105,10 +125,18 @@ class BrokenLinkRepository implements LoggerAwareInterface
         return $results;
     }
 
-    public function hasPageBrokenLinks(int $pageId): bool
+    /**
+     * Check if current page has broken links editable by user
+     *
+     * @param int $pageId
+     * @param bool $withEditableByUser if true, only count broken links for records editable by user
+     * @return bool
+     */
+    public function hasPageBrokenLinks(int $pageId, bool $withEditableByUser = true): bool
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable(self::TABLE);
+
         $count = $queryBuilder
             ->count('uid')
             ->from(self::TABLE)
@@ -116,14 +144,14 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->expr()->orX(
                     $queryBuilder->expr()->andX(
                         $queryBuilder->expr()->eq(
-                            'record_uid',
+                            self::TABLE . '.record_uid',
                             $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
                         ),
                         $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
                     ),
                     $queryBuilder->expr()->andX(
                         $queryBuilder->expr()->eq(
-                            'record_pid',
+                            self::TABLE . '.record_pid',
                             $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
                         ),
                         $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
@@ -140,9 +168,12 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @param array<string|int> $pageIds page uids
      * @param array<string> $linkTypes
+     * @param array<string,array<string>> $searchFields
      * @return mixed[] array with the number of links found
+     *
+     * @todo is currently not used, use for statistics
      */
-    public function getLinkCounts(array $pageIds, array $linkTypes = []): array
+    public function getLinkCounts(array $pageIds, array $linkTypes = [], array $searchFields): array
     {
         $markerArray = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
@@ -152,28 +183,44 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->getQueryBuilderForTable(self::TABLE);
             $queryBuilder->getRestrictions()->removeAll();
 
-            $result = $queryBuilder->select('link_type')
-                ->addSelectLiteral($queryBuilder->expr()->count('uid', 'nbBrokenLinks'))
+            if (!$GLOBALS['BE_USER']->isAdmin()) {
+                /**
+                 * @var EditableRestriction
+                 */
+                $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
+                $queryBuilder->getRestrictions()
+                    ->add($editableRestriction);
+            }
+
+            $result = $queryBuilder->select(self::TABLE . '.link_type')
+                ->addSelectLiteral($queryBuilder->expr()->count(self::TABLE . '.uid', 'nbBrokenLinks'))
                 ->from(self::TABLE)
+                ->join(
+                    self::TABLE,
+                    'pages',
+                    'pages',
+                    // @todo record_pid is not always page id
+                    $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
+                )
                 ->where(
                     $queryBuilder->expr()->orX(
                         $queryBuilder->expr()->andX(
                             $queryBuilder->expr()->in(
-                                'record_uid',
+                                self::TABLE . '.record_uid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
-                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                            $queryBuilder->expr()->eq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
                         ),
                         $queryBuilder->expr()->andX(
                             $queryBuilder->expr()->in(
-                                'record_pid',
+                                self::TABLE . '.record_pid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
-                            $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                            $queryBuilder->expr()->neq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
                         )
                     )
                 )
-                ->groupBy('link_type')
+                ->groupBy(self::TABLE . '.link_type')
                 ->execute();
 
             while ($row = $result->fetch()) {
@@ -181,10 +228,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $markerArray[$row['link_type']] = 0;
                 }
                 $markerArray[$row['link_type']] += (int)($row['nbBrokenLinks']);
-                if (!isset($markerArray['brokenlinkCount'])) {
-                    $markerArray['brokenlinkCount'] = 0;
+                if (!isset($markerArray['total'])) {
+                    $markerArray['total'] = 0;
                 }
-                $markerArray['brokenlinkCount'] += (int)($row['nbBrokenLinks']);
+                $markerArray['total'] += (int)($row['nbBrokenLinks']);
             }
         }
         if ($linkTypes) {
@@ -193,8 +240,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 if (!isset($markerArray[$linkType])) {
                     $markerArray[$linkType] = 0;
                 }
-                if (!isset($markerArray['brokenlinkCount'])) {
-                    $markerArray['brokenlinkCount'] = 0;
+                if (!isset($markerArray['total'])) {
+                    $markerArray['total'] = 0;
                 }
             }
         }

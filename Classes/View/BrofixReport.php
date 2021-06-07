@@ -215,11 +215,6 @@ class BrofixReport
     protected $pageList;
 
     /**
-     * @var array<string,array<string>>
-     */
-    protected $searchFields = [];
-
-    /**
      * @var BrokenLinkRepository
      */
     protected $brokenLinkRepository;
@@ -520,7 +515,7 @@ class BrofixReport
             $this->pageList = [];
         }
         $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
-        $this->linkAnalyzer->init($this->searchFields, $this->pageList, $this->configuration);
+        $this->linkAnalyzer->init($this->pageList, $this->configuration);
     }
 
     /**
@@ -533,7 +528,6 @@ class BrofixReport
         $view = $this->createView('ReportTab');
         $view->assign('depth', $this->depth);
 
-        $linkTypes = $this->linkTypes;
         $items = [];
         $totalCount = 0;
         // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
@@ -542,8 +536,8 @@ class BrofixReport
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
-                // todo: do we need to pass this, was already handled when checking links?
-                $linkTypes,
+                $this->linkTypes,
+                $this->configuration->getSearchFields(),
                 self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
             if ($brokenLinks) {

@@ -6,6 +6,16 @@
 Changelog
 =========
 
+2.1.0
+=====
+
+-  Add editable restrictions: Show only broken links the editor has
+   access to.
+
+
+**!!! Change in SQL:** It is required to do database compare and recheck links.
+
+
 2.0.2
 =====
 
