@@ -118,9 +118,9 @@
 						</f:if>
 						{item.elementHeadline -> f:format.raw()} [{item.record_uid}]
 					</td>
-					<td>{item.elementIcon -> f:format.raw()}<span
+					<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
 						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span></td>
-					<td class="table-column-divider-end"
+					<td class="table-column-divider-end mobile-optional"
 						title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
 						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
 						<f:if condition="{item.freshness} == 'stale'>">
@@ -138,7 +138,7 @@
 						</f:if>
 					</td>
 					<td>{item.linkmessage -> f:format.raw()}</td>
-					<td class="table-column-divider-end">{item.lastcheck_url}</td>
+					<td class="table-column-divider-end mobile-optional">{item.lastcheck_url}</td>
 					<td>
 						<a class="btn btn-primary" href="{item.editUrl}"
 						   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">

@@ -70,6 +70,7 @@ div.brofix-brokenlink-list-form select.form-control {
 #brofix-broken-links-table td {
     border-left: 1px solid white;
     word-break: break-word;
+    padding:10px;
 }
 
 #brofix-broken-links-table td span.valid {
@@ -93,4 +94,57 @@ div.brofix-brokenlink-list-form select.form-control {
 #brofix-broken-links-table th.table-column-divider-end
 {
     border-right: 6px white solid;
+}
+
+/** --- for small screens --- */
+
+@media screen and (max-width:920px) {
+    #brofix-broken-links-table {
+        word-wrap:break-word;
+    }
+    #brofix-broken-links-table thead {
+        display:none
+    }
+    #brofix-broken-links-table td {
+        display:block;
+        float:left;/* ie9 and under hack */
+        width:100%;
+        clear:both;
+        background:#f5f5f5;
+        -moz-box-sizing:border-box;
+        -webkit-box-sizing:border-box;
+        box-sizing:border-box;
+    }
+    #brofix-broken-links-table tbody, #brofix-broken-links-table tr {
+        display:block
+    }
+    #brofix-broken-links-table td:before {
+        content:attr(data-th);
+        display:block;
+        font-weight:bold;
+        margin:0 0 2px;
+        color:#000;
+    }
+    #brofix-broken-links-table tbody tr {
+        float:left;width:100%;
+        padding: 10px;
+        margin-bottom:20px;
+        border:2px solid #ccc;
+    }
+
+    /** remove column dividers */
+    #brofix-broken-links-table td.table-column-divider-end,
+    #brofix-broken-links-table th.table-column-divider-end
+    {
+        border-right: none;
+    }
+}
+
+/** --- for very small screens --- */
+
+@media screen and (max-width:601px) {
+    /** remove optional columns */
+    #brofix-broken-links-table tbody tr td.mobile-optional {
+        display: none;
+    }
 }

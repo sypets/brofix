@@ -9,11 +9,12 @@ Changelog
 2.1.0
 =====
 
+**!!! Change in SQL:** It is required to do database compare and recheck links.
+
+-  UI optimization: use card layout instead of table for small screens
+
 -  Add editable restrictions: Show only broken links the editor has
    access to.
-
-
-**!!! Change in SQL:** It is required to do database compare and recheck links.
 
 
 2.0.2
