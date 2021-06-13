@@ -6,6 +6,11 @@
 Changelog
 =========
 
+2.1.1
+=====
+
+*  Fix version constraints (in ext_emconf.php)
+
 2.1.0
 =====
 
