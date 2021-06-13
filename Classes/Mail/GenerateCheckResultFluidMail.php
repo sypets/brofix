@@ -41,6 +41,10 @@ class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
     public function generateMail(Configuration $config, CheckLinksStatistics $stats, int $pageId): bool
     {
         $templatePaths = new TemplatePaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']);
+
+        /**
+         * @var FluidEmail
+         */
         $fluidEmail = GeneralUtility::makeInstance(FluidEmail::class, $templatePaths);
         $recipients = $config->getMailRecipients();
 
@@ -70,7 +74,7 @@ class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
 
         $replyTo = $config->getMailReplyToEmail();
         if ($replyTo !== '') {
-            $fluidEmail->setReplyTo($replyTo);
+            $fluidEmail->replyTo($replyTo);
         }
         $subject = $config->getMailSubject();
         if ($subject) {
