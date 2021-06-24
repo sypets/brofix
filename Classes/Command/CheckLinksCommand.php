@@ -290,7 +290,6 @@ class CheckLinksCommand extends Command
     protected function checkPageLinks(int $pageUid): bool
     {
         $depth = $this->configuration->getDepth();
-        $searchFields = $this->configuration->getSearchFields();
         $linkTypes = $this->configuration->getLinkTypes();
 
         $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
