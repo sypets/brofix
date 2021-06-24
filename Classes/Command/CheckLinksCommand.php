@@ -179,7 +179,16 @@ class CheckLinksCommand extends Command
             return 1;
         }
 
-        $this->depth = (int)($input->getOption('depth') ?: -1);
+        /**
+         * @var string|null $depthOption
+         */
+        $depthOption = $input->getOption('depth');
+        if ($depthOption !== null) {
+            $this->depth = (int)($depthOption);
+        } else {
+            $this->depth = -1;
+        }
+
         $this->sendTo = $input->getOption('to') ?: '';
 
         foreach ($startPages as $pageId) {

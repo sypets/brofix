@@ -9,9 +9,12 @@ Changelog
 2.1.1
 =====
 
-*  Fix version constraints (in ext_emconf.php)
+*  Fix setting of depth=0 via CLI command brofix:checklinks
+   (issue:`69 <https://github.com/sypets/brofix/issues/69>`__)
 *  Fix fatal error: Exception was thrown on CLI command checklinks if
    replytoemail was set (due to call to not existing function).
+   (issue:`68 <https://github.com/sypets/brofix/issues/68>`__)
+*  Fix version constraints (in ext_emconf.php)
 
 2.1.0
 =====
