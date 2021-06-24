@@ -70,24 +70,23 @@ class CheckLinksCommand extends Command
     protected $statistics;
 
     /**
-     * @var object|Configuration
+     * @var Configuration
      */
     protected $configuration;
 
     /**
-     * @var object|BrokenLinkRepository
+     * @var BrokenLinkRepository
      */
     protected $brokenLinkRepository;
 
     /**
-     * @var object|PagesRepository
+     * @var PagesRepository
      */
     protected $pagesRepository;
 
     public function __construct(string $name = null)
     {
         parent::__construct($name);
-
         $this->configuration = GeneralUtility::makeInstance(Configuration::class);
         $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
@@ -260,7 +259,7 @@ class CheckLinksCommand extends Command
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 /**
-                * @var GenerateCheckResultMailInterface
+                * @var GenerateCheckResultMailInterface $generateCheckResultMail
                 */
                 $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);

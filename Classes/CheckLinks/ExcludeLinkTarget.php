@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Sypets\Brofix\CheckLinks;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -59,8 +60,7 @@ class ExcludeLinkTarget
             return false;
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder();
 
         $matchConstraints = [
             // match by: exact
@@ -126,8 +126,7 @@ class ExcludeLinkTarget
         if ($GLOBALS['BE_USER']->check('tables_modify', static::TABLE)
 
         ) {
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                ->getQueryBuilderForTable('pages');
+            $queryBuilder = $this->generateQueryBuilder('pages');
             $row = $queryBuilder
                 ->select('*')
                 ->from('pages')
@@ -153,5 +152,17 @@ class ExcludeLinkTarget
             return true;
         }
         return false;
+    }
+
+    protected function generateQueryBuilder(string $table = ''): QueryBuilder
+    {
+        if ($table === '') {
+            $table = static::TABLE;
+        }
+        /**
+         * @var ConnectionPool $connectionPool
+         */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($table);
     }
 }

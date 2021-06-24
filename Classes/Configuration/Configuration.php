@@ -81,6 +81,9 @@ class Configuration
      */
     public function overrideTsConfigByString(string $tsConfigString): void
     {
+        /**
+         * @var TypoScriptParser $parseObj
+         */
         $parseObj = GeneralUtility::makeInstance(TypoScriptParser::class);
         $parseObj->parse($tsConfigString);
         if (!empty($parseObj->errors)) {

@@ -63,6 +63,9 @@ class FileLinktype extends AbstractLinktype
     {
         $this->initializeErrorParams();
 
+        /**
+         * @var ResourceFactory $resourceFactory
+         */
         $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         try {
             $file = $resourceFactory->retrieveFileOrFolderObject($url);

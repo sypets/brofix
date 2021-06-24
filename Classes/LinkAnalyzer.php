@@ -107,6 +107,9 @@ class LinkAnalyzer implements LoggerAwareInterface
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
             $this->hookObjectsArr[$key] = GeneralUtility::makeInstance($className);
         }
+        /**
+         * @var FieldShouldBeChecked
+         */
         $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
     }
