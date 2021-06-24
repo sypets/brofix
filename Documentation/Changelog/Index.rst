@@ -10,6 +10,8 @@ Changelog
 =====
 
 *  Fix version constraints (in ext_emconf.php)
+*  Fix fatal error: Exception was thrown on CLI command checklinks if
+   replytoemail was set (due to call to not existing function).
 
 2.1.0
 =====
