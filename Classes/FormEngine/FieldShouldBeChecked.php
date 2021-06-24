@@ -38,6 +38,9 @@ class FieldShouldBeChecked implements FormDataGroupInterface
      */
     public function compile(array $result): array
     {
+        /**
+         * @var OrderedProviderList $orderedProviderList
+         */
         $orderedProviderList = GeneralUtility::makeInstance(OrderedProviderList::class);
         $orderedProviderList->setProviderList(
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked']

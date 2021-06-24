@@ -17,6 +17,7 @@ namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
  */
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -36,8 +37,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      */
     public function hasEntryForUrl(string $linkTarget, string $linkType, bool $useExpire = true, int $expire = 0): bool
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder();
 
         $constraints = [
             $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
@@ -76,8 +76,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
     public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): array
     {
         $expire = $expire ?: $this->expire;
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
             ->select('url_response', 'last_check')
             ->from(static::TABLE)
@@ -122,8 +121,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      */
     protected function insert(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
             ->insert(static::TABLE)
             ->values(
@@ -146,8 +144,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      */
     protected function update(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
             ->update(static::TABLE)
             ->where(
@@ -155,8 +152,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
             )
             ->set('url_response', \json_encode($urlResponse))
-            ->set('check_status', $checkStatus)
-            ->set('last_check', \time())
+            ->set('check_status', (string)$checkStatus)
+            ->set('last_check', (string)\time())
             ->execute();
     }
 
@@ -171,5 +168,17 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
             )
             ->execute();
+    }
+
+    protected function generateQueryBuilder(string $table = ''): QueryBuilder
+    {
+        if ($table === '') {
+            $table = static::TABLE;
+        }
+        /**
+         * @var ConnectionPool $connectionPool
+         */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($table);
     }
 }

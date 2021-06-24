@@ -187,8 +187,13 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             }
         }
 
+        /**
+         * @todo add typehint
+         */
+        $cookieJar = GeneralUtility::makeInstance(CookieJar::class);
+
         $options = [
-            'cookies' => GeneralUtility::makeInstance(CookieJar::class),
+            'cookies' => $cookieJar,
             'allow_redirects' => [
                 'strict' => true,
                 'referer' => true,

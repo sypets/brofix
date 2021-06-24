@@ -6,6 +6,7 @@ namespace Sypets\Brofix\Repository;
 
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -29,8 +30,7 @@ class ContentRepository
     public function getRowForUid(int $uid, string $table, array $fields, bool $checkHidden = false): array
     {
         // get all links for $record / $table / $field combination
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable($table);
+        $queryBuilder = $this->generateQueryBuilder($table);
         if ($checkHidden) {
             $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class);
         }
@@ -66,10 +66,14 @@ class ContentRepository
      */
     public function isGridElementParentHidden(int $uid): bool
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
+        /**
+         * @var DeletedRestriction
+         */
+        $deletedRestriction = GeneralUtility::makeInstance(DeletedRestriction::class);
+        $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            ->add($deletedRestriction);
 
         $parentId = (int)$queryBuilder
             ->select('tx_gridelements_container')
@@ -83,10 +87,14 @@ class ContentRepository
             ->execute()
             ->fetchColumn(0);
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
+        /**
+         * @var DeletedRestriction
+         */
+        $deletedRestriction = GeneralUtility::makeInstance(DeletedRestriction::class);
+        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            ->add($deletedRestriction);
 
         return (bool)$queryBuilder
             ->select('hidden')
@@ -99,5 +107,17 @@ class ContentRepository
             )
             ->execute()
             ->fetchColumn(0);
+    }
+
+    protected function generateQueryBuilder(string $table = ''): QueryBuilder
+    {
+        if ($table === '') {
+            $table = static::TABLE;
+        }
+        /**
+         * @var ConnectionPool $connectionPool
+         */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($table);
     }
 }

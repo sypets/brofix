@@ -7,3 +7,18 @@ parameters:
       count: 1
       path: ../Classes/View/BrofixReport.php
 
+    -
+      message: "#^Parameter \\#1 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+      count: 1
+      path: ../Classes/CheckLinks/ExcludeLinkTarget.php
+
+    -
+      message: "#^Parameter \\#1 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+      count: 6
+      path: ../Classes/Repository/BrokenLinkRepository.php
+
+    -
+      message: "#^Parameter \\#2 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+      count: 6
+      path: ../Classes/Repository/BrokenLinkRepository.php
+

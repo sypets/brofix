@@ -7,6 +7,7 @@ namespace Sypets\Brofix\Repository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
@@ -45,10 +46,14 @@ class PagesRepository
             return $subPageIds;
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder = $this->generateQueryBuilder('pages');
+        /**
+         * @var DeletedRestriction $deletedRestriction
+         */
+        $deletedRestriction = GeneralUtility::makeInstance(DeletedRestriction::class);
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            ->add($deletedRestriction);
 
         $result = $queryBuilder
             ->select('uid', 'title', 'hidden', 'extendToSubpages')
@@ -162,12 +167,16 @@ class PagesRepository
         bool $considerHiddenPages,
         array $limitToLanguageIds = []
     ): array {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+        /**
+         * @var HiddenRestriction $hiddenRestriction
+         */
+        $hiddenRestriction = GeneralUtility::makeInstance(HiddenRestriction::class);
         $queryBuilder->getRestrictions()
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
         if (!$considerHiddenPages) {
-            $queryBuilder->getRestrictions()->add(GeneralUtility::makeInstance(HiddenRestriction::class));
+            $queryBuilder->getRestrictions()->add($hiddenRestriction);
         }
         $constraints = [
             $queryBuilder->expr()->eq(
@@ -224,5 +233,17 @@ class PagesRepository
             $path = '/' . strip_tags($record['title']) . $path;
         }
         return [$title, $path];
+    }
+
+    protected function generateQueryBuilder(string $table = ''): QueryBuilder
+    {
+        if ($table === '') {
+            $table = static::TABLE;
+        }
+        /**
+         * @var ConnectionPool $connectionPool
+         */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($table);
     }
 }

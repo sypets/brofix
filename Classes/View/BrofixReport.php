@@ -35,6 +35,7 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -294,6 +295,9 @@ class BrofixReport
 
     protected function createView(string $templateName): StandaloneView
     {
+        /**
+         * @var StandaloneView $view
+         */
         $view = GeneralUtility::makeInstance(StandaloneView::class);
         $view->setLayoutRootPaths(['EXT:brofix/Resources/Private/Layouts']);
         $view->setPartialRootPaths(['EXT:brofix/Resources/Private/Partials']);
@@ -376,6 +380,9 @@ class BrofixReport
         // if same key, additionalQueryParameters should overwrite parameters
         $parameters = array_merge($parameters, $additionalQueryParameters);
 
+        /**
+         * @var UriBuilder $uriBuilder
+         */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uri = (string)$uriBuilder->buildUriFromRoute($route, $parameters);
 
@@ -596,6 +603,9 @@ class BrofixReport
      */
     protected function createFlashMessage(string $message, string $title = '', int $type = FlashMessage::INFO): void
     {
+        /**
+         * @var FlashMessage $flashMessage
+         */
         $flashMessage = GeneralUtility::makeInstance(
             FlashMessage::class,
             $title,
@@ -603,6 +613,9 @@ class BrofixReport
             $type,
             false
         );
+        /**
+         * @var FlashMessageService $flashMessageService
+         */
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('brofix');
         $defaultFlashMessageQueue->enqueue($flashMessage);
@@ -695,6 +708,9 @@ class BrofixReport
             ]
         );
 
+        /**
+         * @var UriBuilder $uriBuilder
+         */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $variables['editUrl'] = (string)$uriBuilder->buildUriFromRoute('record_edit', [
             'edit' => [
@@ -897,7 +913,14 @@ class BrofixReport
      */
     protected function resolveSiteLanguages(int $pageId): void
     {
-        $site = GeneralUtility::makeInstance(SiteMatcher::class)->matchByPageId($pageId);
+        /**
+         * @var SiteMatcher $siteMatcher
+         */
+        $siteMatcher = GeneralUtility::makeInstance(SiteMatcher::class);
+        /**
+         * @var SiteInterface $site
+         */
+        $site = $siteMatcher->matchByPageId($pageId);
         $this->siteLanguages = $site->getAvailableLanguages($this->getBackendUser(), true, $pageId);
     }
 

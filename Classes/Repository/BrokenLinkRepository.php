@@ -11,6 +11,7 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -31,6 +32,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
     public function __construct()
     {
+        /**
+         * @var ConnectionPool $connectionPool
+         */
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connection = $connectionPool->getConnectionForTable(static::TABLE);
         $this->maxBindParameters = PlatformInformation::getMaxBindParameters($connection->getDatabasePlatform());
@@ -58,12 +62,11 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageList, $max)
                  as $pageIdsChunk) {
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                ->getQueryBuilderForTable(self::TABLE);
+            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
             if (!$GLOBALS['BE_USER']->isAdmin()) {
                 /**
-                 * @var EditableRestriction
+                 * @var EditableRestriction $editableRestriction
                  */
                 $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
                 $queryBuilder->getRestrictions()
@@ -134,8 +137,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      */
     public function hasPageBrokenLinks(int $pageId, bool $withEditableByUser = true): bool
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(self::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
         $count = $queryBuilder
             ->count('uid')
@@ -179,13 +181,12 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageIds, $max)
                  as $pageIdsChunk) {
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                ->getQueryBuilderForTable(self::TABLE);
+            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
             $queryBuilder->getRestrictions()->removeAll();
 
             if (!$GLOBALS['BE_USER']->isAdmin()) {
                 /**
-                 * @var EditableRestriction
+                 * @var EditableRestriction $editableRestriction
                  */
                 $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
                 $queryBuilder->getRestrictions()
@@ -250,8 +251,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
     public function removeBrokenLinksForRecord(string $tableName, int $recordUid): int
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
         $constraints = [];
 
         if ($tableName === 'pages') {
@@ -297,8 +297,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
     public function removeForRecordUrl(string $tableName, int $recordUid, string $url, string $linkType): int
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
 
         if ($tableName === 'pages') {
             $constraints[] = $queryBuilder->expr()->orX(
@@ -351,8 +350,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
     public function removeBrokenLinksForRecordBeforeTime(string $tableName, int $recordUid, int $time): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
 
         $queryBuilder->delete(static::TABLE)
             ->where(
@@ -382,8 +380,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageIds, $max)
                  as $pageIdsChunk) {
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                ->getQueryBuilderForTable(self::TABLE);
+            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
             $queryBuilder->delete(self::TABLE)
                 ->where(
@@ -426,8 +423,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     public function isLinkTargetBrokenLink(string $linkTarget, string $linkType): bool
     {
         try {
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                ->getQueryBuilderForTable(static::TABLE);
+            $queryBuilder = $this->generateQueryBuilder(static::TABLE);
             $queryBuilder
                 ->count('uid')
                 ->from(static::TABLE)
@@ -458,8 +454,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         string $matchBy = ExcludeLinkTarget::MATCH_BY_EXACT,
         int $excludeLinkTargetPid = -1
     ): int {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(static::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
 
         $constraints = [];
 
@@ -507,8 +502,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      */
     public function insertOrUpdateBrokenLink(array $record): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable(self::TABLE);
+        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
         $count = (int)$queryBuilder->count('uid')
             ->from(self::TABLE)
             ->where(
@@ -593,5 +587,17 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 . ', stack trace=' . $e->getTraceAsString()
             );
         }
+    }
+
+    protected function generateQueryBuilder(string $table = ''): QueryBuilder
+    {
+        if ($table === '') {
+            $table = static::TABLE;
+        }
+        /**
+         * @var ConnectionPool $connectionPool
+         */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($table);
     }
 }
