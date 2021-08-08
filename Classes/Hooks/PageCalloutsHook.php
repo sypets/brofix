@@ -17,6 +17,7 @@ namespace Sypets\Brofix\Hooks;
  */
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
@@ -41,14 +42,24 @@ final class PageCalloutsHook
      */
     public function addMessages(array $pageInfo): array
     {
+        if (!$pageInfo || !is_array($pageInfo)) {
+            return [];
+        }
         $pageId = (int)($pageInfo['uid']);
+        if ($pageId === 0) {
+            return [];
+        }
         $lang = $this->getLanguageService();
 
+        // todo: access check
         if ($this->brokenLinkRepository->hasPageBrokenLinks($pageId)) {
             $title = '';
+            $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+            $uri = (string)$uriBuilder->buildUriFromRoute('web_info', ['id' => $pageId]) . '&SET[function]=Sypets\\Brofix\\View\\BrofixReport';
             $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:broken_links_found_for_page');
-            $message .= '<p><a class="btn btn-info" href="javascript:top.goToModule(\'web_info\',1, \'SET[function]=Sypets%5C%5CBrofix%5C%5CView%5C%5CBrofixReport\');">'
-                . $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:go_to_info_modul')
+            //$message .= '<p><a class="btn btn-info" href="javascript:top.goToModule(\'web_info\',1, \'SET[function]=Sypets%5C%5CBrofix%5C%5CView%5C%5CBrofixReport\');">';
+            $message .= '<p><a class="btn btn-info" href="' . $uri . '">';
+            $message .= $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:go_to_info_modul')
                 . '</a> '
                 . $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:and_check_links')
                 . '!</p>';
