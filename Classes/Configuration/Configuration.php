@@ -134,6 +134,9 @@ class Configuration
      */
     public function getSearchFields(): array
     {
+        if (!isset($this->tsConfig['searchFields.'])) {
+            return [];
+        }
         // Get the searchFields from TypoScript
         foreach ($this->tsConfig['searchFields.'] as $table => $fieldList) {
             $fields = GeneralUtility::trimExplode(',', $fieldList);

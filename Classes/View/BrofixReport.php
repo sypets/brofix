@@ -34,6 +34,9 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Pagination\ArrayPaginator;
+use TYPO3\CMS\Core\Pagination\PaginationInterface;
+use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
@@ -104,6 +107,11 @@ class BrofixReport
      * @var string
      */
     protected $orderBy = self::ORDER_BY_DEFAULT;
+
+    /**
+     * @var int
+     */
+    protected $paginationCurrentPage;
 
     /**
      * @var DocumentTemplate
@@ -250,6 +258,9 @@ class BrofixReport
      */
     protected $configuration;
 
+    /** @var PaginationInterface|null */
+    protected $pagination;
+
     public function __construct(
         PagesRepository $pagesRepository = null,
         BrokenLinkRepository $brokenLinkRepository = null,
@@ -273,18 +284,22 @@ class BrofixReport
     public function init(InfoModuleController $pObj): void
     {
         $this->pObj = $pObj;
-        $this->id = (int)GeneralUtility::_GP('id');
-        if ($this->id === 0) {
-            // @todo work-around, because this->id does not work if "Refresh display" is used
-            $this->id = (int)GeneralUtility::_GP('currentPage');
+
+        $val = GeneralUtility::_GP('id');
+        if ($val === null) {
+            // work-around, because this->id does not work if "Refresh display" is used
+            $val = GeneralUtility::_GP('currentPage');
         }
-        if ($this->id !== 0) {
+        if ($val !== null) {
+            $this->id = (int)$val;
             $this->resolveSiteLanguages($this->id);
+        } else {
+            $this->id = 0;
         }
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
         $this->view = $this->createView('InfoModule');
-        if (isset($this->id)) {
+        if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
             $this->currentUserHasPermissionsForExcludeLinkTargetStorage
                 = $this->excludeLinkTarget->currentUserHasCreatePermissions(
@@ -319,6 +334,10 @@ class BrofixReport
     protected function getSettingsFromQueryParameters(): void
     {
         $this->currentRecord = [];
+        /**
+         * @var bool $resetPagination
+         */
+        $resetPagination = false;
 
         // get information for last edited record
         $this->currentRecord['uid'] = GeneralUtility::_GP('current_record_uid') ?? 0;
@@ -330,11 +349,18 @@ class BrofixReport
 
         // get searchLevel (number of levels of pages to check / show results)
         $depth = GeneralUtility::_GP('depth');
+        /**
+         * @var int $previousDepth
+         */
+        $previousDepth = (int)($this->pObj->MOD_SETTINGS['depth'] ?? 0);
         if (is_null($depth)) {
             // not set, set to stored value or 0 (default)
-            $this->depth = (int)($this->pObj->MOD_SETTINGS['depth'] ?? 0);
+            $this->depth = $previousDepth;
         } else {
             $this->depth = (int)$depth;
+            if ($this->depth !== $previousDepth) {
+                $resetPagination = true;
+            }
         }
         $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
 
@@ -346,8 +372,12 @@ class BrofixReport
             $this->action = 'updateLinkList';
         }
 
+        // orderBy
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy')
             ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? self::ORDER_BY_DEFAULT));
+        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? self::ORDER_BY_DEFAULT)) {
+            $resetPagination = true;
+        }
         $this->pObj->MOD_SETTINGS['orderBy'] = $this->orderBy;
 
         $this->linkTypes = [];
@@ -358,6 +388,18 @@ class BrofixReport
                 $this->linkTypes[] = $linkType;
             }
         }
+
+        // pagination + currentPage
+        $lastCurrentPage = (int)($this->pObj->MOD_SETTINGS['currentPage'] ?? 0);
+        if (($this->id !== $lastCurrentPage) || $resetPagination) {
+            // pagination (reset pagination if page id changed!)
+            $this->paginationCurrentPage = 1;
+        } else {
+            $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage')
+                ?: ($this->pObj->MOD_SETTINGS['paginationPage'] ?? 1));
+        }
+        $this->pObj->MOD_SETTINGS['currentPage'] = $this->id;
+        $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
 
         // save settings
         $this->getBackendUser()->pushModuleData('web_info', $this->pObj->MOD_SETTINGS);
@@ -374,7 +416,8 @@ class BrofixReport
         $parameters = [
             'id' => $this->id,
             'depth' => $this->depth,
-            'orderBy' => $this->orderBy
+            'orderBy' => $this->orderBy,
+            'paginationPage', $this->paginationCurrentPage
         ];
 
         // if same key, additionalQueryParameters should overwrite parameters
@@ -549,10 +592,17 @@ class BrofixReport
             );
             if ($brokenLinks) {
                 $totalCount = count($brokenLinks);
+
+                $itemsPerPage = 100;
+                $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
+                $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
+                // move end
+                foreach ($paginator->getPaginatedItems() as $row) {
+                    $items[] = $this->renderTableRow($row['table_name'], $row);
+                }
             }
-            foreach ($brokenLinks as $row) {
-                $items[] = $this->renderTableRow($row['table_name'], $row);
-            }
+        } else {
+            $this->pagination = null;
         }
         $view->assign('totalCount', $totalCount);
         if ($this->id === 0) {
@@ -561,7 +611,10 @@ class BrofixReport
             $this->createFlashMessagesForNoBrokenLinks();
         }
         $view->assign('brokenLinks', $items);
+
+        $view->assign('pagination', $this->pagination);
         $view->assign('orderBy', $this->orderBy);
+        $view->assign('paginationPage', $this->paginationCurrentPage ?? 1);
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {
