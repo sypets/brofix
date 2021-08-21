@@ -59,7 +59,8 @@ jobs:
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
-        db: [ 'mariadb', 'mssql', 'postgres', 'sqlite' ]
+        #db: [ 'mariadb', 'mssql', 'postgres', 'sqlite' ]
+        db: [ 'mariadb' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
