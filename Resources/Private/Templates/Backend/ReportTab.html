@@ -14,6 +14,7 @@
 			<input type="hidden" name="currentPage" value="{currentPage}"/>
 			<input type="hidden" name="id" value="{currentPage}"/>
 			<input type="hidden" name="orderBy" value="{orderBy}"/>
+			<input type="hidden" name="paginationPage" value="{paginationPage}"/>
 			<br/>
 			<select id="brofix-list-select-pagedepth" name="depth" class="form-control input-sm">
 				<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
@@ -50,6 +51,7 @@
 				</f:link.external>
 			</f:if>
 		</form>
+		<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy}" />
 	</div>
 </f:section>
 
