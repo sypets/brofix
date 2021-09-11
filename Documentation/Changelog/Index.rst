@@ -13,6 +13,8 @@ Changelog
 
 *  Add crdate to table. This will later make it possible to detect
    new broken links (or broken links recently detected).
+*  Add start and stop time to check links email report
+*  Change order of settings in check links email report
 
 2.1.1
 =====
