@@ -58,6 +58,45 @@
 	"scripts": {
 		"post-autoload-dump": [
 			"TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
+		],
+		"ci:composerinstall": [
+			"Build/Scripts/runTests.sh -p 7.4 -s composerInstallMax"
+		],
+		"ci:composervalidate": [
+			"Build/Scripts/runTests.sh -p 7.4 -s composerValidate"
+		],
+		"ci:phpcgl:check": [
+			"Build/Scripts/runTests.sh -p 7.4 -s cgl -n"
+		],
+		"ci:phpcgl:fix": [
+			"Build/Scripts/runTests.sh -p 7.4 -s cgl"
+		],
+		"ci:cgl:check": [
+			"@ci:phpcgl:check"
+		],
+		"ci:phplint": [
+			"Build/Scripts/runTests.sh -p 7.4 -s phpstan -e \"-c ../Build/phpstan.neon\""
+		],
+		"ci:phpstan": [
+			"Build/Scripts/runTests.sh -p 7.4 -s phpstan -e \"-c ../Build/phpstan.neon\""
+		],
+		"ci:phpunit": [
+			"Build/Scripts/runTests.sh -p 7.4 -s unit"
+		],
+		"ci:phpfunctional": [
+			"Build/Scripts/runTests.sh -p 7.4 -s functional"
+		],
+		"ci:check": [
+			"@ci:composerinstall",
+			"@ci:composervalidate",
+			"@ci:cgl:check",
+			"@ci:phplint",
+			"@ci:phpstan",
+			"@ci:phpunit",
+			"@ci:phpfunctional"
+		],
+		"ci:cleanup": [
+			"rm -rf .Build;rm composer.lock;composer config --unset platform.php;composer config --unset platform"
 		]
 	}
 }

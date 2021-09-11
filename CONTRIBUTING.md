@@ -45,16 +45,25 @@ Check **and fix** CGL in PHP files:
 Build/Scripts/runTests.sh -s cgl -v
 ```
 
+## Run all tests
+
+
 See all options:
 
 ```
 Build/Scripts/runTests.sh -h
 ```
 
-Cleanup:
+You can run the tests via Composer:
 
 ```
-rm -rf .Build;rm composer.lock;composer config --unset platform.php;composer config --unset platform
+composer ci:check
+```
+
+## Cleanup:
+
+```
+composer ci:cleanup
 ```
 
 ## yarn
