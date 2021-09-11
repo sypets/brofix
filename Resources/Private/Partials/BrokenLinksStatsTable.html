@@ -23,26 +23,15 @@
 </style>
 
 <table class="BrokenLinkStats">
-    <tr class="tableHeader">
-        <th colspan="2">Pages checked</th>
-    </tr>
-    <tr>
-        <th>Depth</th>
-        <td>
-            <f:if condition="{depth} == 999">
-                <f:then>infinite</f:then>
-                <f:else>{depth}</f:else>
-            </f:if>
-        </td>
-    </tr>
-    <tr>
-        <th>Number of pages</th>
-        <td>{stats.countPages}</td>
-    </tr>
+
 
     <tr class="tableHeader">
         <th colspan="2">Broken links</th>
     </tr>
+	<tr>
+		<th>Percent broken links</th>
+		<td><f:format.number decimals="2" decimalSeparator=".">{stats.percentBrokenLinks}</f:format.number>%</td>
+	</tr>
     <tr>
         <th>Broken links</th>
         <td>{stats.countBrokenLinks}</td>
@@ -51,10 +40,24 @@
         <th>Total links checked</th>
         <td>{stats.countLinksChecked}</td>
     </tr>
-    <tr>
-        <th>Percent broken links</th>
-        <td><f:format.number decimals="2" decimalSeparator=".">{stats.percentBrokenLinks}</f:format.number>%</td>
-    </tr>
+
+	<tr class="tableHeader">
+		<th colspan="2">Pages checked</th>
+	</tr>
+	<tr>
+		<th>Depth</th>
+		<td>
+			<f:if condition="{depth} == 999">
+				<f:then>infinite</f:then>
+				<f:else>{depth}</f:else>
+			</f:if>
+		</td>
+	</tr>
+	<tr>
+		<th>Number of pages</th>
+		<td>{stats.countPages}</td>
+	</tr>
+
 
     <tr class="tableHeader">
         <th colspan="2">Excluded links</th>
