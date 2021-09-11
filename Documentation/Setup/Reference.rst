@@ -806,3 +806,23 @@ Always uses the default template CheckLinksResults if not supplied.
    Default
       CheckLinksResults
 
+.. _tsconfigMailTemplate:
+
+mail.language
+-------------
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.mail.language
+
+   Data type
+      string
+
+   Description
+      Use this language for the report sent via email.
+
+   Default
+      en

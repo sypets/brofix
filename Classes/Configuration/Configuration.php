@@ -411,6 +411,11 @@ class Configuration
         return $this->tsConfig['mail.']['subject'] ?? '';
     }
 
+    public function getMailLanguage(): string
+    {
+        return $this->tsConfig['mail.']['language'] ?? 'en';
+    }
+
     /**
      * @return mixed[]
      */

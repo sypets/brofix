@@ -1,19 +1,23 @@
 <f:layout name="SystemEmail" />
-<f:section name="Title">Broken links report</f:section>
-<f:section name="Subject"><f:if condition="{subject}"><f:then>{subject}</f:then><f:else>Broken links report</f:else></f:if> "{stats.pageTitle}" [{pageId}]: {stats.countBrokenLinks}</f:section>
+<f:section name="Title"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.title" languageKey="{language}">Broken Links Report</f:translate></f:section>
+<f:section name="Subject"><f:if condition="{subject}"><f:then>{subject}</f:then><f:else><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header" languageKey="{language}">Broken links for page </f:translate></f:else></f:if> "{stats.pageTitle}" [{pageId}]: {stats.countBrokenLinks}</f:section>
 <f:section name="Main">
-Percent broken links       : {stats.percentBrokenLinks}%
-Number of broken links     : {stats.countBrokenLinks}
-Total links checked        : {stats.countLinksChecked}
 
-Number of pages checked    : {stats.countPages}
-Depth                      : <f:if condition="{depth} == 999"><f:then>infinite</f:then><f:else>{depth}</f:else></f:if>
+<f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate>
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.percent_broken_links" languageKey="{language}">Percent broken links</f:translate></f:format.padding>: {stats.percentBrokenLinks}%
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_broken_links" languageKey="{language}">Number of broken links</f:translate></f:format.padding>: {stats.countBrokenLinks}
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_links_checked" languageKey="{language}">Total links checked</f:translate></f:format.padding>: {stats.countLinksChecked}
 
-Excluded links not checked : {stats.countExcludedLinks}
-Percent links not checked  : <f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%
+<f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.pages" languageKey="{language}">Pages checked</f:translate>
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.depth" languageKey="{language}">Depth</f:translate></f:format.padding>: <f:if condition="{depth} == 999"><f:then><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.depth.infinite" languageKey="{language}">infinite</f:translate></f:then><f:else>{depth}</f:else></f:if>
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_of_pages" languageKey="{language}">Number of pages checked</f:translate></f:format.padding>: {stats.countPages}
 
-Check started              : <f:format.date>{stats.checkStartTime}</f:format.date> <f:format.date format="H:i">{stats.checkStartTime}</f:format.date>
-Check done                 : <f:format.date>{stats.checkEndTime}</f:format.date> <f:format.date format="H:i">{stats.checkEndTime}</f:format.date>
+<f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.excluded_urls" languageKey="{language}">Excluded URLs</f:translate>
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked" languageKey="{language}">Links not checked</f:translate></f:format.padding>: {stats.countExcludedLinks}
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked_percent" languageKey="{language}">Percent links not checked</f:translate></f:format.padding>: <f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%
 
+<f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.check" languageKey="{language}">Check</f:translate>
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.check.start" languageKey="{language}">Check started</f:translate></f:format.padding>: <f:format.date>{stats.checkStartTime}</f:format.date> <f:format.date format="H:i">{stats.checkStartTime}</f:format.date>
+  <f:format.padding padLength="{padLength}" padType="right"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.check.done" languageKey="{language}">Check done</f:translate></f:format.padding>: <f:format.date>{stats.checkEndTime}</f:format.date> <f:format.date format="H:i">{stats.checkEndTime}</f:format.date>
 </f:section>
 

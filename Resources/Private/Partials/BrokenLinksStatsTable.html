@@ -26,61 +26,61 @@
 
 
     <tr class="tableHeader">
-        <th colspan="2">Broken links</th>
+        <th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate></th>
     </tr>
 	<tr>
-		<th>Percent broken links</th>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.percent_broken_links" languageKey="{language}">Percent broken links</f:translate></th>
 		<td><f:format.number decimals="2" decimalSeparator=".">{stats.percentBrokenLinks}</f:format.number>%</td>
 	</tr>
     <tr>
-        <th>Broken links</th>
+        <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_broken_links" languageKey="{language}">Number of broken links</f:translate></th>
         <td>{stats.countBrokenLinks}</td>
     </tr>
     <tr>
-        <th>Total links checked</th>
+        <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_links_checked" languageKey="{language}">Total links checked</f:translate></th>
         <td>{stats.countLinksChecked}</td>
     </tr>
 
 	<tr class="tableHeader">
-		<th colspan="2">Pages checked</th>
+		<th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.pages" languageKey="{language}">Pages checked</f:translate></th>
 	</tr>
 	<tr>
-		<th>Depth</th>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.depth" languageKey="{language}">Depth</f:translate></th>
 		<td>
 			<f:if condition="{depth} == 999">
-				<f:then>infinite</f:then>
+				<f:then><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.depth.infinite" languageKey="{language}">infinite</f:translate></f:then>
 				<f:else>{depth}</f:else>
 			</f:if>
 		</td>
 	</tr>
 	<tr>
-		<th>Number of pages</th>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_of_pages" languageKey="{language}">Number of pages checked</f:translate></th>
 		<td>{stats.countPages}</td>
 	</tr>
 
 
     <tr class="tableHeader">
-        <th colspan="2">Excluded links</th>
+        <th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.excluded_urls" languageKey="{language}">Excluded URLs</f:translate></th>
     </tr>
     <tr>
-        <th>Links not checked</th>
+        <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked" languageKey="{language}">Links not checked</f:translate></th>
         <td>{stats.countExcludedLinks}</td>
     </tr>
     <tr>
-        <th>Percent links not checked</th>
+        <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked_percent" languageKey="{language}">Percent links not checked</f:translate></th>
         <td><f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%</td>
     </tr>
 
 
 	<tr class="tableHeader">
-		<th colspan="2">Check</th>
+		<th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.check" languageKey="{language}">Check</f:translate></th>
 	</tr>
 	<tr>
-		<th>Check started</th>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.check.start" languageKey="{language}">Check started</f:translate></th>
 		<td><f:format.date>{stats.checkStartTime}</f:format.date> <f:format.date format="H:i">{stats.checkStartTime}</f:format.date></td>
 	</tr>
 	<tr>
-		<th>Check done</th>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.check.done" languageKey="{language}">Check done</f:translate></th>
 		<td><f:format.date>{stats.checkEndTime}</f:format.date> <f:format.date format="H:i">{stats.checkEndTime}</f:format.date></td>
 	</tr>
 </table>

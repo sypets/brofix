@@ -15,6 +15,8 @@ Changelog
    new broken links (or broken links recently detected).
 *  Add start and stop time to check links email report
 *  Change order of settings in check links email report
+*  Add additional setting mod.brofix.mail.language to set the
+   language of the email report.
 
 2.1.1
 =====

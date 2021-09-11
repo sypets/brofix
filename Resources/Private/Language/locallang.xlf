@@ -7,6 +7,61 @@
 				<source>Broken link fixer</source>
 			</trans-unit>
 
+			<!--
+				__________________
+				broken links email
+				__________________
+			-->
+			<trans-unit id="email.brokenlinksreport.title" resname="email.brokenlinksreport.title">
+				<source>Broken Links Report</source>
+			</trans-unit>
+			<!-- header is in subject and used as header in email body -->
+			<trans-unit id="email.brokenlinksreport.header" resname="email.brokenlinksreport.header">
+				<source>Broken links for page</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.broken_links" resname="email.brokenlinksreport.header.broken_links">
+				<source>Broken links</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.percent_broken_links" resname="email.brokenlinksreport.percent_broken_links">
+				<source>Percent broken links</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.number_broken_links" resname="email.brokenlinksreport.number_broken_links">
+				<source>Number of broken links</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.number_links_checked" resname="email.brokenlinksreport.number_links_checked">
+				<source>Total links checked</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.pages" resname="email.brokenlinksreport.header.pages">
+				<source>Pages checked</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.depth" resname="email.brokenlinksreport.depth">
+				<source>Depth</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.number_of_pages" resname="email.brokenlinksreport.number_of_pages">
+				<source>Number of pages checked</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.depth.infinite" resname="email.brokenlinksreport.depth.infinite">
+				<source>infinite</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.excluded_urls" resname="email.brokenlinksreport.header.excluded_urls">
+				<source>Excluded URLs</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.links_not_checked" resname="email.brokenlinksreport.links_not_checked">
+				<source>Links not checked</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.links_not_checked_percent" resname="email.brokenlinksreport.links_not_checked_percent">
+				<source>Percent links not checked</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.check" resname="email.brokenlinksreport.header.check">
+				<source>Check</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.check.start" resname="email.brokenlinksreport.check.start">
+				<source>Check started</source>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.check.done" resname="email.brokenlinksreport.check.done">
+				<source>Check done</source>
+			</trans-unit>
+
 			<!-- broken link list -->
 
 			<trans-unit id="list.header" resname="list.header">

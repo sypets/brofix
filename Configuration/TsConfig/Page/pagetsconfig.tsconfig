@@ -64,6 +64,7 @@ mod.brofix {
 		replytoemail =
 		subject =
 		template = CheckLinksResults
+    language = en
 	}
 
 	custom {
