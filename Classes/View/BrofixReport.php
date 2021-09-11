@@ -291,7 +291,9 @@ class BrofixReport
             $val = GeneralUtility::_GP('currentPage');
         }
         if ($val !== null) {
+            // @extensionScannerIgnoreLine
             $this->id = (int)$val;
+            // @extensionScannerIgnoreLine
             $this->resolveSiteLanguages($this->id);
         } else {
             $this->id = 0;

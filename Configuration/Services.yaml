@@ -28,3 +28,11 @@ services:
         identifier: 'rte-check-link-to-file'
         event: TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent
         method: 'checkFileLink'
+
+  # Commands
+  Sypets\Brofix\Command\CheckLinksCommand:
+    tags:
+      - name: 'console.command'
+        command: 'brofix:checklinks'
+        description: 'Check for broken links'
+        hidden: false

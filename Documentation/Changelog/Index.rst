@@ -11,6 +11,7 @@ Changelog
 
 **Update to 2.2.0 requires updating the database.**
 
+*  Add support for TYPO3 v11
 *  Add crdate to table. This will later make it possible to detect
    new broken links (or broken links recently detected).
 *  Add start and stop time to check links email report

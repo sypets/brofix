@@ -6,56 +6,64 @@
 	<ul class="pagination pagination-block">
 		<f:if condition="{pagination.previousPageNumber}">
 			<f:then>
-				<li>
-					<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: 1}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.first')}">
-						<core:icon identifier="actions-view-paging-first" />
-					</a>
+				<li class="page-item">
+					<span class="page-link">
+						<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: 1}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.first')}">
+							<core:icon identifier="actions-view-paging-first" />
+						</a>
+					</span>
 				</li>
-				<li>
-					<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: pagination.previousPageNumber}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.previous')}">
-						<core:icon identifier="actions-view-paging-previous" />
-					</a>
+				<li class="page-item">
+					<span class="page-link">
+						<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: pagination.previousPageNumber}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.previous')}">
+							<core:icon identifier="actions-view-paging-previous" />
+						</a>
+					</span>
 				</li>
 			</f:then>
 			<f:else>
-				<li class="disabled">
-                        <span>
+				<li class="disabled page-item">
+                        <span class="page-link">
                             <core:icon identifier="actions-view-paging-first" />
                         </span>
 				</li>
-				<li class="disabled">
-                        <span>
+				<li class="disabled page-item">
+                        <span class="page-link">
                             <core:icon identifier="actions-view-paging-previous" />
                         </span>
 				</li>
 			</f:else>
 		</f:if>
-		<li>
-                <span>
+		<li class="page-item">
+                <span class="page-link">
                     {pagination.startRecordNumber} - {pagination.endRecordNumber}
                 </span>
 		</li>
 		<f:if condition="{pagination.nextPageNumber}">
 			<f:then>
-				<li>
-					<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: pagination.nextPageNumber}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.next')}">
-						<core:icon identifier="actions-view-paging-next" />
-					</a>
+				<li class="page-item">
+					<span class="page-link">
+						<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: pagination.nextPageNumber}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.next')}">
+							<core:icon identifier="actions-view-paging-next" />
+						</a>
+					</span>
 				</li>
-				<li>
-					<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: pagination.lastPageNumber}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.last')}">
-						<core:icon identifier="actions-view-paging-last" />
-					</a>
+				<li class="page-item">
+					<span class="page-link">
+						<a href="{f:be.uri(route:'web_info', parameters: '{currentPage: currentPage, id: currentPage, orderBy: orderBy, depth: depth, paginationPage: pagination.lastPageNumber}')}" title="{f:translate(extensionName: 'fluid', key:'widget.pagination.last')}">
+							<core:icon identifier="actions-view-paging-last" />
+						</a>
+					</span>
 				</li>
 			</f:then>
 			<f:else>
-				<li class="disabled">
-                        <span>
+				<li class="disabled page-item">
+                        <span class="page-link">
                             <core:icon identifier="actions-view-paging-next" />
                         </span>
 				</li>
-				<li class="disabled">
-                        <span>
+				<li class="disabled page-item">
+                        <span class="page-link">
                             <core:icon identifier="actions-view-paging-last" />
                         </span>
 				</li>
