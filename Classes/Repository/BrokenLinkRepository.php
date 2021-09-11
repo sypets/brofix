@@ -573,6 +573,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     public function insertBrokenLink(array $record): void
     {
         $record['tstamp'] = \time();
+        $record['crdate'] = \time();
         try {
             GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getConnectionForTable(static::TABLE)

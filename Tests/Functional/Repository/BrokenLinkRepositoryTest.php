@@ -673,6 +673,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
             unset($result['last_check']);
             unset($result['last_check_url']);
             unset($result['tstamp']);
+            unset($result['crdate']);
             unset($result['exclude_link_targets_pid']);
         }
 

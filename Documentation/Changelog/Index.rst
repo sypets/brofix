@@ -6,6 +6,14 @@
 Changelog
 =========
 
+2.2.0
+=====
+
+**Update to 2.2.0 requires updating the database.**
+
+*  Add crdate to table. This will later make it possible to detect
+   new broken links (or broken links recently detected).
+
 2.1.1
 =====
 
