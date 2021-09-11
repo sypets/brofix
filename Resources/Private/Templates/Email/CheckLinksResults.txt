@@ -11,5 +11,9 @@ Depth                      : <f:if condition="{depth} == 999"><f:then>infinite</
 
 Excluded links not checked : {stats.countExcludedLinks}
 Percent links not checked  : <f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%
+
+Check started              : <f:format.date>{stats.checkStartTime}</f:format.date> <f:format.date format="H:i">{stats.checkStartTime}</f:format.date>
+Check done                 : <f:format.date>{stats.checkEndTime}</f:format.date> <f:format.date format="H:i">{stats.checkEndTime}</f:format.date>
+
 </f:section>
 

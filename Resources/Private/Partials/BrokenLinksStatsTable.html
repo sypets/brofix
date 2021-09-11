@@ -70,4 +70,17 @@
         <th>Percent links not checked</th>
         <td><f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%</td>
     </tr>
+
+
+	<tr class="tableHeader">
+		<th colspan="2">Check</th>
+	</tr>
+	<tr>
+		<th>Check started</th>
+		<td><f:format.date>{stats.checkStartTime}</f:format.date> <f:format.date format="H:i">{stats.checkStartTime}</f:format.date></td>
+	</tr>
+	<tr>
+		<th>Check done</th>
+		<td><f:format.date>{stats.checkEndTime}</f:format.date> <f:format.date format="H:i">{stats.checkEndTime}</f:format.date></td>
+	</tr>
 </table>
