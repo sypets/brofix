@@ -70,6 +70,8 @@ class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
             ->assign('stats', $stats)
             ->assign('depth', $config->getDepth())
             ->assign('subject', $config->getMailSubject())
+            ->assign('language', $config->getMailLanguage())
+            ->assign('padLength', 32)
             ->assign('pageId', $pageId);
 
         $replyTo = $config->getMailReplyToEmail();

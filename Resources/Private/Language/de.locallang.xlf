@@ -8,8 +8,74 @@
 				<target>Links prüfen</target>
 			</trans-unit>
 
-			<!-- broken link list -->
+			<!-- broken links email -->
+			<trans-unit id="email.brokenlinksreport.title" resname="email.brokenlinksreport.title">
+				<source>Broken Links Report</source>
+				<target>Bericht über fehlerhafte Links</target>
+			</trans-unit>
+			<!-- header is in subject and used as header in email body -->
+			<trans-unit id="email.brokenlinksreport.header" resname="email.brokenlinksreport.header">
+				<source>Broken links for page</source>
+				<target>Fehlerhafte Links für Seite</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.broken_links" resname="email.brokenlinksreport.header.broken_links">
+				<source>Broken links</source>
+				<target>Fehlerhafte Links</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.percent_broken_links" resname="email.brokenlinksreport.percent_broken_links">
+				<source>Percent broken links</source>
+				<target>Fehlerhafte Links in Prozent</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.number_broken_links" resname="email.brokenlinksreport.number_broken_links">
+				<source>Number of broken links</source>
+				<target>Anzahl fehlerhafte Links</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.number_links_checked" resname="email.brokenlinksreport.number_links_checked">
+				<source>Total links checked</source>
+				<target>Anzahl Links (gesamt)</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.pages" resname="email.brokenlinksreport.header.pages">
+				<source>Pages checked</source>
+				<target>Seiten</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.depth" resname="email.brokenlinksreport.depth">
+				<source>Depth</source>
+				<target>Tiefe</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.number_of_pages" resname="email.brokenlinksreport.number_of_pages">
+				<source>Number of pages checked</source>
+				<target>Anzahl Seiten</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.depth.infinite" resname="email.brokenlinksreport.depth.infinite">
+				<source>infinite</source>
+				<target>unendlich</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.excluded_urls" resname="email.brokenlinksreport.header.excluded_urls">
+				<source>Excluded URLs</source>
+				<target>Von Prüfung ausgeschlossene URLs</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.links_not_checked" resname="email.brokenlinksreport.links_not_checked">
+				<source>Number of links</source>
+				<target>Anzahl Links</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.links_not_checked_percent" resname="email.brokenlinksreport.links_not_checked_percent">
+				<source>Percent links</source>
+				<target>Anzahl Links in Prozent</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.header.check" resname="email.brokenlinksreport.header.check">
+				<source>Check</source>
+				<target>Prüfung</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.check.start" resname="email.brokenlinksreport.check.start">
+				<source>Started</source>
+				<target>Gestarted</target>
+			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.check.done" resname="email.brokenlinksreport.check.done">
+				<source>Done</source>
+				<target>Beendet</target>
+			</trans-unit>
 
+			<!-- broken link list -->
 			<trans-unit id="list.header" resname="list.header">
 				<source>Broken links</source>
 				<target>Fehlerhafte Links</target>
