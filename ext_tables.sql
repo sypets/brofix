@@ -3,6 +3,7 @@
 CREATE TABLE tx_brofix_broken_links (
 	uid int(11) NOT NULL auto_increment,
 	tstamp int(11) DEFAULT '0' NOT NULL,
+    crdate int(11) DEFAULT '0' NOT NULL,
 	record_uid int(11) DEFAULT '0' NOT NULL,
 	record_pid int(11) DEFAULT '0' NOT NULL,
 	language int(11) DEFAULT '-1' NOT NULL,
