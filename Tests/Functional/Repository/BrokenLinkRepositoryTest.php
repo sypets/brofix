@@ -221,6 +221,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $this->importDataSet($inputFile);
         $brokenLinksRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class, $brokenLinksRepository);
+        // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
         $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
