@@ -15,9 +15,6 @@ Broken Link Fixer
 :Language:
       en
 
-:Copyright:
-      Since 2000
-
 :Author:
       Sybille Peters et al. (see :ref:`credits`)
 

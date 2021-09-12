@@ -51,7 +51,9 @@ Credits
 =======
 
 This extension is based on the TYPO3 core extension
-`EXT:linkvalidator <https://github.com/TYPO3-CMS/linkvalidator>`__.
+`EXT:linkvalidator <https://github.com/TYPO3-CMS/linkvalidator>`__. It was
+forked from the source code of linkvalidator. Thus, it is based on the work
+of the original authors and maintainers.
 
 
 
