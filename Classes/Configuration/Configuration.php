@@ -111,6 +111,14 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function getEnable(): bool
+    {
+        return (bool)($this->tsConfig['enable'] ?? true);
+    }
+
+    /**
      * @param array<string,array<string>> $searchFields, e.g.
      *   [
      *      'tt_content' => ['bodytext', 'media']

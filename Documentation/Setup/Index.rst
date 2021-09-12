@@ -13,4 +13,5 @@ Setup
    :titlesonly:
 
    Quickstart
+   ConsoleCommands
    Reference
