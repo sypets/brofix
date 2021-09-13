@@ -265,11 +265,13 @@ class LinkAnalyzer implements LoggerAwareInterface
     ): bool {
         $selectFields = $this->getSelectFields($table, [$field]);
         $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
-
+        $startTime = \time();
         $header = $row['header'] ?: $recordUid;
         if (!$row) {
             // missing record: remove existing links
             $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
+            // remove existing broken links from table
+            $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
             return true;
         }
 
@@ -283,7 +285,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         $resultsLinks = [];
         $this->findLinksForRecord($resultsLinks, $table, [$field], $row, false);
-        $startTime = \time();
+
         if ($resultsLinks) {
             $flags = AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY | AbstractLinktype::CHECK_LINK_FLAG_SYNCHRONOUS;
             // find all broken links for list of links
