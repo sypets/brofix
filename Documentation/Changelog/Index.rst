@@ -18,6 +18,10 @@ Changelog
 *  Change order of settings in check links email report
 *  Add additional setting mod.brofix.mail.language to set the
    language of the email report.
+*  Do not check records of default language if l18n_cfg is 1 or 3
+   ("Hide default language of page")
+*  Also consider if records should be checked on page if rechecking
+   URL or fields.
 
 2.1.1
 =====

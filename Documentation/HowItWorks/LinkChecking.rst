@@ -11,8 +11,8 @@ Link checking
 When link checking is done
 ==========================
 
-#. Via console command, a full link check of the entire sites or specific pages
-   can be performed
+#. Via console command (or scheduler), a full link check of the entire sites or
+   specific pages can be performed
 
 #. "on-the-fly" checking: When editing a record by pressing the blue "edit" action
    button |edit_action_image| in the list of broken links, a recheck is performed
@@ -24,6 +24,8 @@ When link checking is done
 #. It is possible to manually start (re)checking by pressing the "Check links"
    button |check_links_button_image| in the list. This will check all links on
    the current page and subpages (depending on the selected depth, e.g. 2 levels).
+   This is by default not active for editors (to avoid excessive rechecking),
+   but can be configured to be available.
 
 #. It is possible to recheck the current link by pressing the "Recheck URL"
    button. |recheck_url_action_image| This is faster than the previous option and can
@@ -33,11 +35,26 @@ It is recommended to configure the console command to perform a full check
 regularly (e.g. once a day).
 
 Due to normal editing activity some of the broken link information can become
-outdated between the checks, which can be handled either with the "Recheck URL"
-button (for recheck for one broken link) or with the "Check links" button.
+outdated between the full checks, which can be handled either with the "Recheck URL"
+button (for recheck for one broken link) or with the "Check links" button to
+check an entire page or page and subpages.
 
 The fifth option (Recheck URL) is the only action where the link target cache
 is not used. This can be used to refresh the information about the link target.
+
+What is checked
+===============
+
+By default, links are not checked on hidden records or records on hidden pages.
+In general, if content is not rendered in the frontend, it does not make sense
+to check the content. Thus, the following are also not checked:
+
+*  Content on pages with page type "Shortcut" or "Link to external URL".
+*  Content of default language on pages with the option "Hide default language
+   of page" enabled
+*  Subpages or content on subpages of a hidden page with "Extend to subpages"
+   enabled
+*  Content in a hidden gridelement
 
 Link target cache
 =================

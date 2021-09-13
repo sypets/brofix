@@ -27,6 +27,7 @@ use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\ContentRepository;
+use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -45,6 +46,26 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class LinkAnalyzer implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    /**
+     * @var int
+     */
+    protected const MASK_CONTENT_CHECK_IF_EDITABLE_FIELD = 1;
+
+    /**
+     * @var int
+     */
+    protected const MASK_CONTENT_CHECK_IF_RECORD_SHOULD_BE_CHECKED = 2;
+
+    /**
+     * @var int
+     */
+    protected const MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED = 4;
+
+    /**
+     * @var int
+     */
+    protected const MASK_CONTENT_CHECK_ALL = 0xff;
 
     /**
      * Array of tables and fields to search for broken links
@@ -83,6 +104,11 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected $contentRepository;
 
     /**
+     * @var PagesRepository
+     */
+    protected $pagesRepository;
+
+    /**
      * @var FormDataCompiler
      */
     protected $formDataCompiler;
@@ -97,11 +123,13 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository = null,
-        ContentRepository $contentRepository = null
+        ContentRepository $contentRepository = null,
+        PagesRepository $pagesRepository = null
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->contentRepository = $contentRepository ?: GeneralUtility::makeInstance(ContentRepository::class);
+        $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
 
         // Hook to handle own checks
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
@@ -176,8 +204,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $results,
                     $record['table'],
                     [$record['field']],
-                    $row,
-                    true
+                    $row
                 );
                 $urls = [];
                 foreach ($results[$linkType] ?? [] as $entryValue) {
@@ -284,7 +311,13 @@ class LinkAnalyzer implements LoggerAwareInterface
             return false;
         }
         $resultsLinks = [];
-        $this->findLinksForRecord($resultsLinks, $table, [$field], $row, false);
+        $this->findLinksForRecord(
+            $resultsLinks,
+            $table,
+            [$field],
+            $row,
+            self::MASK_CONTENT_CHECK_ALL-self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
+        );
 
         if ($resultsLinks) {
             $flags = AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY | AbstractLinktype::CHECK_LINK_FLAG_SYNCHRONOUS;
@@ -470,12 +503,22 @@ class LinkAnalyzer implements LoggerAwareInterface
                 while ($row = $result->fetch()) {
                     $results = [];
                     $l18nCfg = (int)($row['l18n_cfg'] ?? 0);
-                    $lang = (int)($row['sys_language_uid'] ?? 0);
-                    if (($l18nCfg ===1 || $l18nCfg === 3) && $lang ===0) {
+                    $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
+                    $lang = 0;
+                    if ($languageField) {
+                        $lang = (int)($record[$languageField] ?? 0);
+                    }
+                    if (($l18nCfg === 1 || $l18nCfg === 3) && $lang ===0) {
                         // do not render records of default language due to setting l18n_cfg in page
                         continue;
                     }
-                    $this->findLinksForRecord($results, $table, $fields, $row);
+                    $this->findLinksForRecord(
+                        $results,
+                        $table,
+                        $fields,
+                        $row,
+                        self::MASK_CONTENT_CHECK_ALL - self::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
+                    );
                     $this->statistics->addCountLinks($this->countLinks($results));
                     $this->checkLinks($results, $linkTypes);
                 }
@@ -547,15 +590,14 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param string $table Table name of the record
      * @param array<string> $fields Array of fields to analyze
      * @param mixed[] $record Record to analyze
-     * @param bool $checkIfEditable should check if field is editable, this can be skipped if the information
-     *        is already available (for performance reasons)
+     * @param int $checks what checks should be performed. (Default is: all checks enabled)
      */
     public function findLinksForRecord(
         array &$results,
         $table,
         array $fields,
         array $record,
-        bool $checkIfEditable = true
+        int $checks = self::MASK_CONTENT_CHECK_ALL
     ): void {
         $idRecord = (int)($record['uid'] ?? 0);
         try {
@@ -563,11 +605,19 @@ class LinkAnalyzer implements LoggerAwareInterface
             /** @var HtmlParser $htmlParser */
             $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
 
-            if ($this->isRecordShouldBeChecked($table, $record) === false) {
-                return;
+            if ($checks & self::MASK_CONTENT_CHECK_IF_RECORD_SHOULD_BE_CHECKED) {
+                if ($this->isRecordShouldBeChecked($table, $record) === false) {
+                    return;
+                }
             }
 
-            if ($checkIfEditable) {
+            if ($checks & self::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED) {
+                if ($this->isRecordsOnPageShouldBeChecked($table, $record) === false) {
+                    return;
+                }
+            }
+
+            if ($checks & self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD) {
                 $fields = $this->getEditableFields($idRecord, $table, $fields);
             }
 
@@ -737,7 +787,6 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
     }
 
-
     /**
      * Check if a record is visible in the Frontend. This concerns whether
      * a record has the "hidden" field set, but also considers other factors
@@ -791,6 +840,49 @@ class LinkAnalyzer implements LoggerAwareInterface
                     return false;
                 }
             }
+        }
+        return true;
+    }
+
+    /**
+     * Check if records should be checked by checking the page
+     *
+     * - is not hidden
+     * - is not doktype=3 or 4
+     * - is not record of default language and cfg_l18n is 1 or 3
+     *
+     * @param string $table
+     * @param array<mixed> $record
+     * @return bool
+     */
+    public function isRecordsOnPageShouldBeChecked(string $table, array $record): bool
+    {
+        if ($table === 'pages') {
+            return true;
+        }
+        $pageUid = $record['pid'] ?? 0;
+        if ($pageUid === 0) {
+            return false;
+        }
+        $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
+        if (!$pageRow) {
+            return false;
+        }
+        $doktype = (int)($pageRow['doktype'] ?? 0);
+        if ($doktype === 3 || $doktype === 4) {
+            return false;
+        }
+        $l18nCfg = (int)($pageRow['l18n_cfg'] ?? 0);
+        $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
+        $lang = 0;
+        if ($languageField) {
+            $lang = (int)($record[$languageField] ?? 0);
+        }
+        if (($l18nCfg === 3 || $l18nCfg === 1) && $lang === 0) {
+            return false;
+        }
+        if ($this->pagesRepository->getRootLineIsHidden($pageRow)) {
+            return false;
         }
         return true;
     }
