@@ -26,6 +26,37 @@ In most cases, you should set values for the following properties (see
    :local:
    :depth: 1
 
+.. _tsconfigEnable:
+
+enable
+======
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.enable
+
+   Data type
+      int
+
+   Description
+      Can be used to disable link checking for a site. By default,
+      link checking is enabled.
+
+
+   Example
+
+      .. code-block:: typoscript
+
+         mod.brofix.enable = 0
+
+   Default
+      1
+
+
+
 .. _tsconfigSearchfields:
 
 searchFields.[table]

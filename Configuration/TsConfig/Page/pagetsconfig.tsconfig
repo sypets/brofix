@@ -1,4 +1,6 @@
 mod.brofix {
+  enable = 1
+
 	searchFields {
 		pages = media,url
 		tt_content = bodytext,header_link,records

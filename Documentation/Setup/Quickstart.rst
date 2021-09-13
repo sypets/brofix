@@ -48,15 +48,9 @@ Steps
 
    Go to Environment > Test Mail Setup
 
-#. Setup the console command `brofix:checkLinks`
+#. Setup the console command :ref:`brofix:checkLinks <console-command-checkLinks>`
 
-   This will use the settings from the TSconfig configuration.
-   If no start pages are supplied as arguments, all start pages
-   that have a site configuration are used.
-
-   You can run the console command from the command line (or cron).
-
-   Do not execute link checking, just show what configuration is used:
+   **dry-run**: Do not execute link checking, just show what configuration is used:
 
    .. code-block:: shell
 
@@ -68,18 +62,16 @@ Steps
 
        vendor/bin/typo3 brofix:checklinks
 
-   Execute link checking, send an email to `webmaster@example.org`:
+   It is recommended to run this regularly (e.g. via cron or scheduler), for
+   example once a day.
+
+   You can also run an :ref:`incremental check <console-command-checkLinksInc>`
+   more frequently (e.g. every minute):
 
    .. code-block:: shell
 
-       vendor/bin/typo3 brofix:checklinks --to webmaster@example.org
+      vendor/bin/typo3 brofix:checklinksInc
 
-   .. code-block:: shell
-
-      # Use -h to show all parameters:
-      vendor/bin/typo3 brofix:checklinks -h
-
-   Or set it up via the scheduler: "Execute console commands > brofix:checklinks".
 
 
 .. _minimalConfig:

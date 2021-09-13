@@ -246,6 +246,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      *
      * This will recheck all URLs in the record using link target cache.
      *
+     * @param string $message Will contain message (unless null is passed)
      * @param array<string> $linkTypes
      * @param int $recordUid uid of record to check
      * @param string $table
@@ -269,14 +270,18 @@ class LinkAnalyzer implements LoggerAwareInterface
         $header = $row['header'] ?: $recordUid;
         if (!$row) {
             // missing record: remove existing links
-            $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
+            if ($message !== null) {
+                $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
+            }
             return true;
         }
         if ($beforeEditedTimestamp && isset($row['timestamp']) && $beforeEditedTimestamp >= (int)$row['timestamp']) {
             // if timestamp of record is not after $beforeEditedTimestamp: no need to recheck
-            $message = $this->getLanguageService()->getLL('list.recheck.message.notchanged');
-            if ($message) {
-                $message = sprintf($message, $header);
+            if ($message !== null) {
+                $message = $this->getLanguageService()->getLL('list.recheck.message.notchanged');
+                if ($message) {
+                    $message = sprintf($message, $header);
+                }
             }
             return false;
         }
@@ -290,7 +295,9 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         // remove existing broken links from table
         $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
-        $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.checked'), $header);
+        if ($message !== null) {
+            $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.checked'), $header);
+        }
         return true;
     }
 

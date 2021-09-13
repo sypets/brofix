@@ -29,10 +29,22 @@ services:
         event: TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent
         method: 'checkFileLink'
 
+  # Cache
+  cache.brofix_checklinkcache:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontentInterface
+    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
+    arguments: ['brofix_checklinkcache']
+
   # Commands
   Sypets\Brofix\Command\CheckLinksCommand:
     tags:
       - name: 'console.command'
         command: 'brofix:checklinks'
         description: 'Check for broken links'
+        hidden: false
+  Sypets\Brofix\Command\CheckLinksIncrementalCommand:
+    tags:
+      - name: 'console.command'
+        command: 'brofix:checklinksInc'
+        description: 'Check for broken links (incremental)'
         hidden: false
