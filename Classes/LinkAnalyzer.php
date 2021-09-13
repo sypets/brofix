@@ -272,6 +272,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
             return true;
         }
+
         if ($beforeEditedTimestamp && isset($row['timestamp']) && $beforeEditedTimestamp >= (int)$row['timestamp']) {
             // if timestamp of record is not after $beforeEditedTimestamp: no need to recheck
             $message = $this->getLanguageService()->getLL('list.recheck.message.notchanged');
@@ -445,16 +446,13 @@ class LinkAnalyzer implements LoggerAwareInterface
                     );
                     $constraints[] = $queryBuilder->expr()->neq('p.doktype', $queryBuilder->createNamedParameter(3, \PDO::PARAM_INT));
                     $constraints[] =$queryBuilder->expr()->neq('p.doktype', $queryBuilder->createNamedParameter(4, \PDO::PARAM_INT));
-                    if ($table === 'tt_content') {
-                        $excludedCtypes = $this->configuration->getExcludedCtypes();
-                        if ($excludedCtypes !== []) {
-                            $constraints[] =$queryBuilder->expr()->notIn('CType', $queryBuilder->createNamedParameter($excludedCtypes, Connection::PARAM_STR_ARRAY));
-                        }
-                    }
+
                     $tmpFields = [];
                     foreach ($selectFields as $field) {
                         $tmpFields[] = $table . '.' . $field . ' AS ' . $field;
                     }
+                    // add l18n_cfg to check for option: Hide default language of page
+                    $tmpFields[] = 'p.l18n_cfg';
                     $selectFields = $tmpFields;
                 }
 
@@ -469,6 +467,12 @@ class LinkAnalyzer implements LoggerAwareInterface
 
                 while ($row = $result->fetch()) {
                     $results = [];
+                    $l18nCfg = (int)($row['l18n_cfg'] ?? 0);
+                    $lang = (int)($row['sys_language_uid'] ?? 0);
+                    if (($l18nCfg ===1 || $l18nCfg === 3) && $lang ===0) {
+                        // do not render records of default language due to setting l18n_cfg in page
+                        continue;
+                    }
                     $this->findLinksForRecord($results, $table, $fields, $row);
                     $this->statistics->addCountLinks($this->countLinks($results));
                     $this->checkLinks($results, $linkTypes);
@@ -557,34 +561,16 @@ class LinkAnalyzer implements LoggerAwareInterface
             /** @var HtmlParser $htmlParser */
             $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
 
-            if ($checkIfEditable) {
-                // check if the field to be checked will be rendered in FormEngine
-                // if not, the field should not be checked for broken links because it can't be edited in BE
-                $formDataCompilerInput = [
-                    'tableName' => $table,
-                    'vanillaUid' => $idRecord,
-                    'command' => 'edit',
-                ];
-                // we need TcaColumnsProcessShowitem
-                $formData = $this->formDataCompiler->compile($formDataCompilerInput);
-                $columns = $formData['processedTca']['columns'] ?? [];
+            if ($this->isRecordShouldBeChecked($table, $record) === false) {
+                return;
+            }
 
-                // if gridelements and in gridelement, check if parent is hidden
-                if ($table === 'tt_content'
-                    && ((int)($record['colPos'] ?? 0)) == -1
-                    && ExtensionManagementUtility::isLoaded('gridelements')
-                    && $this->contentRepository->isGridElementParentHidden($idRecord)
-                ) {
-                    return;
-                }
+            if ($checkIfEditable) {
+                $fields = $this->getEditableFields($idRecord, $table, $fields);
             }
 
             // Get all references
             foreach ($fields as $field) {
-                if ($checkIfEditable && !isset($columns[$field])) {
-                    continue;
-                }
-
                 $conf = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
 
@@ -747,6 +733,98 @@ class LinkAnalyzer implements LoggerAwareInterface
             $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['link_title'] = $title;
             $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['pageAndAnchor'] = $referencedRecordType;
         }
+    }
+
+
+    /**
+     * Check if a record is visible in the Frontend. This concerns whether
+     * a record has the "hidden" field set, but also considers other factors
+     * such as if the element is in a hidden gridelement.
+     *
+     * This function does not
+     *
+     * @param string $tablename
+     * @param array<mixed> $row
+     * @return bool
+     */
+    public function isVisibleFrontendRecord(string $tablename, array $row): bool
+    {
+        $uid = (int)($record['uid'] ?? 0);
+        if ($row['hidden'] ?? false) {
+            return false;
+        }
+        // if gridelements and in gridelement, check if parent is hidden
+        if ($tablename === 'tt_content'
+            && ((int)($row['colPos'] ?? 0)) == -1
+            && ExtensionManagementUtility::isLoaded('gridelements')
+            && $this->contentRepository->isGridElementParentHidden($uid)
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * When checking links, there are several criteria for records / fields
+     * which should not be checked.
+     *
+     * These are records / fields which
+     * - are not rendered in the FE
+     * - excluded from checking
+     *
+     * @param string $tablename
+     * @param array<mixed> $row
+     * @return bool
+     */
+    public function isRecordShouldBeChecked(string $tablename, array $row): bool
+    {
+        if ($this->isVisibleFrontendRecord($tablename, $row) === false) {
+            return false;
+        }
+
+        if ($tablename === 'tt_content') {
+            $excludedCtypes = $this->configuration->getExcludedCtypes();
+            if ($excludedCtypes !== [] && $row['CType'] ?? false) {
+                if (in_array($row['CType'], $excludedCtypes)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Return the editable fields of a record (using FormEngine).
+     *
+     * @param int $uid
+     * @param string $tablename
+     * @param string[] $fields
+     * @return string[]
+     */
+    public function getEditableFields(int $uid, string $tablename, array $fields): array
+    {
+        if ($fields === []) {
+            return [];
+        }
+        // check if the field to be checked will be rendered in FormEngine
+        // if not, the field should not be checked for broken links because it can't be edited in BE
+        $formDataCompilerInput = [
+            'tableName' => $tablename,
+            'vanillaUid' => $uid,
+            'command' => 'edit',
+        ];
+        // we need TcaColumnsProcessShowitem
+        $formData = $this->formDataCompiler->compile($formDataCompilerInput);
+        $columns = $formData['processedTca']['columns'] ?? [];
+        if ($columns === []) {
+            return [];
+        }
+        foreach ($fields as $key => $field) {
+            if (!isset($columns[$field])) {
+                unset($fields[$key]);
+            }
+        }
+        return $fields;
     }
 
     /**
