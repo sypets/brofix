@@ -152,7 +152,6 @@ class PagesRepository
         return false;
     }
 
-
     /**
      * Add page translations to list of pages
      *
