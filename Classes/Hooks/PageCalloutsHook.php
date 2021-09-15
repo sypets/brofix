@@ -52,12 +52,17 @@ final class PageCalloutsHook
         $lang = $this->getLanguageService();
 
         // todo: access check
-        if ($this->brokenLinkRepository->hasPageBrokenLinks($pageId)) {
+        $count = $this->brokenLinkRepository->getLinkCountForPage($pageId);
+        if ($count !== 0) {
             $title = '';
             $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-            $uri = (string)$uriBuilder->buildUriFromRoute('web_info', ['id' => $pageId]) . '&SET[function]=Sypets\\Brofix\\View\\BrofixReport';
-            $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:broken_links_found_for_page');
-            //$message .= '<p><a class="btn btn-info" href="javascript:top.goToModule(\'web_info\',1, \'SET[function]=Sypets%5C%5CBrofix%5C%5CView%5C%5CBrofixReport\');">';
+            $uri = (string)($uriBuilder->buildUriFromRoute('web_info', ['id' => $pageId]) . '&SET[function]=Sypets\\Brofix\\View\\BrofixReport');
+            $message = sprintf(
+                ($count === 1 ? $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_singular_broken_links_found_for_page')
+                        : $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_plural_broken_links_found_for_page'))
+                        ?: '%d broken links were found on this page',
+                $count
+            );
             $message .= '<p><a class="btn btn-info" href="' . $uri . '">';
             $message .= $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:go_to_info_modul')
                 . '</a> '

@@ -134,8 +134,25 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param int $pageId
      * @param bool $withEditableByUser if true, only count broken links for records editable by user
      * @return bool
+     *
+     * @todo use $withEditableByUser
      */
     public function hasPageBrokenLinks(int $pageId, bool $withEditableByUser = true): bool
+    {
+        $count = $this->getLinkCountForPage($pageId, $withEditableByUser);
+        return $count !== 0;
+    }
+
+    /**
+     * Check if current page has broken links editable by user
+     *
+     * @param int $pageId
+     * @param bool $withEditableByUser if true, only count broken links for records editable by user
+     * @return int
+     *
+     * @todo use $withEditableByUser
+     */
+    public function getLinkCountForPage(int $pageId, bool $withEditableByUser = true): int
     {
         $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
@@ -162,7 +179,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
             )
             ->execute()
             ->fetchColumn(0);
-        return $count !== 0;
+        return $count ?: 0;
     }
 
     /**
