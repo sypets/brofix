@@ -851,7 +851,7 @@ class BrofixReport
             $variables['table'] = $table;
             $variables['field'] = $row['field'] ?? '';
         }
-        $variables['elementType'] = $this->getLanguageSplitLabel($GLOBALS['TCA'][$table]['ctrl']['title']);
+        $variables['elementType'] = $this->getLanguageSplitLabel($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
         // Get the language label for the field from TCA
         $fieldName = '';
         if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']) {
