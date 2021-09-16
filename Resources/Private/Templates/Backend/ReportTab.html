@@ -51,7 +51,6 @@
 				</f:link.external>
 			</f:if>
 		</form>
-		<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy}" />
 	</div>
 </f:section>
 
@@ -168,6 +167,7 @@
 				</f:for>
 				</tbody>
 			</table>
+			<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy}" />
 		</f:then>
 	</f:if>
 </f:section>
