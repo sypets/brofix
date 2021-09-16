@@ -24,8 +24,6 @@ mod.brofix {
           #
           User-Agent =
           Accept = */*
-          Accept-Language = *
-          Accept-Encoding = *
         }
         timeout = 10
         redirects = 5
