@@ -22,6 +22,11 @@ Changelog
    ("Hide default language of page")
 *  Also consider if records should be checked on page if rechecking
    URL or fields.
+*  Optimize external link checking: Do not use extra headers
+   Accept-Language and Accept-Encoding by default. This causes problems with
+   some websites.
+*  Optimize pagination: Do not show pagination controls if there is
+   only one page
 
 2.1.1
 =====
