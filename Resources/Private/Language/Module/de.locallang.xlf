@@ -66,7 +66,7 @@
 			</trans-unit>
 			<trans-unit id="list.recheck.url.ok.removed" resname="list.recheck.url.ok.removed">
 				<source>URL %s was rechecked as valid. Removed %d broken link entries.</source>
-				<target>URL %s wurde neu geprüft und als nicht fehlerhaft befunden. %d Einträge f. fehlerhafte Links entfernt</target>
+				<target>URL %s wurde neu geprüft und als nicht fehlerhaft befunden. %d Einträge für fehlerhafte Links entfernt</target>
 			</trans-unit>
 			<trans-unit id="list.recheck.url.notok.removed" resname="list.recheck.url.notok.removed">
 				<source>URL %s was rechecked as still invalid but no longer exists in record. Number of broken link entries removed: %d</source>

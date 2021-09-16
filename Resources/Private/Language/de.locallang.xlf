@@ -88,9 +88,13 @@
 				<source>Refreshing link list, please stand by.</source>
 				<target>Linkliste wird aktualisiert.</target>
 			</trans-unit>
-			<trans-unit id="list.action.checkLinks" resname="list.action.checkLinks">
-				<source>Check links</source>
+			<trans-unit id="list.button.checkLinks" resname="list.button.checkLinks">
+				<source>Check Links</source>
 				<target>Links prüfen</target>
+			</trans-unit>
+			<trans-unit id="list.action.checkLinks" resname="list.action.checkLinks">
+				<source>Checking Links. This may take a while.</source>
+				<target>Links werden geprüft. Dies kann eine Weile dauern.</target>
 			</trans-unit>
 			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
 				<source>Broken link information may be outdated.</source>
