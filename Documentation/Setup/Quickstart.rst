@@ -140,8 +140,8 @@ Set the logo used in the Fluid email in the EXT:backend extension configuration:
 
 .. _tsconfigMinimal:
 
-TSconfig
---------
+Page TSconfig
+-------------
 
 .. code-block:: typoscript
 
