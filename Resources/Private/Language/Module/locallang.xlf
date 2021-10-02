@@ -74,19 +74,6 @@
 			<trans-unit id="list.edit" resname="list.edit">
 				<source>Edit element containing this broken link</source>
 			</trans-unit>
-			<trans-unit id="list.field" resname="list.field">
-				<source>(Field: %s)</source>
-			</trans-unit>
-			<trans-unit id="list.no.headline" resname="list.no.headline">
-				<source>no headline</source>
-			</trans-unit>
-
-
-			<!-- Error messages for email -->
-
-			<trans-unit id="list.report.error.email.invalid" resname="list.report.error.email.invalid">
-				<source>Email is invalid.</source>
-			</trans-unit>
 
 			<!-- Error messages for pages -->
 
@@ -123,23 +110,6 @@
 				<source>Element is not visible.</source>
 			</trans-unit>
 
-			<!-- deprecated -->
-			<trans-unit id="list.report.contentnotexisting" resname="list.report.contentnotexisting">
-				<source>Element [###uid###] does not exist.</source>
-			</trans-unit>
-
-			<trans-unit id="list.report.rownotvisible" resname="list.report.rownotvisible">
-				<source>###title### row [###uid###)] is not visible.</source>
-			</trans-unit>
-			<trans-unit id="list.report.rowdeleted" resname="list.report.rowdeleted">
-				<source>###title### row [###uid###)] is deleted.</source>
-			</trans-unit>
-			<trans-unit id="list.report.rowdeleted.default.title" resname="list.report.rowdeleted.default.title">
-				<source>Linked</source>
-			</trans-unit>
-			<trans-unit id="list.report.rownotexisting" resname="list.report.rownotexisting">
-				<source>Row [###uid###)] does not exist.</source>
-			</trans-unit>
 			<trans-unit id="list.report.noinformation" resname="list.report.noinformation">
 				<source>No information about the error is available.</source>
 			</trans-unit>
@@ -284,7 +254,7 @@
 			<trans-unit id="list.msg.ok" resname="list.msg.ok">
 				<source>Ok</source>
 			</trans-unit>
-			<trans-unit id="list.rootpage"  resname="list.rootpage">
+			<trans-unit id="list.rootpage" resname="list.rootpage">
 				<source>Select a page in the page tree!</source>
 			</trans-unit>
 			<trans-unit id="list.no.broken.links" resname="list.no.broken.links">
@@ -298,13 +268,6 @@
 			</trans-unit>
 			<trans-unit id="no.access" resname="no.access">
 				<source>You do not have access to these listings.</source>
-			</trans-unit>
-
-			<trans-unit id="broken_links_removed" resname="broken_links_removed">
-				<source>%d broken link(s) removed from list for %s</source>
-			</trans-unit>
-			<trans-unit id="exlude_list" resname="exlude_list">
-				<source>Exclude list</source>
 			</trans-unit>
 		</body>
 	</file>

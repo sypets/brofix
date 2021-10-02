@@ -79,15 +79,6 @@
 			<trans-unit id="list.action.checkLinks" resname="list.action.checkLinks">
 				<source>Checking Links. This may take a while.</source>
 			</trans-unit>
-			<trans-unit id="list.info.freshness.stale" resname="list.info.freshness.stale">
-				<source>Broken link information may be outdated.</source>
-			</trans-unit>
-			<trans-unit id="list.info.freshness.fresh" resname="list.info.freshness.fresh">
-				<source>Broken link information is most likely up to date.</source>
-			</trans-unit>
-			<trans-unit id="list.info.freshness.unknown" resname="list.info.freshness.unknown">
-				<source></source>
-			</trans-unit>
 			<trans-unit id="list.edit.field" resname="list.edit.field">
 				<source>Edit field containing this broken link</source>
 			</trans-unit>

@@ -96,23 +96,8 @@
 				<source>Edit element containing this broken link</source>
 				<target>Editiere Element welches fehlerhaften Link enthält</target>
 			</trans-unit>
-			<trans-unit id="list.field" resname="list.field">
-				<source>(Field: %s)</source>
-				<target>(Feld: %s)</target>
-			</trans-unit>
-			<trans-unit id="list.no.headline" resname="list.no.headline">
-				<source>no headline</source>
-				<target>keine Überschrift</target>
-			</trans-unit>
 
 			<!-- link target error messages -->
-
-			<!-- Error messages for email -->
-
-			<trans-unit id="list.report.error.email.invalid" resname="list.report.error.email.invalid">
-				<source>Email is invalid.</source>
-			</trans-unit>
-
 
 			<!-- Error messages for pages -->
 
@@ -156,28 +141,6 @@
 				<target>Element '###title###' [###uid###] ist verborgen.</target>
 			</trans-unit>
 
-			<!-- deprecated -->
-			<trans-unit id="list.report.contentnotexisting" resname="list.report.contentnotexisting">
-				<source>Element [###uid###] does not exist.</source>
-				<target>Element [###uid###] existiert nicht.</target>
-			</trans-unit>
-
-			<trans-unit id="list.report.rownotvisible" resname="list.report.rownotvisible">
-				<source>###title### row [###uid###] is not visible.</source>
-				<target>###title### row [###uid###] is not visible.</target>
-			</trans-unit>
-			<trans-unit id="list.report.rowdeleted" resname="list.report.rowdeleted">
-				<source>###title### [###uid###] is deleted.</source>
-				<source>###title### [###uid###] ist gelöscht.</source>
-			</trans-unit>
-			<trans-unit id="list.report.rowdeleted.default.title" resname="list.report.rowdeleted.default.title">
-				<source>Linked</source>
-				<target>Verlinkt</target>
-			</trans-unit>
-			<trans-unit id="list.report.rownotexisting" resname="list.report.rownotexisting">
-				<source>[###uid###] does not exist.</source>
-				<target>[###uid###] existiert nicht.</target>
-			</trans-unit>
 			<trans-unit id="list.report.noinformation" resname="list.report.noinformation">
 				<source>No information about the error is available.</source>
 				<target>Unbekannter Fehler.</target>
@@ -378,15 +341,6 @@
 			<trans-unit id="no.access" resname="no.access">
 				<source>You do not have access to these listings.</source>
 				<target>Zugriff verweigert!</target>
-			</trans-unit>
-
-			<trans-unit id="broken_links_removed" resname="broken_links_removed">
-				<source>%d broken link(s) removed from list for %s</source>
-				<target>%d fehlerhafte(r) Link(s) wurde entfernt für %s</target>
-			</trans-unit>
-			<trans-unit id="exlude_list" resname="exlude_list">
-				<source>Excluded Links</source>
-				<target>Link Ausschluss</target>
 			</trans-unit>
 		</body>
 	</file>
