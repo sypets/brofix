@@ -80,7 +80,13 @@ class EditableRestriction implements QueryRestrictionInterface
      */
     protected function getAllowedLanguagesForCurrentUser(): array
     {
-        if (!(is_string($GLOBALS['BE_USER']->groupData['allowed_languages'] ?? false))) {
+        /**
+         * Is string of comma-separated languages, e.g. "0,1"
+         *
+         * @var string $allowedLanguages
+         */
+        $allowedLanguages = (string)($GLOBALS['BE_USER']->groupData['allowed_languages'] ?? '');
+        if ($allowedLanguages === '') {
             return [];
         }
 
