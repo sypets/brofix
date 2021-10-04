@@ -90,7 +90,7 @@ class EditableRestriction implements QueryRestrictionInterface
             return [];
         }
 
-        return array_map('intval', explode(',', $GLOBALS['BE_USER']->groupData['allowed_languages']));
+        return array_map('intval', explode(',', $allowedLanguages));
     }
 
     /**
