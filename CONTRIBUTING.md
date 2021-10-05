@@ -9,8 +9,9 @@ checked:
 
 1. Coding guidelines (CGL)
 2. lint
-3. unit tests
-4. functional tests
+3. phpstan
+4. unit tests
+5. functional tests
 
 For more information, see the file .github/workflows/tests.yml and
 the documentation on https://docs.typo3.org/m/typo3/reference-coreapi/10.4/en-us/Testing/ExtensionTesting.html.
