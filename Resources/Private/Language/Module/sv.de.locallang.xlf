@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns:t3="http://typo3.org/schemas/xliff" version="1.0">
+  <file t3:id="1415814894" source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang.xlf" date="2011-10-17T20:22:34Z" product-name="brofix" target-language="sv-SE">
+    <header/>
+    <body>
+      <trans-unit id="brofix" resname="brofix">
+        <source>Broken Link Fixer</source>
+        <target state="needs-translation">Broken Link Fixer</target>
+      </trans-unit>
+      <trans-unit id="Report" resname="Report">
+        <source>Report</source>
+        <target state="needs-translation">Report</target>
+      </trans-unit>
+      <trans-unit id="report.func.title" resname="report.func.title">
+        <source>Show this level</source>
+        <target state="needs-translation">Show this level</target>
+      </trans-unit>
+      <trans-unit id="list.status.check.done" resname="list.status.check.done">
+        <source>Check links done</source>
+        <target state="needs-translation">Check links done</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.page" resname="list.tableHead.page">
+        <source>Page</source>
+        <target state="needs-translation">Page</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.element" resname="list.tableHead.element">
+        <source>Element</source>
+        <target state="needs-translation">Element</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.type" resname="list.tableHead.type">
+        <source>Type</source>
+        <target state="needs-translation">Type</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.last_check" resname="list.tableHead.last_check">
+        <source>Checked</source>
+        <target state="needs-translation">Checked</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.url" resname="list.tableHead.url">
+        <source>URL</source>
+        <target state="needs-translation">URL</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.error" resname="list.tableHead.error">
+        <source>Error</source>
+        <target state="needs-translation">Error</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.last_check_url" resname="list.tableHead.last_check_url">
+        <source>Checked</source>
+        <target state="needs-translation">Checked</target>
+      </trans-unit>
+      <trans-unit id="list.tableHead.action" resname="list.tableHead.action">
+        <source>Action</source>
+        <target state="needs-translation">Action</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
+        <source>Recheck links</source>
+        <target state="needs-translation">Recheck links</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.url.title" resname="list.recheck.url.title">
+        <source>Recheck URL</source>
+        <target state="needs-translation">Recheck URL</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.url.ok.removed" resname="list.recheck.url.ok.removed">
+        <source>URL %s was rechecked as valid. Removed %d broken link entries.</source>
+        <target state="needs-translation">URL %s was rechecked as valid. Removed %d broken link entries.</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.url.notok.removed" resname="list.recheck.url.notok.removed">
+        <source>URL %s was rechecked as still invalid but no longer exists in record. Number of broken link entries removed: %d</source>
+        <target state="needs-translation">URL %s was rechecked as still invalid but no longer exists in record. Number of broken link entries removed: %d</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.url.notok.updated" resname="list.recheck.url.notok.updated">
+        <source>URL %s was rechecked as still invalid. Number of broken link entries updated: %d</source>
+        <target state="needs-translation">URL %s was rechecked as still invalid. Number of broken link entries updated: %d</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.url" resname="list.recheck.url">
+        <source>URL %s was rechecked.</source>
+        <target state="needs-translation">URL %s was rechecked.</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.message.checked" resname="list.recheck.message.checked">
+        <source>Rechecked links for record: %s</source>
+        <target state="needs-translation">Rechecked links for record: %s</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.message.removed" resname="list.recheck.message.removed">
+        <source>Record %s was deleted - removed broken links for record</source>
+        <target state="needs-translation">Record %s was deleted - removed broken links for record</target>
+      </trans-unit>
+      <trans-unit id="list.recheck.message.notchanged" resname="list.recheck.message.notchanged">
+        <source>Record %s was not changed - no need to recheck</source>
+        <target state="needs-translation">Record %s was not changed - no need to recheck</target>
+      </trans-unit>
+      <trans-unit id="list.edit" resname="list.edit">
+        <source>Edit element containing this broken link</source>
+        <target state="needs-translation">Edit element containing this broken link</target>
+      </trans-unit>
+      <!-- Error messages for pages -->
+      <trans-unit id="list.report.error.content.notexisting" resname="list.report.error.content.notexisting">
+        <source>Element does not exist.</source>
+        <target state="needs-translation">Element does not exist.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.page.deleted" resname="list.report.error.page.deleted">
+        <source>Page is deleted.</source>
+        <target state="needs-translation">Page is deleted.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.page.notvisible" resname="list.report.error.page.notvisible">
+        <source>Page is hidden.</source>
+        <target state="needs-translation">Page is hidden.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.page.notexisting" resname="list.report.error.page.notexisting">
+        <source>Page does not exist.</source>
+        <target state="needs-translation">Page does not exist.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.contentmoved" resname="list.report.error.contentmoved">
+        <source>Element '###title###' [###uid###] is not located on page ###wrongpage###, but on page ###rightpage###.</source>
+        <target state="needs-translation">Element '###title###' [###uid###] is not located on page ###wrongpage###, but on page ###rightpage###.</target>
+      </trans-unit>
+      <!-- deprecated -->
+      <trans-unit id="list.report.contentdeleted" resname="list.report.contentdeleted">
+        <source>Element '###title###' [###uid###] is deleted.</source>
+        <target state="needs-translation">Element '###title###' [###uid###] is deleted.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.content.deleted" resname="list.report.error.content.deleted">
+        <source>Element is deleted.</source>
+        <target state="needs-translation">Element is deleted.</target>
+      </trans-unit>
+      <!-- deprecated -->
+      <trans-unit id="list.report.contentnotvisible" resname="list.report.contentnotvisible">
+        <source>Element '###title###' [###uid###] is not visible.</source>
+        <target state="needs-translation">Element '###title###' [###uid###] is not visible.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.content.notvisible" resname="list.report.error.content.notvisible">
+        <source>Element is not visible.</source>
+        <target state="needs-translation">Element is not visible.</target>
+      </trans-unit>
+      <trans-unit id="list.report.noinformation" resname="list.report.noinformation">
+        <source>No information about the error is available.</source>
+        <target state="needs-translation">No information about the error is available.</target>
+      </trans-unit>
+      <trans-unit id="list.report.noresponse" resname="list.report.noresponse">
+        <source>External Link not reachable.</source>
+        <target state="needs-translation">External Link not reachable.</target>
+      </trans-unit>
+      <trans-unit id="list.report.url.file" resname="list.report.url.file">
+        <source>File</source>
+        <target state="needs-translation">File</target>
+      </trans-unit>
+      <trans-unit id="list.report.url.page" resname="list.report.url.page">
+        <source>Link to page</source>
+        <target state="needs-translation">Link to page</target>
+      </trans-unit>
+      <trans-unit id="list.report.url.element" resname="list.report.url.element">
+        <source>Element</source>
+        <target state="needs-translation">Element</target>
+      </trans-unit>
+      <!-- link target error messages: external -->
+      <trans-unit id="list.report.error.tooManyRedirects" resname="list.report.error.tooManyRedirects">
+        <source>Too many redirects.</source>
+        <target state="needs-translation">Too many redirects.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.networkexception" resname="list.report.error.networkexception">
+        <source>Network error / invalid domain</source>
+        <target state="needs-translation">Network error / invalid domain</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.other.parse" resname="list.report.networkexception">
+        <source>Unable to parse URI</source>
+        <target state="needs-translation">Unable to parse URI</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.redirectloop" resname="list.report.error.redirectloop">
+        <source>A redirect loop occurred. (%s: %s)</source>
+        <target state="needs-translation">A redirect loop occurred. (%s: %s)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.file.notexisting" resname="list.report.error.file.notexisting">
+        <source>File doesn't exist.</source>
+        <target state="needs-translation">File doesn't exist.</target>
+      </trans-unit>
+      <!-- link target error messages: HTTP Status codes -->
+      <trans-unit id="list.report.error.httpstatus.general" resname="list.report.error.httpstatus.general">
+        <source>HTTP status code=%s.</source>
+        <target state="needs-translation">HTTP status code=%s.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.400" resname="list.report.networkexception">
+        <source>Bad request (400)</source>
+        <target state="needs-translation">Bad request (400)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.401" resname="list.report.networkexception">
+        <source>Unauthorized (401)</source>
+        <target state="needs-translation">Unauthorized (401)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.403" resname="list.report.error.httpstatus.403">
+        <source>Accessing this address is not allowed (403).</source>
+        <target state="needs-translation">Accessing this address is not allowed (403).</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.404" resname="list.report.error.httpstatus.404">
+        <source>The requested url was not found (404)</source>
+        <target state="needs-translation">The requested url was not found (404)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.405" resname="list.report.networkexception">
+        <source>Method not allowed (405)</source>
+        <target state="needs-translation">Method not allowed (405)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.406" resname="list.report.networkexception">
+        <source>Not Acceptable (406)</source>
+        <target state="needs-translation">Not Acceptable (406)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.410" resname="list.report.pagenotfound404">
+        <source>The requested resource is no longer available (410)</source>
+        <target state="needs-translation">The requested resource is no longer available (410)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.414" resname="list.report.pagenotfound404">
+        <source>URI too long (414)</source>
+        <target state="needs-translation">URI too long (414)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.415" resname="list.report.pagenotfound404">
+        <source>Unsupported Media Type (415)</source>
+        <target state="needs-translation">Unsupported Media Type (415)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.429" resname="list.report.pagenotfound404">
+        <source>Too Many Requests (429)</source>
+        <target state="needs-translation">Too Many Requests (429)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.451" resname="list.report.pagenotfound404">
+        <source>Unavailable For Legal Reasons (451)</source>
+        <target state="needs-translation">Unavailable For Legal Reasons (451)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.500" resname="list.report.internalerror500">
+        <source>Internal Server Error (500)</source>
+        <target state="needs-translation">Internal Server Error (500)</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.httpstatus.503" resname="list.report.internalerror500">
+        <source>Service Unavailable (503)</source>
+        <target state="needs-translation">Service Unavailable (503)</target>
+      </trans-unit>
+      <!-- libcurl error messages from https://curl.haxx.se/libcurl/c/libcurl-errors.html -->
+      <!-- ignoring various FTP errors here: 10 - 15, 17, 19  and other error that are unlikely -->
+      <trans-unit id="list.report.error.libcurl.1" resname="list.report.error.libcurl.1">
+        <source>Unsupported protocol.</source>
+        <target state="needs-translation">Unsupported protocol.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.2" resname="list.report.error.libcurl.2">
+        <source>Initialization failed.</source>
+        <target state="needs-translation">Initialization failed.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.3" resname="list.report.error.libcurl.3">
+        <source>The URL was not properly formatted.</source>
+        <target state="needs-translation">The URL was not properly formatted.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.4" resname="list.report.error.libcurl.4">
+        <source>Feature not supported.</source>
+        <target state="needs-translation">Feature not supported.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.5" resname="list.report.error.libcurl.5">
+        <source>Couldn't resolve proxy.</source>
+        <target state="needs-translation">Couldn't resolve proxy.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.6" resname="list.report.error.libcurl.6">
+        <source>Couldn't resolve host.</source>
+        <target state="needs-translation">Couldn't resolve host.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.7" resname="list.report.error.libcurl.7">
+        <source>Failed to connect to host or proxy.</source>
+        <target state="needs-translation">Failed to connect to host or proxy.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.8" resname="list.report.error.libcurl.8">
+        <source>The remote server sent data that could not be parsed.</source>
+        <target state="needs-translation">The remote server sent data that could not be parsed.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.9" resname="list.report.error.libcurl.9">
+        <source>Access denied.</source>
+        <target state="needs-translation">Access denied.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.16" resname="list.report.error.libcurl.16">
+        <source>Generic HTTP/2 error.</source>
+        <target state="needs-translation">Generic HTTP/2 error.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.18" resname="list.report.error.libcurl.18">
+        <source>A file transfer was shorter or larger than expected.</source>
+        <target state="needs-translation">A file transfer was shorter or larger than expected.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.28" resname="list.report.error.libcurl.28">
+        <source>Timeout: The remote server possibly took too long to answer.</source>
+        <target state="needs-translation">Timeout: The remote server possibly took too long to answer.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.35" resname="list.report.error.libcurl.35">
+        <source>Problem with SSl / TLS handshake.</source>
+        <target state="needs-translation">Problem with SSl / TLS handshake.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.47" resname="list.report.error.libcurl.47">
+        <source>Too many redirects.</source>
+        <target state="needs-translation">Too many redirects.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.51" resname="list.report.error.libcurl.51">
+        <source>SSL / TLS certificate not OK.</source>
+        <target state="needs-translation">SSL / TLS certificate not OK.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.55" resname="list.report.error.libcurl.55">
+        <source>General network error. Send failed.</source>
+        <target state="needs-translation">General network error. Send failed.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.56" resname="list.report.error.libcurl.56">
+        <source>General network error. Receive failed.</source>
+        <target state="needs-translation">General network error. Receive failed.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.60" resname="list.report.error.libcurl.60">
+        <source>SSL / TLS certificate not OK.</source>
+        <target state="needs-translation">SSL / TLS certificate not OK.</target>
+      </trans-unit>
+      <trans-unit id="list.report.error.libcurl.63" resname="list.report.error.libcurl.63">
+        <source>Maximum file size exceeded</source>
+        <target state="needs-translation">Maximum file size exceeded</target>
+      </trans-unit>
+      <trans-unit id="list.msg.ok" resname="list.msg.ok">
+        <source>Ok</source>
+        <target state="needs-translation">Ok</target>
+      </trans-unit>
+      <trans-unit id="list.rootpage" resname="list.rootpage">
+        <source>Select a page in the page tree!</source>
+        <target state="needs-translation">Select a page in the page tree!</target>
+      </trans-unit>
+      <trans-unit id="list.no.broken.links" resname="list.no.broken.links">
+        <source>No broken links!</source>
+        <target state="needs-translation">No broken links!</target>
+      </trans-unit>
+      <trans-unit id="list.no.broken.links.this.page" resname="list.no.broken.links">
+        <source>No broken links on this page!</source>
+        <target state="needs-translation">No broken links on this page!</target>
+      </trans-unit>
+      <trans-unit id="no.access.title" resname="no.access.title">
+        <source>No access!</source>
+        <target state="needs-translation">No access!</target>
+      </trans-unit>
+      <trans-unit id="no.access" resname="no.access">
+        <source>You do not have access to these listings.</source>
+        <target state="needs-translation">You do not have access to these listings.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
