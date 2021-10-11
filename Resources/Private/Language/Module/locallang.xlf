@@ -114,7 +114,7 @@
 				<source>No information about the error is available.</source>
 			</trans-unit>
 			<trans-unit id="list.report.noresponse" resname="list.report.noresponse">
-				<source>External Link not reachable.</source>
+				<source>External page not reachable.</source>
 			</trans-unit>
 			<trans-unit id="list.report.url.file" resname="list.report.url.file">
 				<source>File</source>
