@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns:t3="http://typo3.org/schemas/xliff" version="1.0">
-  <file t3:id="1605200483" source-language="en" target-language="pt-PT" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf" date="2020-11-12T15:22:34Z" product-name="brofix">
+  <file t3:id="1605200483" source-language="en" target-language="pt-BR" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf" date="2020-11-12T15:22:34Z" product-name="brofix">
     <header/>
     <body>
       <trans-unit id="tx_brofix_exclude_link_target" resname="tx_brofix_exclude_link_target">
