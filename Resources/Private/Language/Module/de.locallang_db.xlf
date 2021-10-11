@@ -1,72 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
-	<file t3:id="1605200483" source-language="en" target-language="de" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf" date="2020-11-12T15:22:34Z" product-name="brofix">
-		<header/>
-		<body>
-			<trans-unit id="tx_brofix_exclude_link_target" resname="tx_brofix_exclude_link_target">
-				<source>Do not check URLs</source>
-				<target>URLs von Prüfung ausschließen</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_type" resname="tx_brofix_exclude_link_target.link_type">
-				<source>Link type</source>
-				<target>Link Typ</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_type.external" resname="tx_brofix_exclude_link_target.link_type.external">
-				<source>External</source>
-				<target>Extern</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_type.db" resname="tx_brofix_exclude_link_target.link_type.db">
-				<source>Internal (Pages, content, ...)</source>
-				<target>Intern (Seite, Inhalt, ...)</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_type.file" resname="tx_brofix_exclude_link_target.link_type.file">
-				<source>File</source>
-				<target>Datei</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.match_by" resname="tx_brofix_exclude_link_target.link_type.match_by">
-				<source>Match by</source>
-				<target>Vergleich</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="">
-				<source>exact</source>
-				<target>exakt</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="">
-				<source>domain</source>
-				<target>domain</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_target" resname="">
-				<source>Link target</source>
-				<target>Link Ziel</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="">
-				<source>Enter the URL or domain to match with.</source>
-				<target>URL oder domain</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="">
-				<source>Why should this URL not be checked?</source>
-				<target>Warum sollte diese URL nicht geprüft werden?</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.reason" resname="">
-				<source>Reason</source>
-				<target>Begründung</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="">
-				<source>None given</source>
-				<target>Keine</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="">
-				<source>URL is available (was falsely detected as broken link)</source>
-				<target>URL ist verfügbar (wurde fälschlicherweise als fehlerhaft erkannt)</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.notes" resname="">
-				<source>Notes</source>
-				<target>Notizen</target>
-			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.disabled" resname="tx_brofix_exclude_link_target.disabled">
-				<source>Disable</source>
-				<target>Deaktivieren</target>
-			</trans-unit>
-		</body>
-	</file>
+<xliff xmlns:t3="http://typo3.org/schemas/xliff" version="1.0">
+  <file t3:id="1605200483" source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf" date="2020-11-12T15:22:34Z" product-name="brofix" target-language="de">
+    <header/>
+    <body>
+      <trans-unit id="tx_brofix_exclude_link_target" resname="tx_brofix_exclude_link_target">
+        <source>Exclude URLs</source>
+        <target state="translated">URLs von Prüfung ausschließen</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type" resname="tx_brofix_exclude_link_target.link_type">
+        <source>Link type</source>
+        <target state="translated">Link Typ</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type.external" resname="tx_brofix_exclude_link_target.link_type.external">
+        <source>External</source>
+        <target state="translated">Extern</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type.db" resname="tx_brofix_exclude_link_target.link_type.db">
+        <source>Internal (Pages, content, ...)</source>
+        <target state="translated">Intern (Seite, Inhalt, ...)</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type.file" resname="tx_brofix_exclude_link_target.link_type.file">
+        <source>File</source>
+        <target state="translated">Datei</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by" resname="tx_brofix_exclude_link_target.link_type.match_by">
+        <source>Match by</source>
+        <target state="translated">Vergleich</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="">
+        <source>exact</source>
+        <target state="translated">exakt</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="">
+        <source>domain</source>
+        <target state="needs-translation">domain</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_target" resname="">
+        <source>Link target</source>
+        <target state="translated">Link Ziel</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="">
+        <source>Enter the URL or domain to match with.</source>
+        <target state="translated">URL oder domain</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="">
+        <source>Why should this URL not be checked?</source>
+        <target state="translated">Warum sollte diese URL nicht geprüft werden?</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.reason" resname="">
+        <source>Reason</source>
+        <target state="translated">Begründung</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="">
+        <source>None given</source>
+        <target state="translated">Keine</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="">
+        <source>URL is available (was falsely detected as broken link)</source>
+        <target state="translated">URL ist verfügbar (wurde fälschlicherweise als fehlerhaft erkannt)</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.notes" resname="">
+        <source>Notes</source>
+        <target state="translated">Notizen</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.disabled" resname="tx_brofix_exclude_link_target.disabled">
+        <source>Disable</source>
+        <target state="translated">Deaktivieren</target>
+      </trans-unit>
+    </body>
+  </file>
 </xliff>
