@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+	<file t3:id="1415814894" source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang.xlf" date="2011-10-17T20:22:34Z" product-name="brofix">
+		<header/>
+		<body>
+			<trans-unit id="brofix" resname="brofix">
+				<source>Broken Link Fixer</source>
+			</trans-unit>
+			<trans-unit id="Report" resname="Report">
+				<source>Report</source>
+			</trans-unit>
+			<trans-unit id="report.func.title" resname="report.func.title">
+				<source>Show this level</source>
+			</trans-unit>
+			<trans-unit id="list.status.check.done" resname="list.status.check.done">
+				<source>Check links done</source>
+			</trans-unit>
+
+
+			<trans-unit id="list.tableHead.page" resname="list.tableHead.page">
+				<source>Page</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.element" resname="list.tableHead.element">
+				<source>Element</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.type" resname="list.tableHead.type">
+				<source>Type</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.last_check" resname="list.tableHead.last_check">
+				<source>Checked</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.url" resname="list.tableHead.url">
+				<source>URL</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.error" resname="list.tableHead.error">
+				<source>Error</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.last_check_url" resname="list.tableHead.last_check_url">
+				<source>Checked</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.action" resname="list.tableHead.action">
+				<source>Action</source>
+			</trans-unit>
+
+
+
+			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
+				<source>Recheck links</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.title" resname="list.recheck.url.title">
+				<source>Recheck URL</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.ok.removed" resname="list.recheck.url.ok.removed">
+				<source>URL %s was rechecked as valid. Removed %d broken link entries.</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.notok.removed" resname="list.recheck.url.notok.removed">
+				<source>URL %s was rechecked as still invalid but no longer exists in record. Number of broken link entries removed: %d</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.url.notok.updated" resname="list.recheck.url.notok.updated">
+				<source>URL %s was rechecked as still invalid. Number of broken link entries updated: %d</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.url" resname="list.recheck.url">
+				<source>URL %s was rechecked.</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.message.checked" resname="list.recheck.message.checked">
+				<source>Rechecked links for record: %s</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.message.removed" resname="list.recheck.message.removed">
+				<source>Record %s was deleted - removed broken links for record</source>
+			</trans-unit>
+			<trans-unit id="list.recheck.message.notchanged" resname="list.recheck.message.notchanged">
+				<source>Record %s was not changed - no need to recheck</source>
+			</trans-unit>
+			<trans-unit id="list.edit" resname="list.edit">
+				<source>Edit element containing this broken link</source>
+			</trans-unit>
+
+			<!-- Error messages for pages -->
+
+			<trans-unit id="list.report.error.content.notexisting" resname="list.report.error.content.notexisting">
+				<source>Element does not exist.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.page.deleted" resname="list.report.error.page.deleted">
+				<source>Page is deleted.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.page.notvisible" resname="list.report.error.page.notvisible">
+				<source>Page is hidden.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.page.notexisting" resname="list.report.error.page.notexisting">
+				<source>Page does not exist.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.contentmoved" resname="list.report.error.contentmoved">
+				<source>Element '###title###' [###uid###] is not located on page ###wrongpage###, but on page ###rightpage###.</source>
+			</trans-unit>
+			<!-- deprecated -->
+			<trans-unit id="list.report.contentdeleted" resname="list.report.contentdeleted">
+				<source>Element '###title###' [###uid###] is deleted.</source>
+			</trans-unit>
+
+			<trans-unit id="list.report.error.content.deleted" resname="list.report.error.content.deleted">
+				<source>Element is deleted.</source>
+			</trans-unit>
+
+			<!-- deprecated -->
+			<trans-unit id="list.report.contentnotvisible" resname="list.report.contentnotvisible">
+				<source>Element '###title###' [###uid###] is not visible.</source>
+			</trans-unit>
+
+			<trans-unit id="list.report.error.content.notvisible" resname="list.report.error.content.notvisible">
+				<source>Element is not visible.</source>
+			</trans-unit>
+
+			<trans-unit id="list.report.noinformation" resname="list.report.noinformation">
+				<source>No information about the error is available.</source>
+			</trans-unit>
+			<trans-unit id="list.report.noresponse" resname="list.report.noresponse">
+				<source>External Link not reachable.</source>
+			</trans-unit>
+			<trans-unit id="list.report.url.file" resname="list.report.url.file">
+				<source>File</source>
+			</trans-unit>
+			<trans-unit id="list.report.url.page" resname="list.report.url.page">
+				<source>Link to page</source>
+			</trans-unit>
+			<trans-unit id="list.report.url.element" resname="list.report.url.element">
+				<source>Element</source>
+			</trans-unit>
+
+
+			<!-- link target error messages: external -->
+
+			<trans-unit id="list.report.error.tooManyRedirects" resname="list.report.error.tooManyRedirects">
+				<source>Too many redirects.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.networkexception" resname="list.report.error.networkexception">
+				<source>Network error / invalid domain</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.other.parse" resname="list.report.networkexception">
+				<source>Unable to parse URI</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.redirectloop" resname="list.report.error.redirectloop">
+				<source>A redirect loop occurred. (%s: %s)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.file.notexisting" resname="list.report.error.file.notexisting">
+				<source>File doesn't exist.</source>
+			</trans-unit>
+
+
+			<!-- link target error messages: HTTP Status codes -->
+			<trans-unit id="list.report.error.httpstatus.general" resname="list.report.error.httpstatus.general">
+				<source>HTTP status code=%s.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.400" resname="list.report.networkexception">
+				<source>Bad request (400)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.401" resname="list.report.networkexception">
+				<source>Unauthorized (401)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.403" resname="list.report.error.httpstatus.403">
+				<source>Accessing this address is not allowed (403).</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.404" resname="list.report.error.httpstatus.404">
+				<source>The requested url was not found (404)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.405" resname="list.report.networkexception">
+				<source>Method not allowed (405)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.406" resname="list.report.networkexception">
+				<source>Not Acceptable (406)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.410" resname="list.report.pagenotfound404">
+				<source>The requested resource is no longer available (410)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.414" resname="list.report.pagenotfound404">
+				<source>URI too long (414)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.415" resname="list.report.pagenotfound404">
+				<source>Unsupported Media Type (415)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.429" resname="list.report.pagenotfound404">
+				<source>Too Many Requests (429)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.451" resname="list.report.pagenotfound404">
+				<source>Unavailable For Legal Reasons (451)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.500" resname="list.report.internalerror500">
+				<source>Internal Server Error (500)</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.httpstatus.503" resname="list.report.internalerror500">
+				<source>Service Unavailable (503)</source>
+			</trans-unit>
+
+
+			<!-- libcurl error messages from https://curl.haxx.se/libcurl/c/libcurl-errors.html -->
+			<!-- ignoring various FTP errors here: 10 - 15, 17, 19  and other error that are unlikely -->
+			<trans-unit id="list.report.error.libcurl.1" resname="list.report.error.libcurl.1">
+				<source>Unsupported protocol.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.2" resname="list.report.error.libcurl.2">
+				<source>Initialization failed.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.3" resname="list.report.error.libcurl.3">
+				<source>The URL was not properly formatted.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.4" resname="list.report.error.libcurl.4">
+				<source>Feature not supported.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.5" resname="list.report.error.libcurl.5">
+				<source>Couldn't resolve proxy.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.6" resname="list.report.error.libcurl.6">
+				<source>Couldn't resolve host.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.7" resname="list.report.error.libcurl.7">
+				<source>Failed to connect to host or proxy.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.8" resname="list.report.error.libcurl.8">
+				<source>The remote server sent data that could not be parsed.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.9" resname="list.report.error.libcurl.9">
+				<source>Access denied.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.16" resname="list.report.error.libcurl.16">
+				<source>Generic HTTP/2 error.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.18" resname="list.report.error.libcurl.18">
+				<source>A file transfer was shorter or larger than expected.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.28" resname="list.report.error.libcurl.28">
+				<source>Timeout: The remote server possibly took too long to answer.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.35" resname="list.report.error.libcurl.35">
+				<source>Problem with SSl / TLS handshake.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.47" resname="list.report.error.libcurl.47">
+				<source>Too many redirects.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.51" resname="list.report.error.libcurl.51">
+				<source>SSL / TLS certificate not OK.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.55" resname="list.report.error.libcurl.55">
+				<source>General network error. Send failed.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.56" resname="list.report.error.libcurl.56">
+				<source>General network error. Receive failed.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.60" resname="list.report.error.libcurl.60">
+				<source>SSL / TLS certificate not OK.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.libcurl.63" resname="list.report.error.libcurl.63">
+				<source>Maximum file size exceeded</source>
+			</trans-unit>
+
+			<trans-unit id="list.msg.ok" resname="list.msg.ok">
+				<source>Ok</source>
+			</trans-unit>
+			<trans-unit id="list.rootpage" resname="list.rootpage">
+				<source>Select a page in the page tree!</source>
+			</trans-unit>
+			<trans-unit id="list.no.broken.links" resname="list.no.broken.links">
+				<source>No broken links!</source>
+			</trans-unit>
+			<trans-unit id="list.no.broken.links.this.page" resname="list.no.broken.links">
+				<source>No broken links on this page!</source>
+			</trans-unit>
+			<trans-unit id="no.access.title" resname="no.access.title">
+				<source>No access!</source>
+			</trans-unit>
+			<trans-unit id="no.access" resname="no.access">
+				<source>You do not have access to these listings.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
