@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns:t3="http://typo3.org/schemas/xliff" version="1.0">
+  <file t3:id="1415814893" source-language="en" target-language="ar" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/locallang.xlf" date="2011-10-17T20:22:34Z" product-name="brofix">
+    <header/>
+    <body>
+      <trans-unit id="mod_brofix" resname="mod_brofix">
+        <source>Broken link fixer</source>
+        <target state="needs-translation">Broken link fixer</target>
+      </trans-unit>
+      <!-- broken links email -->
+      <trans-unit id="email.brokenlinksreport.title" resname="email.brokenlinksreport.title">
+        <source>Broken Links Report</source>
+        <target state="needs-translation">Broken Links Report</target>
+      </trans-unit>
+      <!-- header is in subject and used as header in email body -->
+      <trans-unit id="email.brokenlinksreport.header" resname="email.brokenlinksreport.header">
+        <source>Broken links for page</source>
+        <target state="needs-translation">Broken links for page</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.header.broken_links" resname="email.brokenlinksreport.header.broken_links">
+        <source>Broken links</source>
+        <target state="needs-translation">Broken links</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.percent_broken_links" resname="email.brokenlinksreport.percent_broken_links">
+        <source>Percent broken links</source>
+        <target state="needs-translation">Percent broken links</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.number_broken_links" resname="email.brokenlinksreport.number_broken_links">
+        <source>Number of broken links</source>
+        <target state="needs-translation">Number of broken links</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.number_links_checked" resname="email.brokenlinksreport.number_links_checked">
+        <source>Total links checked</source>
+        <target state="needs-translation">Total links checked</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.header.pages" resname="email.brokenlinksreport.header.pages">
+        <source>Pages checked</source>
+        <target state="needs-translation">Pages checked</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.depth" resname="email.brokenlinksreport.depth">
+        <source>Depth</source>
+        <target state="needs-translation">Depth</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.number_of_pages" resname="email.brokenlinksreport.number_of_pages">
+        <source>Number of pages checked</source>
+        <target state="needs-translation">Number of pages checked</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.depth.infinite" resname="email.brokenlinksreport.depth.infinite">
+        <source>infinite</source>
+        <target state="needs-translation">infinite</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.header.excluded_urls" resname="email.brokenlinksreport.header.excluded_urls">
+        <source>Excluded URLs</source>
+        <target state="needs-translation">Excluded URLs</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.links_not_checked" resname="email.brokenlinksreport.links_not_checked">
+        <source>Number of links</source>
+        <target state="needs-translation">Number of links</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.links_not_checked_percent" resname="email.brokenlinksreport.links_not_checked_percent">
+        <source>Percent links</source>
+        <target state="needs-translation">Percent links</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.header.check" resname="email.brokenlinksreport.header.check">
+        <source>Check</source>
+        <target state="needs-translation">Check</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.check.start" resname="email.brokenlinksreport.check.start">
+        <source>Started</source>
+        <target state="needs-translation">Started</target>
+      </trans-unit>
+      <trans-unit id="email.brokenlinksreport.check.done" resname="email.brokenlinksreport.check.done">
+        <source>Done</source>
+        <target state="needs-translation">Done</target>
+      </trans-unit>
+      <!-- broken link list -->
+      <trans-unit id="list.header" resname="list.header">
+        <source>Broken links</source>
+        <target state="needs-translation">Broken links</target>
+      </trans-unit>
+      <trans-unit id="label_refresh" resname="label_refresh">
+        <source>Refresh display</source>
+        <target state="needs-translation">Refresh display</target>
+      </trans-unit>
+      <trans-unit id="label_refresh-link-list" resname="label_refresh-link-list">
+        <source>Refreshing link list, please stand by.</source>
+        <target state="needs-translation">Refreshing link list, please stand by.</target>
+      </trans-unit>
+      <trans-unit id="list.button.checkLinks" resname="list.button.checkLinks">
+        <source>Check Links</source>
+        <target state="needs-translation">Check Links</target>
+      </trans-unit>
+      <trans-unit id="list.action.checkLinks" resname="list.action.checkLinks">
+        <source>Checking Links. This may take a while.</source>
+        <target state="needs-translation">Checking Links. This may take a while.</target>
+      </trans-unit>
+      <trans-unit id="list.edit.field" resname="list.edit.field">
+        <source>Edit field containing this broken link</source>
+        <target state="needs-translation">Edit field containing this broken link</target>
+      </trans-unit>
+      <trans-unit id="list.action.web_layout" resname="list.action.web_layout">
+        <source>Page layout</source>
+        <target state="needs-translation">Page layout</target>
+      </trans-unit>
+      <trans-unit id="list.action.recheckUrl" resname="list.action.recheckUrl">
+        <source>Recheck URL</source>
+        <target state="needs-translation">Recheck URL</target>
+      </trans-unit>
+      <trans-unit id="list.action.excludeUrl" resname="list.action.excludeUrl">
+        <source>Permanently exclude this URL from URL checking</source>
+        <target state="needs-translation">Permanently exclude this URL from URL checking</target>
+      </trans-unit>
+      <trans-unit id="broken_links_found_for_page" resname="broken_links_found_for_page">
+        <source>Broken links were found on this page</source>
+        <target state="needs-translation">Broken links were found on this page</target>
+      </trans-unit>
+      <trans-unit id="count_singular_broken_links_found_for_page" resname="count_broken_links_found_for_page">
+        <source>%d broken link was found on this page.</source>
+        <target state="needs-translation">%d broken link was found on this page.</target>
+      </trans-unit>
+      <trans-unit id="count_plural_broken_links_found_for_page" resname="count_broken_links_found_for_page">
+        <source>%d broken links were found on this page.</source>
+        <target state="needs-translation">%d broken links were found on this page.</target>
+      </trans-unit>
+      <trans-unit id="go_to_info_modul" resname="go_to_info_modul">
+        <source>Go to the Info module</source>
+        <target state="needs-translation">Go to the Info module</target>
+      </trans-unit>
+      <trans-unit id="and_check_links" resname="and_check_links">
+        <source>and check links</source>
+        <target state="needs-translation">and check links</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
