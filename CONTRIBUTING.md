@@ -4,10 +4,10 @@ Contributions are welcome.
 
 You can contribute in multiple ways, for example:
 
-* Open (issues)[https://github.com/sypets/brofix/issues] to report bugs, make feature requests or ask questions.
+* Open [issues](https://github.com/sypets/brofix/issues) to report bugs, make feature requests or ask questions.
 * Create pull requests to propose changes. For extensive changes, please propose change as issue first.
 * Make changes to the documentation, either by a pull request or by clicking on "Edit on GitHub" in
-  the top right of a (ocumentation page)[https://docs.typo3.org/p/sypets/brofix/master/en-us/Index.html].
+  the top right of a [documentation page](https://docs.typo3.org/p/sypets/brofix/master/en-us/Index.html).
 * Help with translation on [Crowdin](https://crowdin.com/project/typo3-extension-brofix)
 
 [![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
