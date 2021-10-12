@@ -1,7 +1,18 @@
 # Contributing
 
-Contributions are welcome. Please open issues to report bugs and
-create PR to propose changes.
+Contributions are welcome.
+
+You can contribute in multiple ways, for example:
+
+* Open (issues)[https://github.com/sypets/brofix/issues] to report bugs, make feature requests or ask questions.
+* Create pull requests to propose changes. For extensive changes, please propose change as issue first.
+* Make changes to the documentation, either by a pull request or by clicking on "Edit on GitHub" in
+  the top right of a (ocumentation page)[https://docs.typo3.org/p/sypets/brofix/master/en-us/Index.html].
+* Help with translation on [Crowdin](https://crowdin.com/project/typo3-extension-brofix)
+
+[![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
+
+## Development
 
 A similar testing workflow to the TYPO3 core is used. However, it
 is currently not as extensive as the core, but the following is
@@ -16,7 +27,7 @@ checked:
 For more information, see the file .github/workflows/tests.yml and
 the documentation on https://docs.typo3.org/m/typo3/reference-coreapi/10.4/en-us/Testing/ExtensionTesting.html.
 
-## CGL
+### CGL
 
 Please adhere to the TYPO3 core coding Guidelines.
 
@@ -46,7 +57,7 @@ Check **and fix** CGL in PHP files:
 Build/Scripts/runTests.sh -s cgl -v
 ```
 
-## Run all tests
+### Run all tests
 
 
 See all options:
@@ -61,13 +72,13 @@ You can run the tests via Composer:
 composer ci:check
 ```
 
-## Cleanup:
+### Cleanup:
 
 ```
 composer ci:cleanup
 ```
 
-## yarn
+### yarn
 
 To build and minimize css files.
 
