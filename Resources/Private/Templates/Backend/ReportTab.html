@@ -1,7 +1,6 @@
 <f:layout name="TabContent"/>
-
 <f:section name="header">
-	<f:translate key="list.header" extensionName="Brofix">Broken links</f:translate>
+	<f:translate key="list.header" extensionName="Brofix">Broken links </f:translate>
 	<f:if condition="{pageTitle}">
 		&quot;{title}&quot;
 	</f:if>
@@ -9,7 +8,9 @@
 </f:section>
 
 <f:section name="form">
-	<div class="brofix-brokenlink-list-form">
+
+	<row class="brofix-brokenlink-list-form">
+
 		<form id="brofix-list-form">
 			<input type="hidden" name="currentPage" value="{currentPage}"/>
 			<input type="hidden" name="id" value="{currentPage}"/>
@@ -36,21 +37,84 @@
 				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
 				</option>
 			</select>
+
 			<br/>
+
+			<row>
+				<div class="form-control-clearable">
+					<input type="number" min="0" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="uid_searchFilter" placeholder="UID..." id="uid_searchFilter" value="{f:if(condition: uid_filter, then: uid_filter, else: '')}"/>
+					<button type="button" tabindex="-1" class="close" id="uidButton" style="visibility: visible;">
+										<span class="t3js-icon icon icon-size-small icon-state-default icon-actions-close" data-identifier="actions-close">
+				<span class="icon-markup">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+						<path d="M11.9 5.5L9.4 8l2.5 2.5c.2.2.2.5 0
+							.7l-.7.7c-.2.2-.5.2-.7 0L8 9.4l-2.5 2.5c-.2.2-.5.2-.7
+							0l-.7-.7c-.2-.2-.2-.5 0-.7L6.6 8 4.1 5.5c-.2-.2-.2-.5
+							0-.7l.7-.7c.2-.2.5-.2.7 0L8 6.6l2.5-2.5c.2-.2.5-.2.7
+							0l.7.7c.2.2.2.5 0 .7z" class="icon-color"></path>
+					</svg>
+				</span>
+    			</span></button>
+				</div>
+				<input type="hidden" name="data[pages][14287][title]" value="BrokenLinksTest">
+
+				<div class="form-control-clearable">
+										<input type="text"  class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="url_searchFilter" placeholder="URL..." id="url_searchFilter" value="{f:if(condition: url_filter, then: url_filter, else: '')}"/>
+										<button type="button" tabindex="-1" class="close" id="urlButton" style="visibility: visible;">
+										<span class="t3js-icon icon icon-size-small icon-state-default icon-actions-close" data-identifier="actions-close">
+					<span class="icon-markup">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+							<path d="M11.9 5.5L9.4 8l2.5 2.5c.2.2.2.5 0
+								.7l-.7.7c-.2.2-.5.2-.7 0L8 9.4l-2.5 2.5c-.2.2-.5.2-.7
+								0l-.7-.7c-.2-.2-.2-.5 0-.7L6.6 8 4.1 5.5c-.2-.2-.2-.5
+								0-.7l.7-.7c.2-.2.5-.2.7 0L8 6.6l2.5-2.5c.2-.2.5-.2.7
+								0l.7.7c.2.2.2.5 0 .7z" class="icon-color"></path>
+						</svg>
+					</span>
+			</span></button>
+									</div>
+				<input type="hidden" name="data[pages][14287][title]" value="BrokenLinksTest">
+
+				<div class="form-control-clearable">
+					<input type="text" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="title_searchFilter" placeholder="Link title" id="title_searchFilter" value="{f:if(condition: title_filter , then: title_filter, else: '')}"/>
+					<button type="button" tabindex="-1" class="close" id="titleButton" style="visibility: visible;">
+										<span class="t3js-icon icon icon-size-small icon-state-default icon-actions-close" data-identifier="actions-close">
+				<span class="icon-markup">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+						<path d="M11.9 5.5L9.4 8l2.5 2.5c.2.2.2.5 0
+							.7l-.7.7c-.2.2-.5.2-.7 0L8 9.4l-2.5 2.5c-.2.2-.5.2-.7
+							0l-.7-.7c-.2-.2-.2-.5 0-.7L6.6 8 4.1 5.5c-.2-.2-.2-.5
+							0-.7l.7-.7c.2-.2.5-.2.7 0L8 6.6l2.5-2.5c.2-.2.5-.2.7
+							0l.7.7c.2.2.2.5 0 .7z" class="icon-color"></path>
+					</svg>
+				</span>
+			</span></button>
+						</div>
+						<input type="hidden" name="data[pages][14287][title]" value="BrokenLinksTest">
+
+			</row>
+			<br />
+			<br />
+
 			<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"
 				   value="{f:translate(key: 'label_refresh', extensionName: 'Brofix')}"
 				   data-notification-message="{f:translate(key: 'label_refresh-link-list', extensionName: 'Brofix')}"/>
+
 			<f:if condition="{showRecheckButton}">
 				<input type="submit" class="btn btn-default t3js-update-button" name="updateLinkList" id="updateLinkList"
 					   value="{f:translate(key: 'list.button.checkLinks', extensionName: 'Brofix')}"
 					   data-notification-message="{f:translate(key: 'list.action.checkLinks', extensionName: 'Brofix')}"/>
 			</f:if>
+			<!--<input type="reset" class="btn btn-default t3js-update-button" name="refreshLinkList"
+				   value="Reset Filters"/>-->
 			<f:if condition="{docsurl}">
 				<f:link.external class="btn btn-default" uri="{docsurl}" target="_blank">
 					<core:icon identifier="actions-document-info" size="small"/>
 				</f:link.external>
 			</f:if>
+
 		</form>
+
 	</div>
 </f:section>
 
@@ -93,7 +157,11 @@
 						</f:if>
 					</th>
 					<th class="table-column-divider-end">
-						{tableHeader.last_check_url.header}<br/>(URL)
+						<f:format.raw>	{tableHeader.last_check_url.header}</f:format.raw>
+						<f:if condition="{tableHeader.last_check_url.icon}">
+							<core:icon identifier="{tableHeader.last_check_url.icon}"/>
+						</f:if>
+						<br/>(URL)
 					<th>
 						{tableHeader.action.header}
 					</th>

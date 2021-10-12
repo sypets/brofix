@@ -17,6 +17,8 @@ namespace Sypets\Brofix\View;
 
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\BackendSession\BackendSession;
+use Sypets\Brofix\Filter\Filter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
@@ -44,7 +46,7 @@ use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Info\Controller\InfoModuleController;
-
+use TYPO3\CMS\Core\Utility\DebugUtility;
 /**
  * Module 'Check links' as sub module of Web -> Info
  * @internal
@@ -77,10 +79,17 @@ class BrofixReport
             ['field', 'DESC'],
         ],
         'last_check' => [
-            ['last_check', 'ASC']
+            ['last_check', 'ASC'],
         ],
         'last_check_reverse' => [
-            ['last_check', 'DESC']
+            ['last_check', 'DESC'],
+        ],
+        // add by Mee
+        'last_check_url' => [
+            ['last_check_url', 'ASC'],
+        ],
+        'last_check_url_reverse' => [
+            ['last_check_url', 'DESC'],
         ],
         'url' => [
             ['link_type', 'ASC'],
@@ -149,6 +158,20 @@ class BrofixReport
     protected $linkAnalyzer;
 
     /**
+     * Link validation class
+     *
+     * @var BackendSession
+     */
+    protected $backendSession;
+
+    /**
+     * Link validation class
+     *
+     * @var Filter
+     */
+    protected $filter;
+
+    /**
      * @var array<string>
      */
     protected $linkTypes = [];
@@ -162,6 +185,13 @@ class BrofixReport
      * @var int
      */
     protected $depth = -1;
+
+    /**
+     * Search filter parameters
+     */
+    protected $url_searchFilter = "";
+    protected $title_searchFilter = "";
+    protected $uid_searchFilter = "";
 
     /**
      * @var string
@@ -266,7 +296,9 @@ class BrofixReport
         BrokenLinkRepository $brokenLinkRepository = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         Configuration $configuration = null,
-        FlashMessageService $flashMessageService = null
+        FlashMessageService $flashMessageService = null,
+        Filter $filter = null,
+        BackendSession $backendSession = null
     ) {
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
@@ -274,6 +306,9 @@ class BrofixReport
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
+        $this->filter = $filter ?: GeneralUtility::makeInstance(Filter::class);
+        $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
+
     }
 
     /**
@@ -308,6 +343,7 @@ class BrofixReport
                     $this->configuration->getExcludeLinkTargetStoragePid()
                 );
         }
+
     }
 
     protected function createView(string $templateName): StandaloneView
@@ -351,6 +387,26 @@ class BrofixReport
 
         // get searchLevel (number of levels of pages to check / show results)
         $depth = GeneralUtility::_GP('depth');
+
+        // store filter parameters in the Filter Object
+
+        $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
+
+        $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
+
+        $this->filter->setTitleFilter(GeneralUtility::_GP('title_searchFilter') ?? '');
+
+        // to prevent deleting session, when user sort the records
+        if(!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))){
+            $this->backendSession->store('filterKey',$this->filter);
+        }
+
+        // create session, if it the first time
+        if(is_null($this->backendSession->get('filterKey'))){
+            $this->backendSession->setStorageKey('filterKey');
+            $this->backendSession->store('filterKey', new Filter());
+        }
+
         /**
          * @var int $previousDepth
          */
@@ -551,6 +607,7 @@ class BrofixReport
         $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
 
         $this->initializeLinkAnalyzer();
+
     }
 
     /**
@@ -586,11 +643,18 @@ class BrofixReport
         // @extensionScannerIgnoreLine problem with getRootLineIsHidden
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
+            // build the search filter from the backendSession session
+            $searchFilter = new Filter();
+            $searchFilter->setUrlFilter($this->backendSession->get('filterKey')->getUrlFilter());
+            $searchFilter->setUidFilter($this->backendSession->get('filterKey')->getUidFilter());
+            $searchFilter->setTitleFilter($this->backendSession->get('filterKey')->getTitleFilter());
+
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
-                self::ORDER_BY_VALUES[$this->orderBy] ?? []
+                self::ORDER_BY_VALUES[$this->orderBy] ?? [],
+                $searchFilter
             );
             if ($brokenLinks) {
                 $totalCount = count($brokenLinks);
@@ -600,13 +664,42 @@ class BrofixReport
                 $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
                 // move end
                 foreach ($paginator->getPaginatedItems() as $row) {
+                    // filter from the result :  Search Filter : return the record only if the search succed
+                    /*$filterTest = true;
+                    if($this->backendSession->get('filterKey')->getUrlFilter() != ''){
+                        if(strpos($row['url'],$this->backendSession->get('filterKey')->getUrlFilter()) == false){
+                            $filterTest = false;
+                        }
+                    }
+
+                    if($this->backendSession->get('filterKey')->getTitleFilter() != ''){
+                        if(strpos($row['headline'],$this->backendSession->get('filterKey')->getTitleFilter()) === false){
+                            $filterTest = false;
+                        }
+                    }
+
+                    if($this->backendSession->get('filterKey')->getUidFilter() != ''){
+                        if($row['uid'] != (int) $this->backendSession->get('filterKey')->getUidFilter()){
+                            $filterTest = false;
+                        }
+                    }
+
+                    if($filterTest == true){
+                        $items[] = $this->renderTableRow($row['table_name'], $row);
+                    }*/
                     $items[] = $this->renderTableRow($row['table_name'], $row);
+
                 }
+
             }
         } else {
             $this->pagination = null;
         }
         $view->assign('totalCount', $totalCount);
+        // send the search filters to the view
+        $view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
+        $view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
+        $view->assign('title_filter', $this->backendSession->get('filterKey')->getTitleFilter());
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
@@ -626,7 +719,9 @@ class BrofixReport
 
         // Table header
         $view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+
         return $view;
+
     }
 
     /**
@@ -933,7 +1028,6 @@ class BrofixReport
                 $variables['freshness'] = 'fresh';
             }
         }
-
         return $variables;
     }
 
@@ -999,4 +1093,5 @@ class BrofixReport
     {
         return $GLOBALS['BE_USER'];
     }
+
 }

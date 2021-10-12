@@ -14,9 +14,22 @@
 /**
  * Module: TYPO3/CMS/Brofix/Brofix
  */
+
 define(['jquery'], function($) {
   'use strict';
+  $(document).ready(function () {
+    $('#uidButton').on('click', function (){
+      $('#uid_searchFilter').val('')
+    })
 
+    $('#urlButton').on('click', function (){
+      $('#url_searchFilter').val('')
+    })
+
+    $('#titleButton').on('click', function (){
+      $('#title_searchFilter').val('')
+    })
+  })
   var Brofix = {};
 
   /**
@@ -67,5 +80,7 @@ define(['jquery'], function($) {
 
   $(Brofix.initializeEvents);
 
+
   return Brofix;
 });
+

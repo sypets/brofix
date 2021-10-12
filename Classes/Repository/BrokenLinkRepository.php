@@ -8,11 +8,13 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\Filter\Filter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 
 /**
  * Handle database queries for table of broken links
@@ -56,7 +58,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param array<array<string>> $orderBy
      * @return mixed[]
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = []): array
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = [],Filter $filter): array
     {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
@@ -100,7 +102,26 @@ class BrokenLinkRepository implements LoggerAwareInterface
                             $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
                         )
                     )
+                )
+                // SQL Filter
+                ->andWhere(
+                    $queryBuilder->expr()->like(
+                        self::TABLE . '.url',
+                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                    )
+                )
+                ->andWhere(
+                    $queryBuilder->expr()->like(
+                        self::TABLE . '.headline',
+                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getTitleFilter()) . '%')
+                    )
                 );
+            if($filter->getUidFilter() != ''){
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq( self::TABLE . '.uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT)));
+            }
+
+
             if ($orderBy !== []) {
                 $values = array_shift($orderBy);
                 if ($values && is_array($values) && count($values) === 2) {
