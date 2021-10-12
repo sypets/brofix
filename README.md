@@ -1,5 +1,7 @@
 # Broken Link Fixer
 
+[![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
+
 This extension checks the links
 in your website. It can check all kinds of links:
 Links to page, content elements, external and file links.
