@@ -1,6 +1,8 @@
 # Broken Link Fixer
 
 [![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
+[![CI Status](https://github.com/sypets/brofix/workflows/CI/badge.svg)](https://github.com/sypets/brofix/actions)
+[![Downloads](https://img.shields.io/packagist/dt/sypets/brofix)](https://packagist.org/packages/sypets/brofix)
 
 This extension checks the links
 in your website. It can check all kinds of links:
