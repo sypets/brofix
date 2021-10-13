@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /***
  *
@@ -14,9 +15,8 @@ declare(strict_types = 1);
 
 namespace Sypets\Brofix\BackendSession;
 
-
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Utility\DebugUtility;
+
 class BackendSession
 {
     /**

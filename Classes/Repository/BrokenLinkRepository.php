@@ -14,7 +14,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\DebugUtility;
 
 /**
  * Handle database queries for table of broken links
@@ -58,7 +57,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param array<array<string>> $orderBy
      * @return mixed[]
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = [],Filter $filter): array
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = [], Filter $filter): array
     {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
@@ -116,11 +115,11 @@ class BrokenLinkRepository implements LoggerAwareInterface
                         $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getTitleFilter()) . '%')
                     )
                 );
-            if($filter->getUidFilter() != ''){
+            if ($filter->getUidFilter() != '') {
                 $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq( self::TABLE . '.uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT)));
+                    $queryBuilder->expr()->eq(self::TABLE . '.uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+                );
             }
-
 
             if ($orderBy !== []) {
                 $values = array_shift($orderBy);

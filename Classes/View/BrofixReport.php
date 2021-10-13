@@ -15,9 +15,9 @@
 
 namespace Sypets\Brofix\View;
 
+use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\Filter\Filter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
@@ -46,7 +46,7 @@ use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Info\Controller\InfoModuleController;
-use TYPO3\CMS\Core\Utility\DebugUtility;
+
 /**
  * Module 'Check links' as sub module of Web -> Info
  * @internal
@@ -189,9 +189,9 @@ class BrofixReport
     /**
      * Search filter parameters
      */
-    protected $url_searchFilter = "";
-    protected $title_searchFilter = "";
-    protected $uid_searchFilter = "";
+    protected $url_searchFilter = '';
+    protected $title_searchFilter = '';
+    protected $uid_searchFilter = '';
 
     /**
      * @var string
@@ -308,7 +308,6 @@ class BrofixReport
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $this->filter = $filter ?: GeneralUtility::makeInstance(Filter::class);
         $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
-
     }
 
     /**
@@ -343,7 +342,6 @@ class BrofixReport
                     $this->configuration->getExcludeLinkTargetStoragePid()
                 );
         }
-
     }
 
     protected function createView(string $templateName): StandaloneView
@@ -397,12 +395,12 @@ class BrofixReport
         $this->filter->setTitleFilter(GeneralUtility::_GP('title_searchFilter') ?? '');
 
         // to prevent deleting session, when user sort the records
-        if(!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))){
-            $this->backendSession->store('filterKey',$this->filter);
+        if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
+            $this->backendSession->store('filterKey', $this->filter);
         }
 
         // create session, if it the first time
-        if(is_null($this->backendSession->get('filterKey'))){
+        if (is_null($this->backendSession->get('filterKey'))) {
             $this->backendSession->setStorageKey('filterKey');
             $this->backendSession->store('filterKey', new Filter());
         }
@@ -607,7 +605,6 @@ class BrofixReport
         $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
 
         $this->initializeLinkAnalyzer();
-
     }
 
     /**
@@ -688,9 +685,7 @@ class BrofixReport
                         $items[] = $this->renderTableRow($row['table_name'], $row);
                     }*/
                     $items[] = $this->renderTableRow($row['table_name'], $row);
-
                 }
-
             }
         } else {
             $this->pagination = null;
@@ -721,7 +716,6 @@ class BrofixReport
         $view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
 
         return $view;
-
     }
 
     /**
@@ -1093,5 +1087,4 @@ class BrofixReport
     {
         return $GLOBALS['BE_USER'];
     }
-
 }
