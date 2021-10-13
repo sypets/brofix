@@ -187,10 +187,19 @@ class BrofixReport
     protected $depth = -1;
 
     /**
-     * Search filter parameters
+     * Search filter parameter
+     * @var string
      */
     protected $url_searchFilter = '';
+
+    /**
+     * @var string
+     */
     protected $title_searchFilter = '';
+
+    /**
+     * @var string
+     */
     protected $uid_searchFilter = '';
 
     /**

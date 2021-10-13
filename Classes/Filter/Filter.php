@@ -6,8 +6,19 @@ namespace Sypets\Brofix\Filter;
 
 class Filter
 {
+    /**
+     * @var string
+     */
     protected $url_filtre = '';
+
+    /**
+     * @var string
+     */
     protected $uid_filtre = '';
+
+    /**
+     * @var string
+     */
     protected $title_filter = '';
 
     // Getters and Setters

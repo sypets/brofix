@@ -39,7 +39,7 @@ class BackendSession
         $this->sessionObject = $GLOBALS['BE_USER'];
     }
 
-    public function setStorageKey($storageKey)
+    public function setStorageKey(string $storageKey): void
     {
         $this->storageKey = $storageKey;
     }
@@ -50,7 +50,7 @@ class BackendSession
      * @param string $key
      * @param mixed $value
      */
-    public function store($key, $value)
+    public function store(string $key, $value): void
     {
         $sessionData = $this->sessionObject->getSessionData($this->storageKey);
         $sessionData[$key] = $value;
@@ -62,7 +62,7 @@ class BackendSession
      *
      * @param string $key
      */
-    public function delete($key)
+    public function delete($key): void
     {
         $sessionData = $this->sessionObject->getSessionData($this->storageKey);
         unset($sessionData[$key]);
@@ -75,7 +75,7 @@ class BackendSession
      * @param string $key
      * @return mixed
      */
-    public function get($key)
+    public function get(string $key)
     {
         $sessionData = $this->sessionObject->getSessionData($this->storageKey);
         return isset($sessionData[$key]) ? $sessionData[$key] : null;
