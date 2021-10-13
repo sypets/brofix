@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
+use Sypets\Brofix\Filter\Filter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
@@ -354,7 +355,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $results = $brokenLinksRepository->getBrokenLinks(
             $pidList,
             $linkTypes,
-            $searchFields
+            $searchFields,
+            [],
+            new Filter()
         );
 
         self::assertEquals($expectedCount, count($results));
@@ -642,7 +645,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $results = $brokenLinksRepository->getBrokenLinks(
             $pidList,
             $linkTypes,
-            $searchFields
+            $searchFields,
+            [],
+            new Filter()
         );
 
         $this->normalizeBrokenLinksResults($expectedResult);

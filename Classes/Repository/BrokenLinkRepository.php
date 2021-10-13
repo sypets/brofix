@@ -55,6 +55,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param string[] $linkTypes Link types to validate
      * @param array<string,array<string>> $searchFields
      * @param array<array<string>> $orderBy
+     * @param Filter $filter
      * @return mixed[]
      */
     public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = [], Filter $filter): array
