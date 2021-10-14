@@ -118,7 +118,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             if ($filter->getUidFilter() != '') {
                 $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
                 );
             }
 

@@ -158,14 +158,12 @@ class BrofixReport
     protected $linkAnalyzer;
 
     /**
-     * Link validation class
      *
      * @var BackendSession
      */
     protected $backendSession;
 
     /**
-     * Link validation class
      *
      * @var Filter
      */
@@ -185,22 +183,6 @@ class BrofixReport
      * @var int
      */
     protected $depth = -1;
-
-    /**
-     * Search filter parameter
-     * @var string
-     */
-    protected $url_searchFilter = '';
-
-    /**
-     * @var string
-     */
-    protected $title_searchFilter = '';
-
-    /**
-     * @var string
-     */
-    protected $uid_searchFilter = '';
 
     /**
      * @var string
@@ -306,7 +288,6 @@ class BrofixReport
         ExcludeLinkTarget $excludeLinkTarget = null,
         Configuration $configuration = null,
         FlashMessageService $flashMessageService = null,
-        Filter $filter = null,
         BackendSession $backendSession = null
     ) {
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
@@ -315,7 +296,6 @@ class BrofixReport
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-        $this->filter = $filter ?: GeneralUtility::makeInstance(Filter::class);
         $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
     }
 
@@ -396,7 +376,7 @@ class BrofixReport
         $depth = GeneralUtility::_GP('depth');
 
         // store filter parameters in the Filter Object
-
+        $this->filter = new Filter();
         $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
 
         $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
@@ -670,29 +650,6 @@ class BrofixReport
                 $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
                 // move end
                 foreach ($paginator->getPaginatedItems() as $row) {
-                    // filter from the result :  Search Filter : return the record only if the search succed
-                    /*$filterTest = true;
-                    if($this->backendSession->get('filterKey')->getUrlFilter() != ''){
-                        if(strpos($row['url'],$this->backendSession->get('filterKey')->getUrlFilter()) == false){
-                            $filterTest = false;
-                        }
-                    }
-
-                    if($this->backendSession->get('filterKey')->getTitleFilter() != ''){
-                        if(strpos($row['headline'],$this->backendSession->get('filterKey')->getTitleFilter()) === false){
-                            $filterTest = false;
-                        }
-                    }
-
-                    if($this->backendSession->get('filterKey')->getUidFilter() != ''){
-                        if($row['uid'] != (int) $this->backendSession->get('filterKey')->getUidFilter()){
-                            $filterTest = false;
-                        }
-                    }
-
-                    if($filterTest == true){
-                        $items[] = $this->renderTableRow($row['table_name'], $row);
-                    }*/
                     $items[] = $this->renderTableRow($row['table_name'], $row);
                 }
             }
