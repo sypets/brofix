@@ -158,13 +158,11 @@ class BrofixReport
     protected $linkAnalyzer;
 
     /**
-     *
      * @var BackendSession
      */
     protected $backendSession;
 
     /**
-     *
      * @var Filter
      */
     protected $filter;
