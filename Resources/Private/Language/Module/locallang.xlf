@@ -16,6 +16,7 @@
 				<source>Check links done</source>
 			</trans-unit>
 
+			<!-- table header -->
 
 			<trans-unit id="list.tableHead.page" resname="list.tableHead.page">
 				<source>Page</source>
@@ -43,6 +44,16 @@
 			</trans-unit>
 
 
+			<!-- filter -->
+			<trans-unit id="list.filter.uid" resname="list.filter.uid">
+				<source>UID</source>
+			</trans-unit>
+			<trans-unit id="list.filter.url" resname="list.filter..url">
+				<source>URL</source>
+			</trans-unit>
+			<trans-unit id="list.filter.title" resname="list.filter.title">
+				<source>Title</source>
+			</trans-unit>
 
 			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
 				<source>Recheck links</source>
