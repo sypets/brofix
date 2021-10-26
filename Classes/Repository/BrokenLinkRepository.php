@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\Filter\Filter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
@@ -24,6 +25,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     use LoggerAwareTrait;
 
     protected const TABLE = 'tx_brofix_broken_links';
+    protected const EXCLUDESLINKSTABLE = 'tx_brofix_exclude_link_target';
 
     /**
      * @var int
@@ -54,9 +56,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param string[] $linkTypes Link types to validate
      * @param array<string,array<string>> $searchFields
      * @param array<array<string>> $orderBy
+     * @param Filter $filter
      * @return mixed[]
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = []): array
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = [], Filter $filter): array
     {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
@@ -100,7 +103,26 @@ class BrokenLinkRepository implements LoggerAwareInterface
                             $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
                         )
                     )
+                )
+                // SQL Filter
+                ->andWhere(
+                    $queryBuilder->expr()->like(
+                        self::TABLE . '.url',
+                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                    )
+                )
+                ->andWhere(
+                    $queryBuilder->expr()->like(
+                        self::TABLE . '.headline',
+                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getTitleFilter()) . '%')
+                    )
                 );
+            if ($filter->getUidFilter() != '') {
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+                );
+            }
+
             if ($orderBy !== []) {
                 $values = array_shift($orderBy);
                 if ($values && is_array($values) && count($values) === 2) {
@@ -128,6 +150,82 @@ class BrokenLinkRepository implements LoggerAwareInterface
         return $results;
     }
 
+    /**
+     * Get Excluded links.
+     *
+     *
+     * @param array<array<string>> $orderBy
+     * @param Filter $filter
+     * @return mixed[]
+     */
+    public function getExcludedBrokenLinks(array $orderBy = [], Filter $filter): array
+    {
+        $results = [];
+
+        $queryBuilder = $this->generateQueryBuilder(self::EXCLUDESLINKSTABLE);
+
+        $queryBuilder
+            ->select(self::EXCLUDESLINKSTABLE . '.*')
+            ->from(self::EXCLUDESLINKSTABLE)
+            ->join(
+                self::EXCLUDESLINKSTABLE,
+                'pages',
+                'pages',
+                // @todo record_pid is not always page id
+                $queryBuilder->expr()->eq(self::EXCLUDESLINKSTABLE . '.pid', $queryBuilder->quoteIdentifier('pages.uid'))
+            )
+            // SQL Filter
+            ->andWhere(
+                $queryBuilder->expr()->like(
+                    self::EXCLUDESLINKSTABLE . '.linktarget',
+                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getExcludeUrlFilter()) . '%')
+                )
+            )
+            ->andWhere(
+                $queryBuilder->expr()->like(
+                    self::EXCLUDESLINKSTABLE . '.link_type',
+                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getExcludeLinkTypeFilter()) . '%')
+                )
+            );
+        if ($filter->getExcludeReasonFilter() != '') {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::EXCLUDESLINKSTABLE . '.reason', $queryBuilder->createNamedParameter($filter->getExcludeReasonFilter(), \PDO::PARAM_INT))
+            );
+        }
+
+        if ($orderBy !== []) {
+            $values = array_shift($orderBy);
+            if ($values && is_array($values) && count($values) === 2) {
+                $queryBuilder->orderBy($values[0], $values[1]);
+                foreach ($orderBy as $values) {
+                    if (!is_array($values) || count($values) != 2) {
+                        break;
+                    }
+                    $queryBuilder->addOrderBy(self::EXCLUDESLINKSTABLE . '.' . $values[0], $values[1]);
+                }
+            }
+        }
+
+        $results = array_merge($results, $queryBuilder->execute()->fetchAll());
+        return $results;
+    }
+
+    /**
+     * Delete Exclude Link
+     * @param array<int> $uids
+     */
+    public function deleteExcludeLink(array $uids): void
+    {
+        foreach ($uids as $uid) {
+            $queryBuilder = $this->generateQueryBuilder(self::EXCLUDESLINKSTABLE);
+            $affectedRows = $queryBuilder
+                ->delete(self::EXCLUDESLINKSTABLE)
+                ->where(
+                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+                )
+                ->execute();
+        }
+    }
     /**
      * Check if current page has broken links editable by user
      *

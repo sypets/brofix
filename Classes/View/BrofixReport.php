@@ -15,8 +15,10 @@
 
 namespace Sypets\Brofix\View;
 
+use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\Filter\Filter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
@@ -77,10 +79,17 @@ class BrofixReport
             ['field', 'DESC'],
         ],
         'last_check' => [
-            ['last_check', 'ASC']
+            ['last_check', 'ASC'],
         ],
         'last_check_reverse' => [
-            ['last_check', 'DESC']
+            ['last_check', 'DESC'],
+        ],
+        // add by Mee
+        'last_check_url' => [
+            ['last_check_url', 'ASC'],
+        ],
+        'last_check_url_reverse' => [
+            ['last_check_url', 'DESC'],
         ],
         'url' => [
             ['link_type', 'ASC'],
@@ -147,6 +156,16 @@ class BrofixReport
      * @var LinkAnalyzer
      */
     protected $linkAnalyzer;
+
+    /**
+     * @var BackendSession
+     */
+    protected $backendSession;
+
+    /**
+     * @var Filter
+     */
+    protected $filter;
 
     /**
      * @var array<string>
@@ -266,7 +285,8 @@ class BrofixReport
         BrokenLinkRepository $brokenLinkRepository = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         Configuration $configuration = null,
-        FlashMessageService $flashMessageService = null
+        FlashMessageService $flashMessageService = null,
+        BackendSession $backendSession = null
     ) {
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
@@ -274,6 +294,7 @@ class BrofixReport
         $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
+        $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
     }
 
     /**
@@ -351,6 +372,26 @@ class BrofixReport
 
         // get searchLevel (number of levels of pages to check / show results)
         $depth = GeneralUtility::_GP('depth');
+
+        // store filter parameters in the Filter Object
+        $this->filter = new Filter();
+        $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
+
+        $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
+
+        $this->filter->setTitleFilter(GeneralUtility::_GP('title_searchFilter') ?? '');
+
+        // to prevent deleting session, when user sort the records
+        if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
+            $this->backendSession->store('filterKey', $this->filter);
+        }
+
+        // create session, if it the first time
+        if (is_null($this->backendSession->get('filterKey'))) {
+            $this->backendSession->setStorageKey('filterKey');
+            $this->backendSession->store('filterKey', new Filter());
+        }
+
         /**
          * @var int $previousDepth
          */
@@ -514,13 +555,23 @@ class BrofixReport
         }
 
         $reportsTabView = $this->createViewForBrokenLinksTab();
-        $menuItems = [
-            0 => [
-                'label' => $this->getLanguageService()->getLL('Report'),
-                'content' => $reportsTabView->render()
-            ],
+        // Add Management Exclusions Tab
+        $view = $this->createView('ManageExclusions');
+        $manageExclusions = new ManageExclusions();
+        $manageExclusionsTabView = $manageExclusions->createViewForManageExclusionTab($view, $this->pObj);
+
+        $menuItems[0] = [
+            'label' => $this->getLanguageService()->getLL('Report'),
+            'content' => $reportsTabView->render()
         ];
 
+        $reportsTabView->assignMultiple([
+            'prefix' => 'manageExclusions',
+        ]);
+        $menuItems[1] = [
+            'label' => 'Manage Exclusions',
+            'content' => $manageExclusionsTabView->render()
+        ];
         return $this->moduleTemplate->getDynamicTabMenu($menuItems, 'report-brofix');
     }
 
@@ -586,11 +637,18 @@ class BrofixReport
         // @extensionScannerIgnoreLine problem with getRootLineIsHidden
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
+            // build the search filter from the backendSession session
+            $searchFilter = new Filter();
+            $searchFilter->setUrlFilter($this->backendSession->get('filterKey')->getUrlFilter());
+            $searchFilter->setUidFilter($this->backendSession->get('filterKey')->getUidFilter());
+            $searchFilter->setTitleFilter($this->backendSession->get('filterKey')->getTitleFilter());
+
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
-                self::ORDER_BY_VALUES[$this->orderBy] ?? []
+                self::ORDER_BY_VALUES[$this->orderBy] ?? [],
+                $searchFilter
             );
             if ($brokenLinks) {
                 $totalCount = count($brokenLinks);
@@ -607,6 +665,10 @@ class BrofixReport
             $this->pagination = null;
         }
         $view->assign('totalCount', $totalCount);
+        // send the search filters to the view
+        $view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
+        $view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
+        $view->assign('title_filter', $this->backendSession->get('filterKey')->getTitleFilter());
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
@@ -626,6 +688,7 @@ class BrofixReport
 
         // Table header
         $view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+
         return $view;
     }
 
@@ -933,7 +996,6 @@ class BrofixReport
                 $variables['freshness'] = 'fresh';
             }
         }
-
         return $variables;
     }
 
