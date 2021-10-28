@@ -29,6 +29,33 @@ define(['jquery'], function($) {
     $('#titleButton').on('click', function (){
       $('#title_searchFilter').val('')
     })
+
+    $('#excludeUrlButton').on('click', function (){
+      $('#excludeUrl_filter').val('')
+    })
+
+    $('.selectAllLinks').click(function() {
+      alert('hello woeld')
+      var $checkboxes = $('.check').find('input[type=checkbox]');
+      $checkboxes.prop('checked', $(this).is(':checked'));
+    });
+
+    $('#deleteSelectedLinks').click(function(){
+      var selecteditems = [];
+      $(".check").find("input:checked").each(function (i, ob) {
+        selecteditems.push($(ob).val());
+      });
+      require(['TYPO3/CMS/Core/Ajax/AjaxRequest'], function (AjaxRequest) {
+        // Generate a random number between 1 and 32
+        new AjaxRequest(TYPO3.settings.ajaxUrls.delete_excluded_links)
+          .withQueryArguments({input: selecteditems})
+          .get()
+          .then(async function (response) {
+            const resolved = await response.resolve();
+          });
+      });
+
+    })
   })
   var Brofix = {};
 

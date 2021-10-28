@@ -21,6 +21,21 @@ class Filter
      */
     protected $title_filter = '';
 
+    /**
+     * @var string
+     */
+    protected $excludeLinkType_filter = '';
+
+    /**
+     * @var string
+     */
+    protected $excludeUrl_filter = '';
+
+    /**
+     * @var string
+     */
+    protected $excludeReason_filter = '';
+
     // Getters and Setters
 
     public function getUrlFilter(): string
@@ -37,6 +52,21 @@ class Filter
         return $this->title_filter;
     }
 
+    public function getExcludeLinkTypeFilter(): string
+    {
+        return $this->excludeLinkType_filter;
+    }
+
+    public function getExcludeUrlFilter(): string
+    {
+        return $this->excludeUrl_filter;
+    }
+
+    public function getExcludeReasonFilter(): string
+    {
+        return $this->excludeReason_filter;
+    }
+
     public function setUrlFilter(string $url_filter): void
     {
         $this->url_filtre = $url_filter;
@@ -50,5 +80,20 @@ class Filter
     public function setTitleFilter(string $title_filter): void
     {
         $this->title_filter = $title_filter;
+    }
+
+    public function setExcludeLinkTypeFilter(string $excludeLinkType_filter): void
+    {
+        $this->excludeLinkType_filter = $excludeLinkType_filter;
+    }
+
+    public function setExcludeUrlFilter(string $excludeUrl_filter): void
+    {
+        $this->excludeUrl_filter = $excludeUrl_filter;
+    }
+
+    public function setExcludeReasonFilter(string $excludeReason_filter): void
+    {
+        $this->excludeReason_filter = $excludeReason_filter;
     }
 }

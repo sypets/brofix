@@ -280,6 +280,66 @@
 			<trans-unit id="no.access" resname="no.access">
 				<source>You do not have access to these listings.</source>
 			</trans-unit>
+	<!-- Set for Manage Exclusion tab -->
+			<trans-unit id="columnHeader.page">
+				<source>Page</source>
+			</trans-unit>
+			<trans-unit id="columnHeader.linktarget">
+				<source>Exclude list</source>
+			</trans-unit>
+			<trans-unit id="columnHeader.link_type">
+				<source>Link type</source>
+			 </trans-unit>
+			 <trans-unit id="columnHeader.hidden">
+				<source>Hidden</source>
+			 </trans-unit>
+			 <trans-unit id="columnHeader.crdate">
+				<source>Excluding Date</source>
+			 </trans-unit>
+			 <trans-unit id="columnHeader.reason">
+				<source>Reason</source>
+			 </trans-unit>
+			 <trans-unit id="records.isHidden">
+				   <source>Hidden</source>
+			  </trans-unit>
+			  <trans-unit id="records.isNotHidden">
+					<source>is Not Hidden</source>
+			  </trans-unit>
+			  <trans-unit id="records.reason1">
+				   <source>Non given</source>
+			   </trans-unit>
+				<trans-unit id="records.reason2">
+					<source>Was falsely detected as broken link</source>
+			   </trans-unit>
+			   <trans-unit id="exportCsv">
+					<source>Export Csv File</source>
+			   </trans-unit>
+			   <trans-unit id="search">
+					 <source>Search</source>
+				</trans-unit>
+				<trans-unit id="selectAndDeselect">
+					  <source>Select / Deselect </source>
+				 </trans-unit>
+				 <trans-unit id="deleteLinks">
+					   <source>Delete Link(s)</source>
+				  </trans-unit>
+				 <trans-unit id="excludeLinksTitle">
+					  <source>Excluded Links</source>
+				  </trans-unit>
+				  <trans-unit id="form.selectReason">
+					   <source>Select reason</source>
+				   </trans-unit>
+				   <trans-unit id="form.external">
+						<source>External</source>
+				   </trans-unit>
+				   <trans-unit id="form.internal">
+						<source>Internal</source>
+				   </trans-unit>
+				   <trans-unit id="form.selectLinkType">
+						<source> Select Link Type</source>
+					</trans-unit>
+			 <!-- End Modification -->
+
 		</body>
 	</file>
 </xliff>
