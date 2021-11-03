@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
+use DateTime;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -84,6 +85,11 @@ class CheckLinksCommand extends Command
      */
     protected $pagesRepository;
 
+    /**
+     * @var array<string>
+     */
+    protected $excludedPages = [];
+
     public function __construct(string $name = null)
     {
         parent::__construct($name);
@@ -131,6 +137,12 @@ class CheckLinksCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Send email (override configuration). 1: send, 0: do not send'
             )
+            ->addOption(
+                'exclude-uid',
+                'x',
+                InputOption::VALUE_OPTIONAL,
+                'Page id, separated by comma, that will not be checked. The function is recursive'
+            )
         ;
     }
 
@@ -154,6 +166,12 @@ class CheckLinksCommand extends Command
         $this->sendEmail = (int)($input->getOption('send-email') ?? -1);
         if ($this->sendEmail === 0) {
             $this->io->writeln('Do not send email.');
+        }
+
+        // exluded pages uid
+        $excludedPagesString =  (string)($input->getOption('exclude-uid') ?? '');
+        if ($excludedPagesString !== '') {
+            $this->excludedPages = explode(',', $excludedPagesString);
         }
 
         $startPageString = (string)($input->getOption('start-pages') ?? '');
@@ -192,6 +210,10 @@ class CheckLinksCommand extends Command
         $this->sendTo = $input->getOption('to') ?: '';
 
         foreach ($startPages as $pageId) {
+            $date = new DateTime();
+            $dateString  = $date->format('Y-m-d H:i:s');
+            $this->io->writeln("\n" . 'Brofix linkcheck started at: ' . $dateString);
+
             $this->io->title('Start checking page ' . $pageId);
 
             $pageId = (int)$pageId;
@@ -268,13 +290,16 @@ class CheckLinksCommand extends Command
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 /**
-                * @var GenerateCheckResultMailInterface $generateCheckResultMail
-                */
+                 * @var GenerateCheckResultMailInterface $generateCheckResultMail
+                 */
                 $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
             } else {
                 $this->io->writeln('Do not send mail, because sending was deactivated.');
             }
+            $date = new DateTime();
+            $dateString  = $date->format('Y-m-d H:i:s');
+            $this->io->writeln("\n" . 'Brofix linkcheck ended at: ' . $dateString . "\n");
         }
 
         // @todo use constant Command::SUCCESS (not available in earlier Symfony versions)
@@ -328,7 +353,8 @@ class CheckLinksCommand extends Command
                 $pageUid,
                 $depth,
                 '1=1',
-                $checkHidden
+                $checkHidden,
+                $this->excludedPages
             );
         } else {
             $this->io->warning(
