@@ -338,6 +338,15 @@
 				   <trans-unit id="form.selectLinkType">
 						<source> Select Link Type</source>
 					</trans-unit>
+					 <trans-unit id="visitBackendPage">
+                    	<source>Visit the backend page</source>
+               		</trans-unit>
+               		<trans-unit id="pageTitle">
+                         <source>Page Title</source>
+                    </trans-unit>
+                    <trans-unit id="link">
+                         <source>Link</source>
+                    </trans-unit>
 			 <!-- End Modification -->
 
 		</body>

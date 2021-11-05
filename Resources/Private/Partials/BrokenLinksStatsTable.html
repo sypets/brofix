@@ -107,25 +107,27 @@
 </table>
 <br>
  <a href="http://mce.local.vici.io/typo3">
-	 <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:visitTheBackend"/>
+	 <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:visitBackendPage"/>
  </a>
 <br>
 <br>
-<table class="BrokenLinks">
-	<tr class="tableHeader">
-		<th>UID</th>
-		<th>
-			<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:pageTitle"/>
-		</th>
-		<th>
-			<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:link"/>
-		</th>
-	</tr>
-	<f:for each="{stats.checkedLinksInfoList}" as="item">
-		<tr>
-			<td>{item.uid}</td>
-			<td>{item.pageTitle}</td>
-			<td>{item.url}</td>
+<f:if condition="{stats.checkedLinksInfoList}">
+	<table class="BrokenLinks">
+		<tr class="tableHeader">
+			<th>UID</th>
+			<th>
+				<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:pageTitle"/>
+			</th>
+			<th>
+				<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:link"/>
+			</th>
 		</tr>
-	</f:for>
-</table>
+		<f:for each="{stats.checkedLinksInfoList}" as="item">
+			<tr>
+				<td>{item.uid}</td>
+				<td>{item.pageTitle}</td>
+				<td>{item.url}</td>
+			</tr>
+		</f:for>
+	</table>
+</f:if>

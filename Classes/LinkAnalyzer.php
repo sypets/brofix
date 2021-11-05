@@ -411,33 +411,30 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                     $this->statistics->incrementCountBrokenLinks();
 
-                    // Get The Page Title
-                    $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-                    $queryBuilder = $connectionPool->getQueryBuilderForTable('pages');
-                    $queryBuilder->select('title')
-                        ->from('pages')
-                        ->where(
-                            $queryBuilder->expr()->eq('pages' . '.uid', $record['record_pid'])
-                        );
+                    // test if the links list is enable
+                    if ($this->configuration->getMailAddLinks() == '1') {
+                        // Get The Page Title
+                        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+                        $queryBuilder = $connectionPool->getQueryBuilderForTable('pages');
+                        $queryBuilder->select('title')
+                            ->from('pages')
+                            ->where(
+                                $queryBuilder->expr()->eq('pages' . '.uid', $record['record_pid'])
+                            );
 
-                    $result = $queryBuilder
-                        ->execute();
-                    // Generate CheckedLinkInfoModel
-                    $checkedLinkInfo = new CheckedLinkInfoModel();
-                    $checkedLinkInfo->setUid($row['uid']);
-                    $checkedLinkInfo->setPid($record['record_pid']);
-                    $checkedLinkInfo->setUrl($url);
-                    //$row = $result->fetch();
-                    /*if (!is_null($row) && !is_null($row['title'])) {
-                        $checkedLinkInfo->setPageTitle($row['title']);
-                    }*/
-
-                    while ($row = $result->fetch()){
-                        $checkedLinkInfo->setPageTitle($row['title']);
+                        $result = $queryBuilder
+                            ->execute();
+                        // Generate CheckedLinkInfoModel
+                        $checkedLinkInfo = new CheckedLinkInfoModel();
+                        $checkedLinkInfo->setUid($row['uid']);
+                        $checkedLinkInfo->setPid($record['record_pid']);
+                        $checkedLinkInfo->setUrl($url);
+                        while ($row = $result->fetch()){
+                            $checkedLinkInfo->setPageTitle($row['title']);
+                        }
+                        // add the records to the check links info array
+                        $this->statistics->addCheckedLinkInfo($checkedLinkInfo);
                     }
-                    // add the records to the check links info array
-                    $this->statistics->addCheckedLinkInfo($checkedLinkInfo);
-
                 } elseif (GeneralUtility::_GP('showalllinks')) {
                     $response = ['valid' => true];
                     $record['url_response'] = json_encode($response) ?: '';
