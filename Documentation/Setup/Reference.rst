@@ -826,3 +826,23 @@ mail.language
 
    Default
       en
+
+mail.addLinks
+============
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.addLinks
+
+   Data type
+      int
+
+   Description
+      Get Broken links list int the e-mail report. ‘0’ is not displayed by default.
+      ‘1’ will send in the e-email report 10 broken links found, with the UID, page Title, and the link.
+
+   Default
+      0
