@@ -20,6 +20,7 @@ namespace Sypets\Brofix;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Sypets\Brofix\CheckLinks\CheckedLinksInfo\CheckedLinkInfoModel;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -117,6 +118,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @var CheckLinksStatistics
      */
     protected $statistics;
+
 
     /**
      * Fill hookObjectsArr with different link types and possible XClasses.
@@ -236,9 +238,9 @@ class LinkAnalyzer implements LoggerAwareInterface
 
             // URL is not ok, update records (error type may have changed)
             $response = [
-                    'valid' => false,
-                    'errorParams' => $hookObj->getErrorParams()->toArray()
-                ];
+                'valid' => false,
+                'errorParams' => $hookObj->getErrorParams()->toArray()
+            ];
             $brokenLinkRecord = [];
             $brokenLinkRecord['url'] = $url;
             $brokenLinkRecord['url_response'] = json_encode($response) ?: '';
@@ -246,9 +248,9 @@ class LinkAnalyzer implements LoggerAwareInterface
             $brokenLinkRecord['last_check_url'] = \time();
             $brokenLinkRecord['last_check'] = \time();
             $identifier = [
-                    'url' => $url,
-                    'link_type' => $linkType
-                ];
+                'url' => $url,
+                'link_type' => $linkType
+            ];
             $count = $this->brokenLinkRepository->updateBrokenLink($brokenLinkRecord, $identifier);
             $message = sprintf(
                 $this->getLanguageService()->getLL('list.recheck.url.notok.updated'),
@@ -408,6 +410,34 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                     $this->statistics->incrementCountBrokenLinks();
+
+                    // Get The Page Title
+                    $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+                    $queryBuilder = $connectionPool->getQueryBuilderForTable('pages');
+                    $queryBuilder->select('title')
+                        ->from('pages')
+                        ->where(
+                            $queryBuilder->expr()->eq('pages' . '.uid', $record['record_pid'])
+                        );
+
+                    $result = $queryBuilder
+                        ->execute();
+                    // Generate CheckedLinkInfoModel
+                    $checkedLinkInfo = new CheckedLinkInfoModel();
+                    $checkedLinkInfo->setUid($row['uid']);
+                    $checkedLinkInfo->setPid($record['record_pid']);
+                    $checkedLinkInfo->setUrl($url);
+                    //$row = $result->fetch();
+                    /*if (!is_null($row) && !is_null($row['title'])) {
+                        $checkedLinkInfo->setPageTitle($row['title']);
+                    }*/
+
+                    while ($row = $result->fetch()){
+                        $checkedLinkInfo->setPageTitle($row['title']);
+                    }
+                    // add the records to the check links info array
+                    $this->statistics->addCheckedLinkInfo($checkedLinkInfo);
+
                 } elseif (GeneralUtility::_GP('showalllinks')) {
                     $response = ['valid' => true];
                     $record['url_response'] = json_encode($response) ?: '';
@@ -415,6 +445,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                 }
+
             }
         }
     }
@@ -425,7 +456,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array<int,string> $linkTypes List of link types to check (corresponds to hook object)
      * @param bool $considerHidden Defines whether to look into hidden fields
      */
-    public function generateBrokenLinkRecords(array $linkTypes = [], $considerHidden = false): void
+    public function generateBrokenLinkRecords(array $linkTypes = [], $considerHidden = false, $searchFilter = ''): void
     {
         if (empty($linkTypes) || empty($this->pids)) {
             return;
@@ -594,7 +625,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function findLinksForRecord(
         array &$results,
-        $table,
+              $table,
         array $fields,
         array $record,
         int $checks = self::MASK_CONTENT_CHECK_ALL
@@ -733,10 +764,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected function analyzeTypoLinks(
         array $resultArray,
         array &$results,
-        $htmlParser,
+              $htmlParser,
         array $record,
-        $field,
-        $table
+              $field,
+              $table
     ): void {
         $currentR = [];
         $linkTags = $htmlParser->splitIntoBlock('a,link', $resultArray['content']);

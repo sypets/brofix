@@ -13,20 +13,40 @@
 	}
 
 	table.BrokenLinkStats td {
-		text-align: right;
+		text-align : right;
 	}
 
     table.BrokenLinkStats tr.tableHeader {
         background-color: darkgrey;
         color: white;
     }
+
+
+	table.BrokenLinks,
+	table.BrokenLinks th,
+	table.BrokenLinks td {
+		padding: 10px;
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+
+	table.BrokenLinks  th {
+		text-align: left;
+	}
+
+	table.BrokenLinks tr.tableHeader {
+		background-color: darkgrey;
+		color: white;
+	}
 </style>
 
 <table class="BrokenLinkStats">
 
 
     <tr class="tableHeader">
-        <th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate></th>
+        <th colspan="2">
+			<f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate>
+		</th>
     </tr>
 	<tr>
 		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.percent_broken_links" languageKey="{language}">Percent broken links</f:translate></th>
@@ -83,4 +103,29 @@
 		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.check.done" languageKey="{language}">Check done</f:translate></th>
 		<td><f:format.date>{stats.checkEndTime}</f:format.date> <f:format.date format="H:i">{stats.checkEndTime}</f:format.date></td>
 	</tr>
+
+</table>
+<br>
+ <a href="http://mce.local.vici.io/typo3">
+	 <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:visitTheBackend"/>
+ </a>
+<br>
+<br>
+<table class="BrokenLinks">
+	<tr class="tableHeader">
+		<th>UID</th>
+		<th>
+			<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:pageTitle"/>
+		</th>
+		<th>
+			<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:link"/>
+		</th>
+	</tr>
+	<f:for each="{stats.checkedLinksInfoList}" as="item">
+		<tr>
+			<td>{item.uid}</td>
+			<td>{item.pageTitle}</td>
+			<td>{item.url}</td>
+		</tr>
+	</f:for>
 </table>

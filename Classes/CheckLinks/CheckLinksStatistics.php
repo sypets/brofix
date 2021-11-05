@@ -16,6 +16,8 @@ namespace Sypets\Brofix\CheckLinks;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\CheckLinks\CheckedLinksInfo\CheckedLinkInfoModel;
+
 class CheckLinksStatistics
 {
     /**
@@ -65,6 +67,11 @@ class CheckLinksStatistics
      * @var float
      */
     protected $percentBrokenLinks;
+
+    /**
+     * @var array<CheckedLinkInfoModel> CheckedLinkInfoModel
+     */
+    protected $checkedLinksInfoList = array();
 
     public function __construct()
     {
@@ -132,6 +139,14 @@ class CheckLinksStatistics
         $this->pageTitle = $pageTitle;
     }
 
+    public function addCheckedLinkInfo(CheckedLinkInfoModel $checkedLinkInfo): void
+    {
+        // limit the display checked links details
+        if(count($this->checkedLinksInfoList) < 10){
+            array_push($this->checkedLinksInfoList, $checkedLinkInfo);
+        }
+    }
+
     public function getPageTitle(): string
     {
         return $this->pageTitle;
@@ -195,5 +210,13 @@ class CheckLinksStatistics
     public function getPercentBrokenLinks(): float
     {
         return $this->percentBrokenLinks;
+    }
+
+    /**
+     * @return array<CheckedLinkInfoModel>
+     */
+    public function getCheckedLinksInfoList() : array
+    {
+        return $this->checkedLinksInfoList;
     }
 }
