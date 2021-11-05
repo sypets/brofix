@@ -452,6 +452,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      *
      * @param array<int,string> $linkTypes List of link types to check (corresponds to hook object)
      * @param bool $considerHidden Defines whether to look into hidden fields
+     * @param string $searchFilter
      */
     public function generateBrokenLinkRecords(array $linkTypes = [], $considerHidden = false, $searchFilter = ''): void
     {
