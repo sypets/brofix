@@ -273,8 +273,8 @@ class ManageExclusions
     /**
      * Displays one line of the excluded links table
      *
-     * @param array<> $row Name of database table
-     * @return mixed[] HTML of the rendered row
+     * @param array<mixed> $row Name of database table
+     * @return array<mixed> HTML of the rendered row
      */
     protected function renderTableRow(array $row): array
     {
