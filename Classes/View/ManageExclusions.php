@@ -318,7 +318,8 @@ class ManageExclusions
     protected function generateCsvHeaderArray(array $itemsArray): array
     {
         $headerCsv = [];
-        for ($i = 0; $i < count($itemsArray); $i++) {
+        $count = count($itemsArray);
+        for ($i = 0; $i < $count; $i++) {
             $headerCsv[] = $this->charsetConverter->conv($itemsArray[$i], 'utf-8', 'iso-8859-15');
         }
         return $headerCsv;
