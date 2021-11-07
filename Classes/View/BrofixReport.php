@@ -326,8 +326,8 @@ class BrofixReport
             $this->configuration->loadPageTsConfig($this->id);
             $this->currentUserHasPermissionsForExcludeLinkTargetStorage
                 = $this->excludeLinkTarget->currentUserHasCreatePermissions(
-                $this->configuration->getExcludeLinkTargetStoragePid()
-            );
+                    $this->configuration->getExcludeLinkTargetStoragePid()
+                );
         }
     }
 
