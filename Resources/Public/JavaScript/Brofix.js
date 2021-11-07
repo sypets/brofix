@@ -35,7 +35,6 @@ define(['jquery'], function($) {
     })
 
     $('.selectAllLinks').click(function() {
-      alert('hello woeld')
       var $checkboxes = $('.check').find('input[type=checkbox]');
       $checkboxes.prop('checked', $(this).is(':checked'));
     });
