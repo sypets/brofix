@@ -119,7 +119,6 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     protected $statistics;
 
-
     /**
      * Fill hookObjectsArr with different link types and possible XClasses.
      */
@@ -429,7 +428,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $checkedLinkInfo->setUid($row['uid']);
                         $checkedLinkInfo->setPid($record['record_pid']);
                         $checkedLinkInfo->setUrl($url);
-                        while ($row = $result->fetch()){
+                        while ($row = $result->fetch()) {
                             $checkedLinkInfo->setPageTitle($row['title']);
                         }
                         // add the records to the check links info array
@@ -442,7 +441,6 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                 }
-
             }
         }
     }
@@ -623,7 +621,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function findLinksForRecord(
         array &$results,
-              $table,
+        $table,
         array $fields,
         array $record,
         int $checks = self::MASK_CONTENT_CHECK_ALL
@@ -762,10 +760,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected function analyzeTypoLinks(
         array $resultArray,
         array &$results,
-              $htmlParser,
+        $htmlParser,
         array $record,
-              $field,
-              $table
+        $field,
+        $table
     ): void {
         $currentR = [];
         $linkTags = $htmlParser->splitIntoBlock('a,link', $resultArray['content']);

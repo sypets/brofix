@@ -64,5 +64,4 @@ class CheckedLinkInfoModel
     {
         $this->pid = $pid;
     }
-
 }

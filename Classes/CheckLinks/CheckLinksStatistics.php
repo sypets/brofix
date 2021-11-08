@@ -71,7 +71,7 @@ class CheckLinksStatistics
     /**
      * @var array<CheckedLinkInfoModel> CheckedLinkInfoModel
      */
-    protected $checkedLinksInfoList = array();
+    protected $checkedLinksInfoList = [];
 
     public function __construct()
     {
@@ -142,7 +142,7 @@ class CheckLinksStatistics
     public function addCheckedLinkInfo(CheckedLinkInfoModel $checkedLinkInfo): void
     {
         // limit the display checked links details
-        if(count($this->checkedLinksInfoList) < 10){
+        if (count($this->checkedLinksInfoList) < 10) {
             array_push($this->checkedLinksInfoList, $checkedLinkInfo);
         }
     }
@@ -215,7 +215,7 @@ class CheckLinksStatistics
     /**
      * @return array<CheckedLinkInfoModel>
      */
-    public function getCheckedLinksInfoList() : array
+    public function getCheckedLinksInfoList(): array
     {
         return $this->checkedLinksInfoList;
     }
