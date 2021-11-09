@@ -506,6 +506,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                         'p',
                         $queryBuilder->expr()->eq('p.uid', $queryBuilder->quoteIdentifier($table . '.pid'))
                     );
+                    // order by the link creation
+                    $queryBuilder->orderBy($table.'.crdate', 'DESC');
                     $constraints[] = $queryBuilder->expr()->neq('p.doktype', $queryBuilder->createNamedParameter(3, \PDO::PARAM_INT));
                     $constraints[] =$queryBuilder->expr()->neq('p.doktype', $queryBuilder->createNamedParameter(4, \PDO::PARAM_INT));
 

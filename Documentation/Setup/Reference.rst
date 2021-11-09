@@ -842,7 +842,7 @@ mail.addLinks
 
    Description
       Get Broken links list int the e-mail report. ‘0’ is not displayed by default.
-      ‘1’ will send in the e-email report 10 broken links found, with the UID, page Title, and the link.
+      ‘1’ will send in the e-email report 10 broken links found recently created, with the UID, page Title, and the link.
 
    Default
       0
