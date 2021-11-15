@@ -159,7 +159,7 @@
                 </thead>
                 <tbody class="check">
 
-                <label class="btn btn-default btn-checkbox "><input type="checkbox" name="slectedExcludeLink" value="1" class="selectAllLinks">
+                <label class="btn btn-default btn-checkbox "><input type="checkbox" name="selectedExcludeLink" value="1" class="selectAllLinks">
                     <span class="t3-icon fa ">
                     </span>
                     <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:selectAndDeselect"/>
@@ -175,11 +175,9 @@
                 <f:for each="{brokenLinks}" as="item">
                     <tr>
                         <td>
-                            <label class="btn btn-default btn-checkbox "><input type="checkbox"
-                                                                                name="slectedExcludeLink"
-                                                                                value="{item.uid}"
-                                                                                class="slectedExcludeLink"><span
-                                    class="t3-icon fa "></span></label>
+                            <label class="btn btn-default btn-checkbox ">
+								<input type="checkbox" name="selectedExcludeLink"  value="{item.uid}"  class="selectedExcludeLink">
+							</label>
                             Page {item.page}
                         </td>
                         <td>
