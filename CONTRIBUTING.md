@@ -86,3 +86,10 @@ To build and minimize css files.
 yarn install
 yarn build
 ```
+
+You can use nvm to manage your node versions, e.g.
+
+```
+nvm install 15.0.0
+nvm use 15.0.0
+```
