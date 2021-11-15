@@ -151,6 +151,10 @@ div.brofix-brokenlink-list-form select.form-control {
 
 /** manage exclusions tab */
 
-#exportCsvButton{
+#exportCsvButton {
     float: right;
+}
+
+#brofix-manage-exclusions-table tr td label input.selectedExcludeLink {
+    position: static;
 }
