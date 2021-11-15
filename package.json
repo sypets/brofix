@@ -5,7 +5,7 @@
 	"author": "Sybille Peters",
 	"license": "GPL-2.0+",
 	"engines": {
-		"node": ">=14.15.0 <15.0.0",
+		"node": ">=14.15.0 <=15.0.0",
 		"yarn": "^1.17.3"
 	},
 	"devDependencies": {
