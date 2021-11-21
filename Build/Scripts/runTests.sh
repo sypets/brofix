@@ -44,8 +44,13 @@ setUpDockerComposeDotEnv() {
 
 # Load help text into $HELP
 read -r -d '' HELP <<EOF
-brofix test runner. Execute unit test suite and some other details.
+brofix test runner. Execute unit, functional and other test suites in
+a docker based test environment. Handles execution of single test files, sending
+xdebug information to a local IDE and more.
 Also used by github actions for test execution.
+
+Recommended docker version is >=20.10 for xdebug break pointing to work reliably, and
+a recent docker-compose (tested >=1.21.2) is needed.
 
 Usage: $0 [options] [file]
 
