@@ -14,30 +14,32 @@ setUpDockerComposeDotEnv() {
     # Delete possibly existing local .env file if exists
     [ -e .env ] && rm .env
     # Set up a new .env file for docker-compose
-    echo "COMPOSE_PROJECT_NAME=local" >> .env
+    {
+        echo "COMPOSE_PROJECT_NAME=local"
 
-    # To prevent access rights of files created by the testing, the docker image later
-    # runs with the same user that is currently executing the script. docker-compose can't
-    # use $UID directly itself since it is a shell variable and not an env variable, so
-    # we have to set it explicitly here.
-    echo "HOST_UID=`id -u`" >> .env
+        # To prevent access rights of files created by the testing, the docker image later
+        # runs with the same user that is currently executing the script. docker-compose can't
+        # use $UID directly itself since it is a shell variable and not an env variable, so
+        # we have to set it explicitly here.
+        echo "HOST_UID=`id -u`"
 
-    # Your local home directory for composer and npm caching
-    echo "HOST_HOME=${HOME}" >> .env
+        # Your local home directory for composer and npm caching
+        echo "HOST_HOME=${HOME}"
 
-    # Your local user
-    echo "CORE_ROOT"=${CORE_ROOT} >> .env
-    echo "ROOT_DIR"=${ROOT_DIR} >> .env
-    echo "HOST_USER=${USER}" >> .env
-    echo "TEST_FILE=${TEST_FILE}" >> .env
-    echo "CGLCHECK_DRY_RUN=${CGLCHECK_DRY_RUN}" >> .env
-    echo "PHP_XDEBUG_ON=${PHP_XDEBUG_ON}" >> .env
-    echo "PHP_XDEBUG_PORT=${PHP_XDEBUG_PORT}" >> .env
-    echo "PHP_VERSION=${PHP_VERSION}" >> .env
-    echo "DOCKER_PHP_IMAGE=${DOCKER_PHP_IMAGE}" >> .env
-    echo "EXTRA_TEST_OPTIONS=${EXTRA_TEST_OPTIONS}" >> .env
-    echo "SCRIPT_VERBOSE=${SCRIPT_VERBOSE}" >> .env
-    echo "PASSWD_PATH=${PASSWD_PATH}" >> .env
+        # Your local user
+        echo "CORE_ROOT=${CORE_ROOT}"
+        echo "ROOT_DIR=${ROOT_DIR}"
+        echo "HOST_USER=${USER}"
+        echo "TEST_FILE=${TEST_FILE}"
+        echo "CGLCHECK_DRY_RUN=${CGLCHECK_DRY_RUN}"
+        echo "PHP_XDEBUG_ON=${PHP_XDEBUG_ON}"
+        echo "PHP_XDEBUG_PORT=${PHP_XDEBUG_PORT}"
+        echo "PHP_VERSION=${PHP_VERSION}"
+        echo "DOCKER_PHP_IMAGE=${DOCKER_PHP_IMAGE}"
+        echo "EXTRA_TEST_OPTIONS=${EXTRA_TEST_OPTIONS}"
+        echo "SCRIPT_VERBOSE=${SCRIPT_VERBOSE}"
+        echo "PASSWD_PATH=${PASSWD_PATH}"
+    } > .env
 }
 
 # Load help text into $HELP
@@ -143,14 +145,7 @@ PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 EXTRA_TEST_OPTIONS=""
 SCRIPT_VERBOSE=0
-PHPUNIT_RANDOM=""
 CGLCHECK_DRY_RUN=""
-DATABASE_DRIVER=""
-MARIADB_VERSION="10.3"
-MYSQL_VERSION="5.5"
-POSTGRES_VERSION="10"
-CHUNKS=0
-THISCHUNK=0
 PASSWD_PATH=/etc/passwd
 
 # Option parsing
@@ -193,10 +188,10 @@ while getopts ":s:d:p:e:xy:huvn" OPT; do
             SCRIPT_VERBOSE=1
             ;;
         \?)
-            INVALID_OPTIONS+=(${OPTARG})
+            INVALID_OPTIONS+=("${OPTARG}")
             ;;
         :)
-            INVALID_OPTIONS+=(${OPTARG})
+            INVALID_OPTIONS+=("${OPTARG}")
             ;;
     esac
 done
