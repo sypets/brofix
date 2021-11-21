@@ -78,12 +78,13 @@ Options:
             - postgres: use postgres
             - sqlite: use sqlite
 
-    -p <7.2|7.3|7.4|8.0>
+    -p <7.2|7.3|7.4|8.0|8.1>
         Specifies the PHP minor version to be used
             - 7.2 (default): use PHP 7.2
             - 7.3: use PHP 7.3
             - 7.4: use PHP 7.4
             - 8.0: use PHP 8.0
+            - 8.1: use PHP 8.1
 
     -e "<phpunit options>"
         Only with -s functional|unit|phpstan
@@ -124,6 +125,12 @@ Examples:
 
     # Run unit tests using PHP 7.3
     ./Build/Scripts/runTests.sh -p 7.3
+
+    # Run functional tests using PHP 7.4 and sqlite
+    ./Build/Scripts/runTests.sh -s functional -p 7.4 -d sqlite
+    
+    # Run functional tests in phpunit with a filtered test method name in a specified file, php 7.4 and xdebug enabled.
+    ./Build/Scripts/runTests.sh -s functional -p 7.4 -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
 
 # Test if docker-compose exists, else exit out with error
@@ -145,7 +152,7 @@ CORE_ROOT="${PWD}/../../"
 ROOT_DIR=`readlink -f ${PWD}/../../`
 TEST_SUITE="unit"
 DBMS="mariadb"
-PHP_VERSION="7.3"
+PHP_VERSION="7.2"
 PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 EXTRA_TEST_OPTIONS=""
@@ -169,6 +176,9 @@ while getopts ":s:d:p:e:xy:huvn" OPT; do
             ;;
         p)
             PHP_VERSION=${OPTARG}
+            if ! [[ ${PHP_VERSION} =~ ^(7.2|7.3|7.4|8.0|8.1)$ ]]; then
+                INVALID_OPTIONS+=("${OPT} ${OPTARG} : unsupported php version")
+            fi
             ;;
         e)
             EXTRA_TEST_OPTIONS=${OPTARG}
