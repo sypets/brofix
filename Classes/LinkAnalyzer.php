@@ -337,7 +337,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected function checkLinks(array $links, array $linkTypes, int $mode = 0): void
     {
         foreach ($this->hookObjectsArr as $key => $hookObj) {
-            if (!is_array($links[$key]) || (!in_array($key, $linkTypes, true))) {
+            if (!is_array($links[$key] ?? false) || (!in_array($key, $linkTypes, true))) {
                 continue;
             }
 
