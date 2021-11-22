@@ -421,7 +421,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         $host = (string)($parts['host'] ?? '');
         if ($host !== '') {
             try {
-                $newDomain = (string)HttpUtility::idn_to_ascii($host);
+                $newDomain = (string)idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
                 if (strcmp($host, $newDomain) !== 0) {
                     $parts['host'] = $newDomain;
                     $url = HttpUtility::buildUrl($parts);
