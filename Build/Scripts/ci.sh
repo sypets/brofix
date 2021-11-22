@@ -9,6 +9,7 @@ set -x
 
 php="7.4"
 m="composerInstallMax"
+vt3="11"
 cleanup=0
 
 # -------------------
@@ -23,15 +24,19 @@ progname=$(basename $0)
 
 usage()
 {
-    echo "[-p <PHP version>] [-m <min|max>] [-h] [-c]"
+    echo "[-p <PHP version>] [-m <min|max>] [-t <10|11> [-h] [-c]"
     echo " -c : runs cleanup after"
+    echo " -t : TYPO3 version, can be 10 or 11, 11 is default"
     exit 1
 }
 
-while getopts "hp:m:c" opt;do
+while getopts "hp:m:ct:" opt;do
   case $opt in
     p)
       php=${OPTARG}
+      ;;
+    t)
+      vt3=${OPTARG}
       ;;
     h)
       usage
@@ -61,6 +66,12 @@ echo "Running with PHP=$php and $m"
 # echo "Install typo3/cms-core as source. Modifies composer.json! (config:preferred-install)"
 # composer config preferred-install.typo3/cms-core source
 
+if [[ $vt3 == 10 ]];then
+    composer require typo3/cms-backend:^10.4.21
+    composer require typo3/cms-core:^10.4.21
+    composer require typo3/cms-fluid:^10.4.21
+    composer require typo3/cms-info:^10.4.21
+fi
 
 echo "composer install"
 Build/Scripts/runTests.sh -p ${php} -s ${m}
@@ -87,11 +98,15 @@ echo "cleanup"
 echo "remove preferred-install from composer.json"
 composer config --unset preferred-install
 
+set +x
+
 if [ $cleanup -eq 1 ];then
     $thisdir/cleanup.sh
 else
-    echo "Make sure to run Build/Script/cleanup.sh to revert changes to composer.json"
+    echo "--------------------------------------------------------------------------------"
+    echo "!!!! Make sure to run Build/Script/cleanup.sh to revert changes to composer.json"
     git diff composer.json
+    echo "--------------------------------------------------------------------------------"
 fi
 
-echo "done"
+echo "done: ok"
