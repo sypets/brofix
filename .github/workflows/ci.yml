@@ -12,63 +12,75 @@ on:
 jobs:
 
   static:
-    name: static analysis
+    name: "static analysis"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         php: [ '7.4' ]
+        typo3version: [ '^10.4' ]
         minMax: [ 'composerInstallMax' ]
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v2
 
-      - name: Composer
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "${{ matrix.typo3version }}" -s composerCoreVersion
+
+      - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
-      - name: cgl
+      - name: "cgl"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
 
-      - name: Composer validate
+      - name: "Composer validate"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
-      - name: Lint PHP
+      - name: "Lint PHP"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
 
-      - name: phpstan
+      - name: "phpstan"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan.neon"
 
   unit:
-    name: Unit tests
+    name: "Unit tests"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
+        typo3version: [ '^10.4' ]
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v2
 
-      - name: Composer
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "${{ matrix.typo3version }}" -s composerCoreVersion
+
+      - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
-      - name: Unit tests
+      - name: "Unit tests"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
 
   functional:
-    name: Functional tests on all DBs
+    name: "Functional tests"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
+        typo3version: [ '^10.4']
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
         #db: [ 'mariadb', 'mssql', 'postgres', 'sqlite' ]
         db: [ 'mariadb' ]
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v2
 
-      - name: Composer
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "${{ matrix.typo3version }}" -s composerCoreVersion
+
+      - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
-      - name: Functional tests with ${{ matrix.db }}
+      - name: "Functional tests with ${{ matrix.db }}"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d ${{ matrix.db }} -s functional

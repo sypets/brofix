@@ -28,6 +28,7 @@ setUpDockerComposeDotEnv() {
 
         # Your local user
         echo "CORE_ROOT=${CORE_ROOT}"
+        echo "CORE_VERSION=${CORE_VERSION}"
         echo "ROOT_DIR=${ROOT_DIR}"
         echo "HOST_USER=${USER}"
         echo "TEST_FILE=${TEST_FILE}"
@@ -63,12 +64,21 @@ Options:
             - composerInstallMax: "composer update", with no platform.php config.
             - composerInstallMin: "composer update --prefer-lowest", with platform.php set to PHP version x.x.0.
             - composerValidate: "composer validate"
+            - composerCoreVersion: "composer require --no-install typo3/minimal:"coreVersion"
             - cglGit: test and fix latest committed patch for CGL compliance
             - cglAll: test and fix all core php files
             - lint: PHP linting
             - phpstan: phpstan tests
             - unit (default): PHP unit tests
             - functional: functional tests
+
+    -c <composer-core-version-constraint>
+        Only with -s composerCoreVersion
+        Specifies the Typo3 core version to be used
+            - '^10.4' (default)
+            - '^11.5'
+            - '^11.5.3'
+            - ...
 
     -d <mariadb|mssql|postgres|sqlite>
         Only with -s functional
@@ -128,7 +138,7 @@ Examples:
 
     # Run functional tests using PHP 7.4 and sqlite
     ./Build/Scripts/runTests.sh -s functional -p 7.4 -d sqlite
-    
+
     # Run functional tests in phpunit with a filtered test method name in a specified file, php 7.4 and xdebug enabled.
     ./Build/Scripts/runTests.sh -s functional -p 7.4 -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
@@ -149,6 +159,7 @@ cd ../testing-docker || exit 1
 
 # Option defaults
 CORE_ROOT="${PWD}/../../"
+CORE_VERSION="10.4"
 ROOT_DIR=`readlink -f ${PWD}/../../`
 TEST_SUITE="unit"
 DBMS="mariadb"
@@ -166,10 +177,13 @@ OPTIND=1
 # Array for invalid options
 INVALID_OPTIONS=();
 # Simple option parsing based on getopts (! not getopt)
-while getopts ":s:d:p:e:xy:huvn" OPT; do
+while getopts ":s:c:d:p:e:xy:huvn" OPT; do
     case ${OPT} in
         s)
             TEST_SUITE=${OPTARG}
+            ;;
+        c)
+            CORE_VERSION=${OPTARG}
             ;;
         d)
             DBMS=${OPTARG}
@@ -246,6 +260,11 @@ fi
 
 # Suite execution
 case ${TEST_SUITE} in
+    composerCoreVersion)
+        setUpDockerComposeDotEnv
+        docker-compose run composer_corevesion_require
+        SUITE_EXIT_CODE=$?
+        ;;
     composerInstall)
         setUpDockerComposeDotEnv
         docker-compose run composer_install
