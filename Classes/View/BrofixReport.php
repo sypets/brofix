@@ -115,7 +115,7 @@ class BrofixReport
     /**
      * @var string
      */
-    protected $orderBy = self::ORDER_BY_DEFAULT;
+    protected $orderBy = BrofixReport::ORDER_BY_DEFAULT;
 
     /**
      * @var int
@@ -417,8 +417,8 @@ class BrofixReport
 
         // orderBy
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy')
-            ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? self::ORDER_BY_DEFAULT));
-        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? self::ORDER_BY_DEFAULT)) {
+            ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrofixReport::ORDER_BY_DEFAULT));
+        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrofixReport::ORDER_BY_DEFAULT)) {
             $resetPagination = true;
         }
         $this->pObj->MOD_SETTINGS['orderBy'] = $this->orderBy;
