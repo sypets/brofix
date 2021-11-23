@@ -67,9 +67,9 @@ echo "Running with PHP=$php and $m"
 # composer config preferred-install.typo3/cms-core source
 
 if [[ $vt3 == 10 ]];then
-    Build/Scripts/runTests.sh -p ${php} -c "^10.4" -s
+    Build/Scripts/runTests.sh -p ${php} -c "^10.4" -s composerCoreVersion
 else
-    Build/Scripts/runTests.sh -p ${php} -c "^11.5" -s
+    Build/Scripts/runTests.sh -p ${php} -c "^11.5" -s composerCoreVersion
 fi
 
 echo "composer install"
