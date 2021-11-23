@@ -15,6 +15,9 @@ jobs:
     name: "static analysis"
     runs-on: ubuntu-20.04
     strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: false
       matrix:
         php: [ '7.4' ]
         typo3version: [ '^10.4' ]
@@ -45,6 +48,9 @@ jobs:
     name: "Unit tests"
     runs-on: ubuntu-20.04
     strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: false
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
         typo3version: [ '^10.4' ]
@@ -66,6 +72,9 @@ jobs:
     name: "Functional tests"
     runs-on: ubuntu-20.04
     strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: false
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
         typo3version: [ '^10.4']
