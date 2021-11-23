@@ -25,7 +25,6 @@ use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -121,11 +120,6 @@ class BrofixReport
      * @var int
      */
     protected $paginationCurrentPage;
-
-    /**
-     * @var DocumentTemplate
-     */
-    protected $doc;
 
     /**
      * Information about the current page record
