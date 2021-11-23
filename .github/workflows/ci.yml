@@ -13,23 +13,22 @@ on:
 
 jobs:
 
-  static:
-    name: "static analysis"
+  all:
+    name: "all core-10"
     runs-on: ubuntu-20.04
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
       # rest matrix jobs be be executed anyway.
       fail-fast: false
       matrix:
-        php: [ '7.4' ]
-        typo3version: [ '^10.4' ]
-        minMax: [ 'composerInstallMax' ]
+        php: [ '7.2', '7.3', '7.4' ]
+        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
 
       - name: "Set Typo3 core version"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "${{ matrix.typo3version }}" -s composerCoreVersion
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "^10.4" -s composerCoreVersion
 
       - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
@@ -38,60 +37,29 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
 
       - name: "Composer validate"
+        if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
       - name: "Lint PHP"
+        if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
 
       - name: "phpstan"
+        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan.neon"
 
-  unit:
-    name: "Unit tests"
-    runs-on: ubuntu-20.04
-    strategy:
-      # This prevents cancellation of matrix job runs, if one/two already failed and let the
-      # rest matrix jobs be be executed anyway.
-      fail-fast: false
-      matrix:
-        php: [ '7.2', '7.3', '7.4' ]
-        typo3version: [ '^10.4' ]
-        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2
-
-      - name: "Set Typo3 core version"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "${{ matrix.typo3version }}" -s composerCoreVersion
-
-      - name: "Composer"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
-
       - name: "Unit tests"
+        if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
 
-  functional:
-    name: "Functional tests"
-    runs-on: ubuntu-20.04
-    strategy:
-      # This prevents cancellation of matrix job runs, if one/two already failed and let the
-      # rest matrix jobs be be executed anyway.
-      fail-fast: false
-      matrix:
-        php: [ '7.2', '7.3', '7.4' ]
-        typo3version: [ '^10.4']
-        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
-        #db: [ 'mariadb', 'mssql', 'postgres', 'sqlite' ]
-        db: [ 'mariadb' ]
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2
+      - name: "Functional tests with mariadb"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional
 
-      - name: "Set Typo3 core version"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "${{ matrix.typo3version }}" -s composerCoreVersion
+      - name: "Functional tests with sqlite (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d sqlite -s functional
 
-      - name: "Composer"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
-
-      - name: "Functional tests with ${{ matrix.db }}"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d ${{ matrix.db }} -s functional
+      - name: "Functional tests with postgres (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
