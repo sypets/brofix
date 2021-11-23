@@ -26,7 +26,7 @@ services:
     tmpfs:
       - /var/lib/postgresql/data:rw,noexec,nosuid
 
-  composer_corevesion_require:
+  composer_coreversion_require:
     image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:

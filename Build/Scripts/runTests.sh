@@ -262,7 +262,7 @@ fi
 case ${TEST_SUITE} in
     composerCoreVersion)
         setUpDockerComposeDotEnv
-        docker-compose run composer_corevesion_require
+        docker-compose run composer_coreversion_require
         SUITE_EXIT_CODE=$?
         ;;
     composerInstall)
