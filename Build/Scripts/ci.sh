@@ -103,7 +103,7 @@ if [ $cleanup -eq 1 ];then
     $thisdir/cleanup.sh
 else
     echo "--------------------------------------------------------------------------------"
-    echo "!!!! Make sure to run Build/Script/cleanup.sh to revert changes to composer.json"
+    echo "!!!! Make sure to revert changes to composer.json e.g. by git checkout composer.json"
     git diff composer.json
     echo "--------------------------------------------------------------------------------"
 fi
