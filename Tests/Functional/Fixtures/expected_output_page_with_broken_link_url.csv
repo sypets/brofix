@@ -1,3 +1,3 @@
 "tx_brofix_broken_links",,,,,,,
 ,"record_uid","record_pid","field","table_name","link_title","url","link_type"
-,1,0,"url","pages",,"https://sfsfsfsfdfsfsdfsf/sfdsfsds","external"
+,1,0,"url","pages",,"http://localhost/iAmInvalid","external"
