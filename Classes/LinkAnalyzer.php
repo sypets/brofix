@@ -649,7 +649,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $softRefParams = $spParams;
                     if (!is_array($softRefParams)) {
                         // set subst such that findRef will return substitutes for urls, emails etc
-                        $softRefParams = ['subst' => true];
+                        $softRefParams = ['subst'];
                     }
 
                     // Do processing
