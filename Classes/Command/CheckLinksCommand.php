@@ -16,7 +16,6 @@ namespace Sypets\Brofix\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
-use DateTime;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -210,10 +209,6 @@ class CheckLinksCommand extends Command
         $this->sendTo = $input->getOption('to') ?: '';
 
         foreach ($startPages as $pageId) {
-            $date = new DateTime();
-            $dateString  = $date->format('Y-m-d H:i:s');
-            $this->io->writeln("\n" . 'Brofix linkcheck started at: ' . $dateString);
-
             $this->io->title('Start checking page ' . $pageId);
 
             $pageId = (int)$pageId;
