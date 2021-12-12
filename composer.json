@@ -33,7 +33,7 @@
 		"typo3/cms-info": "^10.4.21 || ^11.5.3"
 	},
 	"require-dev": {
-		"friendsofphp/php-cs-fixer": "^2.18.6",
+		"friendsofphp/php-cs-fixer": "^3.2",
 		"jangregor/phpstan-prophecy": "^0.8.1",
 		"phpstan/phpstan": "^0.12.64",
 		"phpunit/phpunit": "^8.5.21",
