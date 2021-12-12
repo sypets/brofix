@@ -21,6 +21,7 @@ use Sypets\Brofix\Filter\Filter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BrokenLinkRepositoryTest extends AbstractFunctionalTest
@@ -662,6 +663,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         }
         $this->backendUserFixture = $fixtureFile;
         $this->setUpBackendUserFromFixture($uid);
+        Bootstrap::initializeLanguageObject();
     }
 
     /**

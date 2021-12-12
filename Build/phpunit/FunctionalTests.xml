@@ -50,8 +50,8 @@
                          with TYPO3 core v11 and up.
                          Will always be done with next major version.
                          To still suppress warnings, notices and deprecations, do NOT define the constant at all.
+            <const name="TYPO3_TESTING_FUNCTIONAL_REMOVE_ERROR_HANDLER" value="true" />
          -->
-        <const name="TYPO3_TESTING_FUNCTIONAL_REMOVE_ERROR_HANDLER" value="true" />
         <ini name="display_errors" value="1" />
         <env name="TYPO3_CONTEXT" value="Testing" />
     </php>

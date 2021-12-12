@@ -21,10 +21,20 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Sypets\Brofix\Command\CheckLinksCommand;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
 use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CheckLinksCommandTest extends AbstractFunctionalTest
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class);
+        $GLOBALS['LANG'] = $this->getContainer()->get(LanguageServiceFactory::class)->create('default');
+    }
+
     /**
      * @test
      */
