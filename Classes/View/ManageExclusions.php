@@ -198,7 +198,7 @@ class ManageExclusions
         $searchFilter->setExcludeReasonFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
 
         // Get Records from the database
-        $brokenLinks = $this->brokenLinkRepository->getExcludedBrokenLinks(self::ORDER_BY_VALUES[$this->orderBy] ?? [], $searchFilter);
+        $brokenLinks = $this->brokenLinkRepository->getExcludedBrokenLinks($searchFilter, self::ORDER_BY_VALUES[$this->orderBy] ?? []);
         $totalCount = count($brokenLinks);
 
         if ($brokenLinks) {
@@ -371,7 +371,7 @@ class ManageExclusions
         $headerCsv = $this->generateCsvHeaderArray($LangArrayHeader);
 
         //Render Excluded Links
-        $excludedLinks = $this->brokenLinkRepository->getExcludedBrokenLinks(self::ORDER_BY_VALUES[$this->orderBy] ?? [], new Filter());
+        $excludedLinks = $this->brokenLinkRepository->getExcludedBrokenLinks(new Filter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);
 
         //Open File Based on Function Php To start Write inside the file CSV
         $fp = fopen('php://output', 'wb');
