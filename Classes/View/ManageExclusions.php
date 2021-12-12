@@ -78,6 +78,12 @@ class ManageExclusions
     protected $backendSession;
 
     /**
+     * Current page
+     * @var int
+     */
+    protected $id;
+
+    /**
      * @var int
      */
     protected $paginationCurrentPage;
@@ -133,7 +139,9 @@ class ManageExclusions
     protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_info'): string
     {
         $parameters = [
+            'id' => $this->id,
             'orderBy' => $this->orderBy,
+            'paginationPage', $this->paginationCurrentPage
         ];
         // if same key, additionalQueryParameters should overwrite parameters
         $parameters = array_merge($parameters, $additionalQueryParameters);
@@ -151,11 +159,12 @@ class ManageExclusions
      * @return StandaloneView
      * Displays the table of the excluded links
      */
-    public function createViewForManageExclusionTab(StandaloneView $view, InfoModuleController $pObj): StandaloneView
+    public function createViewForManageExclusionTab(StandaloneView $view, InfoModuleController $pObj, int $pageId): StandaloneView
     {
         // pagination + currentPage
         $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage') ?? 1);
 
+        $this->id = $pageId;
         $pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
         $this->getBackendUser()->pushModuleData('web_info', $pObj->MOD_SETTINGS);
 
@@ -207,6 +216,7 @@ class ManageExclusions
         $view->assign('brokenLinks', $items);
         $view->assign('pagination', $this->pagination);
         $view->assign('paginationPage', $this->paginationCurrentPage ?? 1);
+        $view->assign('currentPage', $this->id);
 
         // Table header
         $sortActions = [];

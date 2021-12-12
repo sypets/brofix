@@ -552,7 +552,7 @@ class BrofixReport
         // Add Management Exclusions Tab
         $view = $this->createView('ManageExclusions');
         $manageExclusions = new ManageExclusions();
-        $manageExclusionsTabView = $manageExclusions->createViewForManageExclusionTab($view, $this->pObj);
+        $manageExclusionsTabView = $manageExclusions->createViewForManageExclusionTab($view, $this->pObj, $this->id);
 
         $menuItems[0] = [
             'label' => $this->getLanguageService()->getLL('Report'),
