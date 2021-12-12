@@ -18,10 +18,17 @@ namespace Sypets\Brofix\Tests\Functional;
  */
 
 use Sypets\Brofix\LinkAnalyzer;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LinkAnalyzerTest extends AbstractFunctionalTest
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $GLOBALS['LANG'] = $this->getContainer()->get(LanguageServiceFactory::class)->create('default');
+    }
+
     /**
      * @param array<string|int> $pidList
      * @return LinkAnalyzer

@@ -92,6 +92,7 @@ class CheckLinksCommand extends Command
     public function __construct(string $name = null)
     {
         parent::__construct($name);
+
         $this->configuration = GeneralUtility::makeInstance(Configuration::class);
         $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);

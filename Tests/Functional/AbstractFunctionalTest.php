@@ -18,7 +18,6 @@ namespace Sypets\Brofix\Tests\Functional;
  */
 
 use Sypets\Brofix\Configuration\Configuration;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
@@ -55,7 +54,6 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
     {
         parent::setUp();
 
-        Bootstrap::initializeLanguageObject();
         $this->initializeConfiguration();
     }
 
