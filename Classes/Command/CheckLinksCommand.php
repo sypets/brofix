@@ -295,9 +295,6 @@ class CheckLinksCommand extends Command
             } else {
                 $this->io->writeln('Do not send mail, because sending was deactivated.');
             }
-            $date = new DateTime();
-            $dateString  = $date->format('Y-m-d H:i:s');
-            $this->io->writeln("\n" . 'Brofix linkcheck ended at: ' . $dateString . "\n");
         }
 
         // @todo use constant Command::SUCCESS (not available in earlier Symfony versions)
