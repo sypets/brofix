@@ -139,9 +139,6 @@ class CheckLinksCommand extends Command
             ->addOption(
                 'exclude-uid',
                 'x',
-                // we use one value separated by string instead of InputOption::VALUE_IS_ARRAY, otherwise
-                // several values can not be entered in scheduler task. This would not be necessary if
-                // we did not have to support running the command via the CLI.
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Page id (and subpages), which will not be checked. Use several -x options if more than one, e.g -x1 -x2'
             )
