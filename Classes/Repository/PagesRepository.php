@@ -35,12 +35,13 @@ class PagesRepository
      * @param string $permsClause Perms clause
      * @param array<string> $excludedPages
      * @param bool $considerHidden Whether to consider hidden pages or not
+     * @param array<int,int> $excludedPages
      *
      * @return mixed[]
      *
      * @todo begin is never really used
      */
-    public function getAllSubpagesForPage(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = null): array
+    public function getAllSubpagesForPage(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
     {
         $subPageIds = [];
         if ($depth === 0) {
@@ -73,7 +74,7 @@ class PagesRepository
             $isHidden = (bool)$row['hidden'];
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
 
-            if ($excludedPages !== null) {
+            if ($excludedPages !== []) {
                 if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages)) {
                     $subPageIds[] = $id;
                 }
@@ -113,10 +114,11 @@ class PagesRepository
      * @param string $permsClause
      * @param array<string> $excludedPages
      * @param bool $considerHidden
+     * @param array<int,int> $excludedPages
      *
      * @return mixed[]
      */
-    public function getPageList(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = null): array
+    public function getPageList(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
     {
         $pageList = $this->getAllSubpagesForPage(
             $id,

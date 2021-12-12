@@ -139,8 +139,11 @@ class CheckLinksCommand extends Command
             ->addOption(
                 'exclude-uid',
                 'x',
-                InputOption::VALUE_OPTIONAL,
-                'Page id, separated by comma, that will not be checked. The function is recursive'
+                // we use one value separated by string instead of InputOption::VALUE_IS_ARRAY, otherwise
+                // several values can not be entered in scheduler task. This would not be necessary if
+                // we did not have to support running the command via the CLI.
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Page id(s), separated by comma, that will not be checked. The function is recursive'
             )
         ;
     }
@@ -168,9 +171,9 @@ class CheckLinksCommand extends Command
         }
 
         // exluded pages uid
-        $excludedPagesString =  (string)($input->getOption('exclude-uid') ?? '');
-        if ($excludedPagesString !== '') {
-            $this->excludedPages = explode(',', $excludedPagesString);
+        $this->excludedPages = [];
+        foreach ($input->getOption('exclude-uid') ?: [] as $value) {
+            $this->excludedPages[] = (int) $value;
         }
 
         $startPageString = (string)($input->getOption('start-pages') ?? '');
