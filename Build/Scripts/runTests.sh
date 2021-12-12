@@ -72,7 +72,7 @@ Options:
             - unit (default): PHP unit tests
             - functional: functional tests
 
-    -c <composer-core-version-constraint>
+    -t <composer-core-version-constraint>
         Only with -s composerCoreVersion
         Specifies the Typo3 core version to be used
             - '^10.4' (default)
@@ -177,12 +177,12 @@ OPTIND=1
 # Array for invalid options
 INVALID_OPTIONS=();
 # Simple option parsing based on getopts (! not getopt)
-while getopts ":s:c:d:p:e:xy:huvn" OPT; do
+while getopts ":s:t:d:p:e:xy:huvn" OPT; do
     case ${OPT} in
         s)
             TEST_SUITE=${OPTARG}
             ;;
-        c)
+        t)
             CORE_VERSION=${OPTARG}
             ;;
         d)
