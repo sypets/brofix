@@ -65,8 +65,8 @@ Options:
             - composerInstallMin: "composer update --prefer-lowest", with platform.php set to PHP version x.x.0.
             - composerValidate: "composer validate"
             - composerCoreVersion: "composer require --no-install typo3/minimal:"coreVersion"
+            - cgl: test and fix all core php files
             - cglGit: test and fix latest committed patch for CGL compliance
-            - cglAll: test and fix all core php files
             - lint: PHP linting
             - phpstan: phpstan tests
             - unit (default): PHP unit tests
@@ -114,7 +114,7 @@ Options:
         is not listening on default port.
 
     -n
-        Only with -s cglGit|cglAll
+        Only with -s cgl|cglGit
         Activate dry-run in CGL check that does not actively change files and only prints broken ones.
 
     -u
@@ -292,10 +292,17 @@ case ${TEST_SUITE} in
     cgl)
         # Active dry-run for cglAll needs not "-n" but specific options
         if [[ ! -z ${CGLCHECK_DRY_RUN} ]]; then
-            CGLCHECK_DRY_RUN="--dry-run --diff --diff-format udiff"
+            CGLCHECK_DRY_RUN="--dry-run --diff"
         fi
         setUpDockerComposeDotEnv
         docker-compose run cgl_all
+        SUITE_EXIT_CODE=$?
+        docker-compose down
+        ;;
+    cglGit)
+        # Active dry-run for cglAll needs not "-n" but specific options
+        setUpDockerComposeDotEnv
+        docker-compose run cgl_git
         SUITE_EXIT_CODE=$?
         docker-compose down
         ;;
