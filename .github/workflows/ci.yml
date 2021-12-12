@@ -77,7 +77,7 @@ jobs:
       # rest matrix jobs be be executed anyway.
       fail-fast: false
       matrix:
-        php: [ '7.4' ]
+        php: [ '7.4', '8.0' ]
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
     steps:
       - name: "Checkout"
