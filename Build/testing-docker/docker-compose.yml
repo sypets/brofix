@@ -285,15 +285,27 @@ services:
           bin/phpunit -c Web/typo3conf/ext/brofix/Build/phpunit/FunctionalTests.xml ${EXTRA_TEST_OPTIONS} --exclude-group not-sqlite ${TEST_FILE};
         fi
       "
+
+  cgl_git:
+    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    user: "${HOST_UID}"
+    volumes:
+      - ${ROOT_DIR}:${ROOT_DIR}
+    working_dir: ${ROOT_DIR}
+    command: >
+      /bin/sh -c "
+        if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
+          set -x
+        fi
+        Build/Scripts/cglFixMyCommit.sh ${CGLCHECK_DRY_RUN};
+      "
+
   cgl_all:
     image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
-      - ${CORE_ROOT}:${CORE_ROOT}
-      - ${HOST_HOME}:${HOST_HOME}
-      - ${PASSWD_PATH}:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
-    working_dir: ${CORE_ROOT}
+      - ${ROOT_DIR}:${ROOT_DIR}
+    working_dir: ${ROOT_DIR}
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
