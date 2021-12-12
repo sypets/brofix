@@ -32,7 +32,8 @@ module.exports = function (grunt) {
           outputStyle: 'compressed'
         },
         files: {
-          'Resources/Public/Css/brofix.css': 'Resources/Private/Sass/brofix.scss'
+          'Resources/Public/Css/brofix.css': 'Resources/Private/Sass/brofix.scss',
+          'Resources/Public/Css/brofix_manage_exclusions.css': 'Resources/Private/Sass/brofix_manage_exclusions.scss'
         }
       }
     },
@@ -40,7 +41,8 @@ module.exports = function (grunt) {
     watch: {
       sass: {
         files: [
-          'Resources/Private/Sass/brofix.scss'
+          'Resources/Private/Sass/brofix.scss',
+          'Resources/Private/Sass/brofix_manage_exclusions.scss'
         ],
         tasks: [
           'sass'
