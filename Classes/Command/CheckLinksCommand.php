@@ -84,6 +84,11 @@ class CheckLinksCommand extends Command
      */
     protected $pagesRepository;
 
+    /**
+     * @var int[]
+     */
+    protected $excludedPages = [];
+
     public function __construct(string $name = null)
     {
         parent::__construct($name);
@@ -131,6 +136,12 @@ class CheckLinksCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Send email (override configuration). 1: send, 0: do not send'
             )
+            ->addOption(
+                'exclude-uid',
+                'x',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Page id (and subpages), which will not be checked. Use several -x options if more than one, e.g -x1 -x2'
+            )
         ;
     }
 
@@ -154,6 +165,12 @@ class CheckLinksCommand extends Command
         $this->sendEmail = (int)($input->getOption('send-email') ?? -1);
         if ($this->sendEmail === 0) {
             $this->io->writeln('Do not send email.');
+        }
+
+        // exluded pages uid
+        $this->excludedPages = [];
+        foreach ($input->getOption('exclude-uid') ?: [] as $value) {
+            $this->excludedPages[] = (int)$value;
         }
 
         $startPageString = (string)($input->getOption('start-pages') ?? '');
@@ -268,8 +285,8 @@ class CheckLinksCommand extends Command
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
                 /**
-                * @var GenerateCheckResultMailInterface $generateCheckResultMail
-                */
+                 * @var GenerateCheckResultMailInterface $generateCheckResultMail
+                 */
                 $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
                 $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
             } else {
@@ -328,7 +345,8 @@ class CheckLinksCommand extends Command
                 $pageUid,
                 $depth,
                 '1=1',
-                $checkHidden
+                $checkHidden,
+                $this->excludedPages
             );
         } else {
             $this->io->warning(

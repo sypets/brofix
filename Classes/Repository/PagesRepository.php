@@ -33,13 +33,15 @@ class PagesRepository
      * @param int $id Start page id
      * @param int $depth Depth to traverse down the page tree.
      * @param string $permsClause Perms clause
+     * @param array<string> $excludedPages
      * @param bool $considerHidden Whether to consider hidden pages or not
+     * @param array<int,int> $excludedPages
      *
      * @return mixed[]
      *
      * @todo begin is never really used
      */
-    public function getAllSubpagesForPage(int $id, int $depth, string $permsClause, bool $considerHidden = false): array
+    public function getAllSubpagesForPage(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
     {
         $subPageIds = [];
         if ($depth === 0) {
@@ -71,15 +73,17 @@ class PagesRepository
             $id = (int)$row['uid'];
             $isHidden = (bool)$row['hidden'];
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
-            if (!$isHidden || $considerHidden) {
+
+            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages)) {
                 $subPageIds[] = $id;
             }
-            if ($depth > 1 && (!($isHidden && $extendToSubpages) || $considerHidden)) {
+            if ($depth > 1 && (!($isHidden && $extendToSubpages) || $considerHidden) && !in_array($id, $excludedPages)) {
                 $subPageIds = array_merge($subPageIds, $this->getAllSubpagesForPage(
                     $id,
                     $depth - 1,
                     $permsClause,
-                    $considerHidden
+                    $considerHidden,
+                    $excludedPages
                 ));
             }
         }
@@ -93,17 +97,24 @@ class PagesRepository
      * @param int $id
      * @param int $depth
      * @param string $permsClause
+     * @param array<string> $excludedPages
      * @param bool $considerHidden
+     * @param array<int,int> $excludedPages
      *
      * @return mixed[]
      */
-    public function getPageList(int $id, int $depth, string $permsClause, bool $considerHidden = false): array
+    public function getPageList(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
     {
+        if (in_array($id, $excludedPages)) {
+            // do not add page, if in list of excluded pages
+            return [];
+        }
         $pageList = $this->getAllSubpagesForPage(
             $id,
             $depth,
             $permsClause,
-            $considerHidden
+            $considerHidden,
+            $excludedPages
         );
         // Always add the current page
         $pageList[] = $id;
