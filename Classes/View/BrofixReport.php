@@ -641,8 +641,8 @@ class BrofixReport
                 $this->pageList,
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
-                self::ORDER_BY_VALUES[$this->orderBy] ?? [],
-                $searchFilter
+                $searchFilter,
+                self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
             if ($brokenLinks) {
                 $totalCount = count($brokenLinks);

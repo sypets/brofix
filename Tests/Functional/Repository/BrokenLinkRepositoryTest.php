@@ -357,8 +357,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
             $pidList,
             $linkTypes,
             $searchFields,
-            [],
-            new Filter()
+            new Filter(),
+            []
         );
 
         self::assertEquals($expectedCount, count($results));
@@ -647,8 +647,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
             $pidList,
             $linkTypes,
             $searchFields,
-            [],
-            new Filter()
+            new Filter(),
+            []
         );
 
         $this->normalizeBrokenLinksResults($expectedResult);

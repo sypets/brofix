@@ -59,7 +59,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param Filter $filter
      * @return mixed[]
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, array $orderBy = [], Filter $filter): array
+    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, Filter $filter, array $orderBy = []): array
     {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
@@ -158,7 +158,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param Filter $filter
      * @return mixed[]
      */
-    public function getExcludedBrokenLinks(array $orderBy = [], Filter $filter): array
+    public function getExcludedBrokenLinks(Filter $filter, array $orderBy = []): array
     {
         $results = [];
 
@@ -290,7 +290,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @todo is currently not used, use for statistics
      */
-    public function getLinkCounts(array $pageIds, array $linkTypes = [], array $searchFields): array
+    public function getLinkCounts(array $pageIds, array $linkTypes = [], array $searchFields = []): array
     {
         $markerArray = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
