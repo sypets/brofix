@@ -64,53 +64,53 @@ jobs:
         if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
 
-#  all_core_11:
-#    name: "all core-11"
-#    runs-on: ubuntu-20.04
-#    strategy:
-#      # This prevents cancellation of matrix job runs, if one/two already failed and let the
-#      # rest matrix jobs be be executed anyway.
-#      fail-fast: false
-#      matrix:
-#        php: [ '7.4' ]
-#        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
-#    steps:
-#      - name: "Checkout"
-#        uses: actions/checkout@v2
-#
-#      - name: "Set Typo3 core version"
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "^11.5" -s composerCoreVersion
-#
-#      - name: "Composer"
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
-#
-#      - name: "cgl"
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
-#
-#      - name: "Composer validate"
-#        if: always()
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
-#
-#      - name: "Lint PHP"
-#        if: always()
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
-#
-#      - name: "phpstan"
-#        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan.neon"
-#
-#      - name: "Unit tests"
-#        if: always()
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
-#
-#      - name: "Functional tests with mariadb"
-#        if: always()
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional
-#
-#      - name: "Functional tests with sqlite (nightly or pull_request)"
-#        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d sqlite -s functional
-#
-#      - name: "Functional tests with postgres (nightly or pull_request)"
-#        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
-#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
+  all_core_11:
+    name: "all core-11"
+    runs-on: ubuntu-20.04
+    strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: false
+      matrix:
+        php: [ '7.4' ]
+        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -c "^11.5" -s composerCoreVersion
+
+      - name: "Composer"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
+      - name: "cgl"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
+
+      - name: "Composer validate"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
+
+      - name: "Lint PHP"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
+
+      - name: "phpstan"
+        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan.neon"
+
+      - name: "Unit tests"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
+
+      - name: "Functional tests with mariadb"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional
+
+      - name: "Functional tests with sqlite (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d sqlite -s functional
+
+      - name: "Functional tests with postgres (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
