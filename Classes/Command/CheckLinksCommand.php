@@ -170,7 +170,7 @@ class CheckLinksCommand extends Command
         // exluded pages uid
         $this->excludedPages = [];
         foreach ($input->getOption('exclude-uid') ?: [] as $value) {
-            $this->excludedPages[] = (int) $value;
+            $this->excludedPages[] = (int)$value;
         }
 
         $startPageString = (string)($input->getOption('start-pages') ?? '');
