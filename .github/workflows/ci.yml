@@ -27,6 +27,11 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v2
 
+      # This must be checked before core version select is run, as this would write this
+      # and than the check would fail - obiously.
+      - name: "Check if typo3/minimal has been pushed in composer.json"
+        run: Build/Scripts/checkComposerJsonForPushedMinimalPackage.sh
+
       - name: "Set Typo3 core version"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^10.4" -s composerCoreVersion
 
@@ -77,6 +82,11 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
+
+      # This must be checked before core version select is run, as this would write this
+      # and than the check would fail - obiously.
+      - name: "Check if typo3/minimal has been pushed in composer.json"
+        run: Build/Scripts/checkComposerJsonForPushedMinimalPackage.sh
 
       - name: "Set Typo3 core version"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^11.5" -s composerCoreVersion
