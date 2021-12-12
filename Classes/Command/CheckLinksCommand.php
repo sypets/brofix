@@ -85,7 +85,7 @@ class CheckLinksCommand extends Command
     protected $pagesRepository;
 
     /**
-     * @var array<string>
+     * @var int[]
      */
     protected $excludedPages = [];
 
