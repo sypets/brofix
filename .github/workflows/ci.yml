@@ -95,6 +95,7 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
       - name: "cgl"
+        if: ${{ matrix.php != '8.1' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
 
       - name: "Composer validate"
