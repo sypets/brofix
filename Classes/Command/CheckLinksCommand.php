@@ -143,7 +143,7 @@ class CheckLinksCommand extends Command
                 // several values can not be entered in scheduler task. This would not be necessary if
                 // we did not have to support running the command via the CLI.
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Page id(s), separated by comma, that will not be checked. The function is recursive'
+                'Page id (and subpages), which will not be checked. Use several -x options if more than one, e.g -x1 -x2'
             )
         ;
     }
