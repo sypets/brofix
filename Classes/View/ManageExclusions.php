@@ -7,6 +7,7 @@ use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\Filter\Filter;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Http\Response;
@@ -92,6 +93,11 @@ class ManageExclusions
     protected $localizationUtility;
 
     /**
+     * @var ModuleTemplate
+     */
+    protected $moduleTemplate;
+
+    /**
      * @var Filter
      */
     protected $filter;
@@ -152,6 +158,10 @@ class ManageExclusions
 
         $pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
         $this->getBackendUser()->pushModuleData('web_info', $pObj->MOD_SETTINGS);
+
+        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
 
         // orderBy
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy') ?? self::ORDER_BY_DEFAULT);
