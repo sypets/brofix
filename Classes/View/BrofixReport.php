@@ -672,7 +672,7 @@ class BrofixReport
 
         $view->assign('pagination', $this->pagination);
         $view->assign('orderBy', $this->orderBy);
-        $view->assign('paginationPage', $this->paginationCurrentPage ?? 1);
+        $view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {
@@ -756,6 +756,11 @@ class BrofixReport
         $tableHeadData = [];
 
         foreach ($headers as $key) {
+            $tableHeadData[$key] = [
+                'label' => '',
+                'url'   => '',
+                'icon'  => '',
+            ];
             $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
             if (isset($sortActions[$key])) {
                 // sorting available, add url
@@ -776,7 +781,7 @@ class BrofixReport
 
         $tableHeaderHtml = [];
         foreach ($tableHeadData as $key => $values) {
-            if (isset($values['url'])) {
+            if ($values['url'] !== '') {
                 $tableHeaderHtml[$key]['header'] = sprintf(
                     '<a href="%s" style="text-decoration: underline;">%s</a>',
                     $values['url'],
@@ -786,7 +791,7 @@ class BrofixReport
                 $tableHeaderHtml[$key]['header'] = $values['label'];
             }
 
-            if (($values['icon'] ?? '') !== '') {
+            if ($values['icon'] !== '') {
                 $tableHeaderHtml[$key]['icon'] = $values['icon'];
             }
         }

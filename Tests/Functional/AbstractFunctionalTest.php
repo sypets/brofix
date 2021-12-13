@@ -24,7 +24,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 abstract class AbstractFunctionalTest extends FunctionalTestCase
 {
     /**
-     * @var array<string>
+     * @var array<int,string>
      */
     protected $coreExtensionsToLoad = [
         'backend',
