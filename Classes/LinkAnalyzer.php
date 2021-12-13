@@ -506,7 +506,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
                     $lang = 0;
                     if ($languageField) {
-                        $lang = (int)($record[$languageField] ?? 0);
+                        $lang = (int)($row[$languageField] ?? 0);
                     }
                     if (($l18nCfg === 1 || $l18nCfg === 3) && $lang ===0) {
                         // do not render records of default language due to setting l18n_cfg in page
@@ -800,7 +800,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function isVisibleFrontendRecord(string $tablename, array $row): bool
     {
-        $uid = (int)($record['uid'] ?? 0);
+        $uid = (int)($row['uid'] ?? 0);
         if ($row['hidden'] ?? false) {
             return false;
         }
@@ -835,7 +835,7 @@ class LinkAnalyzer implements LoggerAwareInterface
 
         if ($tablename === 'tt_content') {
             $excludedCtypes = $this->configuration->getExcludedCtypes();
-            if ($excludedCtypes !== [] && $row['CType'] ?? false) {
+            if ($excludedCtypes !== [] && ($row['CType'] ?? false)) {
                 if (in_array($row['CType'], $excludedCtypes)) {
                     return false;
                 }

@@ -27,7 +27,7 @@ interface LinkTargetCacheInterface
      *
      * @param bool $isValid
      * @param ErrorParams $errorParams
-     * @return array{'valid': bool, 'errorParams': array}
+     * @return array{'valid': bool, 'errorParams': array<mixed>}
      */
     public function generateUrlResponse(bool $isValid, ErrorParams $errorParams): array;
 

@@ -215,7 +215,7 @@ class ManageExclusions
         $view->assign('title', 'Excludes Links');
         $view->assign('brokenLinks', $items);
         $view->assign('pagination', $this->pagination);
-        $view->assign('paginationPage', $this->paginationCurrentPage ?? 1);
+        $view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
         $view->assign('currentPage', $this->id);
 
         // Table header
@@ -254,6 +254,11 @@ class ManageExclusions
         $tableHeadData = [];
 
         foreach ($headers as $key) {
+            $tableHeadData[$key] = [
+                'label' => '',
+                'url'   => '',
+                'icon'  => '',
+            ];
             $tableHeadData[$key]['label'] = $languageService->getLL('columnHeader.' . $key);
             if (isset($sortActions[$key])) {
                 // sorting available, add url
@@ -273,7 +278,7 @@ class ManageExclusions
         }
         $tableHeaderHtml = [];
         foreach ($tableHeadData as $key => $values) {
-            if (isset($values['url'])) {
+            if ($values['url'] !== '') {
                 $tableHeaderHtml[$key]['header'] = sprintf(
                     '<a href="%s" style="text-decoration: underline;">%s</a>',
                     $values['url'],
@@ -283,7 +288,7 @@ class ManageExclusions
                 $tableHeaderHtml[$key]['header'] = $values['label'];
             }
 
-            if (($values['icon'] ?? '') !== '') {
+            if ($values['icon'] !== '') {
                 $tableHeaderHtml[$key]['icon'] = $values['icon'];
             }
         }

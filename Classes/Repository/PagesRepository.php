@@ -239,7 +239,7 @@ class PagesRepository
             }
             if ($title == '') {
                 $title = GeneralUtility::fixed_lgd_cs(strip_tags($record['title']), $titleLimit)
-                    ?? '[' . $record['uid'] . ']';
+                    ?: '[' . $record['uid'] . ']';
             }
             $path = '/' . strip_tags($record['title']) . $path;
         }
