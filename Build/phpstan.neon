@@ -17,6 +17,6 @@ parameters:
   scanDirectories:
     - %currentWorkingDirectory%/Web/typo3/sysext
 
-  excludes_analyse:
+  excludePaths:
     - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
     - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultPlainMail.php
