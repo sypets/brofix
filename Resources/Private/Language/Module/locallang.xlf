@@ -269,15 +269,6 @@
 			<trans-unit id="no.access" resname="no.access">
 				<source>You do not have access to these listings.</source>
 			</trans-unit>
-			 <trans-unit id="visitBackendPage">
-				<source>Visit the backend page</source>
-			</trans-unit>
-			<trans-unit id="pageTitle">
-				 <source>Page Title</source>
-			</trans-unit>
-			<trans-unit id="link">
-				 <source>Link</source>
-			</trans-unit>
 		</body>
 	</file>
 </xliff>
