@@ -45,12 +45,6 @@ class ManageExclusions
         'link_type_reverse' => [
             ['link_type', 'DESC'],
         ],
-        'hidden' => [
-            ['hidden', 'ASC'],
-        ],
-        'hidden_reverse' => [
-            ['hidden', 'DESC'],
-        ],
         'crdate' => [
             ['crdate', 'ASC'],
         ],
@@ -246,7 +240,6 @@ class ManageExclusions
             'page',
             'linktarget',
             'link_type',
-            'hidden',
             'crdate',
             'reason'
         ];

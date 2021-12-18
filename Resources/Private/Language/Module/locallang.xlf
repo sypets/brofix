@@ -290,21 +290,12 @@
 			<trans-unit id="columnHeader.link_type">
 				<source>Link type</source>
 			 </trans-unit>
-			 <trans-unit id="columnHeader.hidden">
-				<source>Hidden</source>
-			 </trans-unit>
 			 <trans-unit id="columnHeader.crdate">
 				<source>Excluding Date</source>
 			 </trans-unit>
 			 <trans-unit id="columnHeader.reason">
 				<source>Reason</source>
 			 </trans-unit>
-			 <trans-unit id="records.isHidden">
-				   <source>Hidden</source>
-			  </trans-unit>
-			  <trans-unit id="records.isNotHidden">
-					<source>is Not Hidden</source>
-			  </trans-unit>
 			  <trans-unit id="records.reason1">
 				   <source>Non given</source>
 			   </trans-unit>

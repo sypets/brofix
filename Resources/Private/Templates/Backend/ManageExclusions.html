@@ -139,12 +139,6 @@
                         </f:if>
                     </th>
                     <th colspan="2">
-                        <f:format.raw>{tableHeader.hidden.header}</f:format.raw>
-                        <f:if condition="{tableHeader.hidden.icon}">
-                            <core:icon identifier="{tableHeader.hidden.icon}"/>
-                        </f:if>
-                    </th>
-                    <th colspan="2">
                         <f:format.raw>{tableHeader.crdate.header}</f:format.raw>
                         <f:if condition="{tableHeader.crdate.icon}">
                             <core:icon identifier="{tableHeader.crdate.icon}"/>
@@ -190,20 +184,6 @@
                         </td>
                         <td colspan="2">
                             {item.link_type}
-                        </td>
-                        <td colspan="2">
-                            <f:if condition="{item.hidden} == 0">
-                                <f:then>
-                                    <span title="{item.link_title}">
-                                        <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:records.isNotHidden"/>
-                                    </span>
-                                </f:then>
-                                <f:else>
-                                    <span title="{item.link_title}">
-                                        <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:records.istHidden"/>
-                                    </span>
-                                </f:else>
-                            </f:if>
                         </td>
                         <td colspan="2">
                             {item.exclude_date}
