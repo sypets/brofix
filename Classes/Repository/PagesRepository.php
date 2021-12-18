@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
+use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -69,7 +70,7 @@ class PagesRepository
             )
             ->execute();
 
-        while ($row = $result->fetch()) {
+        while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
             $id = (int)$row['uid'];
             $isHidden = (bool)$row['hidden'];
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
@@ -212,7 +213,7 @@ class PagesRepository
             ->execute();
 
         $translatedPages = [];
-        while ($row = $result->fetch()) {
+        while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
             $translatedPages[] = (int)$row['uid'];
         }
 

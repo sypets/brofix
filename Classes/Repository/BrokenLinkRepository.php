@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use Sypets\Brofix\Filter\Filter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -145,7 +146,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
-            $results = array_merge($results, $queryBuilder->execute()->fetchAll());
+            $results = array_merge($results, $queryBuilder->execute()->{DoctrineDbalMethodNameHelper::fetchAllAssociative()}());
         }
         return $results;
     }
@@ -206,7 +207,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
             }
         }
 
-        $results = array_merge($results, $queryBuilder->execute()->fetchAll());
+        $results = array_merge($results, $queryBuilder->execute()->{DoctrineDbalMethodNameHelper::fetchAllAssociative()}());
         return $results;
     }
 
@@ -276,7 +277,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 )
             )
             ->execute()
-            ->fetchColumn(0);
+            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
         return $count ?: 0;
     }
 
@@ -339,7 +340,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->groupBy(self::TABLE . '.link_type')
                 ->execute();
 
-            while ($row = $result->fetch()) {
+            while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
                 if (!isset($markerArray[$row['link_type']])) {
                     $markerArray[$row['link_type']] = 0;
                 }
@@ -548,7 +549,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             return (bool)$queryBuilder
                 ->execute()
-                ->fetchColumn(0);
+                ->{DoctrineDbalMethodNameHelper::fetchOne()}();
         } catch (TableNotFoundException $e) {
             return false;
         }
@@ -639,7 +640,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 )
             )
             ->execute()
-            ->fetchColumn(0);
+            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
         if ($count > 0) {
             $identifier = [
                 'record_uid' => $record['record_uid'],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
+use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -51,7 +52,7 @@ class ContentRepository
                 )
             )
             ->execute()
-            ->fetch();
+            ->{DoctrineDbalMethodNameHelper::fetchAssociative()}();
         if (!is_array($result)) {
             $result = [];
         }
@@ -85,7 +86,7 @@ class ContentRepository
                 )
             )
             ->execute()
-            ->fetchColumn(0);
+            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
 
         /**
          * @var DeletedRestriction
@@ -106,7 +107,7 @@ class ContentRepository
                 )
             )
             ->execute()
-            ->fetchColumn(0);
+            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
     }
 
     protected function generateQueryBuilder(string $table = ''): QueryBuilder
