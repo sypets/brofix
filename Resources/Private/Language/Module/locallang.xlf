@@ -285,7 +285,7 @@
 				<source>Page</source>
 			</trans-unit>
 			<trans-unit id="columnHeader.linktarget">
-				<source>Exclude list</source>
+				<source>Link target</source>
 			</trans-unit>
 			<trans-unit id="columnHeader.link_type">
 				<source>Link type</source>
