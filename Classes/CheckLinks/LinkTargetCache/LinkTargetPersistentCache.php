@@ -16,6 +16,7 @@ namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -61,7 +62,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             ->from(static::TABLE)
             ->where(...$constraints)
             ->execute()
-            ->fetchColumn(0) ? true : false;
+            ->{DoctrineDbalMethodNameHelper::fetchOne()}() ? true : false;
     }
 
     /**
@@ -88,7 +89,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             );
         $row = $queryBuilder
             ->execute()
-            ->fetch();
+            ->{DoctrineDbalMethodNameHelper::fetchAssociative()}();
         if (!$row) {
             return [];
         }
