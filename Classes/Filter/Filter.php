@@ -36,6 +36,11 @@ class Filter
      */
     protected $excludeReason_filter = '';
 
+    /**
+     * @var int
+     */
+    protected $excludeStoragePid;
+
     // Getters and Setters
 
     public function getUrlFilter(): string
@@ -95,5 +100,15 @@ class Filter
     public function setExcludeReasonFilter(string $excludeReason_filter): void
     {
         $this->excludeReason_filter = $excludeReason_filter;
+    }
+
+    public function getExcludeStoragePid(): int
+    {
+        return $this->excludeStoragePid;
+    }
+
+    public function setExcludeStoragePid(int $excludeStoragePid): void
+    {
+        $this->excludeStoragePid = $excludeStoragePid;
     }
 }
