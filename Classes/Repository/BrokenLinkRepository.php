@@ -188,6 +188,12 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getExcludeLinkTypeFilter()) . '%')
                 )
             );
+        $storagePid = $filter->getExcludeStoragePid();
+        if ($storagePid !== -1) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::EXCLUDESLINKSTABLE . '.pid', $queryBuilder->createNamedParameter($storagePid, \PDO::PARAM_INT))
+            );
+        }
         if ($filter->getExcludeReasonFilter() != '') {
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->eq(self::EXCLUDESLINKSTABLE . '.reason', $queryBuilder->createNamedParameter($filter->getExcludeReasonFilter(), \PDO::PARAM_INT))

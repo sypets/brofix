@@ -549,23 +549,31 @@ class BrofixReport
         }
 
         $reportsTabView = $this->createViewForBrokenLinksTab();
-        // Add Management Exclusions Tab
-        $view = $this->createView('ManageExclusions');
-        $manageExclusions = new ManageExclusions();
-        $manageExclusionsTabView = $manageExclusions->createViewForManageExclusionTab($view, $this->pObj, $this->id);
 
         $menuItems[0] = [
             'label' => $this->getLanguageService()->getLL('Report'),
             'content' => $reportsTabView->render()
         ];
 
-        $reportsTabView->assignMultiple([
-            'prefix' => 'manageExclusions',
-        ]);
-        $menuItems[1] = [
-            'label' => 'Manage Exclusions',
-            'content' => $manageExclusionsTabView->render()
-        ];
+        if ($this->currentUserHasPermissionsForExcludeLinkTargetStorage) {
+            // Add Management Exclusions Tab
+            $view = $this->createView('ManageExclusions');
+            $manageExclusions = new ManageExclusions();
+            $manageExclusionsTabView = $manageExclusions->createViewForManageExclusionTab(
+                $view,
+                $this->pObj,
+                $this->id,
+                $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid()
+            );
+
+            $reportsTabView->assignMultiple([
+                'prefix' => 'manageExclusions',
+            ]);
+            $menuItems[1] = [
+                'label' => 'Manage Exclusions',
+                'content' => $manageExclusionsTabView->render()
+            ];
+        }
         return $this->moduleTemplate->getDynamicTabMenu($menuItems, 'report-brofix');
     }
 

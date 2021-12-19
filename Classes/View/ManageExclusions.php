@@ -153,8 +153,12 @@ class ManageExclusions
      * @return StandaloneView
      * Displays the table of the excluded links
      */
-    public function createViewForManageExclusionTab(StandaloneView $view, InfoModuleController $pObj, int $pageId): StandaloneView
-    {
+    public function createViewForManageExclusionTab(
+        StandaloneView $view,
+        InfoModuleController $pObj,
+        int $pageId,
+        int $storagePid
+    ): StandaloneView {
         // pagination + currentPage
         $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage') ?? 1);
 
@@ -190,6 +194,7 @@ class ManageExclusions
         $searchFilter->setExcludeUrlFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeUrlFilter());
         $searchFilter->setExcludeLinkTypeFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeLinkTypeFilter());
         $searchFilter->setExcludeReasonFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
+        $searchFilter->setExcludeStoragePid($storagePid);
 
         // Get Records from the database
         $brokenLinks = $this->brokenLinkRepository->getExcludedBrokenLinks($searchFilter, self::ORDER_BY_VALUES[$this->orderBy] ?? []);
@@ -318,7 +323,7 @@ class ManageExclusions
         return $GLOBALS['LANG'];
     }
 
-    /**
+    /**createViewForManageExclusionTab
      * @return BackendUserAuthentication
      */
     protected function getBackendUser(): BackendUserAuthentication
