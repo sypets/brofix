@@ -6,6 +6,12 @@
 Changelog
 =========
 
+2.2.2
+=====
+
+* Rename branch master => main
+* Add TAB "Exclude URLs" to module
+
 2.2.0
 =====
 
