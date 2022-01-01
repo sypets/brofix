@@ -18,6 +18,6 @@ it was forked from the source. Thus, previous work has been used. Thanks goes
 to the original authors and maintainers in the core, without whom this work
 would not have been possible.
 
-* [Documentation](https://docs.typo3.org/p/sypets/brofix/master/en-us/)
+* [Documentation](https://docs.typo3.org/p/sypets/brofix/main/en-us/)
 * [Repository](https://github.com/sypets/brofix)
 * [Packagist](https://packagist.org/packages/sypets/brofix)

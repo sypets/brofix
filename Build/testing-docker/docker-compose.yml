@@ -73,12 +73,12 @@ services:
           set -x
         fi
         if [ ${PHP_VERSION} == "8.0" ]; then
-          composer req --dev typo3/cms-core:"dev-master" \
-            typo3/cms-backend:"dev-master" \
-            typo3/cms-frontend:"dev-master" \
-            typo3/cms-extbase:"dev-master" \
-            typo3/cms-fluid:"dev-master" \
-            typo3/cms-recordlist:"dev-master"
+          composer req --dev typo3/cms-core:"dev-main" \
+            typo3/cms-backend:"dev-main" \
+            typo3/cms-frontend:"dev-main" \
+            typo3/cms-extbase:"dev-main" \
+            typo3/cms-fluid:"dev-main" \
+            typo3/cms-recordlist:"dev-main"
         fi
         composer config --unset platform.php;
         composer update --no-progress --no-interaction;
@@ -100,12 +100,12 @@ services:
           set -x
         fi
         if [ ${PHP_VERSION} == "8.0" ]; then
-          composer req --dev typo3/cms-core:"dev-master" \
-            typo3/cms-backend:"dev-master" \
-            typo3/cms-frontend:"dev-master" \
-            typo3/cms-extbase:"dev-master" \
-            typo3/cms-fluid:"dev-master" \
-            typo3/cms-recordlist:"dev-master"
+          composer req --dev typo3/cms-core:"dev-main" \
+            typo3/cms-backend:"dev-main" \
+            typo3/cms-frontend:"dev-main" \
+            typo3/cms-extbase:"dev-main" \
+            typo3/cms-fluid:"dev-main" \
+            typo3/cms-recordlist:"dev-main"
         fi
         composer config platform.php ${PHP_VERSION}.0;
         composer update --prefer-lowest --no-progress --no-interaction;

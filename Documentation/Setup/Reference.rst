@@ -549,7 +549,7 @@ report.docsurl
 
       .. code-block:: typoscript
 
-         report.docsurl = https://docs.typo3.org/p/sypets/brofix/master/en-us/Index.html
+         report.docsurl = https://docs.typo3.org/p/sypets/brofix/main/en-us/Index.html
 
    Default
       empty
