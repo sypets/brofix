@@ -5,7 +5,7 @@ namespace Sypets\Brofix\View;
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\Filter\Filter;
-use Sypets\Brofix\Repository\BrokenLinkRepository;
+use Sypets\Brofix\Repository\ExcludeLinkTargetRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -103,9 +103,9 @@ class ManageExclusions
     protected $filter;
 
     /**
-     * @var BrokenLinkRepository
+     * @var ExcludeLinkTargetRepository
      */
-    protected $brokenLinkRepository;
+    protected $excludeLinkTargetRepository;
 
     /** @var PaginationInterface|null */
     protected $pagination;
@@ -117,7 +117,7 @@ class ManageExclusions
         CharsetConverter $charsetConverter = null,
         LocalizationUtility $localizationUtility = null
     ) {
-        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
+        $this->excludeLinkTargetRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
         $this->filter = $filter ?: GeneralUtility::makeInstance(Filter::class);
         $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
@@ -197,7 +197,7 @@ class ManageExclusions
         $searchFilter->setExcludeStoragePid($storagePid);
 
         // Get Records from the database
-        $brokenLinks = $this->brokenLinkRepository->getExcludedBrokenLinks($searchFilter, self::ORDER_BY_VALUES[$this->orderBy] ?? []);
+        $brokenLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks($searchFilter, self::ORDER_BY_VALUES[$this->orderBy] ?? []);
         $totalCount = count($brokenLinks);
 
         if ($brokenLinks) {
@@ -374,7 +374,7 @@ class ManageExclusions
         $headerCsv = $this->generateCsvHeaderArray($LangArrayHeader);
 
         //Render Excluded Links
-        $excludedLinks = $this->brokenLinkRepository->getExcludedBrokenLinks(new Filter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);
+        $excludedLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(new Filter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);
 
         //Open File Based on Function Php To start Write inside the file CSV
         $fp = fopen('php://output', 'wb');
@@ -413,7 +413,7 @@ class ManageExclusions
     public function deleteExcludedLinks(ServerRequestInterface $request): Response
     {
         $urlParam = $request->getQueryParams();
-        $this->brokenLinkRepository->deleteExcludeLink($urlParam['input']);
+        $this->excludeLinkTargetRepository->deleteExcludeLink($urlParam['input']);
         $data = ['result' => ''];
         $response = new Response('php://output', 200);
         $response->getBody()->write(json_encode($data));

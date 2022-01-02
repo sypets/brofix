@@ -104,7 +104,7 @@ class Filter
 
     public function getExcludeStoragePid(): int
     {
-        return $this->excludeStoragePid;
+        return $this->excludeStoragePid ?: -1;
     }
 
     public function setExcludeStoragePid(int $excludeStoragePid): void
