@@ -150,7 +150,6 @@ class BrokenLinkRepository implements LoggerAwareInterface
         return $results;
     }
 
-
     /**
      * Check if current page has broken links editable by user
      *
