@@ -111,13 +111,13 @@ class ManageExclusions
     protected $pagination;
 
     public function __construct(
-        BrokenLinkRepository $brokenLinkRepository = null,
+        ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         Filter $filter = null,
         BackendSession $backendSession = null,
         CharsetConverter $charsetConverter = null,
         LocalizationUtility $localizationUtility = null
     ) {
-        $this->excludeLinkTargetRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
+        $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
         $this->filter = $filter ?: GeneralUtility::makeInstance(Filter::class);
         $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
