@@ -9,6 +9,9 @@
 			<trans-unit id="Report" resname="Report">
 				<source>Report</source>
 			</trans-unit>
+			<trans-unit id="ManageExclusions" resname="Report">
+				<source>Manage Exclusions</source>
+			</trans-unit>
 			<trans-unit id="report.func.title" resname="report.func.title">
 				<source>Show this level</source>
 			</trans-unit>

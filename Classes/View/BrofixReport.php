@@ -570,7 +570,7 @@ class BrofixReport
                 'prefix' => 'manageExclusions',
             ]);
             $menuItems[1] = [
-                'label' => 'Manage Exclusions',
+                'label' => $this->getLanguageService()->getLL('ManageExclusions') ?: 'Manage Exclusions',
                 'content' => $manageExclusionsTabView->render()
             ];
         }
