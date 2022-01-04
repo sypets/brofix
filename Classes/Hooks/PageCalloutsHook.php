@@ -56,7 +56,8 @@ final class PageCalloutsHook
         if ($count !== 0) {
             $title = '';
             $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-            $uri = (string)($uriBuilder->buildUriFromRoute('web_info', ['id' => $pageId]) . '&SET[function]=Sypets\\Brofix\\View\\BrofixReport');
+            //$uri = (string)($uriBuilder->buildUriFromRoute('web_info', ['id' => $pageId]) . '&SET[function]=Sypets\\Brofix\\View\\BrofixReport');
+            $uri = (string)($uriBuilder->buildUriFromRoute('web_brokenlinks', ['id' => $pageId]));
             $message = sprintf(
                 ($count === 1 ? $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_singular_broken_links_found_for_page')
                         : $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_plural_broken_links_found_for_page'))

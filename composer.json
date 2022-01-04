@@ -30,7 +30,8 @@
 		"typo3/cms-backend": "^10.4.21 || ^11.5.3",
 		"typo3/cms-core": "^10.4.21 || ^11.5.3",
 		"typo3/cms-fluid": "^10.4.21 || ^11.5.3",
-		"typo3/cms-info": "^10.4.21 || ^11.5.3"
+		"typo3/cms-info": "^10.4.21 || ^11.5.3",
+		"typo3/minimal": "^11.5"
 	},
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^3.2",

@@ -11,7 +11,12 @@
 
 	<row class="brofix-brokenlink-list-form">
 
-		<form id="brofix-list-form">
+		<form id="brofix-list-form"
+			action="{f:be.uri(route:'web_brofix', parameters: '{action: \'brokenlinks\'}')}"
+			  method="post"
+			  enctype="multipart/form-data"
+			  name="demand"
+			  class="form-inline form-inline-spaced">
 			<input type="hidden" name="currentPage" value="{currentPage}"/>
 			<input type="hidden" name="id" value="{currentPage}"/>
 			<input type="hidden" name="orderBy" value="{orderBy}"/>
@@ -213,7 +218,7 @@
 				</f:for>
 				</tbody>
 			</table>
-			<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy, route: 'web_info'}"/>
+			<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy, route: 'web_brofix'}"/>
 		</f:then>
 	</f:if>
 </f:section>

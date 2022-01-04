@@ -7,6 +7,9 @@ services:
   Sypets\Brofix\:
     resource: '../Classes/*'
 
+  Sypets\Brofix\Controller\BrofixModuleController:
+    tags: ['backend.controller']
+
   Sypets\Brofix\LinkAnalyzer:
     public: true
 
