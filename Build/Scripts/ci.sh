@@ -93,11 +93,14 @@ Build/Scripts/runTests.sh -p ${php} -s unit
 echo "functional tests"
 Build/Scripts/runTests.sh -p ${php} -d mariadb -s functional
 
+# -------
+# cleanup
+# -------
+
 echo "cleanup"
 echo "remove preferred-install from composer.json"
 composer config --unset preferred-install
-
-set +x
+composer remove typo3/minimal
 
 if [ $cleanup -eq 1 ];then
     $thisdir/cleanup.sh
@@ -107,5 +110,8 @@ else
     git diff composer.json
     echo "--------------------------------------------------------------------------------"
 fi
+
+# check if changes in composer.json
+Build/Scripts/checkComposerJsonForPushedMinimalPackage.sh
 
 echo "done: ok"
