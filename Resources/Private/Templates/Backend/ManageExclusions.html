@@ -119,7 +119,11 @@
             <table class="table table-striped table-hover" id="brofix-manage-exclusions-table">
                 <thead>
                 <tr>
-					<th colspan="1"></th>
+					<f:if condition="{hasPermission}">
+						<f:then>
+							<th colspan="1"></th>
+						</f:then>
+					</f:if>
                     <th colspan="2">
                         <f:format.raw>{tableHeader.page.header}</f:format.raw>
                         <f:if condition="{tableHeader.page.icon}">
@@ -154,14 +158,19 @@
                 </thead>
                 <tbody class="check">
 
-                <label class="btn btn-default btn-checkbox "><input type="checkbox" name="selectedExcludeLink" value="1" class="selectAllLinks">
-                    <span class="t3-icon fa ">
-                    </span>
-                    <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:selectAndDeselect"/>
-                </label>
-                <button class="btn btn-default" style="margin-left: 10px" id="deleteSelectedLinks">
-                    <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:deleteLinks"/>
-                </button>
+				<f:if condition="{hasPermission}">
+					<f:then>
+						<label class="btn btn-default btn-checkbox "><input type="checkbox" name="selectedExcludeLink" value="1" class="selectAllLinks">
+							<span class="t3-icon fa ">
+							</span>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:selectAndDeselect"/>
+						</label>
+						<button class="btn btn-default" style="margin-left: 10px" id="deleteSelectedLinks">
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:deleteLinks"/>
+						</button>
+					</f:then>
+				</f:if>
+
                 <a class="btn btn-default" href="{f:be.uri(route: 'export-excluded_links')}" id="exportCsvButton">
                     <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:exportCsv"/>
                 </a>
@@ -169,11 +178,15 @@
                 <br/>
                 <f:for each="{brokenLinks}" as="item">
                     <tr>
-                        <td colspan="1">
-                            <label class="btn btn-default btn-checkbox ">
-								<input type="checkbox" name="selectedExcludeLink"  value="{item.uid}"  class="selectedExcludeLink">
-							</label>
-						</td>
+						<f:if condition="{hasPermission}">
+							<f:then>
+								<td colspan="1">
+									<label class="btn btn-default btn-checkbox ">
+										<input type="checkbox" name="selectedExcludeLink"  value="{item.uid}"  class="selectedExcludeLink">
+									</label>
+								</td>
+							</f:then>
+						</f:if>
 						<td colspan="2">
                             {item.page}
                         </td>

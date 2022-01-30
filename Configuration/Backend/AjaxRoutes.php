@@ -10,6 +10,6 @@ return [
     // Delete Exclude Link
     'delete_excluded_links' => [
         'path' => '/deletelinks',
-        'target' =>  \Sypets\Brofix\View\ManageExclusions::class . '::deleteExcludedLinks'
+        'target' =>  \Sypets\Brofix\Controller\ManageExclusionsController::class . '::deleteExcludedLinks'
     ],
 ];

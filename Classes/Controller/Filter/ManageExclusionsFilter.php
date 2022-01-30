@@ -2,30 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Sypets\Brofix\Filter;
+namespace Sypets\Brofix\Controller\Filter;
 
-/**
- * This is no longer used but will result in exception if removed due to being
- * loaded from user permissions
- * @deprecated
- */
-class Filter
+class ManageExclusionsFilter
 {
-    /**
-     * @var string
-     */
-    protected $url_filtre = '';
-
-    /**
-     * @var string
-     */
-    protected $uid_filtre = '';
-
-    /**
-     * @var string
-     */
-    protected $title_filter = '';
-
     /**
      * @var string
      */
@@ -48,20 +28,6 @@ class Filter
 
     // Getters and Setters
 
-    public function getUrlFilter(): string
-    {
-        return $this->url_filtre;
-    }
-    public function getUidFilter(): string
-    {
-        return $this->uid_filtre;
-    }
-
-    public function getTitleFilter(): string
-    {
-        return $this->title_filter;
-    }
-
     public function getExcludeLinkTypeFilter(): string
     {
         return $this->excludeLinkType_filter;
@@ -75,21 +41,6 @@ class Filter
     public function getExcludeReasonFilter(): string
     {
         return $this->excludeReason_filter;
-    }
-
-    public function setUrlFilter(string $url_filter): void
-    {
-        $this->url_filtre = $url_filter;
-    }
-
-    public function setUidFilter(string $uid_filter): void
-    {
-        $this->uid_filtre = $uid_filter;
-    }
-
-    public function setTitleFilter(string $title_filter): void
-    {
-        $this->title_filter = $title_filter;
     }
 
     public function setExcludeLinkTypeFilter(string $excludeLinkType_filter): void

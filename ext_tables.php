@@ -2,12 +2,20 @@
 
 defined('TYPO3_MODE') or die();
 
-// Add module
+// Add Info module: Broken link list
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
     'web_info',
-    \Sypets\Brofix\View\BrofixReport::class,
+    \Sypets\Brofix\Controller\BrokenLinkListController::class,
     null,
-    'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:mod_brofix'
+    'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:function.list.header.broken_links'
+);
+
+// Add Info module: Manage exclusions
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
+    'web_info',
+    \Sypets\Brofix\Controller\ManageExclusionsController::class,
+    null,
+    'LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:function.list.header.manage_exclusions'
 );
 
 // Initialize Context Sensitive Help (CSH)

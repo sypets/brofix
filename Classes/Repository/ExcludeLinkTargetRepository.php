@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
+use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
 use Sypets\Brofix\DoctrineDbalMethodNameHelper;
-use Sypets\Brofix\Filter\Filter;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -19,10 +19,10 @@ class ExcludeLinkTargetRepository
      *
      *
      * @param array<array<string>> $orderBy
-     * @param Filter $filter
+     * @param ManageExclusionsFilter $filter
      * @return mixed[]
      */
-    public function getExcludedBrokenLinks(Filter $filter, array $orderBy = []): array
+    public function getExcludedBrokenLinks(ManageExclusionsFilter $filter, array $orderBy = []): array
     {
         $results = [];
 

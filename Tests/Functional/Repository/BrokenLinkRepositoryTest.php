@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
-use Sypets\Brofix\Filter\Filter;
+use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
@@ -357,7 +357,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
             $pidList,
             $linkTypes,
             $searchFields,
-            new Filter(),
+            new BrokenLinkListFilter(),
             []
         );
 
@@ -647,7 +647,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
             $pidList,
             $linkTypes,
             $searchFields,
-            new Filter(),
+            new BrokenLinkListFilter(),
             []
         );
 
