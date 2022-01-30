@@ -19,6 +19,11 @@
 			"role": "Developer"
 		}
 	],
+	"support": {
+		"docs": "https://docs.typo3.org/p/sypets/brofix/main/en-us/Index.html",
+		"issues": "https://github.com/sypets/brofix/issues",
+		"source": "https://github.com/sypets/brofix"
+	},
 	"config": {
 		"sort-packages": true,
 		"vendor-dir": ".Build/vendor",
