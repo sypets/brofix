@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -13,12 +15,12 @@
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace Sypets\Brofix\View;
+namespace Sypets\Brofix\Controller;
 
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\Filter\Filter;
+use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
@@ -27,20 +29,13 @@ use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
-use TYPO3\CMS\Core\Pagination\PaginationInterface;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
-use TYPO3\CMS\Core\Routing\SiteMatcher;
-use TYPO3\CMS\Core\Site\Entity\SiteInterface;
-use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -50,7 +45,7 @@ use TYPO3\CMS\Info\Controller\InfoModuleController;
  * Module 'Check links' as sub module of Web -> Info
  * @internal
  */
-class BrofixReport
+class BrokenLinkListController extends AbstractInfoController
 {
     protected const ORDER_BY_VALUES = [
         // there is an inaccuracy here because for table 'pages', the page is record_uid and
@@ -112,16 +107,6 @@ class BrofixReport
     protected const ORDER_BY_DEFAULT = 'page';
 
     /**
-     * @var string
-     */
-    protected $orderBy = BrofixReport::ORDER_BY_DEFAULT;
-
-    /**
-     * @var int
-     */
-    protected $paginationCurrentPage;
-
-    /**
      * Information about the current page record
      *
      * @var mixed[]
@@ -152,12 +137,7 @@ class BrofixReport
     protected $linkAnalyzer;
 
     /**
-     * @var BackendSession
-     */
-    protected $backendSession;
-
-    /**
-     * @var Filter
+     * @var BrokenLinkListFilter
      */
     protected $filter;
 
@@ -215,23 +195,6 @@ class BrofixReport
     protected $iconFactory;
 
     /**
-     * Contains site languages for this page ID
-     *
-     * @var SiteLanguage[]
-     */
-    protected $siteLanguages = [];
-
-    /**
-     * @var int Value of the GET/POST var 'id'
-     */
-    protected $id;
-
-    /**
-     * @var InfoModuleController Contains a reference to the parent calling object
-     */
-    protected $pObj;
-
-    /**
      * @var array<string|int>
      */
     protected $pageList;
@@ -247,32 +210,9 @@ class BrofixReport
     protected $pagesRepository;
 
     /**
-     * @var ExcludeLinkTarget
-     */
-    protected $excludeLinkTarget;
-
-    /**
-     * @var FlashMessageQueue
+     * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
-
-    /**
-     * @var ModuleTemplate
-     */
-    protected $moduleTemplate;
-
-    /**
-     * @var StandaloneView
-     */
-    protected $view;
-
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /** @var PaginationInterface|null */
-    protected $pagination;
 
     public function __construct(
         PagesRepository $pagesRepository = null,
@@ -280,15 +220,27 @@ class BrofixReport
         ExcludeLinkTarget $excludeLinkTarget = null,
         Configuration $configuration = null,
         FlashMessageService $flashMessageService = null,
-        BackendSession $backendSession = null
+        BackendSession $backendSession = null,
+        ModuleTemplate $moduleTemplate = null,
+        IconFactory $iconFactory = null
     ) {
+        $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
+        $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
+        $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
+        $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
+        $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        parent::__construct(
+            $configuration,
+            $backendSession,
+            $iconFactory,
+            $moduleTemplate,
+            $excludeLinkTarget
+        );
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
-        $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
-        $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-        $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
+        $this->orderBy = BrokenLinkListController::ORDER_BY_DEFAULT;
     }
 
     /**
@@ -313,7 +265,6 @@ class BrofixReport
         } else {
             $this->id = 0;
         }
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
         $this->view = $this->createView('InfoModule');
         if ($this->id !== 0) {
@@ -368,7 +319,7 @@ class BrofixReport
         $depth = GeneralUtility::_GP('depth');
 
         // store filter parameters in the Filter Object
-        $this->filter = new Filter();
+        $this->filter = new BrokenLinkListFilter();
         $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
 
         $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
@@ -383,7 +334,7 @@ class BrofixReport
         // create session, if it the first time
         if (is_null($this->backendSession->get('filterKey'))) {
             $this->backendSession->setStorageKey('filterKey');
-            $this->backendSession->store('filterKey', new Filter());
+            $this->backendSession->store('filterKey', new BrokenLinkListFilter());
         }
 
         /**
@@ -411,8 +362,8 @@ class BrofixReport
 
         // orderBy
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy')
-            ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrofixReport::ORDER_BY_DEFAULT));
-        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrofixReport::ORDER_BY_DEFAULT)) {
+            ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrokenLinkListController::ORDER_BY_DEFAULT));
+        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrokenLinkListController::ORDER_BY_DEFAULT)) {
             $resetPagination = true;
         }
         $this->pObj->MOD_SETTINGS['orderBy'] = $this->orderBy;
@@ -554,26 +505,6 @@ class BrofixReport
             'label' => $this->getLanguageService()->getLL('Report'),
             'content' => $reportsTabView->render()
         ];
-
-        if ($this->currentUserHasPermissionsForExcludeLinkTargetStorage) {
-            // Add Management Exclusions Tab
-            $view = $this->createView('ManageExclusions');
-            $manageExclusions = new ManageExclusions();
-            $manageExclusionsTabView = $manageExclusions->createViewForManageExclusionTab(
-                $view,
-                $this->pObj,
-                $this->id,
-                $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid()
-            );
-
-            $reportsTabView->assignMultiple([
-                'prefix' => 'manageExclusions',
-            ]);
-            $menuItems[1] = [
-                'label' => $this->getLanguageService()->getLL('ManageExclusions') ?: 'Manage Exclusions',
-                'content' => $manageExclusionsTabView->render()
-            ];
-        }
         return $this->moduleTemplate->getDynamicTabMenu($menuItems, 'report-brofix');
     }
 
@@ -640,7 +571,7 @@ class BrofixReport
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
             // build the search filter from the backendSession session
-            $searchFilter = new Filter();
+            $searchFilter = new BrokenLinkListFilter();
             $searchFilter->setUrlFilter($this->backendSession->get('filterKey')->getUrlFilter());
             $searchFilter->setUidFilter($this->backendSession->get('filterKey')->getUidFilter());
             $searchFilter->setTitleFilter($this->backendSession->get('filterKey')->getTitleFilter());
@@ -1025,47 +956,5 @@ class BrofixReport
             return $text;
         }
         return '';
-    }
-
-    /**
-     * Reused from PageLayoutView::resolveSiteLanguages()
-     *
-     * Fetch the site language objects for the given $pageId and store it in $this->siteLanguages
-     *
-     * @param int $pageId
-     * @throws SiteNotFoundException
-     */
-    protected function resolveSiteLanguages(int $pageId): void
-    {
-        /**
-         * @var SiteMatcher $siteMatcher
-         */
-        $siteMatcher = GeneralUtility::makeInstance(SiteMatcher::class);
-        /**
-         * @var SiteInterface $site
-         */
-        $site = $siteMatcher->matchByPageId($pageId);
-        $this->siteLanguages = $site->getAvailableLanguages($this->getBackendUser(), true, $pageId);
-    }
-
-    /**
-     * @return LanguageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
-    }
-
-    protected function isAdmin(): bool
-    {
-        return $this->getBackendUser()->isAdmin();
-    }
-
-    /**
-     * @return BackendUserAuthentication
-     */
-    protected function getBackendUser(): BackendUserAuthentication
-    {
-        return $GLOBALS['BE_USER'];
     }
 }

@@ -6,6 +6,12 @@
 			<trans-unit id="mod_brofix" resname="mod_brofix">
 				<source>Broken link fixer</source>
 			</trans-unit>
+			<trans-unit id="function.list.header.broken_links" resname="list.header">
+				<source>Brofix: Broken Links</source>
+			</trans-unit>
+			<trans-unit id="function.list.header.manage_exclusions" resname="list.header">
+				<source>Brofix: Manage Exclusions</source>
+			</trans-unit>
 
 			<!--
 				__________________

@@ -11,6 +11,6 @@ return [
     'export-excluded_links' => [
         'path' => '/export-excluded_links',
         'referrer' => 'required,refresh-empty',
-        'target' =>  \Sypets\Brofix\View\ManageExclusions::class . '::exportExcludedLinks'
+        'target' =>  \Sypets\Brofix\Controller\ManageExclusionsController::class . '::exportExcludedLinks'
     ],
 ];

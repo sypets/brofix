@@ -1,31 +1,34 @@
 <?php
 
-namespace Sypets\Brofix\View;
+namespace Sypets\Brofix\Controller;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
-use Sypets\Brofix\Filter\Filter;
+use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
 use Sypets\Brofix\Repository\ExcludeLinkTargetRepository;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Http\Response;
-use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
-use TYPO3\CMS\Core\Pagination\PaginationInterface;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Info\Controller\InfoModuleController;
 
-class ManageExclusions
+class ManageExclusionsController extends AbstractInfoController
 {
     /**
      * @var string
      */
     const MODULE_LANG_FILE = 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:';
+
+    /** @var string */
+    const TEMPLATE_NAME = 'ManageExclusions';
+
     protected const ORDER_BY_VALUES = [
         'page' => [
             ['pid', 'ASC'],
@@ -62,27 +65,6 @@ class ManageExclusions
     protected const ORDER_BY_DEFAULT = 'linktarget';
 
     /**
-     * @var string
-     */
-    protected $orderBy = self::ORDER_BY_DEFAULT;
-
-    /**
-     * @var BackendSession
-     */
-    protected $backendSession;
-
-    /**
-     * Current page
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * @var int
-     */
-    protected $paginationCurrentPage;
-
-    /**
      * @var CharsetConverter
      */
     protected $charsetConverter;
@@ -93,82 +75,142 @@ class ManageExclusions
     protected $localizationUtility;
 
     /**
-     * @var ModuleTemplate
-     */
-    protected $moduleTemplate;
-
-    /**
-     * @var Filter
+     * @var ManageExclusionsFilter
      */
     protected $filter;
+
+    /**
+     * @var int
+     */
+    protected $storagePid;
 
     /**
      * @var ExcludeLinkTargetRepository
      */
     protected $excludeLinkTargetRepository;
 
-    /** @var PaginationInterface|null */
-    protected $pagination;
+    /**
+     * Current BE user has access to ExcludeLinkTarget storage. This will
+     * be required for each broken link record and should be calculated
+     * only once.
+     *
+     * @var bool
+     */
+    protected $currentUserHasPermissionsForExcludeLinkTargetStorage = false;
 
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
-        Filter $filter = null,
+        ManageExclusionsFilter $filter = null,
+        Configuration $configuration = null,
         BackendSession $backendSession = null,
+        ModuleTemplate $moduleTemplate = null,
+        IconFactory $iconFactory = null,
+        ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
         LocalizationUtility $localizationUtility = null
     ) {
+        $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
+        $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
+        $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
+        $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
+        $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        parent::__construct(
+            $configuration,
+            $backendSession,
+            $iconFactory,
+            $moduleTemplate,
+            $excludeLinkTarget
+        );
         $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
-        $this->filter = $filter ?: GeneralUtility::makeInstance(Filter::class);
-        $this->backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
+        $this->filter = $filter ?: GeneralUtility::makeInstance(ManageExclusionsFilter::class);
         $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
         $this->localizationUtility = $localizationUtility ?? GeneralUtility::makeInstance(LocalizationUtility::class);
+        $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
     }
 
     /**
-     * @param array<string,mixed> $additionalQueryParameters
-     * @param string $route
-     * @return string
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * Init, called from parent object
+     *
+     * @param InfoModuleController $pObj A reference to the parent (calling) object
      */
-    protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_info'): string
+    public function init(InfoModuleController $pObj): void
     {
-        $parameters = [
-            'id' => $this->id,
-            'orderBy' => $this->orderBy,
-            'paginationPage', $this->paginationCurrentPage
-        ];
-        // if same key, additionalQueryParameters should overwrite parameters
-        $parameters = array_merge($parameters, $additionalQueryParameters);
+        $this->pObj = $pObj;
+        $this->storagePid = $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid();
 
-        /**
-         * @var UriBuilder $uriBuilder
-         */
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $uri = (string)$uriBuilder->buildUriFromRoute($route, $parameters);
+        $val = GeneralUtility::_GP('id');
+        if ($val === null) {
+            // work-around, because this->id does not work if "Refresh display" is used
+            $val = GeneralUtility::_GP('currentPage');
+        }
+        if ($val !== null) {
+            // @extensionScannerIgnoreLine
+            $this->id = (int)$val;
+            // @extensionScannerIgnoreLine
+            $this->resolveSiteLanguages($this->id);
+        } else {
+            $this->id = 0;
+        }
+        $this->view = $this->createView(self::TEMPLATE_NAME);
+        if ($this->id !== 0) {
+            $this->configuration->loadPageTsConfig($this->id);
+            $this->currentUserHasPermissionsForExcludeLinkTargetStorage
+                = $this->excludeLinkTarget->currentUserHasCreatePermissions(
+                    $this->configuration->getExcludeLinkTargetStoragePid()
+                );
+        }
+    }
 
-        return $uri;
+    /**
+     * Main, called from parent object
+     *
+     * @return string Module content
+     */
+    public function main(): string
+    {
+        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+        $this->getSettingsFromQueryParameters();
+        $this->initializeRenderer();
+
+        $this->initializeExclusionView();
+        return $this->view->render();
     }
 
     /**
      * @return StandaloneView
      * Displays the table of the excluded links
      */
-    public function createViewForManageExclusionTab(
-        StandaloneView $view,
-        InfoModuleController $pObj,
-        int $pageId,
-        int $storagePid
-    ): StandaloneView {
+    protected function createView(string $templateName): StandaloneView
+    {
+        /**
+         * @var StandaloneView $view
+         */
+        $view = GeneralUtility::makeInstance(StandaloneView::class);
+        $view->setLayoutRootPaths(['EXT:brofix/Resources/Private/Layouts']);
+        $view->setPartialRootPaths(['EXT:brofix/Resources/Private/Partials']);
+        $view->setTemplateRootPaths(['EXT:brofix/Resources/Private/Templates/Backend']);
+        $view->setTemplate($templateName);
+        $view->assign('currentPage', $this->id);
+        return $view;
+    }
+
+    protected function initializeRenderer(): void
+    {
+        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
+        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
+        // $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/ManageExclusions');
+        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+        $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+    }
+
+    protected function getSettingsFromQueryParameters(): void
+    {
         // pagination + currentPage
         $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage') ?? 1);
 
-        $this->id = $pageId;
-        $pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
-        $this->getBackendUser()->pushModuleData('web_info', $pObj->MOD_SETTINGS);
-
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $pageRenderer = $this->moduleTemplate->getPageRenderer();
-        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
+        $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
+        $this->getBackendUser()->pushModuleData('web_info', $this->pObj->MOD_SETTINGS);
 
         // orderBy
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy') ?? self::ORDER_BY_DEFAULT);
@@ -185,24 +227,37 @@ class ManageExclusions
         // create session, if it the first time
         if (is_null($this->backendSession->get('filterKey_excludeLinks'))) {
             $this->backendSession->setStorageKey('filterKey_excludeLinks');
-            $this->backendSession->store('filterKey_excludeLinks', new Filter());
+            $this->backendSession->store('filterKey_excludeLinks', new ManageExclusionsFilter());
         }
+    }
 
+    /**
+     * @return array<mixed>
+     */
+    public function initializeExclusions(): array
+    {
         $items = [];
         // build the search filter from the backendSession session
-        $searchFilter = new Filter();
+        $searchFilter = new ManageExclusionsFilter();
         $searchFilter->setExcludeUrlFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeUrlFilter());
         $searchFilter->setExcludeLinkTypeFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeLinkTypeFilter());
         $searchFilter->setExcludeReasonFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
-        $searchFilter->setExcludeStoragePid($storagePid);
+        $searchFilter->setExcludeStoragePid($this->storagePid);
 
         // Get Records from the database
-        $brokenLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks($searchFilter, self::ORDER_BY_VALUES[$this->orderBy] ?? []);
-        $totalCount = count($brokenLinks);
+        $exclusions = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(
+            $searchFilter,
+            self::ORDER_BY_VALUES[$this->orderBy] ?? []
+        );
 
-        if ($brokenLinks) {
+        if ($exclusions) {
             $itemsPerPage = 100;
-            $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
+            $paginator = GeneralUtility::makeInstance(
+                ArrayPaginator::class,
+                $exclusions,
+                $this->paginationCurrentPage,
+                $itemsPerPage
+            );
             $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
             foreach ($paginator->getPaginatedItems() as $row) {
                 $items[] = $this->renderTableRow($row);
@@ -210,26 +265,34 @@ class ManageExclusions
         } else {
             $this->pagination = null;
         }
-        $view->assign('totalCount', $totalCount);
-        $view->assign('title', 'Excludes Links');
-        $view->assign('brokenLinks', $items);
-        $view->assign('pagination', $this->pagination);
-        $view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
-        $view->assign('currentPage', $this->id);
+        return [
+            'items' => $items,
+             'totalCount' => count($exclusions)
+         ];
+    }
+
+    protected function initializeExclusionView(): void
+    {
+        $exclusions = $this->initializeExclusions();
+        $this->view->assign('totalCount', $exclusions['totalCount']);
+        $this->view->assign('title', 'Excludes Links');
+        $this->view->assign('brokenLinks', $exclusions['items']);
+        $this->view->assign('pagination', $this->pagination);
+        $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->view->assign('currentPage', $this->id);
+        $this->view->assign('hasPermission', $this->currentUserHasPermissionsForExcludeLinkTargetStorage);
 
         // Table header
         $sortActions = [];
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {
             $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
         }
-        $view->assign('sortActions', $sortActions);
-        $view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+        $this->view->assign('sortActions', $sortActions);
+        $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
         // assign the filters value in the inputs
-        $view->assign('excludeUrl_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeUrlFilter());
-        $view->assign('excludeLinkType_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeLinkTypeFilter());
-        $view->assign('excludeReason_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
-
-        return $view;
+        $this->view->assign('excludeUrl_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeUrlFilter());
+        $this->view->assign('excludeLinkType_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeLinkTypeFilter());
+        $this->view->assign('excludeReason_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
     }
 
     /**
@@ -316,22 +379,6 @@ class ManageExclusions
     }
 
     /**
-     * @return LanguageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
-    }
-
-    /**createViewForManageExclusionTab
-     * @return BackendUserAuthentication
-     */
-    protected function getBackendUser(): BackendUserAuthentication
-    {
-        return $GLOBALS['BE_USER'];
-    }
-
-    /**
      * This Function to Generate an array for CSV Header file
      *
      * @param array<string> $itemsArray
@@ -374,7 +421,7 @@ class ManageExclusions
         $headerCsv = $this->generateCsvHeaderArray($LangArrayHeader);
 
         //Render Excluded Links
-        $excludedLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(new Filter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);
+        $excludedLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(new ManageExclusionsFilter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);
 
         //Open File Based on Function Php To start Write inside the file CSV
         $fp = fopen('php://output', 'wb');

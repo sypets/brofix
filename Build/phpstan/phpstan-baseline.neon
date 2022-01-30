@@ -100,8 +100,3 @@ parameters:
 			count: 1
 			path: ../../Classes/Repository/PagesRepository.php
 
-		-
-			message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$defaultFlashMessageQueue type has no value type specified in iterable type TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessageQueue\\.$#"
-			count: 1
-			path: ../../Classes/View/BrofixReport.php
-

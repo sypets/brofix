@@ -12,29 +12,19 @@
  */
 
 /**
- * Module: TYPO3/CMS/Brofix/Brofix
+ * Module: TYPO3/CMS/Brofix/ManageExclusions
  */
 
 define(['jquery'], function($) {
   'use strict';
   $(document).ready(function () {
-    $('#uidButton').on('click', function (){
-      $('#uid_searchFilter').val('')
-    })
-
-    $('#urlButton').on('click', function (){
-      $('#url_searchFilter').val('')
-    })
-
-    $('#titleButton').on('click', function (){
-      $('#title_searchFilter').val('')
-    })
 
     $('#excludeUrlButton').on('click', function (){
       $('#excludeUrl_filter').val('')
     })
 
     $('.selectAllLinks').click(function() {
+      console.log('selectAllLinks');
       var $checkboxes = $('.check').find('input[type=checkbox]');
       $checkboxes.prop('checked', $(this).is(':checked'));
     });
@@ -56,13 +46,13 @@ define(['jquery'], function($) {
 
     })
   })
-  var Brofix = {};
+  var ManageExclusions = {};
 
   /**
    *
    * @param {String} prefix
    */
-  Brofix.toggleActionButton = function(prefix) {
+  ManageExclusions.toggleActionButton = function(prefix) {
     var buttonDisable = true;
     $('.' + prefix).each(function() {
       if ($(this).prop('checked')) {
@@ -80,17 +70,16 @@ define(['jquery'], function($) {
   /**
    * Registers listeners
    */
-  Brofix.initializeEvents = function() {
+  ManageExclusions.initializeEvents = function() {
     $('.refresh').on('click', function() {
-      Brofix.toggleActionButton('refresh');
+      ManageExclusions.toggleActionButton('refresh');
     });
 
     $('.check').on('click', function() {
-      console.log('click on check');
-      Brofix.toggleActionButton('check');
+      ManageExclusions.toggleActionButton('check');
     });
 
-    $('#brofix-list-select-pagedepth').on('change', function() {
+    $('#ManageExclusions-list-select-pagedepth').on('change', function() {
       $('#refreshLinkList').click();
     });
 
@@ -105,9 +94,9 @@ define(['jquery'], function($) {
     });
   };
 
-  $(Brofix.initializeEvents);
+  $(ManageExclusions.initializeEvents);
 
 
-  return Brofix;
+  return ManageExclusions;
 });
 
