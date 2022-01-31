@@ -31,10 +31,9 @@ services:
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     working_dir: ${ROOT_DIR}
+    environment:
+      COMPOSER_CACHE_DIR: ".Build/.cache/composer"
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
@@ -47,10 +46,9 @@ services:
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     working_dir: ${ROOT_DIR}
+    environment:
+      COMPOSER_CACHE_DIR: ".Build/.cache/composer"
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
@@ -63,10 +61,9 @@ services:
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     working_dir: ${ROOT_DIR}
+    environment:
+      COMPOSER_CACHE_DIR: ".Build/.cache/composer"
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
@@ -90,10 +87,9 @@ services:
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     working_dir: ${ROOT_DIR}
+    environment:
+      COMPOSER_CACHE_DIR: ".Build/.cache/composer"
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
@@ -117,10 +113,9 @@ services:
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     working_dir: ${ROOT_DIR}
+    environment:
+      COMPOSER_CACHE_DIR: ".Build/.cache/composer"
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
@@ -136,9 +131,6 @@ services:
       - mariadb10
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     environment:
       typo3DatabaseName: func_test
       typo3DatabaseUsername: root
@@ -176,9 +168,6 @@ services:
       - mssql2019latest
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     environment:
       typo3DatabaseDriver: sqlsrv
       typo3DatabaseName: func
@@ -220,9 +209,6 @@ services:
       - postgres10
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     environment:
       typo3DatabaseDriver: pdo_pgsql
       typo3DatabaseName: bamboo
@@ -261,9 +247,6 @@ services:
       - ${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/:rw,noexec,nosuid,uid=${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     environment:
       typo3DatabaseDriver: pdo_sqlite
     working_dir: ${ROOT_DIR}/.Build
@@ -335,15 +318,16 @@ services:
     image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
-      - ${CORE_ROOT}:${CORE_ROOT}
-    working_dir: ${ROOT_DIR}/.Build
+      - ${ROOT_DIR}:${ROOT_DIR}
+    working_dir: ${ROOT_DIR}
     command: >
       /bin/sh -c "
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
           set -x
         fi
-        mkdir -p .cache
-        bin/phpstan analyse --no-progress --no-interaction --memory-limit 4G ${EXTRA_TEST_OPTIONS} ${TEST_FILE}
+        mkdir -p .Build/.cache
+        php -v | grep '^PHP';
+        php -dxdebug.mode=off .Build/bin/phpstan analyse --no-progress --no-interaction --memory-limit 4G -c Build/phpstan.neon ${EXTRA_TEST_OPTIONS} ${TEST_FILE}
       "
 
   unit:
@@ -351,9 +335,6 @@ services:
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
-      - ${HOST_HOME}:${HOST_HOME}
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
     working_dir: ${ROOT_DIR}/.Build
     extra_hosts:
       - "host.docker.internal:host-gateway"

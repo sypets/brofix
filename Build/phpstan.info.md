@@ -5,15 +5,15 @@
 
 create:
 
-1. Increase level in phpstan.neon
-2. cd .Build; bin/phpstan analyze  --configuration ../Build/phpstan.neon ../Classes --generate-baseline
-3. cp phpstan.baseline.neon ../Build/phpstan-baseline-level$LEVEL.neon
+1. Increase level in `Build/phpstan.neon`
+2. `Build/Scripts/runTests.sh -s phpstan -e '--generate-baseline'`
+3. `cp phpstan.baseline.neon Build/phpstan-baseline-level$LEVEL.neon`
 
 # Dealing with mixed arrays
 
 Be as specific as possible, e.g. use
 
-* `array<string>` etc. 
+* `array<string>` etc.
 * or `array{'foo': int, "bar": string}`
 
 If the array is dynamic or cannot be specified, use `mixed[]`
