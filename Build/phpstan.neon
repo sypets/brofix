@@ -6,20 +6,21 @@ includes:
   - ../.Build/vendor/jangregor/phpstan-prophecy/extension.neon
 
 parameters:
-  tmpDir: %currentWorkingDirectory%/var/cache/phpstan
+  # Use local cache dir instead of /tmp
+  tmpDir: ../.Build/.cache/phpstan
   parallel:
     # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
     maximumNumberOfProcesses: 5
   level: 6
   paths:
-    - %currentWorkingDirectory%/../Classes
-    - %currentWorkingDirectory%/../Tests
+    - %currentWorkingDirectory%/Classes
+    - %currentWorkingDirectory%/Tests
   scanDirectories:
-    - %currentWorkingDirectory%/Web/typo3/sysext
+    - %currentWorkingDirectory%/.Build/Web/typo3/sysext
 
   excludePaths:
-    - %currentWorkingDirectory%/../Classes/Hooks/DataHandlerHook.php
-    - %currentWorkingDirectory%/../Classes/Mail/GenerateCheckResultPlainMail.php
+    - %currentWorkingDirectory%/Classes/Hooks/DataHandlerHook.php
+    - %currentWorkingDirectory%/Classes/Mail/GenerateCheckResultPlainMail.php
 
   ignoreErrors:
     # https://phpstan.org/user-guide/ignoring-errors

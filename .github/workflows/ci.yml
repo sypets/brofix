@@ -51,7 +51,7 @@ jobs:
 
       - name: "phpstan"
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan.neon"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan
 
       - name: "Unit tests"
         if: always()
@@ -108,7 +108,7 @@ jobs:
 
       - name: "phpstan"
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "-c ../Build/phpstan.neon"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan
 
       - name: "Unit tests"
         if: always()

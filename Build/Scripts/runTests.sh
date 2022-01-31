@@ -27,7 +27,6 @@ setUpDockerComposeDotEnv() {
         echo "HOST_HOME=${HOME}"
 
         # Your local user
-        echo "CORE_ROOT=${CORE_ROOT}"
         echo "CORE_VERSION=${CORE_VERSION}"
         echo "ROOT_DIR=${ROOT_DIR}"
         echo "HOST_USER=${USER}"
@@ -158,9 +157,13 @@ cd "$THIS_SCRIPT_DIR" || exit 1
 cd ../testing-docker || exit 1
 
 # Option defaults
-CORE_ROOT="${PWD}/../../"
+if ! command -v realpath &> /dev/null; then
+  echo "This script works best with realpath installed" >&2
+  ROOT_DIR="${PWD}/../../"
+else
+  ROOT_DIR=`realpath ${PWD}/../../`
+fi
 CORE_VERSION="10.4"
-ROOT_DIR=`readlink -f ${PWD}/../../`
 TEST_SUITE="unit"
 DBMS="mariadb"
 PHP_VERSION="7.2"
