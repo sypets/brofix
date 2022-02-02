@@ -1,0 +1,24 @@
+includes:
+  # regenerate baseline with: Build/Scripts/runTests.sh -s phpstanGenerateBaseline
+  - phpstan-baseline.neon
+  - ../../.Build/vendor/jangregor/phpstan-prophecy/extension.neon
+
+parameters:
+  # Use local cache dir instead of /tmp
+  tmpDir: ../../.Build/.cache/phpstan
+
+  parallel:
+    # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
+    maximumNumberOfProcesses: 5
+
+  level: 6
+
+  paths:
+    - ../../Classes
+    - ../../Tests
+  scanDirectories:
+    - ../../.Build/Web/typo3/sysext
+
+  excludePaths:
+    - ../../Classes/Hooks/DataHandlerHook.php
+    - ../../Classes/Mail/GenerateCheckResultPlainMail.php

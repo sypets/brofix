@@ -1,0 +1,107 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+			count: 1
+			path: ../../Classes/CheckLinks/ExcludeLinkTarget.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 2
+			path: ../../Classes/CheckLinks/ExcludeLinkTarget.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 3
+			path: ../../Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 3
+			path: ../../Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php
+
+		-
+			message: "#^Parameter \\#3 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 1
+			path: ../../Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php
+
+		-
+			message: "#^Parameter \\#4 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 1
+			path: ../../Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+			count: 6
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 3
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$where of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:andWhere\\(\\) expects array\\<int, string\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 4
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+			count: 6
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 6
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#3 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 4
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#4 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 1
+			path: ../../Classes/Repository/BrokenLinkRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 3
+			path: ../../Classes/Repository/ContentRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+			count: 4
+			path: ../../Classes/Repository/EditableRestriction.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$expressions of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+			count: 1
+			path: ../../Classes/Repository/EditableRestriction.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 1
+			path: ../../Classes/Repository/ExcludeLinkTargetRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$where of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:andWhere\\(\\) expects array\\<int, string\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 4
+			path: ../../Classes/Repository/ExcludeLinkTargetRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 2
+			path: ../../Classes/Repository/PagesRepository.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$predicates of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:where\\(\\) expects array\\<int, mixed\\>\\|Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression, string given\\.$#"
+			count: 1
+			path: ../../Classes/Repository/PagesRepository.php
+
+		-
+			message: "#^Property Sypets\\\\Brofix\\\\View\\\\BrofixReport\\:\\:\\$defaultFlashMessageQueue type has no value type specified in iterable type TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessageQueue\\.$#"
+			count: 1
+			path: ../../Classes/View/BrofixReport.php
+
