@@ -38,7 +38,6 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
      */
     protected $testExtensionsToLoad = [
         'typo3conf/ext/brofix',
-        'typo3conf/ext/page_callouts'
     ];
 
     /**
