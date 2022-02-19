@@ -13,6 +13,10 @@
 				<source>Brofix: Manage Exclusions</source>
 			</trans-unit>
 
+			<trans-unit id="filter" resname="filter">
+				<source>Filter</source>
+			</trans-unit>
+
 			<!--
 				__________________
 				broken links email

@@ -35,32 +35,17 @@ div.brofix-brokenlink-list-form select.form-control {
     margin-bottom: 5px;
 }
 
-#brofix-statistics-table {
-    width: 230px;
-    margin-top: 5px;
-    margin-bottom: 14px;
+#brofix-broken-links-table tr td .inline-action {
+    margin-top: 2em;
+    border-top: 1px solid white;
+    visibility: hidden;
+    padding: 5px;
 }
-
-#brofix-statistics-table th td.number {
-    padding-top: 4px;
+#brofix-broken-links-table tr td .inline-action a {
+    text-decoration: underline;
 }
-
-#brofix-statistics-table td {
-    border-left: 1px solid white;
-    vertical-align: middle;
-}
-
-#brofix-statistics-table td:first-child {
-    border-left: none;
-}
-
-#brofix-statistics-table .number {
-    padding-right: 6px;
-    text-align: center;
-}
-
-#brofix-statistics-table span {
-    vertical-align: middle;
+#brofix-broken-links-table tr:hover td .inline-action {
+    visibility: visible;
 }
 
 #brofix-broken-links-table {
@@ -71,6 +56,10 @@ div.brofix-brokenlink-list-form select.form-control {
     border-left: 1px solid white;
     word-break: break-word;
     padding:10px;
+}
+
+#brofix-broken-links-table tbody tr td {
+    vertical-align: top;
 }
 
 #brofix-broken-links-table td span.valid {
