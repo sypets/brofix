@@ -61,7 +61,7 @@ class BrokenLinkListFilter
         return $this->title_filter;
     }
 
-    /** @var @deprecated */
+    /** @deprecated */
     public function setTitleFilter(string $title_filter): void
     {
         $this->title_filter = $title_filter;
