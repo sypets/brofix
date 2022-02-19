@@ -6,12 +6,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\Controller\BackendUser\BackendUserInformation;
 use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
 use Sypets\Brofix\Repository\ExcludeLinkTargetRepository;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -95,8 +97,12 @@ class ManageExclusionsController extends AbstractInfoController
      * only once.
      *
      * @var bool
+     * @deprecated
      */
     protected $currentUserHasPermissionsForExcludeLinkTargetStorage = false;
+
+    /** @var BackendUserInformation */
+    protected $backendUserInformation;
 
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
@@ -154,11 +160,14 @@ class ManageExclusionsController extends AbstractInfoController
         $this->view = $this->createView(self::TEMPLATE_NAME);
         if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
-            $this->currentUserHasPermissionsForExcludeLinkTargetStorage
+            $hasPermissions
                 = $this->excludeLinkTarget->currentUserHasCreatePermissions(
                     $this->configuration->getExcludeLinkTargetStoragePid()
                 );
+        } else {
+            $hasPermissions = false;
         }
+        $this->backendUserInformation = new BackendUserInformation(false, $hasPermissions);
     }
 
     /**
@@ -169,10 +178,18 @@ class ManageExclusionsController extends AbstractInfoController
     public function main(): string
     {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
-        $this->getSettingsFromQueryParameters();
-        $this->initializeRenderer();
 
-        $this->initializeExclusionView();
+        if ($this->backendUserInformation->hasPermissionExcludeLinks()) {
+            $this->getSettingsFromQueryParameters();
+            $this->initializeRenderer();
+            $this->initializeExclusionView();
+        } else {
+            $this->moduleTemplate->addFlashMessage(
+                $this->getLanguageService()->getLL('no.access'),
+                $this->getLanguageService()->getLL('no.access.title'),
+                FlashMessage::ERROR
+            );
+        }
         return $this->view->render();
     }
 
@@ -280,7 +297,7 @@ class ManageExclusionsController extends AbstractInfoController
         $this->view->assign('pagination', $this->pagination);
         $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
         $this->view->assign('currentPage', $this->id);
-        $this->view->assign('hasPermission', $this->currentUserHasPermissionsForExcludeLinkTargetStorage);
+        $this->view->assign('hasPermission', $this->backendUserInformation->hasPermissionExcludeLinks());
 
         // Table header
         $sortActions = [];

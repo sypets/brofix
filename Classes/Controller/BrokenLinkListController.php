@@ -20,6 +20,7 @@ namespace Sypets\Brofix\Controller;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\Controller\BackendUser\BackendUserInformation;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
@@ -113,21 +114,8 @@ class BrokenLinkListController extends AbstractInfoController
      */
     protected $pageRecord = [];
 
-    /**
-     * Information, if the module is accessible for the current user or not
-     *
-     * @var bool
-     */
-    protected $isAccessibleForCurrentUser = false;
-
-    /**
-     * Current BE user has access to ExcludeLinkTarget storage. This will
-     * be required for each broken link record and should be calculated
-     * only once.
-     *
-     * @var bool
-     */
-    protected $currentUserHasPermissionsForExcludeLinkTargetStorage = false;
+    /** @var BackendUserInformation|null */
+    protected $backendUserInformation;
 
     /**
      * Link validation class
@@ -269,10 +257,6 @@ class BrokenLinkListController extends AbstractInfoController
         $this->view = $this->createView('InfoModule');
         if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
-            $this->currentUserHasPermissionsForExcludeLinkTargetStorage
-                = $this->excludeLinkTarget->currentUserHasCreatePermissions(
-                    $this->configuration->getExcludeLinkTargetStoragePid()
-                );
         }
     }
 
@@ -489,7 +473,7 @@ class BrokenLinkListController extends AbstractInfoController
      */
     protected function renderContent(): string
     {
-        if (!$this->isAccessibleForCurrentUser) {
+        if (!$this->backendUserInformation->hasPermissionBrokenLinkList()) {
             // If no access or if ID == zero
             $this->moduleTemplate->addFlashMessage(
                 $this->getLanguageService()->getLL('no.access'),
@@ -521,13 +505,19 @@ class BrokenLinkListController extends AbstractInfoController
             $this->id,
             $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
         );
+        $isAccessibleForCurrentUser = false;
         if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
-            $this->isAccessibleForCurrentUser = true;
+            $isAccessibleForCurrentUser = true;
         }
         // Don't access in workspace
         if ($this->getBackendUser()->workspace !== 0) {
-            $this->isAccessibleForCurrentUser = false;
+            $isAccessibleForCurrentUser = false;
         }
+        $excludeLinksPermission =
+            $this->excludeLinkTarget->currentUserHasCreatePermissions(
+                $this->configuration->getExcludeLinkTargetStoragePid()
+            );
+        $this->backendUserInformation = new BackendUserInformation($isAccessibleForCurrentUser, $excludeLinksPermission);
 
         $pageRenderer = $this->moduleTemplate->getPageRenderer();
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
@@ -817,7 +807,7 @@ class BrokenLinkListController extends AbstractInfoController
         $excludeLinkTargetStoragePid = $this->configuration->getExcludeLinkTargetStoragePid();
         // show exclude link target button
         if (in_array($row['link_type'] ?? 'empty', $this->configuration->getExcludeLinkTargetAllowedTypes())
-            && $this->currentUserHasPermissionsForExcludeLinkTargetStorage
+            && $this->backendUserInformation->hasPermissionExcludeLinks()
         ) {
             $returnUrl = $this->constructBackendUri();
             $excludeUrl = (string)$uriBuilder->buildUriFromRoute('record_edit', [
