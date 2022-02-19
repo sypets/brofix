@@ -2,10 +2,16 @@
 {namespace core=TYPO3\CMS\Core\ViewHelpers}
 <f:layout name="TabContent"/>
 <f:section name="header">
-    <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:excludeLinksTitle"/> ({totalCount})
+	<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:excludeLinksTitle"/>
+	<f:if condition="{hasPermissions}">
+		<f:then>
+    	 ({totalCount})
+		</f:then>
+	</f:if>
 </f:section>
 
 <f:section name="form">
+	<f:if condition="{hasPermissions}">
     <row class="brofix-brokenlink-list-form">
         <input type="hidden" name="currentPage" value="{currentPage}"/>
         <input type="hidden" name="id" value="{currentPage}"/>
@@ -106,9 +112,8 @@
                 <core:icon identifier="actions-document-info" size="small"/>
             </f:link.external>
         </f:if>
-
     </row>
-
+	</f:if>
 </f:section>
 
 <f:section name="Main">
