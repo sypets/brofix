@@ -49,7 +49,7 @@
 						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>&nbsp;
 						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid"/>:</label>
 					<div class="form-control-clearable">
-						<input type="number" min="0" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="uid_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid')}" id="uid_searchFilter" value="{f:if(condition: uid_filter, then: uid_filter, else: '')}"/>
+						<input type="number" min="0" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="uid_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid')}" id="uid_searchFilter" value="{uid_filter}"/>
 						<button type="button" tabindex="-1" class="close" id="uidButton" style="visibility: visible;">
 							<core:icon identifier="actions-close" size="small" />
 						</button>
@@ -72,7 +72,7 @@
 				<div class="form-group">
 					<label for="url_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url"/>:</label>
 					<div class="form-control-clearable">
-						<input type="text" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="url_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url')}" id="url_searchFilter" value="{f:if(condition: url_filter, then: url_filter, else: '')}"/>
+						<input type="text" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="url_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url')}" id="url_searchFilter" value="{url_filter}"/>
 						<button type="button" tabindex="-1" class="close" id="urlButton" style="visibility: visible;">
 							<core:icon identifier="actions-close" size="small" />
 						</button>
@@ -184,6 +184,16 @@
 							<core:icon identifier="{item.langIcon}"/>
 						</f:if>
 						{item.elementHeadline -> f:format.raw()} [{item.record_uid}]
+						<div class="inline-action">
+							<f:if condition="{uid_filter}">
+								<f:then>
+									<a href="{listUri}&uid_searchFilter="><core:icon identifier="actions-close"/></a>
+								</f:then>
+								<f:else>
+									<a href="{listUri}&uid_searchFilter={item.record_uid}"><f:translate key="filter" extensionName="Brofix">Filter</f:translate></a>
+								</f:else>
+							</f:if>
+						</div>
 					</td>
 					<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
 						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span></td>
@@ -203,6 +213,16 @@
 								<span title="{item.link_title}">{item.linktext}</span>
 							</f:else>
 						</f:if>
+						<div class="inline-action">
+							<f:if condition="{url_filter}">
+								<f:then>
+									<a href="{listUri}&url_searchFilter="><core:icon identifier="actions-close"/></a>
+								</f:then>
+								<f:else>
+									<a href="{listUri}&url_searchFilter={item.linktarget}"><f:translate key="filter" extensionName="Brofix">Filter</f:translate></a>
+								</f:else>
+							</f:if>
+						</div>
 					</td>
 					<td>{item.linkmessage -> f:format.raw()}</td>
 					<td class="table-column-divider-end mobile-optional">{item.lastcheck_url}</td>

@@ -583,6 +583,7 @@ class BrokenLinkListController extends AbstractInfoController
                 foreach ($paginator->getPaginatedItems() as $row) {
                     $items[] = $this->renderTableRow($row['table_name'], $row);
                 }
+                $view->assign('listUri', $this->constructBackendUri());
             }
         } else {
             $this->pagination = null;

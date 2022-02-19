@@ -18,22 +18,33 @@
 define(['jquery'], function($) {
   'use strict';
   $(document).ready(function () {
-    $('#uidButton').on('click', function (){
-      $('#uid_searchFilter').val('')
+
+    // reload list on change
+    $('#linktype_searchFilter').on('click', function () {
+      $('#refreshLinkList').click();
+    })
+
+    $('#uidButton').on('click', function () {
+      $('#uid_searchFilter').val('');
+      $('#refreshLinkList').click();
     })
 
     $('#urlButton').on('click', function (){
-      $('#url_searchFilter').val('')
+      $('#url_searchFilter').val('');
+      $('#refreshLinkList').click();
     })
 
     $('#titleButton').on('click', function (){
-      $('#title_searchFilter').val('')
+      $('#title_searchFilter').val('');
+      $('#refreshLinkList').click();
     })
 
     $('#excludeUrlButton').on('click', function (){
-      $('#excludeUrl_filter').val('')
+      $('#excludeUrl_filter').val('');
+      $('#refreshLinkList').click();
     })
 
+    /** move to extra JavaScript module for "Manage Exclusions" */
     $('.selectAllLinks').click(function() {
       var $checkboxes = $('.check').find('input[type=checkbox]');
       $checkboxes.prop('checked', $(this).is(':checked'));
@@ -86,7 +97,6 @@ define(['jquery'], function($) {
     });
 
     $('.check').on('click', function() {
-      console.log('click on check');
       Brofix.toggleActionButton('check');
     });
 
