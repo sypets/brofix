@@ -36,10 +36,11 @@ div.brofix-brokenlink-list-form select.form-control {
 }
 
 #brofix-broken-links-table tr td .inline-action {
-    margin-top: 2em;
-    border-top: 1px solid white;
+    margin-top: 5px;
+    border-top: 2px solid white;
     visibility: hidden;
     padding: 5px;
+    vertical-align: bottom;
 }
 #brofix-broken-links-table tr td .inline-action a {
     text-decoration: underline;
