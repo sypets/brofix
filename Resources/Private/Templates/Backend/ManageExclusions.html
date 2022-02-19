@@ -11,7 +11,6 @@
 </f:section>
 
 <f:section name="form">
-	<f:if condition="{hasPermissions}">
     <row class="brofix-brokenlink-list-form">
         <input type="hidden" name="currentPage" value="{currentPage}"/>
         <input type="hidden" name="id" value="{currentPage}"/>
@@ -41,7 +40,6 @@
                 <f:then>
                     <option value="external" selected>
                         <f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.external"/>
-
                     </option>
                 </f:then>
                 <f:else>
@@ -113,7 +111,6 @@
             </f:link.external>
         </f:if>
     </row>
-	</f:if>
 </f:section>
 
 <f:section name="Main">
