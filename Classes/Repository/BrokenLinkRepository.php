@@ -103,23 +103,25 @@ class BrokenLinkRepository implements LoggerAwareInterface
                             $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
                         )
                     )
-                )
-                // SQL Filter
-                ->andWhere(
+                );
+
+            if ($filter->getUidFilter() != '') {
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+                );
+            }
+            if ($filter->getUrlFilter() != '') {
+                $queryBuilder->andWhere(
                     $queryBuilder->expr()->like(
                         self::TABLE . '.url',
                         $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
                     )
-                )
-                ->andWhere(
-                    $queryBuilder->expr()->like(
-                        self::TABLE . '.headline',
-                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getTitleFilter()) . '%')
-                    )
                 );
-            if ($filter->getUidFilter() != '') {
+            }
+            $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
+            if ($linktypeFilter != 'all') {
                 $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+                    $queryBuilder->expr()->eq(self::TABLE . '.link_type', $queryBuilder->createNamedParameter($linktypeFilter))
                 );
             }
 

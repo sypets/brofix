@@ -305,9 +305,8 @@ class BrokenLinkListController extends AbstractInfoController
         // store filter parameters in the Filter Object
         $this->filter = new BrokenLinkListFilter();
         $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
-
         $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
-
+        $this->filter->setLinktypeFilter(GeneralUtility::_GP('linktype_searchFilter') ?? 'all');
         $this->filter->setTitleFilter(GeneralUtility::_GP('title_searchFilter') ?? '');
 
         // to prevent deleting session, when user sort the records
@@ -563,6 +562,7 @@ class BrokenLinkListController extends AbstractInfoController
             // build the search filter from the backendSession session
             $searchFilter = new BrokenLinkListFilter();
             $searchFilter->setUrlFilter($this->backendSession->get('filterKey')->getUrlFilter());
+            $searchFilter->setLinktypeFilter($this->backendSession->get('filterKey')->getLinktypeFilter());
             $searchFilter->setUidFilter($this->backendSession->get('filterKey')->getUidFilter());
             $searchFilter->setTitleFilter($this->backendSession->get('filterKey')->getTitleFilter());
 
@@ -589,15 +589,20 @@ class BrokenLinkListController extends AbstractInfoController
         }
         $view->assign('totalCount', $totalCount);
         // send the search filters to the view
-        $view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
         $view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
-        $view->assign('title_filter', $this->backendSession->get('filterKey')->getTitleFilter());
+        $view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
+        $view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
+        //$view->assign('title_filter', $this->backendSession->get('filterKey')->getTitleFilter());
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
             $this->createFlashMessagesForNoBrokenLinks();
         }
         $view->assign('brokenLinks', $items);
+        $linktypes = array_merge(['all' => 'all'], $this->linkTypes);
+        if (count($linktypes) > 2) {
+            $view->assign('linktypes', $linktypes);
+        }
 
         $view->assign('pagination', $this->pagination);
         $view->assign('orderBy', $this->orderBy);
