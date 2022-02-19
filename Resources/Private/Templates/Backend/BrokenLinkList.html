@@ -10,14 +10,13 @@
 <f:section name="form">
 
 	<row class="brofix-brokenlink-list-form">
-
-		<form id="brofix-list-form">
+		<form id="brofix-list-form" class="brofix-list-form">
 			<input type="hidden" name="currentPage" value="{currentPage}"/>
 			<input type="hidden" name="id" value="{currentPage}"/>
 			<input type="hidden" name="orderBy" value="{orderBy}"/>
 			<input type="hidden" name="paginationPage" value="{paginationPage}"/>
 			<br/>
-			<div class="form-group">
+			<div class="form-group form-group-border">
 				<label for="brofix-list-select-pagedepth">
 					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.func.title"/>:
 				</label>
@@ -42,9 +41,17 @@
 					</option>
 				</select>
 			</div>
+
+			<div class="form-group form-group-border">
+				<input type="radio" name="view_mode" id="view_table_complex" value="view_table_complex" class="view_mode" {f:if(condition: "{view_mode} == 'view_table_complex'", then: 'checked')}  />
+				<label for="view_table_complex"><core:icon identifier="view-table-complex" size="default" /></label>
+				<input type="radio" name="view_mode" id="view_table_min" value="view_table_min" class="view_mode" {f:if(condition: "{view_mode} == 'view_table_min'", then: 'checked')} />
+				<label for="view_table_min"><core:icon identifier="view-table-min" size="default" /></label>
+			</div>
+
 			<br/>
 			<row>
-				<div class="form-group">
+				<div class="form-group form-group-border">
 					<label for="uid_searchFilter">
 						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>&nbsp;
 						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid"/>:</label>
@@ -55,21 +62,20 @@
 						</button>
 					</div>
 				</div>
+					<f:if condition="{linktypes}">
+						<div class="form-group form-group-border">
+							<label for="linktype_searchFilter">Link type:</label>
+							<select id="linktype_searchFilter" name="linktype_searchFilter" class="form-control tceforms-select">
+								<f:for each="{linktypes}" as="linktype">
+									<option value="{linktype}" {f:if(condition:'{linktype} == {linktype_filter}', then: 'selected')}>
+									<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.{linktype}">{linktype}</f:translate>
+									</option>
+								</f:for>
+							</select>
+						</div>
+					</f:if>
 
-				<f:if condition="{linktypes}">
-					<div class="form-group">
-						<label for="linktype_searchFilter">Link type:</label>
-						<select id="linktype_searchFilter" name="linktype_searchFilter" class="form-control tceforms-select">
-							<f:for each="{linktypes}" as="linktype">
-								<option value="{linktype}" {f:if(condition:'{linktype} == {linktype_filter}', then: 'selected')}>
-								<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.{linktype}">{linktype}</f:translate>
-								</option>
-							</f:for>
-						</select>
-					</div>
-				</f:if>
-
-				<div class="form-group">
+				<div class="form-group form-group-border">
 					<label for="url_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url"/>:</label>
 					<div class="form-control-clearable">
 						<input type="text" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="url_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url')}" id="url_searchFilter" value="{url_filter}"/>
@@ -78,40 +84,27 @@
 						</button>
 					</div>
 				</div>
-
-				<f:comment>
-				<div class="form-group">
-					<label for="title_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.title"/>:</label>
-					<div class="form-control-clearable">
-						<input type="text" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="title_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.title')}" id="title_searchFilter" value="{f:if(condition: title_filter , then: title_filter, else: '')}"/>
-						<button type="button" tabindex="-1" class="close" id="titleButton" style="visibility: visible;">
-							<core:icon identifier="actions-close" size="small"/>
-						</button>
-					</div>
-				</div>
-				</f:comment>
-
 			</row>
 			<br/>
-			<br/>
 
-			<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"
-				   value="{f:translate(key: 'label_refresh', extensionName: 'Brofix')}"
-				   data-notification-message="{f:translate(key: 'label_refresh-link-list', extensionName: 'Brofix')}"/>
+			<row>
+				<div class="form-group">
+				<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"
+					   value="{f:translate(key: 'label_refresh', extensionName: 'Brofix')}"
+					   data-notification-message="{f:translate(key: 'label_refresh-link-list', extensionName: 'Brofix')}"/>
 
-			<f:if condition="{showRecheckButton}">
-				<input type="submit" class="btn btn-default t3js-update-button" name="updateLinkList" id="updateLinkList"
-					   value="{f:translate(key: 'list.button.checkLinks', extensionName: 'Brofix')}"
-					   data-notification-message="{f:translate(key: 'list.action.checkLinks', extensionName: 'Brofix')}"/>
-			</f:if>
-			<!--<input type="reset" class="btn btn-default t3js-update-button" name="refreshLinkList"
-				   value="Reset Filters"/>-->
-			<f:if condition="{docsurl}">
-				<f:link.external class="btn btn-default" uri="{docsurl}" target="_blank">
-					<core:icon identifier="actions-document-info" size="small"/>
-				</f:link.external>
-			</f:if>
-
+				<f:if condition="{showRecheckButton}">
+					<input type="submit" class="btn btn-default t3js-update-button" name="updateLinkList" id="updateLinkList"
+						   value="{f:translate(key: 'list.button.checkLinks', extensionName: 'Brofix')}"
+						   data-notification-message="{f:translate(key: 'list.action.checkLinks', extensionName: 'Brofix')}"/>
+				</f:if>
+				<f:if condition="{docsurl}">
+					<f:link.external class="btn btn-default" uri="{docsurl}" target="_blank">
+						<core:icon identifier="actions-document-info" size="small"/>
+					</f:link.external>
+				</f:if>
+				</div>
+			</row>
 		</form>
 	</row>
 </f:section>
@@ -120,7 +113,7 @@
 	<f:flashMessages queueIdentifier="brofix"/>
 	<f:if condition="{brokenLinks -> f:count()}">
 		<f:then>
-			<table class="table table-striped table-hover" id="brofix-broken-links-table">
+			<table class="table table-striped table-hover {view_mode}" id="brofix-broken-links-table">
 				<thead>
 				<tr>
 					<th>
@@ -130,13 +123,13 @@
 						</f:if>
 					</th>
 					<th>{tableHeader.element.header}</th>
-					<th>
+					<th class="mobile-optional">
 						<f:format.raw>{tableHeader.type.header}</f:format.raw>
 						<f:if condition="{tableHeader.type.icon}">
 							<core:icon identifier="{tableHeader.type.icon}"/>
 						</f:if>
 					</th>
-					<th>
+					<th class="mobile-optional">
 						<f:format.raw>{tableHeader.last_check.header}</f:format.raw>
 						<f:if condition="{tableHeader.last_check.icon}">
 							<core:icon identifier="{tableHeader.last_check.icon}"/>
@@ -154,7 +147,7 @@
 							<core:icon identifier="{tableHeader.error.icon}"/>
 						</f:if>
 					</th>
-					<th>
+					<th class="mobile-optional">
 						<f:format.raw> {tableHeader.last_check_url.header}</f:format.raw>
 						<f:if condition="{tableHeader.last_check_url.icon}">
 							<core:icon identifier="{tableHeader.last_check_url.icon}"/>

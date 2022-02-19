@@ -19,8 +19,7 @@ define(['jquery'], function($) {
   'use strict';
   $(document).ready(function () {
 
-    // reload list on change
-    $('#linktype_searchFilter').on('click', function () {
+    $('#linktype_searchFilter').on('change', function () {
       $('#refreshLinkList').click();
     })
 
