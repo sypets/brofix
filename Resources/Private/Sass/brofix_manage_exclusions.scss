@@ -6,3 +6,12 @@
     word-break: break-word;
     padding:10px;
 }
+
+/** manage exclusions tab */
+#exportCsvButton {
+    float: right;
+}
+
+#brofix-manage-exclusions-table tr td label input.selectedExcludeLink {
+    position: static;
+}

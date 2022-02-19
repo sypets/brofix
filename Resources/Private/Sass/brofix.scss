@@ -79,12 +79,6 @@ div.brofix-brokenlink-list-form select.form-control {
     background-color: #c83c3c;
 }
 
-#brofix-broken-links-table td.table-column-divider-end,
-#brofix-broken-links-table th.table-column-divider-end
-{
-    border-right: 6px white solid;
-}
-
 #uid_searchFilter {
     width: 3em;
 }
@@ -124,13 +118,6 @@ div.brofix-brokenlink-list-form select.form-control {
         margin-bottom:20px;
         border:2px solid #ccc;
     }
-
-    /** remove column dividers */
-    #brofix-broken-links-table td.table-column-divider-end,
-    #brofix-broken-links-table th.table-column-divider-end
-    {
-        border-right: none;
-    }
 }
 
 /** --- for very small screens --- */
@@ -142,12 +129,3 @@ div.brofix-brokenlink-list-form select.form-control {
     }
 }
 
-/** manage exclusions tab */
-
-#exportCsvButton {
-    float: right;
-}
-
-#brofix-manage-exclusions-table tr td label input.selectedExcludeLink {
-    position: static;
-}
