@@ -17,33 +17,36 @@
 			<input type="hidden" name="orderBy" value="{orderBy}"/>
 			<input type="hidden" name="paginationPage" value="{paginationPage}"/>
 			<br/>
-			<select id="brofix-list-select-pagedepth" name="depth" class="form-control tceforms-select">
-				<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
-				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0"/>
-				</option>
-				<option value="1" {f:if(condition:'{depth} == 1', then: 'selected')}>
-				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_1"/>
-				</option>
-				<option value="2" {f:if(condition:'{depth} == 2', then: 'selected')}>
-				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_2"/>
-				</option>
-				<option value="3" {f:if(condition:'{depth} == 3', then: 'selected')}>
-				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_3"/>
-				</option>
-				<option value="4" {f:if(condition:'{depth} == 4', then: 'selected')}>
-				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4"/>
-				</option>
-				<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
-				<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
-				</option>
-			</select>
-
+			<div class="form-group">
+				<label for="brofix-list-select-pagedepth">
+					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.func.title"/>:
+				</label>
+				<select id="brofix-list-select-pagedepth" name="depth" class="form-control tceforms-select">
+					<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
+					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0"/>
+					</option>
+					<option value="1" {f:if(condition:'{depth} == 1', then: 'selected')}>
+					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_1"/>
+					</option>
+					<option value="2" {f:if(condition:'{depth} == 2', then: 'selected')}>
+					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_2"/>
+					</option>
+					<option value="3" {f:if(condition:'{depth} == 3', then: 'selected')}>
+					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_3"/>
+					</option>
+					<option value="4" {f:if(condition:'{depth} == 4', then: 'selected')}>
+					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4"/>
+					</option>
+					<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
+					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
+					</option>
+				</select>
+			</div>
 			<br/>
-
 			<row>
 				<div class="form-group">
 					<label for="uid_searchFilter">
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>&nbsp;
 						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid"/>:</label>
 					<div class="form-control-clearable">
 						<input type="number" min="0" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="uid_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid')}" id="uid_searchFilter" value="{f:if(condition: uid_filter, then: uid_filter, else: '')}"/>
