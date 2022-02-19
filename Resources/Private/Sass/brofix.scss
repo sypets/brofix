@@ -83,6 +83,12 @@ div.brofix-brokenlink-list-form select.form-control {
     width: 3em;
 }
 
+form div.form-group-border {
+    border: 1px dotted rgb(204, 204, 204);
+    padding: 10px;
+    margin-left: 0px;
+}
+
 /** --- for small screens --- */
 
 @media screen and (max-width:920px) {
@@ -120,12 +126,9 @@ div.brofix-brokenlink-list-form select.form-control {
     }
 }
 
-/** --- for very small screens --- */
-
-@media screen and (max-width:601px) {
-    /** remove optional columns */
-    #brofix-broken-links-table tbody tr td.mobile-optional {
-        display: none;
-    }
+/** remove optional columns */
+#brofix-broken-links-table.view_table_min tr td.mobile-optional,#brofix-broken-links-table.view_table_min tr th.mobile-optional {
+    display: none;
 }
+
 

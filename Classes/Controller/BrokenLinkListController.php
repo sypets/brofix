@@ -147,6 +147,11 @@ class BrokenLinkListController extends AbstractInfoController
     /**
      * @var string
      */
+    protected $viewMode = 'view_table_min';
+
+    /**
+     * @var string
+     */
     protected $route = '';
 
     /**
@@ -301,6 +306,7 @@ class BrokenLinkListController extends AbstractInfoController
 
         // get searchLevel (number of levels of pages to check / show results)
         $depth = GeneralUtility::_GP('depth');
+        $this->viewMode = GeneralUtility::_GP('view_mode');
 
         // store filter parameters in the Filter Object
         $this->filter = new BrokenLinkListFilter();
@@ -334,6 +340,7 @@ class BrokenLinkListController extends AbstractInfoController
             }
         }
         $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
+        $this->pObj->MOD_SETTINGS['viewMode'] = $this->viewMode;
 
         $this->route = GeneralUtility::_GP('route') ?? '';
         $this->token = GeneralUtility::_GP('token') ?? '';
@@ -584,6 +591,7 @@ class BrokenLinkListController extends AbstractInfoController
         $this->view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
         $this->view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
         $this->view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
+        $this->view->assign('view_mode', $this->viewMode ?: 'view_table_min');
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
