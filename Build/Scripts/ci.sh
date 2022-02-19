@@ -85,7 +85,7 @@ echo "lint"
 Build/Scripts/runTests.sh -p ${php} -s lint
 
 echo "phpstan"
-Build/Scripts/runTests.sh -p ${php} -s phpstan -e "-c ../phpstan.neon"
+Build/Scripts/runTests.sh -p ${php} -s phpstan
 
 echo "Unit tests"
 Build/Scripts/runTests.sh -p ${php} -s unit
