@@ -6,11 +6,23 @@
 Changelog
 =========
 
-2.2.2
+.. important::
+
+   Since version 2.3.0 and higher, we list only the important changes here.
+   For more changes, please see the respective release notes and commit messages
+   in the GitHub repository: https://github.com/sypets/brofix
+
+
+2.3.0
 =====
 
 * Rename branch master => main
-* Add TAB "Exclude URLs" to module
+* Add module for "Manage Exclusions"
+
+.. note::
+
+   Older, more detailed changes.
+
 
 2.2.0
 =====
