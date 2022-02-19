@@ -254,7 +254,7 @@ class BrokenLinkListController extends AbstractInfoController
             $this->id = 0;
         }
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->view = $this->createView('InfoModule');
+        $this->view = $this->createView('BrokenLinkList');
         if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
         }
@@ -463,14 +463,14 @@ class BrokenLinkListController extends AbstractInfoController
 
         $pageTitle = $this->pageRecord ? BackendUtility::getRecordTitle('pages', $this->pageRecord) : '';
         $this->view->assign('title', $pageTitle);
-        $this->view->assign('content', $this->renderContent());
+        $this->renderContent();
         return $this->view->render();
     }
 
     /**
      * Create tabs to split the report and the checkLink functions
      */
-    protected function renderContent(): string
+    protected function renderContent(): void
     {
         if (!$this->backendUserInformation->hasPermissionBrokenLinkList()) {
             // If no access or if ID == zero
@@ -479,16 +479,10 @@ class BrokenLinkListController extends AbstractInfoController
                 $this->getLanguageService()->getLL('no.access.title'),
                 FlashMessage::ERROR
             );
-            return '';
+            return;
         }
 
-        $reportsTabView = $this->createViewForBrokenLinksTab();
-
-        $menuItems[0] = [
-            'label' => $this->getLanguageService()->getLL('Report'),
-            'content' => $reportsTabView->render()
-        ];
-        return $this->moduleTemplate->getDynamicTabMenu($menuItems, 'report-brofix');
+        $this->initializeViewForBrokenLinks();
     }
 
     /**
@@ -545,13 +539,10 @@ class BrokenLinkListController extends AbstractInfoController
 
     /**
      * Displays the table of broken links or a note if there were no broken links
-     *
-     * @return StandaloneView
      */
-    protected function createViewForBrokenLinksTab(): StandaloneView
+    protected function initializeViewForBrokenLinks(): void
     {
-        $view = $this->createView('ReportTab');
-        $view->assign('depth', $this->depth);
+        $this->view->assign('depth', $this->depth);
 
         $items = [];
         $totalCount = 0;
@@ -583,42 +574,39 @@ class BrokenLinkListController extends AbstractInfoController
                 foreach ($paginator->getPaginatedItems() as $row) {
                     $items[] = $this->renderTableRow($row['table_name'], $row);
                 }
-                $view->assign('listUri', $this->constructBackendUri());
+                $this->view->assign('listUri', $this->constructBackendUri());
             }
         } else {
             $this->pagination = null;
         }
-        $view->assign('totalCount', $totalCount);
+        $this->view->assign('totalCount', $totalCount);
         // send the search filters to the view
-        $view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
-        $view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
-        $view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
-        //$view->assign('title_filter', $this->backendSession->get('filterKey')->getTitleFilter());
+        $this->view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
+        $this->view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
+        $this->view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
             $this->createFlashMessagesForNoBrokenLinks();
         }
-        $view->assign('brokenLinks', $items);
+        $this->view->assign('brokenLinks', $items);
         $linktypes = array_merge(['all' => 'all'], $this->linkTypes);
         if (count($linktypes) > 2) {
-            $view->assign('linktypes', $linktypes);
+            $this->view->assign('linktypes', $linktypes);
         }
 
-        $view->assign('pagination', $this->pagination);
-        $view->assign('orderBy', $this->orderBy);
-        $view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->view->assign('pagination', $this->pagination);
+        $this->view->assign('orderBy', $this->orderBy);
+        $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {
             $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
         }
-        $view->assign('sortActions', $sortActions);
+        $this->view->assign('sortActions', $sortActions);
 
         // Table header
-        $view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
-
-        return $view;
+        $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
     }
 
     /**
