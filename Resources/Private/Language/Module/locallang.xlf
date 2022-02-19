@@ -57,6 +57,18 @@
 			<trans-unit id="list.filter.title" resname="list.filter.title">
 				<source>Title</source>
 			</trans-unit>
+			<trans-unit id="list.filter.linktype.all" resname="list.filter.linktype.all">
+				<source>All</source>
+			</trans-unit>
+			<trans-unit id="list.filter.linktype.external" resname="list.filter.linktype.external">
+				<source>External</source>
+			</trans-unit>
+			<trans-unit id="list.filter.linktype.db" resname="list.filter.linktype.db">
+				<source>Internal</source>
+			</trans-unit>
+			<trans-unit id="list.filter.linktype.file" resname="list.filter.linktype.file">
+				<source>File</source>
+			</trans-unit>
 
 			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
 				<source>Recheck links</source>

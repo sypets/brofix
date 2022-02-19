@@ -56,6 +56,19 @@
 					</div>
 				</div>
 
+				<f:if condition="{linktypes}">
+					<div class="form-group">
+						<label for="linktype_searchFilter">Link type:</label>
+						<select id="linktype_searchFilter" name="linktype_searchFilter" class="form-control tceforms-select">
+							<f:for each="{linktypes}" as="linktype">
+								<option value="{linktype}" {f:if(condition:'{linktype} == {linktype_filter}', then: 'selected')}>
+								<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.{linktype}">{linktype}</f:translate>
+								</option>
+							</f:for>
+						</select>
+					</div>
+				</f:if>
+
 				<div class="form-group">
 					<label for="url_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url"/>:</label>
 					<div class="form-control-clearable">
