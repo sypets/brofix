@@ -141,7 +141,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
             'valid' => false,
             'errorParams' => [
                 'isValid' => false,
-                'errorType' => 'httpStatusCode',
+                'errorType' => 'http',
                 'errno' => 404,
                 'exceptionMsg' => '',
                 'message' => '404 - Page not found',

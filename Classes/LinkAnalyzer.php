@@ -399,7 +399,17 @@ class LinkAnalyzer implements LoggerAwareInterface
                         'valid' => false,
                         'errorParams' => $hookObj->getErrorParams()->toArray()
                     ];
+                    // @todo create class for url_response
                     $record['url_response'] = json_encode($response) ?: '';
+
+                    $errorCode = '';
+                    $errorType = $response['errorParams']['errorType'] ?? '';
+                    $errno = (int)($response['errorParams']['errno'] ?? 0);
+                    if ($errorType) {
+                        $errorCode = $errorType . '_' . $errno;
+                    }
+
+                    $record['error_code'] = $errorCode;
                     // last_check reflects time of last check (may be older if URL was in cache)
                     $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
@@ -408,6 +418,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 } elseif (GeneralUtility::_GP('showalllinks')) {
                     $response = ['valid' => true];
                     $record['url_response'] = json_encode($response) ?: '';
+                    $record['error_code'] = '';
                     $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);

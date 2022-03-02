@@ -311,11 +311,18 @@ class BrokenLinkListController extends AbstractBrofixController
         if ($linkType !== null) {
             $this->filter->setLinktypeFilter($linkType ?: 'all');
         }
+        $errorCodeFilter = GeneralUtility::_GP('errorcode_searchFilter');
+        if ($errorCodeFilter !== null) {
+            $this->filter->setErrorcodeFilter($errorCodeFilter);
+        }
 
         $this->userSettings = UserSettings::initializeFromSettingsAndGetParameters($this->pObj->MOD_SETTINGS);
 
         // to prevent deleting session, when user sort the records
-        if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
+        if (!is_null(GeneralUtility::_GP('url_searchFilter'))
+            || !is_null(GeneralUtility::_GP('title_searchFilter'))
+            || !is_null(GeneralUtility::_GP('uid_searchFilter'))
+            || !is_null(GeneralUtility::_GP('errorcode_searchFilter'))) {
             $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
         }
 
@@ -595,7 +602,9 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->view->assign('linktype_filter', $filter->getLinktypeFilter());
         $this->view->assign('url_filter', $filter->getUrlFilter());
         $this->view->assign('url_match_searchFilter', $filter->getUrlFilterMatch());
+        $this->view->assign('errorcode_filter', $filter->getErrorcodeFilter());
         $this->view->assign('view_mode', $this->userSettings->getViewMode());
+
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
@@ -887,11 +896,13 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['pagetitle'] = $path[0] ?? '';
 
         // error message
-        $response = $response = json_decode($row['url_response'], true);
+        $response = \json_decode($row['url_response'], true);
         $errorParams = new ErrorParams($response['errorParams']);
+        $errorCode = '';
         if ($response['valid']) {
             $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->getLL('list.msg.ok')) . '</span>';
         } else {
+            $errorCode = $hookObj->getErrorShortcut($errorParams);
             $linkMessage = sprintf(
                 '<span class="error" title="%s">%s</span>',
                 nl2br(
@@ -905,7 +916,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 nl2br(
                     // Encode for output
                     htmlspecialchars(
-                        $hookObj->getErrorMessage($errorParams),
+                        $hookObj->getErrorMessage($errorParams) . ' [' . $errorCode . ']',
                         ENT_QUOTES,
                         'UTF-8',
                         false
@@ -914,6 +925,7 @@ class BrokenLinkListController extends AbstractBrofixController
             );
         }
         $variables['linkmessage'] = $linkMessage;
+        $variables['error_code'] = $errorCode;
 
         // link / URL
         $variables['linktarget'] = $hookObj->getBrokenUrl($row);

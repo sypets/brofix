@@ -58,6 +58,8 @@ interface LinktypeInterface
      */
     public function getErrorParams(): ErrorParams;
 
+    public function getErrorShortcut(ErrorParams $errorParams = null): string;
+
     /**
      * Generate the localized error message from the error params saved from the parsing
      *

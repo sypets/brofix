@@ -153,6 +153,16 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
+            $errorcode = $filter->getErrorcodeFilter();
+            if ($errorcode) {
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq(
+                        self::TABLE . '.error_code',
+                        $queryBuilder->createNamedParameter($errorcode)
+                    )
+                );
+            }
+
             if ($orderBy !== []) {
                 $values = array_shift($orderBy);
                 if ($values && is_array($values) && count($values) === 2) {

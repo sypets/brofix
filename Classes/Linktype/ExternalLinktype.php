@@ -40,10 +40,23 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    // HTTP status code was delivered (and can be found in $errorParams->errno)
-    public const ERROR_TYPE_HTTP_STATUS_CODE = 'httpStatusCode';
-    // An error occurred in lowlevel handler and a cURL error code can be found in $errorParams->errno
-    public const ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO = 'libcurlErrno';
+    /**
+     * @var string
+     * @todo to be deprecated, use self::ERROR_TYPE_HTTP_STATUS_CODE
+     */
+    public const ERROR_TYPE_HTTP_STATUS_CODE_DEPRECATED = 'httpStatusCode';
+
+    /** @var string  */
+    public const ERROR_TYPE_HTTP_STATUS_CODE = 'http';
+
+    /**
+     * @var string
+     * @todo to be deprecated, use self::ERROR_TYPE_CURL
+     */
+    public const ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO_DEPRECATED = 'libcurlErrno';
+
+    /** @var string  */
+    public const ERROR_TYPE_CURL = 'curl';
     public const ERROR_TYPE_TOO_MANY_REDIRECTS = 'tooManyRedirects';
     public const ERROR_TYPE_UNABLE_TO_PARSE = 'unableToParseUri';
     public const ERROR_TYPE_UNKNOWN = 'unknown';
@@ -285,7 +298,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 'cURL error',
                 strlen('cURL error')
             ) === 0)) {
-                $this->errorParams->setErrorType(self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO);
+                $this->errorParams->setErrorType(self::ERROR_TYPE_CURL);
                 $this->errorParams->setErrno((int)($handlerContext['errno']));
                 // use shorter error message
                 if (isset($handlerContext['error'])) {
@@ -320,6 +333,18 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         return $this->lastChecked;
     }
 
+    public function getErrorShortcut(ErrorParams $errorParams = null): string
+    {
+        $type = $errorParams->getErrorType();
+        if ($type === self::ERROR_TYPE_HTTP_STATUS_CODE_DEPRECATED) {
+            $type = self::ERROR_TYPE_HTTP_STATUS_CODE;
+        } elseif ($type === self::ERROR_TYPE_CURL) {
+            $type = self::ERROR_TYPE_CURL;
+        }
+
+        return $type . '_' . $errorParams->getErrno();
+    }
+
     /**
      * Generate the localized error message from the error params saved from the parsing
      *
@@ -339,6 +364,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
         switch ($errorType) {
             case self::ERROR_TYPE_HTTP_STATUS_CODE:
+            case self::ERROR_TYPE_HTTP_STATUS_CODE_DEPRECATED:
                 $message = $lang->getLL('list.report.error.httpstatus.' . $errno);
                 if (!$message) {
                     if ($errno !== 0) {
@@ -350,7 +376,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 }
                 break;
 
-            case self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO:
+            case self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO_DEPRECATED:
+            case self::ERROR_TYPE_CURL:
                 $message = '';
                 if ($errno > 0) {
                     // get localized error message

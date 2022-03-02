@@ -390,6 +390,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7',
                 ],
                 [
                     'record_uid' => 2,
@@ -402,6 +403,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7',
                 ],
                 [
                     'record_uid' => 3,
@@ -414,6 +416,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => '85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
+                    'error_code' => 'page_4'
                 ],
                 [
                     'record_uid' => 5,
@@ -426,6 +429,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
+                    'error_code' => 'file_1'
                 ],
             ]
         ];
@@ -473,6 +477,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7',
                 ],
                 [
                     'record_uid' => 3,
@@ -485,6 +490,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => '85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
+                    'error_code' => 'page_4'
                 ],
                 [
                     'record_uid' => 5,
@@ -497,6 +503,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
+                    'error_code' => 'file_1'
                 ],
             ]
         ];
@@ -521,6 +528,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7'
                 ],
                 [
                     'record_uid' => 2,
@@ -533,6 +541,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7',
                 ],
                 [
                     'record_uid' => 3,
@@ -545,6 +554,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => '85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
+                    'error_code' => 'page_4'
+
                 ],
                 [
                     'record_uid' => 5,
@@ -557,6 +568,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
+                    'error_code' => 'file_1'
                 ],
             ]
         ];
@@ -581,6 +593,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7'
                 ],
             ]
         ];
@@ -606,6 +619,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'error_code' => 'curl_7'
                 ],
             ]
         ];
