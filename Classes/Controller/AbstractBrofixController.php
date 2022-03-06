@@ -18,9 +18,8 @@ use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-use TYPO3\CMS\Info\Controller\InfoModuleController;
 
-abstract class AbstractInfoController
+abstract class AbstractBrofixController
 {
     /**
      * @var string
@@ -46,7 +45,7 @@ abstract class AbstractInfoController
     protected $siteLanguages = [];
 
     /**
-     * @var InfoModuleController Contains a reference to the parent calling object
+     * @var BrofixController Contains a reference to the parent calling object
      */
     protected $pObj;
 
@@ -102,7 +101,7 @@ abstract class AbstractInfoController
      * @return string
      * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
-    protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_info'): string
+    protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_brofix'): string
     {
         $parameters = [
             'id' => $this->id,

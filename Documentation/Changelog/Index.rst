@@ -8,9 +8,17 @@ Changelog
 
 .. important::
 
-   Since version 2.3.0 and higher, we list only the important changes here.
+   Since version 2.3.0 and higher, we list only the important changes here
+   (specifically breaking changes).
    For more changes, please see the respective release notes and commit messages
    in the GitHub repository: https://github.com/sypets/brofix
+
+3.0.0
+=====
+
+-  [BREAKING] Move the module from the Info module to its own module. This
+   requires changes in the editor configuration: Give the editors permission to
+   the "brofix" module.
 
 
 2.3.0

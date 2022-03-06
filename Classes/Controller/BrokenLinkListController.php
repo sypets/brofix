@@ -2,19 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 namespace Sypets\Brofix\Controller;
 
 use Sypets\Brofix\BackendSession\BackendSession;
@@ -40,13 +27,12 @@ use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-use TYPO3\CMS\Info\Controller\InfoModuleController;
 
 /**
  * Module 'Check links' as sub module of Web -> Info
  * @internal
  */
-class BrokenLinkListController extends AbstractInfoController
+class BrokenLinkListController extends AbstractBrofixController
 {
     protected const ORDER_BY_VALUES = [
         // there is an inaccuracy here because for table 'pages', the page is record_uid and
@@ -238,10 +224,8 @@ class BrokenLinkListController extends AbstractInfoController
 
     /**
      * Init, called from parent object
-     *
-     * @param InfoModuleController $pObj A reference to the parent (calling) object
      */
-    public function init(InfoModuleController $pObj): void
+    public function init(BrofixController $pObj): void
     {
         $this->pObj = $pObj;
 
@@ -380,7 +364,7 @@ class BrokenLinkListController extends AbstractInfoController
         $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
 
         // save settings
-        $this->getBackendUser()->pushModuleData('web_info', $this->pObj->MOD_SETTINGS);
+        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
     }
 
     /**
@@ -389,7 +373,7 @@ class BrokenLinkListController extends AbstractInfoController
      * @return string
      * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
-    protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_info'): string
+    protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_brofix'): string
     {
         $parameters = [
             'id' => $this->id,

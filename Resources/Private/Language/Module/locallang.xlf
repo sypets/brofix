@@ -19,6 +19,11 @@
 				<source>Check links done</source>
 			</trans-unit>
 
+			<trans-unit id="goto" resname="goto">
+				<source>Go to</source>
+			</trans-unit>
+
+
 			<!-- table header -->
 
 			<trans-unit id="list.tableHead.page" resname="list.tableHead.page">

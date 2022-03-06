@@ -17,7 +17,7 @@ namespace Sypets\Brofix\Hooks;
  */
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Module\ModuleLoader;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
@@ -53,28 +53,35 @@ final class PageCalloutsHook
 
         // todo: access check
         $count = $this->brokenLinkRepository->getLinkCountForPage($pageId);
-        if ($count !== 0) {
-            $title = '';
-            $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-            $uri = (string)($uriBuilder->buildUriFromRoute('web_info', ['id' => $pageId]) . '&SET[function]=Sypets\\Brofix\\Controller\\BrokenLinkListController');
-            $message = sprintf(
-                ($count === 1 ? $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_singular_broken_links_found_for_page')
-                        : $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_plural_broken_links_found_for_page'))
-                        ?: '%d broken links were found on this page',
-                $count
-            );
-            $message .= '<p><a class="btn btn-info" href="' . $uri . '">';
-            $message .= $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:go_to_info_modul')
-                . '</a> '
-                . $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:and_check_links')
-                . '!</p>';
-            return [
-                'title' => $title,
-                'message' => $message,
-                'state' => InfoboxViewHelper::STATE_ERROR
-            ];
+        if ($count == 0) {
+            // no broken links to report
+            return [];
         }
-        return [];
+
+        // the following code is loosely based on PageLayoutController::getHeaderFlashMessagesForCurrentPid
+        $moduleLoader = GeneralUtility::makeInstance(ModuleLoader::class);
+        $moduleLoader->load($GLOBALS['TBE_MODULES']);
+        $modules = $moduleLoader->modules;
+        if (!is_array($modules['web']['sub']['brofix'])) {
+            return [];
+        }
+        //$title = $lang->getLL('goToListModule');
+        //$message = '<p>' . $lang->getLL('goToListModuleMessage') . '</p>';
+        $message = '<p>' . sprintf(
+            ($count === 1 ? $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_singular_broken_links_found_for_page')
+                : $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_plural_broken_links_found_for_page'))
+                ?: '%d broken links were found on this page',
+            $count . '</p>'
+        );
+        $message .= '<p>' . ($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:goto') ?: '');
+        $message .= ' <a class="btn btn-info" href="javascript:top.goToModule(\'web_brofix\',1);">'
+            . ($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang_mod.xlf:mlang_tabs_tab') ?: 'Brofix')
+            . '</a></p>';
+        return [
+            'title' => '',
+            'message' => $message,
+            'state' => InfoboxViewHelper::STATE_INFO
+        ];
     }
 
     /**
