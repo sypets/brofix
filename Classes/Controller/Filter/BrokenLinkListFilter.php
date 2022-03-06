@@ -32,7 +32,7 @@ class BrokenLinkListFilter
 
     public function setUidFilter(string $uid_filter): void
     {
-        $this->uid_filtre = $uid_filter;
+        $this->uid_filtre = trim($uid_filter);
     }
 
     public function getLinktypeFilter(): string
@@ -52,7 +52,7 @@ class BrokenLinkListFilter
 
     public function setUrlFilter(string $url_filter): void
     {
-        $this->url_filtre = $url_filter;
+        $this->url_filtre = trim($url_filter);
     }
 
     /** @deprecated */
