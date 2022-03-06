@@ -110,13 +110,24 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
                 );
             }
-            if ($filter->getUrlFilter() != '') {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->like(
-                        self::TABLE . '.url',
-                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
-                    )
-                );
+            $urlFilter = $filter->getUrlFilter();
+            if ($urlFilter != '' && $urlFilter != '=') {
+                if (strpos($urlFilter, '=') === 0) {
+                    // exact match
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->eq(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
+                        )
+                    );
+                } else {
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->like(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                        )
+                    );
+                }
             }
             $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
             if ($linktypeFilter != 'all') {

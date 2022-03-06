@@ -54,6 +54,9 @@
 			<trans-unit id="list.filter.url" resname="list.filter..url">
 				<source>URL</source>
 			</trans-unit>
+			<trans-unit id="list.filter.url.placeholder" resname="list.filter..url">
+				<source>=URL (exact), URL (partial)</source>
+			</trans-unit>
 			<trans-unit id="list.filter.title" resname="list.filter.title">
 				<source>Title</source>
 			</trans-unit>
