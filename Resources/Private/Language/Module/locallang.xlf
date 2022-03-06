@@ -46,6 +46,13 @@
 				<source>Action</source>
 			</trans-unit>
 
+			<!-- form -->
+			<trans-unit id="list.form.table.extended" resname="list.filter.uid">
+				<source>Extended view</source>
+			</trans-unit>
+			<trans-unit id="list.form.table.simple" resname="list.filter.uid">
+				<source>Simplified view</source>
+			</trans-unit>
 
 			<!-- filter -->
 			<trans-unit id="list.filter.uid" resname="list.filter.uid">

@@ -44,9 +44,9 @@
 
 			<div class="form-group form-group-border">
 				<input type="radio" name="view_mode" id="view_table_complex" value="view_table_complex" class="view_mode" {f:if(condition: "{view_mode} == 'view_table_complex'", then: 'checked')}  />
-				<label for="view_table_complex"><core:icon identifier="view-table-complex" size="default" /></label>
-				<input type="radio" name="view_mode" id="view_table_min" value="view_table_min" class="view_mode" {f:if(condition: "{view_mode} == 'view_table_min'", then: 'checked')} />
-				<label for="view_table_min"><core:icon identifier="view-table-min" size="default" /></label>
+				<label for="view_table_complex" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.extended')}"><core:icon identifier="view-table-complex" size="default" /></label>
+				<input type="radio" name="view_mode" id="view_table_min" value="view_table_min"  class="view_mode" {f:if(condition: "{view_mode} == 'view_table_min'", then: 'checked')} />
+				<label for="view_table_min" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.simple')}"><core:icon identifier="view-table-min" size="default" /></label>
 			</div>
 
 			<br/>
