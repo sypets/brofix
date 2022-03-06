@@ -207,12 +207,12 @@
 							</f:else>
 						</f:if>
 						<div class="inline-action">
-							<f:if condition="{url_filter}">
+							<f:if condition="{item.encoded_linktarget}">
 								<f:then>
-									<a href="{listUri}&url_searchFilter="><core:icon identifier="actions-close"/></a>
+									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}"><f:translate key="filter" extensionName="Brofix">Filter</f:translate></a>
 								</f:then>
 								<f:else>
-									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}"><f:translate key="filter" extensionName="Brofix">Filter</f:translate></a>
+									<a href="{listUri}&url_searchFilter="><core:icon identifier="actions-close"/></a>
 								</f:else>
 							</f:if>
 						</div>
