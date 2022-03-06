@@ -894,7 +894,11 @@ class BrokenLinkListController extends AbstractInfoController
 
         // link / URL
         $variables['linktarget'] = $hookObj->getBrokenUrl($row);
-        $variables['encoded_linktarget'] = urlencode('=' . $variables['linktarget']);
+        if ($this->filter->getUrlFilter() == '=' . $variables['linktarget']) {
+            $variables['encoded_linktarget'] = '';
+        } else {
+            $variables['encoded_linktarget'] = urlencode('=' . $variables['linktarget']);
+        }
         if (isset($row['link_title']) && $variables['linktarget'] !== $row['link_title']) {
             $variables['link_title'] = htmlspecialchars($row['link_title']);
         } else {
