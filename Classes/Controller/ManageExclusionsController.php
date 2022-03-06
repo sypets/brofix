@@ -19,9 +19,8 @@ use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-use TYPO3\CMS\Info\Controller\InfoModuleController;
 
-class ManageExclusionsController extends AbstractInfoController
+class ManageExclusionsController extends AbstractBrofixController
 {
     /**
      * @var string
@@ -137,9 +136,9 @@ class ManageExclusionsController extends AbstractInfoController
     /**
      * Init, called from parent object
      *
-     * @param InfoModuleController $pObj A reference to the parent (calling) object
+     * @param BrofixController $pObj A reference to the parent (calling) object
      */
-    public function init(InfoModuleController $pObj): void
+    public function init(BrofixController $pObj): void
     {
         $this->pObj = $pObj;
         $this->storagePid = $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid();
@@ -227,7 +226,7 @@ class ManageExclusionsController extends AbstractInfoController
         $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage') ?? 1);
 
         $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
-        $this->getBackendUser()->pushModuleData('web_info', $this->pObj->MOD_SETTINGS);
+        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
 
         // orderBy
         $this->orderBy = (string)(GeneralUtility::_GP('orderBy') ?? self::ORDER_BY_DEFAULT);
