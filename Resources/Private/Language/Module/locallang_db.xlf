@@ -21,31 +21,31 @@
 			<trans-unit id="tx_brofix_exclude_link_target.match_by" resname="tx_brofix_exclude_link_target.link_type.match_by">
 				<source>Match by</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="tx_brofix_exclude_link_target.match_by.exact">
 				<source>exact</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="tx_brofix_exclude_link_target.match_by.domain">
 				<source>domain</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_target" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.link_target" resname="tx_brofix_exclude_link_target.link_target">
 				<source>Link target</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="tx_brofix_exclude_link_target.link_target.placeholder">
 				<source>Enter the URL or domain to match with.</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="tx_brofix_exclude_link_target.notes.placeholder">
 				<source>Why should this URL not be checked?</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.reason" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.reason" resname="tx_brofix_exclude_link_target.reason">
 				<source>Reason</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="tx_brofix_exclude_link_target.reason.none">
 				<source>None given</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="tx_brofix_exclude_link_target.reason.noBrokenLink">
 				<source>URL is available (was falsely detected as broken link)</source>
 			</trans-unit>
-			<trans-unit id="tx_brofix_exclude_link_target.notes" resname="">
+			<trans-unit id="tx_brofix_exclude_link_target.notes" resname="tx_brofix_exclude_link_target.notes">
 				<source>Notes</source>
 			</trans-unit>
 			<trans-unit id="tx_brofix_exclude_link_target.disabled" resname="tx_brofix_exclude_link_target.disabled">
