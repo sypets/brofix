@@ -6,10 +6,10 @@
 			<trans-unit id="mod_brofix" resname="mod_brofix">
 				<source>Broken link fixer</source>
 			</trans-unit>
-			<trans-unit id="function.list.header.broken_links" resname="list.header">
+			<trans-unit id="function.list.header.broken_links" resname="function.list.header.broken_links">
 				<source>Broken Links</source>
 			</trans-unit>
-			<trans-unit id="function.list.header.manage_exclusions" resname="list.header">
+			<trans-unit id="function.list.header.manage_exclusions" resname="function.list.header.manage_exclusions">
 				<source>Manage Exclusions</source>
 			</trans-unit>
 
@@ -104,7 +104,7 @@
 			<trans-unit id="broken_links_found_for_page" resname="broken_links_found_for_page">
 				<source>Broken links were found on this page</source>
 			</trans-unit>
-			<trans-unit id="count_singular_broken_links_found_for_page" resname="count_broken_links_found_for_page">
+			<trans-unit id="count_singular_broken_links_found_for_page" resname="count_singular_broken_links_found_for_page">
 				<source>%d broken link was found on this page.</source>
 			</trans-unit>
 			<trans-unit id="count_plural_broken_links_found_for_page" resname="count_broken_links_found_for_page">
@@ -115,7 +115,7 @@
 			<trans-unit id="go_to_info_modul" resname="go_to_info_modul">
 				<source>Go to the Info module</source>
 			</trans-unit>
-			<trans-unit id="go_to_brofix_modul" resname="go_to_info_modul">
+			<trans-unit id="go_to_brofix_modul" resname="go_to_brofix_modul">
 				<source>Go to the Brofix module</source>
 			</trans-unit>
 			<trans-unit id="and_check_links" resname="and_check_links">
