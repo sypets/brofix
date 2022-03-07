@@ -552,7 +552,7 @@ report.docsurl
          report.docsurl = https://docs.typo3.org/p/sypets/brofix/main/en-us/Index.html
 
    Default
-      empty
+      Empty
 
 report.recheckButton
 --------------------
