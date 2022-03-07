@@ -310,7 +310,7 @@
 			<trans-unit id="no.access" resname="no.access">
 				<source>You do not have access to these listings.</source>
 			</trans-unit>
-	<!-- Set for Manage Exclusion tab -->
+			<!-- Set for Manage Exclusion tab -->
 			<trans-unit id="columnHeader.page">
 				<source>Page</source>
 			</trans-unit>
@@ -321,7 +321,7 @@
 				<source>Link type</source>
 			 </trans-unit>
 			 <trans-unit id="columnHeader.crdate">
-				<source>Excluding Date</source>
+				<source>Created on</source>
 			 </trans-unit>
 			 <trans-unit id="columnHeader.reason">
 				<source>Reason</source>
@@ -342,10 +342,10 @@
 					  <source>Select / Deselect </source>
 				 </trans-unit>
 				 <trans-unit id="deleteLinks">
-					   <source>Delete Link(s)</source>
+					   <source>Delete</source>
 				  </trans-unit>
 				 <trans-unit id="excludeLinksTitle">
-					  <source>Excluded Links</source>
+					  <source>Excluded link targets</source>
 				  </trans-unit>
 				  <trans-unit id="form.selectReason">
 					   <source>Select reason</source>
@@ -357,7 +357,7 @@
 						<source>Internal</source>
 				   </trans-unit>
 				   <trans-unit id="form.selectLinkType">
-						<source> Select Link Type</source>
+						<source>Select Link Type</source>
 					</trans-unit>
 			 <!-- End Modification -->
 
