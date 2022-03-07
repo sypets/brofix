@@ -878,10 +878,11 @@ class BrokenLinkListController extends AbstractBrofixController
 
         // link / URL
         $variables['linktarget'] = $hookObj->getBrokenUrl($row);
-        if ($this->filter->getUrlFilter() == '=' . $variables['linktarget']) {
+        $variables['orig_linktarget'] = $row['url'];
+        if ($this->filter->getUrlFilter() == '=' . $variables['orig_linktarget']) {
             $variables['encoded_linktarget'] = '';
         } else {
-            $variables['encoded_linktarget'] = urlencode('=' . $variables['linktarget']);
+            $variables['encoded_linktarget'] = urlencode('=' . $variables['orig_linktarget']);
         }
         if (isset($row['link_title']) && $variables['linktarget'] !== $row['link_title']) {
             $variables['link_title'] = htmlspecialchars($row['link_title']);
