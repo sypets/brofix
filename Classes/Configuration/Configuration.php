@@ -281,7 +281,7 @@ class Configuration
 
     public function getDocsUrl(): string
     {
-        return $this->tsConfig['docsurl'] ?? '';
+        return $this->tsConfig['report.']['docsurl'] ?? '';
     }
 
     public function getRecheckButton(): int

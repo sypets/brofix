@@ -243,10 +243,10 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->id = 0;
         }
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->view = $this->createView('BrokenLinkList');
         if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
         }
+        $this->view = $this->createView('BrokenLinkList');
     }
 
     protected function createView(string $templateName): StandaloneView
@@ -261,7 +261,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $view->setTemplate($templateName);
         $view->assign('currentPage', $this->id);
         $view->assign('depth', $this->depth);
-        $view->assign('docsurl', $this->configuration->getTsConfig()['report.']['docsurl'] ?? '');
+        $view->assign('docsurl', $this->configuration->getDocsUrl());
         $view->assign(
             'showRecheckButton',
             $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
