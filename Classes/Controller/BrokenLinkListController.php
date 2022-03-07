@@ -246,6 +246,8 @@ class BrokenLinkListController extends AbstractBrofixController
         if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
         }
+        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+        $this->getSettingsFromQueryParameters();
         $this->view = $this->createView('BrokenLinkList');
     }
 
@@ -401,8 +403,6 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     public function main(): string
     {
-        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
-        $this->getSettingsFromQueryParameters();
         $this->initialize();
 
         if ($this->action === 'updateLinkList') {
