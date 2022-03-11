@@ -121,6 +121,15 @@
 			<trans-unit id="and_check_links" resname="and_check_links">
 				<source>and check links</source>
 			</trans-unit>
+			<trans-unit id="visitBackendPage">
+				<source>Visit the backend page</source>
+			</trans-unit>
+			<trans-unit id="pageTitle">
+				 <source>Page Title</source>
+			</trans-unit>
+			<trans-unit id="link">
+				 <source>Link</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

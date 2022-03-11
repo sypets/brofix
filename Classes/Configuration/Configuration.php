@@ -416,6 +416,11 @@ class Configuration
         return $this->tsConfig['mail.']['language'] ?? 'en';
     }
 
+    public function getMailAddLinks(): string
+    {
+        return $this->tsConfig['mail.']['addLinks'] ?? '0';
+    }
+
     /**
      * @return mixed[]
      */

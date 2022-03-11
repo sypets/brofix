@@ -63,6 +63,7 @@ mod.brofix {
 		subject =
 		template = CheckLinksResults
     language = en
+    addLinks = 0
 	}
 
 	custom {
