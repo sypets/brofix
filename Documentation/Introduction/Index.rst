@@ -56,4 +56,15 @@ forked from the source code of linkvalidator. Thus, it is based on the work
 of the original authors and maintainers.
 
 
+.. _what-is-the-diffence-to-linkvalidator:
 
+What is the diffence to linkvalidator?
+======================================
+
+Broken Links Fixer includes some improvements that not have made it into the core yet. E.g.:
+
+- impoved GUI with possibility to sort and filter the links
+
+- possibility to exclude links from being checked to avoid false positives
+
+- better configuration options
