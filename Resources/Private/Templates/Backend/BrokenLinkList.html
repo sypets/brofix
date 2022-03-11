@@ -183,7 +183,9 @@
 									<a href="{listUri}&uid_searchFilter="><core:icon identifier="actions-close"/></a>
 								</f:then>
 								<f:else>
-									<a href="{listUri}&uid_searchFilter={item.record_uid}"><f:translate key="filter" extensionName="Brofix">Filter</f:translate></a>
+									<a href="{listUri}&uid_searchFilter={item.record_uid}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.element.uid.tooltip', extensionName: 'Brofix')}">
+										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+									</a>
 								</f:else>
 							</f:if>
 						</div>
@@ -209,7 +211,9 @@
 						<div class="inline-action">
 							<f:if condition="{item.encoded_linktarget}">
 								<f:then>
-									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}"><f:translate key="filter" extensionName="Brofix">Filter</f:translate></a>
+									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
+										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+									</a>
 								</f:then>
 								<f:else>
 									<a href="{listUri}&url_searchFilter="><core:icon identifier="actions-close"/></a>
