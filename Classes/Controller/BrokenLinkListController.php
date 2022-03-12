@@ -133,11 +133,6 @@ class BrokenLinkListController extends AbstractBrofixController
     /**
      * @var string
      */
-    protected $viewMode = 'view_table_min';
-
-    /**
-     * @var string
-     */
     protected $route = '';
 
     /**
@@ -292,14 +287,13 @@ class BrokenLinkListController extends AbstractBrofixController
 
         // get searchLevel (number of levels of pages to check / show results)
         $depth = GeneralUtility::_GP('depth');
-        $this->viewMode = GeneralUtility::_GP('view_mode');
 
         // store filter parameters in the Filter Object
         $this->filter = new BrokenLinkListFilter();
         $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
         $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
         $this->filter->setLinktypeFilter(GeneralUtility::_GP('linktype_searchFilter') ?? 'all');
-        $this->filter->setTitleFilter(GeneralUtility::_GP('title_searchFilter') ?? '');
+        $this->filter->setViewMode(GeneralUtility::_GP('view_mode') ?? BrokenLinkListFilter::VIEW_MODE_MIN);
 
         // to prevent deleting session, when user sort the records
         if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
@@ -326,7 +320,7 @@ class BrokenLinkListController extends AbstractBrofixController
             }
         }
         $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
-        $this->pObj->MOD_SETTINGS['viewMode'] = $this->viewMode;
+        $this->pObj->MOD_SETTINGS['viewMode'] = $this->filter->getViewMode();
 
         $this->route = GeneralUtility::_GP('route') ?? '';
         $this->token = GeneralUtility::_GP('token') ?? '';
@@ -546,7 +540,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $searchFilter->setUrlFilter($this->backendSession->get('filterKey')->getUrlFilter());
             $searchFilter->setLinktypeFilter($this->backendSession->get('filterKey')->getLinktypeFilter());
             $searchFilter->setUidFilter($this->backendSession->get('filterKey')->getUidFilter());
-            $searchFilter->setTitleFilter($this->backendSession->get('filterKey')->getTitleFilter());
+            $searchFilter->setViewMode($this->backendSession->get('filterKey')->getViewMode());
 
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
@@ -575,7 +569,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
         $this->view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
         $this->view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
-        $this->view->assign('view_mode', $this->viewMode ?: 'view_table_min');
+        $this->view->assign('view_mode', $this->backendSession->get('filterKey')->getViewMode() ?: BrokenLinkListFilter::VIEW_MODE_MIN);
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {

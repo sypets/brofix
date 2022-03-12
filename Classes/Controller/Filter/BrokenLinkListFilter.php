@@ -6,6 +6,9 @@ namespace Sypets\Brofix\Controller\Filter;
 
 class BrokenLinkListFilter
 {
+    public const VIEW_MODE_MIN = 'view_table_min';
+    public const VIEW_MODE_COMPLEX = 'view_table_complex';
+
     /**
      * @var string
      */
@@ -24,6 +27,9 @@ class BrokenLinkListFilter
      * @deprecated
      */
     protected $title_filter = '';
+
+    /** @var string */
+    protected $viewMode = self::VIEW_MODE_MIN;
 
     public function getUidFilter(): string
     {
@@ -53,6 +59,22 @@ class BrokenLinkListFilter
     public function setUrlFilter(string $url_filter): void
     {
         $this->url_filtre = trim($url_filter);
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewMode(): string
+    {
+        return $this->viewMode;
+    }
+
+    /**
+     * @param string $viewMode
+     */
+    public function setViewMode(string $viewMode): void
+    {
+        $this->viewMode = $viewMode;
     }
 
     /** @deprecated */
