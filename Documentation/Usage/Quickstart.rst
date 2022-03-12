@@ -11,15 +11,14 @@ Usage quickstart
 #. Switch to the broken link list
 
    When you see the message "Broken links were found" in the page module, click
-   on "Go to the Info module".
+   on the link that is displayed.
 
    .. image:: ../_images/message_broken_links_were_found.png
       :class: with-shadow
 
    You will now see the list of broken links.
 
-   Alternatively, select "Info" in the left column, and then "Broken link
-   fixer" in the top select list.
+   Alternatively, select "Check Linnks" in the left column.
 
 #. Start editing
 
@@ -81,10 +80,10 @@ buttons
 -------
 
 *  **Refresh display**: This just reloads the list. It does not recheck links.
-*  **Check links**: (if configured), this checks broken links, depending on the
+*  **Check links** (if available): This checks broken links, depending on the
    selected depth. For external URLs, the :ref:`usagePitfallsLinkTargetCache`
    is used.
-*  **i**: (if configured), this opens the documentation in another browser tab.
+*  **i** (if configured): This opens the documentation in another browser tab.
 
 table
 -----
@@ -94,7 +93,7 @@ Columns in the table:
 .. figure:: ../_images/table1.png
    :class: with-shadow
 
-   Columns 1-4
+   Columns 1-3
 
 
 1. **Page**: The title and [page id] are shown.
@@ -105,18 +104,6 @@ Columns in the table:
 
 3. **Type**: This shows the type of the record (e.g. "Page Content", "Page", "News")
    and the field the broken link is found in (e.g. "Text", "Link").
-
-4. **Checked**: When the record field was last checked. If the record was edited
-   *after* the last check, the broken link information may be outdated. It does
-   not mean, it will always be outdated, as the record may have been edited
-   without changing the links, but it is an indicator, that it might be a good
-   idea to recheck. In this case, you can click on the "Recheck URL" button
-   |recheck_url_action_image|.
-
-   The following is displayed:
-
-   *  if (possibly) outdated: red background and a recheck icon.
-      |check_stale_image|
 
 
 .. figure:: ../_images/table2.png
@@ -130,11 +117,24 @@ Columns in the table:
 6. **Error**: The error that occurred, e.g. "Page not found". Hover over the
    text with the mouse to see the original exception message.
 
-7. **Checked (URL)**: The last check time of the **URL**. Since a link target
-   cache is used for external URLs, this check time may be **before** the check
-   time of the record in column 4. If you loaded the URL in the browser and feel
+7. **Checked (URL)**: The last check time of the **link target** or when the
+   element was last checked (whichever is older). Since a link target
+   cache is used for external URLs, the check time may be **before** the check
+   time of the element in column 2. If you loaded the URL in the browser and feel
    the information displayed is not up to date, you can press the "Recheck URL"
    |recheck_url_action_image| button.
+
+   If the record was edited
+   *after* the last check, the broken link information **may** be outdated.
+   It does not mean, it will always be outdated, as the record may have been
+   edited without changing the links, but it is an indicator, that it might be
+   a good idea to recheck. In this case, you can click on the "Recheck URL" button
+   |recheck_url_action_image|.
+
+   The following is displayed:
+
+   *  if (possibly) outdated: red background and a recheck icon.
+      |check_stale_image|
 
 8. **Action**: Action buttons:
 

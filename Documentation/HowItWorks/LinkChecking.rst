@@ -119,15 +119,7 @@ broken link records are removed. Adding an URL to the exclude list can be
 conveniently done by clicking on a button |exclude_link_target_action_image|
 in the list of broken links.
 
-Exclude link Management
-====================
-
-The management of broken links excluded is done by the tab Management of exclusions,
-this tab allows you to list the excluded links, by a filter on the URL, the type of link,
-and the reason for exclusion, with the ability to extract the CSV file of the excluded links.
-from this tab, there is the possibility to remove a link already excluded from
-the table of excluded broken links, which considers this link as a broken link by the extension.
-
+For more information about the usage see :ref:`usage_exclude_link_targets`.
 
 
 .. |recheck_url_action_image| image:: ../_images/recheck_url_action.png
