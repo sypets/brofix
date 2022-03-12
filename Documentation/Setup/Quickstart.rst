@@ -14,9 +14,8 @@ Steps
 
 #. Editor configuration
 
-   Give your backend users  / user groups permission to the "Info" module. You
-   may want to disable access to the Log and TSconfig, see
-   :ref:`mod.web_info.menu.function <t3tsconfig:pageblindingfunctionmenuoptions-webinfo>`.
+   Give your backend users  / user groups permission to the "Check Links"
+   (web_brofix) module.
 
    Give backend users / user groups permission to the table
    `tx_brofix_exclude_link_target`, if they should be able to add URLs to the
@@ -24,7 +23,8 @@ Steps
    amount of prudence and understanding, otherwise this feature may be misused.)
 
    In this case, you must also set TSconfig :ref:`tsConfigExcludeLinkTargetStoragePid`
-   to a page of type system folder. The editors must have access to this page.
+   to a page of type system folder. The editors must have access to this page
+   (to be able to save records on this page).
 
 #. Setup page tsconfig
 

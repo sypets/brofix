@@ -37,8 +37,8 @@ Additionally, it may occur for
    URL cannot be loaded in the browser as well, wait a few days or contact the
    administrator of the remote site. If the URL is generally ok, but "flaky"
    (the result may fluctuate), you may want to replace the link with something
-   more reliable or exclude this URL (see next item).
-*  if the URL can be loaded in the browser and is ok, press "Recheck URL".
+   more reliable as this affects the usability for the users of your site.
+*  If the URL can be loaded in the browser and is ok, press "Recheck URL".
    |recheck_url_action_image| If the link
    is still reported as broken, exclude the link by clicking the "Exclude"
    button |exclude_link_target_action_image| and save.
@@ -48,7 +48,7 @@ Additionally, it may occur for
    It is often possible to load pages in the browser and the error is not
    immediately visible. This is sometimes the case for "Page not found (404)"
    errors. If you look more closely, you may see a "Page not found" text or
-   something similar on the page or in the title.
+   something similar on the page or in the title bar of your browser.
 
    If you can verify the **HTTP status code** in the browser, this is a good
    indicator. Pages that load ok, should have the status code **200**.
@@ -72,7 +72,8 @@ the "Recheck URL" button |recheck_url_action_image| will always refresh the
 information.
 
 Since the status of external URLs will not change very often, the link target
-cache is not a problem and considerably speeds up link checking.
+cache is not a problem and considerably speeds up link checking. Also it reduces
+network traffic and load on external servers.
 
 Because of the above mentioned problem of the false positives, it is a good
 idea anyway to verify the result by loading the URL in the browser.
