@@ -14,6 +14,7 @@ use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
+use Sypets\Brofix\Util\StringUtil;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -60,16 +61,9 @@ class BrokenLinkListController extends AbstractBrofixController
             ['field', 'DESC'],
         ],
         'last_check' => [
-            ['last_check', 'ASC'],
-        ],
-        'last_check_reverse' => [
-            ['last_check', 'DESC'],
-        ],
-        // add by Mee
-        'last_check_url' => [
             ['last_check_url', 'ASC'],
         ],
-        'last_check_url_reverse' => [
+        'last_check_reverse' => [
             ['last_check_url', 'DESC'],
         ],
         'url' => [
@@ -655,10 +649,9 @@ class BrokenLinkListController extends AbstractBrofixController
             'page',
             'element',
             'type',
-            'last_check',
             'url',
             'error',
-            'last_check_url',
+            'last_check',
             'action'
         ];
 
@@ -886,15 +879,8 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['linktext'] = $hookObj->getBrokenLinkText($row, $errorParams->getCustom());
 
         // last check of record
-        $currentDate = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], \time());
-        $lastcheckDate = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['last_check']);
-        $lastCheckTime = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['last_check']);
-        $variables['lastcheck'] = (($currentDate != $lastcheckDate) ? $lastcheckDate . ' ' : '') . $lastCheckTime;
-
-        // last check of URL
-        $lastcheckDateUrl = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['last_check_url']);
-        $lastCheckTimeUrl = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['last_check_url']);
-        $variables['lastcheck_url'] = (($currentDate != $lastcheckDateUrl) ? $lastcheckDateUrl . ' ' : '') . $lastCheckTimeUrl;
+        // show the oldest last_check, either for the record or for the link target
+        $variables['lastcheck'] = StringUtil::formatTimestampAsString($row['last_check'] < $row['last_check_url'] ? $row['last_check'] : $row['last_check_url']);
 
         // determine if check is fresh or stale
         $tstamp_field = $GLOBALS['TCA'][$row['table_name']]['ctrl']['tstamp'] ?? '';

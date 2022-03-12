@@ -129,12 +129,6 @@
 							<core:icon identifier="{tableHeader.type.icon}"/>
 						</f:if>
 					</th>
-					<th class="mobile-optional">
-						<f:format.raw>{tableHeader.last_check.header}</f:format.raw>
-						<f:if condition="{tableHeader.last_check.icon}">
-							<core:icon identifier="{tableHeader.last_check.icon}"/>
-						</f:if>
-					</th>
 					<th colspan="2">
 						<f:format.raw>{tableHeader.url.header}</f:format.raw>
 						<f:if condition="{tableHeader.url.icon}">
@@ -148,11 +142,11 @@
 						</f:if>
 					</th>
 					<th class="mobile-optional">
-						<f:format.raw> {tableHeader.last_check_url.header}</f:format.raw>
-						<f:if condition="{tableHeader.last_check_url.icon}">
-							<core:icon identifier="{tableHeader.last_check_url.icon}"/>
+						<f:format.raw> {tableHeader.last_check.header}</f:format.raw>
+						<f:if condition="{tableHeader.last_check.icon}">
+							<core:icon identifier="{tableHeader.last_check.icon}"/>
 						</f:if>
-						<br/>(URL)
+						<br/>
 					<th>
 						{tableHeader.action.header}
 					</th>
@@ -191,13 +185,7 @@
 						</div>
 					</td>
 					<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
-						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span></td>
-					<td class="mobile-optional"
-						title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
-						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
-						<f:if condition="{item.freshness} == 'stale'>">
-							<core:icon identifier="actions-document-synchronize"/>
-						</f:if>
+						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
 					</td>
 					<td colspan="2">
 						<f:if condition="{item.linktarget}">
@@ -222,7 +210,12 @@
 						</div>
 					</td>
 					<td>{item.linkmessage -> f:format.raw()}</td>
-					<td class="mobile-optional">{item.lastcheck_url}</td>
+					<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
+						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
+						<f:if condition="{item.freshness} == 'stale'>">
+							<core:icon identifier="actions-document-synchronize"/>
+						</f:if>
+					</td>
 					<td>
 						<a class="btn btn-primary" href="{item.editUrl}"
 						   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
