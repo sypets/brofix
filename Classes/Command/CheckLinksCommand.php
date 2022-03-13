@@ -171,7 +171,8 @@ class CheckLinksCommand extends Command
         // exluded pages uid
         $this->excludedPages = [];
         foreach ($input->getOption('exclude-uid') ?: [] as $value) {
-            $this->excludedPages[] = (int)$value;
+            $id = (int)$value;
+            $this->excludedPages[$id] = $id;
         }
 
         $startPageString = (string)($input->getOption('start-pages') ?? '');
@@ -341,8 +342,10 @@ class CheckLinksCommand extends Command
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($pageRow);
 
         $checkHidden = $this->configuration->isCheckHidden();
+        $pageIds = [];
         if (!$rootLineHidden || $checkHidden) {
-            $pageIds = $this->pagesRepository->getPageList(
+            $this->pagesRepository->getPageList(
+                $pageIds,
                 $pageUid,
                 $depth,
                 '1=1',

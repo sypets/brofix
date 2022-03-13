@@ -508,7 +508,8 @@ class BrokenLinkListController extends AbstractBrofixController
         $depth = $this->depth;
         $permsClause = (string)$this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
         if ($this->id !== 0) {
-            $this->pageList = $this->pagesRepository->getPageList($this->id, $depth, $permsClause, $considerHidden);
+            $this->pageList = [];
+            $this->pagesRepository->getPageList($this->pageList, $this->id, $depth, $permsClause, $considerHidden);
         } else {
             $this->pageList = [];
         }

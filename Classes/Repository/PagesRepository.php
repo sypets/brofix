@@ -24,29 +24,25 @@ class PagesRepository
     protected const TABLE = 'pages';
 
     /**
-     * Calls TYPO3\CMS\Backend\FrontendBackendUserAuthentication::extGetTreeList.
-     * Although this duplicates the function TYPO3\CMS\Backend\FrontendBackendUserAuthentication::extGetTreeList
-     * this is necessary to create the object that is used recursively by the original function.
+     * Generates a list of page uids. The start page is $id and this function
+     * recursively traverses the page tree and adds all pages to $pageList.
      *
-     * Generates a list of page uids from $id. List does not include $id itself.
-     * The only pages excluded from the list are deleted pages.
+     * This is a helper function for getPageList in this class.
      *
+     * @param array <int,int> $pageList
      * @param int $id Start page id
      * @param int $depth Depth to traverse down the page tree.
      * @param string $permsClause Perms clause
-     * @param array<string> $excludedPages
+     * @param array<int,int> $excludedPages list of pages to ignore: do not return them, do not traverse into them
      * @param bool $considerHidden Whether to consider hidden pages or not
      * @param array<int,int> $excludedPages
      *
-     * @return mixed[]
-     *
-     * @todo begin is never really used
+     * @return array<int,int>
      */
-    public function getAllSubpagesForPage(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
+    protected function getAllSubpagesForPage(array &$pageList, int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
     {
-        $subPageIds = [];
         if ($depth === 0) {
-            return $subPageIds;
+            return $pageList;
         }
 
         $queryBuilder = $this->generateQueryBuilder('pages');
@@ -59,7 +55,7 @@ class PagesRepository
             ->add($deletedRestriction);
 
         $result = $queryBuilder
-            ->select('uid', 'title', 'hidden', 'extendToSubpages')
+            ->select('uid', 'hidden', 'extendToSubpages')
             ->from('pages')
             ->where(
                 $queryBuilder->expr()->eq(
@@ -76,41 +72,48 @@ class PagesRepository
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
 
             if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages)) {
-                $subPageIds[] = $id;
+                $pageList[$id] = $id;
             }
             if ($depth > 1 && (!($isHidden && $extendToSubpages) || $considerHidden) && !in_array($id, $excludedPages)) {
-                $subPageIds = array_merge($subPageIds, $this->getAllSubpagesForPage(
+                $this->getAllSubpagesForPage(
+                    $pageList,
                     $id,
                     $depth - 1,
                     $permsClause,
                     $considerHidden,
                     $excludedPages
-                ));
+                );
             }
         }
-        return $subPageIds;
+        return $pageList;
     }
 
     /**
-     * Generates an array of page uids from current pageUid.
-     * List does include pageUid itself.
+     * Generates an array of page uids from the page with id $id. Also adds the page $id itself.
      *
+     * The collection of the list is done in 3 steps:
+     * - Get subpages
+     * - Add the page $id itself (check first if it should be added)
+     * - Add the translations for all collected page ids
+     *
+     * @param array <int,int> $pageList
      * @param int $id
      * @param int $depth
      * @param string $permsClause
-     * @param array<string> $excludedPages
+     * @param array<int,int> $excludedPages
      * @param bool $considerHidden
      * @param array<int,int> $excludedPages
      *
-     * @return mixed[]
+     * @return array<int,int>
      */
-    public function getPageList(int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
+    public function getPageList(array &$pageList, int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
     {
         if (in_array($id, $excludedPages)) {
             // do not add page, if in list of excluded pages
-            return [];
+            return $pageList;
         }
         $pageList = $this->getAllSubpagesForPage(
+            $pageList,
             $id,
             $depth,
             $permsClause,
@@ -118,13 +121,14 @@ class PagesRepository
             $excludedPages
         );
         // Always add the current page
-        $pageList[] = $id;
-        $pageTranslations = $this->getTranslationForPage(
+        $pageList[$id] = $id;
+        $this->getTranslationForPage(
+            $pageList,
             $id,
             $permsClause,
             $considerHidden
         );
-        return array_merge($pageList, $pageTranslations);
+        return $pageList;
     }
 
     /**
@@ -167,13 +171,15 @@ class PagesRepository
     /**
      * Add page translations to list of pages
      *
+     * @param array <int,int> $pageList
      * @param int $currentPage
      * @param string $permsClause
      * @param bool $considerHiddenPages
      * @param int[] $limitToLanguageIds
-     * @return int[]
+     * @return array<int,int>
      */
     public function getTranslationForPage(
+        array $pageList,
         int $currentPage,
         string $permsClause,
         bool $considerHiddenPages,
@@ -212,12 +218,12 @@ class PagesRepository
             ->where(...$constraints)
             ->execute();
 
-        $translatedPages = [];
         while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
-            $translatedPages[] = (int)$row['uid'];
+            $id = (int)$row['uid'];
+            $pageList[$id] = $id;
         }
 
-        return $translatedPages;
+        return $pageList;
     }
 
     /**
