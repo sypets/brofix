@@ -19,10 +19,24 @@ define(['jquery'], function($) {
   'use strict';
   $(document).ready(function () {
 
+    // reload list on changing these values
     $('#linktype_searchFilter').on('change', function () {
       $('#refreshLinkList').click();
     })
 
+    $('#url_match_searchFilter').on('change', function () {
+      $('#refreshLinkList').click();
+    })
+
+    $('#view_table_complex').on('change', function () {
+      $('#refreshLinkList').click();
+    })
+
+    $('#view_table_min').on('change', function () {
+      $('#refreshLinkList').click();
+    })
+
+    // clear input text fields with X button
     $('#uidButton').on('click', function () {
       $('#uid_searchFilter').val('');
       $('#refreshLinkList').click();
