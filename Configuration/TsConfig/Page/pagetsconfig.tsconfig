@@ -8,6 +8,12 @@ mod.brofix {
 
 	linktypes = db,file,external
 
+	check {
+	  doNotCheckContentOnPagesDoktypes = 3,4
+	  doNotCheckPagesDoktypes = 6,7,199,255
+	  doNotTraversePagesDoktypes = 6,199,255
+	}
+
 	checkhidden = 0
 
 	depth = 999

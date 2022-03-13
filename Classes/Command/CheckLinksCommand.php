@@ -350,7 +350,9 @@ class CheckLinksCommand extends Command
                 $depth,
                 '1=1',
                 $checkHidden,
-                $this->excludedPages
+                $this->excludedPages,
+                $this->configuration->getDoNotCheckPagesDoktypes(),
+                $this->configuration->getDoNotTraversePagesDoktypes()
             );
         } else {
             $this->io->warning(

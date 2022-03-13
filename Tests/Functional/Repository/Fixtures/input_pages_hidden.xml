@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+    <!--
+        1
+          2 (hidden)
+            3 (not hidden)
+    -->
+    <pages>
+        <uid>1</uid>
+        <pid>0</pid>
+        <doktype>1</doktype>
+        <hidden>0</hidden>
+        <deleted>0</deleted>
+        <extendToSubpages>0</extendToSubpages>
+        <perms_group>1</perms_group>
+        <!-- Permission::CONTENT_EDIT | Permission::PAGE_EDIT -->
+        <perms_user>18</perms_user>
+    </pages>
+    <pages>
+        <!-- uid=2 hidden subpage  -->
+        <uid>2</uid>
+        <pid>1</pid>
+        <doktype>1</doktype>
+        <hidden>1</hidden>
+        <deleted>0</deleted>
+        <extendToSubpages>0</extendToSubpages>
+        <perms_group>1</perms_group>
+        <!-- Permission::CONTENT_EDIT | Permission::PAGE_EDIT -->
+        <perms_user>18</perms_user>
+    </pages>
+    <pages>
+        <!-- uid=3 not hidden subpage of hidden  -->
+        <uid>3</uid>
+        <pid>2</pid>
+        <doktype>1</doktype>
+        <hidden>0</hidden>
+        <deleted>0</deleted>
+        <extendToSubpages>0</extendToSubpages>
+        <perms_group>1</perms_group>
+        <!-- Permission::CONTENT_EDIT | Permission::PAGE_EDIT -->
+        <perms_user>18</perms_user>
+    </pages>
+</dataset>

@@ -13,6 +13,15 @@ Changelog
    For more changes, please see the respective release notes and commit messages
    in the GitHub repository: https://github.com/sypets/brofix
 
+3.1.0
+=====
+
+-  pages with some pages types (e.g. 'recycler' or 'mount point') will not be
+   checked. This is configurable, see the configuration options in TSconfig:
+   :ref:`tsconfigDoNotCheckContentOnPagesDoktypes`,
+   :ref:`tsconfigDoNotCheckPagesDoktypes`
+   :ref:`tsconfigDoNotTraversePagesDoktypes`
+
 3.0.0
 =====
 

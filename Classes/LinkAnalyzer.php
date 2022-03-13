@@ -479,8 +479,12 @@ class LinkAnalyzer implements LoggerAwareInterface
                         'p',
                         $queryBuilder->expr()->eq('p.uid', $queryBuilder->quoteIdentifier($table . '.pid'))
                     );
-                    $constraints[] = $queryBuilder->expr()->neq('p.doktype', $queryBuilder->createNamedParameter(3, \PDO::PARAM_INT));
-                    $constraints[] =$queryBuilder->expr()->neq('p.doktype', $queryBuilder->createNamedParameter(4, \PDO::PARAM_INT));
+                    foreach ($this->configuration->getDoNotCheckContentOnPagesDoktypes() as $doktype) {
+                        $constraints[] = $queryBuilder->expr()->neq(
+                            'p.doktype',
+                            $queryBuilder->createNamedParameter($doktype, \PDO::PARAM_INT)
+                        );
+                    }
 
                     $tmpFields = [];
                     foreach ($selectFields as $field) {

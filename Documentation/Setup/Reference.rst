@@ -147,6 +147,81 @@ linktypes
       db,file,external
 
 
+.. _tsconfigDoNotCheckContentOnPagesDoktypes:
+
+doNotCheckContentOnPagesDoktypes
+--------------------------------
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.check.doNotCheckContentOnPagesDoktypes
+
+   Data type
+      string
+
+   Description
+      Comma separated list of page types on which content should not be
+      checked. This still means the pages will get checked.
+
+      This is for example by default the cause for the page types shortcut
+      and external link.
+
+   Default
+      3,4 (Link to external URL, shortcut)
+
+
+.. _tsconfigDoNotCheckPagesDoktypes:
+
+doNotCheckPagesDoktypes
+-----------------------
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.check.doNotCheckPagesDoktypes
+
+   Data type
+      string
+
+   Description
+      Comma separated list of page types which should not be checked.
+      This means if a page has a doktype which is listed in this list,
+      we do not do any link checking on the page.
+
+   Default
+      6,7,199,255 (Backend User section, Mount Point, Menu Separator, Recycler)
+
+
+.. _tsconfigDoNotTraversePagesDoktypes:
+
+doNotTraversePagesDoktypes
+--------------------------
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.check.doNotTraversePagesDoktypes
+
+   Data type
+      string
+
+   Description
+      Comma separated list of page types which should not be traversed.
+      This means if a page has a doktype which is listed in this list,
+      we do not do any link checking on subpages of these pages (and
+      subpages of the subpages etc.).
+
+   Default
+      6,199,255 (Backend User section, Menu Separator, Recycler)
+
+
 .. _tsconfigReportHiddenRecords:
 
 reportHiddenRecords
