@@ -111,22 +111,40 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
             $urlFilter = $filter->getUrlFilter();
-            if ($urlFilter != '' && $urlFilter != '=') {
-                if (strpos($urlFilter, '=') === 0) {
-                    // exact match
-                    $queryBuilder->andWhere(
-                        $queryBuilder->expr()->eq(
-                            self::TABLE . '.url',
-                            $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
-                        )
-                    );
-                } else {
-                    $queryBuilder->andWhere(
-                        $queryBuilder->expr()->like(
-                            self::TABLE . '.url',
-                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
-                        )
-                    );
+            if ($urlFilter != '') {
+                switch ($filter->getUrlFilterMatch()) {
+                    case 'partial':
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->like(
+                                self::TABLE . '.url',
+                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                            )
+                        );
+                        break;
+                    case 'exact':
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->eq(
+                                self::TABLE . '.url',
+                                $queryBuilder->createNamedParameter($urlFilter)
+                            )
+                        );
+                        break;
+                    case 'partialnot':
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->notLike(
+                                self::TABLE . '.url',
+                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                            )
+                        );
+                        break;
+                    case 'exactnot':
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->neq(
+                                self::TABLE . '.url',
+                                $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
+                            )
+                        );
+                        break;
                 }
             }
             $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';

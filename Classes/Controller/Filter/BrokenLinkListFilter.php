@@ -22,6 +22,9 @@ class BrokenLinkListFilter
      */
     protected $url_filtre = '';
 
+    /** @var string  */
+    protected $urlFilterMatch = 'partial';
+
     /**
      * @var string
      * @deprecated
@@ -59,6 +62,22 @@ class BrokenLinkListFilter
     public function setUrlFilter(string $url_filter): void
     {
         $this->url_filtre = trim($url_filter);
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlFilterMatch(): string
+    {
+        return $this->urlFilterMatch;
+    }
+
+    /**
+     * @param string $urlFilterMatch
+     */
+    public function setUrlFilterMatch(string $urlFilterMatch): void
+    {
+        $this->urlFilterMatch = $urlFilterMatch;
     }
 
     /**

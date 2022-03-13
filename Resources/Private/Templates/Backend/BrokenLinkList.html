@@ -83,6 +83,20 @@
 							<core:icon identifier="actions-close" size="small" />
 						</button>
 					</div>
+					<select id="url_match_searchFilter" name="url_match_searchFilter" class="form-control tceforms-select">
+						<option value="partial" {f:if(condition:'{url_match_searchFilter} == partial', then: 'selected')}>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.partial">partial match</f:translate>
+						</option>
+						<option value="exact" {f:if(condition:'{url_match_searchFilter} == exact', then: 'selected')}>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.exact">exact match</f:translate>
+						</option>
+						<option value="partialnot" {f:if(condition:'{url_match_searchFilter} == partialnot', then: 'selected')}>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.partialnot">no partial match</f:translate>
+						</option>
+						<option value="exactnot" {f:if(condition:'{url_match_searchFilter} == exactnot', then: 'selected')}>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.exactnot">no exact match</f:translate>
+						</option>
+					</select>
 				</div>
 			</row>
 			<br/>
@@ -199,7 +213,7 @@
 						<div class="inline-action">
 							<f:if condition="{item.encoded_linktarget}">
 								<f:then>
-									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
+									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}&url_match_searchFilter=exact" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
 										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
 									</a>
 								</f:then>

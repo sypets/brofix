@@ -67,7 +67,19 @@
 				<source>URL</source>
 			</trans-unit>
 			<trans-unit id="list.filter.url.placeholder" resname="list.filter.url.placeholder">
-				<source>=URL (exact), URL (partial)</source>
+				<source>URL</source>
+			</trans-unit>
+			<trans-unit id="list.filter.url.match.partial" resname="list.filter.url.match.partial">
+				<source>partial match</source>
+			</trans-unit>
+			<trans-unit id="list.filter.url.match.exact" resname="list.filter.url.match.exact">
+				<source>exact match</source>
+			</trans-unit>
+			<trans-unit id="list.filter.url.match.partialnot" resname="list.filter.url.match.partialnot">
+				<source>no partial match</source>
+			</trans-unit>
+			<trans-unit id="list.filter.url.match.exactnot" resname="list.filter.url.match.exactnot">
+				<source>no exact match</source>
 			</trans-unit>
 			<trans-unit id="list.filter.title" resname="list.filter.title">
 				<source>Title</source>
