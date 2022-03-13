@@ -172,6 +172,48 @@ class Configuration
     }
 
     /**
+     * @return array<int,int>
+     */
+    public function getDoNotCheckContentOnPagesDoktypes(): array
+    {
+        $doktypes = explode(',', $this->tsConfig['check.']['doNotCheckContentOnPagesDoktypes'] ?? '3,4');
+        $result = [];
+        foreach ($doktypes as $doktype) {
+            $doktype = (int)$doktype;
+            $result[$doktype] = $doktype;
+        }
+        return $result;
+    }
+
+    /**
+     * @return array<int,int>
+     */
+    public function getDoNotCheckPagesDoktypes(): array
+    {
+        $doktypes = explode(',', $this->tsConfig['check.']['doNotCheckPagesDoktypes'] ?? '6,7,199,255');
+        $result = [];
+        foreach ($doktypes as $doktype) {
+            $doktype = (int)$doktype;
+            $result[$doktype] = $doktype;
+        }
+        return $result;
+    }
+
+    /**
+     * @return array<int,int>
+     */
+    public function getDoNotTraversePagesDoktypes(): array
+    {
+        $doktypes = explode(',', $this->tsConfig['check.']['doNotTraversePagesDoktypes'] ?? '6,199,255');
+        $result = [];
+        foreach ($doktypes as $doktype) {
+            $doktype = (int)$doktype;
+            $result[$doktype] = $doktype;
+        }
+        return $result;
+    }
+
+    /**
      * @return bool
      */
     public function isCheckHidden(): bool

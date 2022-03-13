@@ -31,18 +31,33 @@ class PagesRepository
      *
      * @param array <int,int> $pageList
      * @param int $id Start page id
+     * @param bool $useStartPage Check and add the page id itself
      * @param int $depth Depth to traverse down the page tree.
      * @param string $permsClause Perms clause
      * @param array<int,int> $excludedPages list of pages to ignore: do not return them, do not traverse into them
      * @param bool $considerHidden Whether to consider hidden pages or not
      * @param array<int,int> $excludedPages
-     *
+     * @param array<int,int> $doNotCheckPageTypes
+     * @param array<int,int> $doNotTraversePageTypes
+ *
      * @return array<int,int>
      */
-    protected function getAllSubpagesForPage(array &$pageList, int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
-    {
-        if ($depth === 0) {
-            return $pageList;
+    protected function getAllSubpagesForPage(
+        array &$pageList,
+        int $id,
+        bool $useStartPage,
+        int $depth,
+        string $permsClause,
+        bool $considerHidden = false,
+        array $excludedPages = [],
+        array $doNotCheckPageTypes = [],
+        array $doNotTraversePageTypes = []
+    ): array {
+        if (!$useStartPage) {
+            if ($depth === 0) {
+                return $pageList;
+            }
+            $depth = $depth - 1;
         }
 
         $queryBuilder = $this->generateQueryBuilder('pages');
@@ -54,34 +69,51 @@ class PagesRepository
             ->removeAll()
             ->add($deletedRestriction);
 
-        $result = $queryBuilder
-            ->select('uid', 'hidden', 'extendToSubpages')
+        $queryBuilder
+            ->select('uid', 'hidden', 'extendToSubpages', 'doktype')
             ->from('pages')
             ->where(
+                QueryHelper::stripLogicalOperatorPrefix($permsClause)
+            );
+        if ($useStartPage) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
+                )
+            );
+        } else {
+            $queryBuilder->andWhere(
                 $queryBuilder->expr()->eq(
                     'pid',
                     $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
-                ),
-                QueryHelper::stripLogicalOperatorPrefix($permsClause)
-            )
-            ->execute();
+                )
+            );
+        }
+        $result = $queryBuilder->execute();
 
         while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
             $id = (int)$row['uid'];
             $isHidden = (bool)$row['hidden'];
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
+            $doktype = (int)($row['doktype'] ?? 1);
 
-            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages)) {
+            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages) && !in_array($doktype, $doNotCheckPageTypes)) {
                 $pageList[$id] = $id;
             }
-            if ($depth > 1 && (!($isHidden && $extendToSubpages) || $considerHidden) && !in_array($id, $excludedPages)) {
+            if ($depth > 0 && (!($isHidden && $extendToSubpages) || $considerHidden) && !in_array($id, $excludedPages)
+                && !in_array($doktype, $doNotTraversePageTypes)
+            ) {
                 $this->getAllSubpagesForPage(
                     $pageList,
                     $id,
-                    $depth - 1,
+                    false,
+                    $depth,
                     $permsClause,
                     $considerHidden,
-                    $excludedPages
+                    $excludedPages,
+                    $doNotCheckPageTypes,
+                    $doNotTraversePageTypes
                 );
             }
         }
@@ -96,6 +128,8 @@ class PagesRepository
      * - Add the page $id itself (check first if it should be added)
      * - Add the translations for all collected page ids
      *
+     * Important: Not all checks are performed on the start page.
+     *
      * @param array <int,int> $pageList
      * @param int $id
      * @param int $depth
@@ -103,11 +137,21 @@ class PagesRepository
      * @param array<int,int> $excludedPages
      * @param bool $considerHidden
      * @param array<int,int> $excludedPages
+     * @param array<int,int> $doNotCheckPageTypes
+     * @param array<int,int> $doNotTraversePageTypes
      *
      * @return array<int,int>
      */
-    public function getPageList(array &$pageList, int $id, int $depth, string $permsClause, bool $considerHidden = false, array $excludedPages = []): array
-    {
+    public function getPageList(
+        array &$pageList,
+        int $id,
+        int $depth,
+        string $permsClause,
+        bool $considerHidden = false,
+        array $excludedPages = [],
+        array $doNotCheckPageTypes = [],
+        array $doNotTraversePageTypes = []
+    ): array {
         if (in_array($id, $excludedPages)) {
             // do not add page, if in list of excluded pages
             return $pageList;
@@ -115,13 +159,14 @@ class PagesRepository
         $pageList = $this->getAllSubpagesForPage(
             $pageList,
             $id,
+            true,
             $depth,
             $permsClause,
             $considerHidden,
-            $excludedPages
+            $excludedPages,
+            $doNotCheckPageTypes,
+            $doNotTraversePageTypes
         );
-        // Always add the current page
-        $pageList[$id] = $id;
         $this->getTranslationForPage(
             $pageList,
             $id,
