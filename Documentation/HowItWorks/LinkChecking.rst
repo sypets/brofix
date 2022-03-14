@@ -6,7 +6,7 @@
 Link checking
 =================
 
-.. _linkCheckingOnTheFly::
+.. _linkCheckingOnTheFly:
 
 When link checking is done
 ==========================
