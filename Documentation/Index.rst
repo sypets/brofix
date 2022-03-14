@@ -24,19 +24,19 @@ Broken Link Fixer
 
 ----
 
-Broken Link Fixer checks the links in your website, generates a report
-and makes it possible to directly edit records with broken links from
-the report in the backend.
+Broken Link Fixer checks the links on your website, generates a report
+and allows you to edit entries with broken links directly from the report
+in the TYPO3 backend.
 
-It can check all kinds of links: Links to pages, records, external
-(URLs) and file links. Scheduler is supported to run a task
-to find broken links. It is possible to send a status mail
-if broken links were detected.
+It can check all types of links: Links to pages, records, external URLs
+and file links. This task can be executed in the TYPO3 backend via the
+TYPO3 :doc:`Scheduler <ext_scheduler:Index>` or via the command line
+and supports sending a status mail when broken links are detected.
 
 ----
 
 The content of this document is related to TYPO3, a GNU/GPL CMS/Framework
-available from `www.typo3.org <http://www.typo3.org/>`_
+available from `www.typo3.org <https://www.typo3.org/>`_
 
 ----
 
