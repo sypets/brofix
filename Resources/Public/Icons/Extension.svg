@@ -5,47 +5,76 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="64mm"
-   height="64mm"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="241.88977"
+   height="241.88977"
    viewBox="0 0 64 64"
    version="1.1"
-   id="svg12987">
+   id="svg12987"
+   sodipodi:docname="Extension.svg"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
+   shape-rendering="crispEdges">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1176"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="2.3181455"
+     inkscape:cx="110.45087"
+     inkscape:cy="108.91493"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12987"
+     inkscape:showpageshadow="true"
+     showborder="true"
+     scale-x="1"
+     units="px" />
   <defs
      id="defs12981">
     <marker
-       style="overflow:visible;"
+       style="overflow:visible"
        id="marker2363"
-       refX="0.0"
-       refY="0.0"
+       refX="0"
+       refY="0"
        orient="auto">
       <path
-         transform="scale(0.8) rotate(180) translate(12.5,0)"
-         style="fill-rule:evenodd;stroke:#2400f6;stroke-width:1pt;stroke-opacity:1;fill:#2400f6;fill-opacity:1"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:#2400f6;fill-opacity:1;fill-rule:evenodd;stroke:#2400f6;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path2361" />
     </marker>
     <marker
        style="overflow:visible"
        id="Arrow1Lstart"
-       refX="0.0"
-       refY="0.0"
+       refX="0"
+       refY="0"
        orient="auto">
       <path
-         transform="scale(0.8) translate(12.5,0)"
-         style="fill-rule:evenodd;stroke:#2400f6;stroke-width:1pt;stroke-opacity:1;fill:#2400f6;fill-opacity:1"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         style="fill:#2400f6;fill-opacity:1;fill-rule:evenodd;stroke:#2400f6;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path2041" />
     </marker>
     <marker
-       style="overflow:visible;"
+       style="overflow:visible"
        id="Arrow1Lend"
-       refX="0.0"
-       refY="0.0"
+       refX="0"
+       refY="0"
        orient="auto">
       <path
-         transform="scale(0.8) rotate(180) translate(12.5,0)"
-         style="fill-rule:evenodd;stroke:#2400f6;stroke-width:1pt;stroke-opacity:1;fill:#2400f6;fill-opacity:1"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:#2400f6;fill-opacity:1;fill-rule:evenodd;stroke:#2400f6;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path2044" />
     </marker>
   </defs>
@@ -63,10 +92,10 @@
   </metadata>
   <g
      id="layer1"
-     transform="matrix(1,0,0,1.0026235,-50.52964,-81.196305)"
-     style="fill:#c58936;fill-opacity:1">
+     transform="translate(-50.52964,-80.983661)"
+     style="fill:#00cfb7;fill-opacity:1">
     <rect
-       style="fill:#c58936;fill-opacity:1;stroke:none;stroke-width:0.405304;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#00cfb7;fill-opacity:1;stroke:none;stroke-width:0.405304;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect17482"
        width="64"
        height="64"
@@ -75,32 +104,21 @@
     <g
        id="g20"
        transform="matrix(0.06792377,0,0,0.06792377,53.148405,106.30638)"
-       style="fill:#c58936;fill-opacity:1">
+       style="fill:#00cfb7;fill-opacity:1">
       <path
          d="m 567.47073,114.5826 c 0,-69.365949 -56.35712,-125.668023 -125.72307,-125.668023 -69.41708,0 -125.60904,56.298141 -125.60904,125.668023 0,69.36988 56.19196,125.72308 125.60904,125.72308 69.36595,0 125.72307,-56.35713 125.72307,-125.72308 M 441.74766,-220.0091 c -184.66388,0 -334.56417,149.876701 -334.61923,334.51305 h 99.65039 c 0.0236,-129.639882 105.24244,-234.94132 234.96884,-234.94132 129.77357,0 235.07502,105.325033 235.07502,235.0239 0,129.71459 -105.24245,234.99242 -234.96885,235.01602 v 99.65038 c 184.74253,-0.0511 334.51305,-149.98287 334.51305,-334.67033 0,-184.687475 -149.82558,-334.5917 -334.61922,-334.5917"
          id="path2"
-         style="fill:#c58936;fill-opacity:1;stroke-width:3.93253" />
+         style="fill:#00cfb7;fill-opacity:1;stroke-width:3.93253" />
     </g>
   </g>
   <g
      class="icon-color"
-     id="g6"
-     transform="matrix(3.6411644,0,0,3.3891839,-4.3298099,-0.29174476)">
-    <path
-       d="M 13.7,3.8 12.3,2.4 c -0.8,-0.8 -2,-0.8 -2.8,0 L 5.9,5.9 c -0.8,0.8 -0.8,2 0,2.8 L 7.1,9.9 8,9.1 6.9,8 C 6.5,7.6 6.5,7 6.9,6.6 l 3.2,-3.2 c 0.4,-0.4 1,-0.4 1.4,0 l 1.1,1.1 c 0.4,0.4 0.4,1 0,1.4 l -1.3,1.3 c 0.2,0.4 0.4,0.9 0.4,1.4 l 2,-2 c 0.7,-0.8 0.7,-2.1 0,-2.8 z"
-       id="path2-6" />
-    <path
-       d="M 8.9,6.1 8,6.9 9.1,8 c 0.4,0.4 0.4,1 0,1.4 L 5.9,12.6 C 5.5,13 4.9,13 4.5,12.6 L 3.4,11.5 C 3,11.1 3,10.5 3.4,10.1 L 4.7,8.8 C 4.5,8.4 4.3,7.9 4.3,7.4 l -2,2 c -0.8,0.8 -0.8,2 0,2.8 l 1.4,1.4 c 0.8,0.8 2,0.8 2.8,0 L 10,10.1 c 0.8,-0.8 0.8,-2 0,-2.8 z"
-       id="path4" />
-  </g>
-  <g
-     class="icon-color"
      id="g4"
-     transform="matrix(2.924354,0,0,2.924354,19.829336,23.007578)"
-     style="fill:#00f660;fill-opacity:1">
+     transform="matrix(3.4252927,0,0,3.4252927,4.7476481,5.2574869)"
+     style="fill:#ffffff;fill-opacity:1">
     <path
        d="M 13.3,4.8 12.6,4.1 C 12.4,3.9 12.1,3.9 11.9,4.1 L 6.5,9.5 4,6.9 C 3.8,6.7 3.5,6.7 3.3,6.9 L 2.7,7.6 c -0.2,0.2 -0.2,0.5 0,0.7 l 3.6,3.6 c 0.2,0.2 0.5,0.2 0.7,0 L 13.4,5.5 C 13.5,5.3 13.5,5 13.3,4.8 Z"
        id="path2-7"
-       style="fill:#00f660;fill-opacity:1" />
+       style="fill:#ffffff;fill-opacity:1" />
   </g>
 </svg>
