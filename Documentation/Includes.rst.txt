@@ -1,0 +1,34 @@
+.. ==================================================
+.. FOR YOUR INFORMATION
+.. --------------------------------------------------
+.. -*- coding: utf-8 -*- with BOM.
+
+.. This is 'Includes.rst.txt'. It is included at the very top of each and
+   every ReST source file in this documentation project (= manual).
+
+
+.. ==================================================
+.. DEFINE SOME TEXTROLES
+.. --------------------------------------------------
+
+.. role:: aspect(emphasis)
+.. role:: bash(code)
+.. role:: html(code)
+.. role:: js(code)
+.. role:: php(code)
+.. role:: rst(code)
+.. role:: sep(strong)
+.. role:: sql(code)
+.. role:: ts(code)
+  :class: typoscript
+
+.. role:: tsconfig(code)
+  :class: typoscript
+
+.. role:: typoscript(code)
+.. role:: xml(code)
+  :class: html
+
+.. role:: yaml(code)
+
+.. highlight:: php
