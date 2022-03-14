@@ -54,7 +54,8 @@ searchFields.[table]
       .. warning::
 
          Currently, Broken Link Fixer can only detect links for fields having at
-         least one :ref:`softref <columns-input-properties-softref>` set in their TCA configuration.
+         least one :ref:`softref <t3tca:columns-input-properties-softref>` set
+         in their TCA configuration.
 
          For this reason, it is currently not possible to check for
          `pages.media`.
@@ -290,7 +291,7 @@ User-Agent
       checking external URLs. It should contain a working URL with
       contact information.
 
-      .. code-block:: tsconfig
+      .. code-block:: none
 
          User-Agent = Mozilla/5.0 (compatible; Mysite LinkChecker/1.1; +https://mysite.com/imprint.html
 
@@ -722,7 +723,7 @@ mail.recipients
       console command. Can be several, separated by comma.
 
    Example
-      .. code-block:: tsconfig
+      .. code-block:: typoscript
 
          mod.brofix.mail.recipients = sender@example.org
 
@@ -753,7 +754,7 @@ mail.fromname
       Set the from name of the report mail sent by the console command.
 
    Example
-      .. code-block:: tsconfig
+      .. code-block:: typoscript
 
          mod.brofix.mail.from = Sender
 
@@ -782,7 +783,7 @@ mail.fromemail
       Set the from email of the report mail sent by the console command.
 
    Example
-      .. code-block:: tsconfig
+      .. code-block:: typoscript
 
          mod.brofix.mail.from = sender@example.org
 
@@ -796,7 +797,7 @@ mail.fromemail
 .. _tsconfigMailReplyto:
 
 mail.replytoemail
-----------------
+-----------------
 
 *optional*
 
@@ -881,7 +882,7 @@ Always uses the default template CheckLinksResults if not supplied.
    Default
       CheckLinksResults
 
-.. _tsconfigMailTemplate:
+.. _tsconfigMailLanguage:
 
 mail.language
 -------------
