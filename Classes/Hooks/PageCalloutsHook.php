@@ -80,7 +80,7 @@ final class PageCalloutsHook
         return [
             'title' => '',
             'message' => $message,
-            'state' => InfoboxViewHelper::STATE_INFO
+            'state' => InfoboxViewHelper::STATE_WARNING
         ];
     }
 
