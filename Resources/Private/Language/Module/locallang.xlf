@@ -39,7 +39,7 @@
 				<source>Checked</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.url" resname="list.tableHead.url">
-				<source>URL</source>
+				<source>Link target</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.error" resname="list.tableHead.error">
 				<source>Error</source>
