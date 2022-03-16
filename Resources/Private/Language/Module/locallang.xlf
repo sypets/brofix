@@ -96,12 +96,16 @@
 			<trans-unit id="list.filter.linktype.file" resname="list.filter.linktype.file">
 				<source>File</source>
 			</trans-unit>
-			<trans-unit id="list.filter.linktarget.tooltip" resname="filter">
+			<trans-unit id="list.filter.linktarget.tooltip" resname="list.filter.linktarget.tooltip">
 				<source>Show only results with this exact link target</source>
 			</trans-unit>
-			<trans-unit id="list.filter.element.uid.tooltip" resname="filter">
+			<trans-unit id="list.filter.element.uid.tooltip" resname="list.filter.element.uid.tooltip">
 				<source>Show only broken links for this element</source>
 			</trans-unit>
+			<trans-unit id="list.filter.view" resname="list.filter.view">
+				<source>View</source>
+			</trans-unit>
+
 
 			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
 				<source>Recheck links</source>
