@@ -96,10 +96,10 @@
 				<source>Page layout</source>
 			</trans-unit>
 			<trans-unit id="list.action.recheckUrl" resname="list.action.recheckUrl">
-				<source>Recheck URL</source>
+				<source>Check link again</source>
 			</trans-unit>
 			<trans-unit id="list.action.excludeUrl" resname="list.action.excludeUrl">
-				<source>Permanently exclude this URL from URL checking</source>
+				<source>Permanently exclude links to this target from checking</source>
 			</trans-unit>
 			<trans-unit id="broken_links_found_for_page" resname="broken_links_found_for_page">
 				<source>Broken links were found on this page</source>
