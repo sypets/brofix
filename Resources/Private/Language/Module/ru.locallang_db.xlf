@@ -24,42 +24,42 @@
         <target state="needs-translation">File</target>
       </trans-unit>
       <trans-unit id="tx_brofix_exclude_link_target.match_by" resname="tx_brofix_exclude_link_target.link_type.match_by">
-        <source>Match by</source>
-        <target state="needs-translation">Match by</target>
+        <source>Rule is applied if the following matches</source>
+        <target state="needs-translation">Rule is applied if the following matches</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="">
-        <source>exact</source>
-        <target state="needs-translation">exact</target>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="tx_brofix_exclude_link_target.match_by.exact">
+        <source>URL</source>
+        <target state="needs-translation">URL</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="tx_brofix_exclude_link_target.match_by.domain">
         <source>domain</source>
         <target state="needs-translation">domain</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.link_target" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.link_target" resname="tx_brofix_exclude_link_target.link_target">
         <source>Link target</source>
         <target state="needs-translation">Link target</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="tx_brofix_exclude_link_target.link_target.placeholder">
         <source>Enter the URL or domain to match with.</source>
         <target state="needs-translation">Enter the URL or domain to match with.</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="tx_brofix_exclude_link_target.notes.placeholder">
         <source>Why should this URL not be checked?</source>
         <target state="needs-translation">Why should this URL not be checked?</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.reason" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.reason" resname="tx_brofix_exclude_link_target.reason">
         <source>Reason</source>
         <target state="needs-translation">Reason</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="tx_brofix_exclude_link_target.reason.none">
         <source>None given</source>
         <target state="needs-translation">None given</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="tx_brofix_exclude_link_target.reason.noBrokenLink">
         <source>URL is available (was falsely detected as broken link)</source>
         <target state="needs-translation">URL is available (was falsely detected as broken link)</target>
       </trans-unit>
-      <trans-unit id="tx_brofix_exclude_link_target.notes" resname="">
+      <trans-unit id="tx_brofix_exclude_link_target.notes" resname="tx_brofix_exclude_link_target.notes">
         <source>Notes</source>
         <target state="needs-translation">Notes</target>
       </trans-unit>
