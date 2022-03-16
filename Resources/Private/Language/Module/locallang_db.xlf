@@ -19,10 +19,10 @@
 				<source>File</source>
 			</trans-unit>
 			<trans-unit id="tx_brofix_exclude_link_target.match_by" resname="tx_brofix_exclude_link_target.link_type.match_by">
-				<source>Match by</source>
+				<source>Rule is applied if the following matches</source>
 			</trans-unit>
 			<trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="tx_brofix_exclude_link_target.match_by.exact">
-				<source>exact</source>
+				<source>URL</source>
 			</trans-unit>
 			<trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="tx_brofix_exclude_link_target.match_by.domain">
 				<source>domain</source>
