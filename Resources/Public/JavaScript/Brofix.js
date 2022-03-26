@@ -15,9 +15,20 @@
  * Module: TYPO3/CMS/Brofix/Brofix
  */
 
-define(['jquery'], function($) {
+define(['jquery',
+  'TYPO3/CMS/Backend/PageTree/PageTreeToolbar'], function($, PageTreeToolbar) {
   'use strict';
   $(document).ready(function () {
+
+    // filter in page tree
+    $('.brofix-pagetree-filter').on('click', function(event) {
+        var uid = $(this).attr("data-uid");
+        console.log('brofix pagetree filter event uid=' + uid);
+        $('input.form-control.search-input', parent.document).
+          val(uid).trigger('input');
+        parent.$('input.form-control.search-input').trigger('input');
+        window.parent.$(window.parent.document).trigger('input');
+      });
 
     // reload list on changing these values
     $('#linktype_searchFilter').on('change', function () {

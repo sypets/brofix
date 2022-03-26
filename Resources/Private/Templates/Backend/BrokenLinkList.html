@@ -176,8 +176,10 @@
 						</f:else>
 					</f:if>
 					<td>
-						<span
-							title="{item.path -> f:format.raw()}">{item.pagetitle -> f:format.raw()} [{item.pageId}]</span>
+						<span title="{item.path -> f:format.raw()}">{item.pagetitle -> f:format.raw()} [{item.pageId}]</span>
+						<div class="inline-action">
+							<a href="#" class="brofix-pagetree-filter" data-uid="{item.pageId}">Pagetree filter</a>
+						</div>
 					</td>
 					<td>
 						<f:if condition="{item.langIcon}">
