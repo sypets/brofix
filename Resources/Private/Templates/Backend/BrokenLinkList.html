@@ -234,11 +234,6 @@
 						   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
 							<core:icon identifier="actions-open" size="small"/>
 						</a>
-						<f:be.link
-							title="{f:translate(key: 'list.action.web_layout', extensionName:'Brofix')}"
-							class="btn btn-default" route="web_layout" parameters="{id:item.pageId}">
-							<core:icon identifier="actions-document-open"/>
-						</f:be.link>
 						<f:if condition="{item.recheckUrl}">
 							<a title="{f:translate(key: 'list.action.recheckUrl', extensionName='Brofix')}"
 							   class="btn btn-default" href="{item.recheckUrl}">
