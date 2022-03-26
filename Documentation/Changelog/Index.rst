@@ -13,6 +13,14 @@ Changelog
    For more changes, please see the respective release notes and commit messages
    in the GitHub repository: https://github.com/sypets/brofix
 
+3.2.0
+=====
+
+-  Remove page layout action button (due to inconsistencies in usability):
+   https://github.com/sypets/brofix/pull/200
+
+-  Add new icon
+
 3.1.0
 =====
 

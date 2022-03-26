@@ -111,13 +111,13 @@ Columns in the table:
 
    Columns 5-8
 
-5. **URL**: The link target (URL). You can click on it, to open it in another
-   browser tab.
+5. **Link target**: The link target (e.g. the URL or target page). You can click
+   on it, to open it in another browser tab.
 
 6. **Error**: The error that occurred, e.g. "Page not found". Hover over the
    text with the mouse to see the original exception message.
 
-7. **Checked (URL)**: The last check time of the **link target** or when the
+7. **Checked**: The last check time of the **link target** or when the
    element was last checked (whichever is older). Since a link target
    cache is used for external URLs, the check time may be **before** the check
    time of the element in column 2. If you loaded the URL in the browser and feel
@@ -139,9 +139,6 @@ Columns in the table:
 8. **Action**: Action buttons:
 
    *  |edit_action_image| **Edit**: Edit the field containing this broken link
-   *  |page_layout_action| **Page Layout**: Open the page. This shows the same
-      view as in the page
-      module. This may be helpful to see more context for the page.
    *  |recheck_url_action_image| **Refresh URL**: Rechecks the URL and removes
       the broken link record if the URL is ok or the broken link is no longer
       in the record. This is the only checking action which will actually check
@@ -160,5 +157,3 @@ Columns in the table:
 .. |recheck_url_action_image| image:: ../_images/recheck_url_action.png
 
 .. |exclude_link_target_action_image| image:: ../_images/exclude_link_target.png
-
-.. |page_layout_action| image:: ../_images/page_layout_action.png
