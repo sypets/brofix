@@ -617,12 +617,32 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function createFlashMessagesForNoBrokenLinks(): void
     {
+        $message = '';
+        $status = FlashMessage::OK;
+        if ($this->filter->hasConstraintsForNumberOfResults()) {
+            $status = FlashMessage::WARNING;
+            $message = $this->getLanguageService()->getLL('list.no.broken.links.filter')
+                ?: 'No broken links found if current filter is applied!';
+        } elseif ($this->depth === 0) {
+            $message = $this->getLanguageService()->getLL('list.no.broken.links.this.page')
+                ?: 'No broken links on this page!';
+            $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
+            $status = FlashMessage::INFO;
+        } elseif ($this->depth > 0 && $this->depth < BrokenLinkListFilter::PAGE_DEPTH_INFINITE) {
+            $message = $this->getLanguageService()->getLL('list.no.broken.links.current.level')
+                ?: 'No broken links for current level';
+            $message .= ' (' . $this->depth . ').';
+            $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
+            $status = FlashMessage::INFO;
+        } else {
+            $message = $this->getLanguageService()->getLL('list.no.broken.links.level.infinite')
+                ?: $this->getLanguageService()->getLL('list.no.broken.links')
+                ?: 'No broken links on this page and its subpages!';
+        }
         $this->createFlashMessage(
-            $this->getLanguageService()->getLL(
-                $this->depth > 0 ? 'list.no.broken.links' : 'list.no.broken.links.this.page'
-            ),
+            $message,
             '',
-            FlashMessage::OK
+            $status
         );
     }
 

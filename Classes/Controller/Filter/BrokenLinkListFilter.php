@@ -9,6 +9,12 @@ class BrokenLinkListFilter
     public const VIEW_MODE_MIN = 'view_table_min';
     public const VIEW_MODE_COMPLEX = 'view_table_complex';
 
+    /** @var string */
+    protected const LINK_TYPE_FILTER = 'all';
+
+    /** @var int */
+    public const PAGE_DEPTH_INFINITE = 999;
+
     /**
      * @var string
      */
@@ -33,6 +39,25 @@ class BrokenLinkListFilter
 
     /** @var string */
     protected $viewMode = self::VIEW_MODE_MIN;
+
+    /**
+     * Check if any filter is active
+     *
+     * - we do not include the View mode in this check since this will
+     *   no affect the number of results
+     *
+     * @return bool
+     */
+    public function hasConstraintsForNumberOfResults(): bool
+    {
+        if ($this->getUidFilter()
+            || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER
+            || $this->getUrlFilter()
+        ) {
+            return true;
+        }
+        return false;
+    }
 
     public function getUidFilter(): string
     {
