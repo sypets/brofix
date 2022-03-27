@@ -86,6 +86,9 @@
 			<trans-unit id="list.button.checkLinks" resname="list.button.checkLinks">
 				<source>Check Links</source>
 			</trans-unit>
+			<trans-unit id="button-remove-all-filter" resname="button-remove-all-filter">
+				<source>Remove all filter</source>
+			</trans-unit>
 			<trans-unit id="list.action.checkLinks" resname="list.action.checkLinks">
 				<source>Checking Links. This may take a while.</source>
 			</trans-unit>
