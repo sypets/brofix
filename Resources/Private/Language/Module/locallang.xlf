@@ -326,11 +326,20 @@
 			<trans-unit id="list.no.broken.links" resname="list.no.broken.links">
 				<source>No broken links!</source>
 			</trans-unit>
+			<trans-unit id="list.no.broken.links.level.infinite" resname="list.no.broken.links.level.infinite">
+				<source>No broken links on this page and its subpages.</source>
+			</trans-unit>
 			<trans-unit id="list.no.broken.links.this.page" resname="list.no.broken.links.this.page">
 				<source>No broken links on this page!</source>
 			</trans-unit>
+			<trans-unit id="list.no.broken.links.current.level" resname="list.no.broken.links.current.level">
+				<source>No broken links for this level</source>
+			</trans-unit>
+			<trans-unit id="message.choose.higher.level" resname="message.choose.higher.level">
+				<source>You might see more results if you select a higher level.</source>
+			</trans-unit>
 			<trans-unit id="list.no.broken.links.filter" resname="list.no.broken.links.filter">
-				<source>No broken links for current filter!</source>
+				<source>No broken links found with current filter!</source>
 			</trans-unit>
 			<trans-unit id="no.access.title" resname="no.access.title">
 				<source>No access!</source>
