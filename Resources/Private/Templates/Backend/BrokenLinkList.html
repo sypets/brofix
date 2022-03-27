@@ -187,7 +187,9 @@
 						<div class="inline-action">
 							<f:if condition="{uid_filter}">
 								<f:then>
-									<a href="{listUri}&uid_searchFilter="><core:icon identifier="actions-close"/></a>
+									<a href="{listUri}&uid_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+										<core:icon identifier="actions-close"/>
+									</a>
 								</f:then>
 								<f:else>
 									<a href="{listUri}&uid_searchFilter={item.record_uid}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.element.uid.tooltip', extensionName: 'Brofix')}">
@@ -217,7 +219,9 @@
 									</a>
 								</f:then>
 								<f:else>
-									<a href="{listUri}&url_searchFilter="><core:icon identifier="actions-close"/></a>
+									<a href="{listUri}&url_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+										<core:icon identifier="actions-close"/>
+									</a>
 								</f:else>
 							</f:if>
 						</div>

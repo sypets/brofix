@@ -102,6 +102,9 @@
 			<trans-unit id="list.filter.element.uid.tooltip" resname="list.filter.element.uid.tooltip">
 				<source>Show only broken links in this element</source>
 			</trans-unit>
+			<trans-unit id="list.filter.unset.tooltip" resname="list.filter.unset.tooltip">
+				<source>No longer apply this filter</source>
+			</trans-unit>
 			<trans-unit id="list.filter.view" resname="list.filter.view">
 				<source>View</source>
 			</trans-unit>
@@ -325,6 +328,9 @@
 			</trans-unit>
 			<trans-unit id="list.no.broken.links.this.page" resname="list.no.broken.links.this.page">
 				<source>No broken links on this page!</source>
+			</trans-unit>
+			<trans-unit id="list.no.broken.links.filter" resname="list.no.broken.links.filter">
+				<source>No broken links for current filter!</source>
 			</trans-unit>
 			<trans-unit id="no.access.title" resname="no.access.title">
 				<source>No access!</source>
