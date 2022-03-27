@@ -2,7 +2,7 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Broken link fixer',
-    'description' => '',
+    'description' => 'Check for broken links and fix them via a backend module (forked from core linkvalidator)',
     'category' => 'module',
     'author' => 'Sybille Peters',
     'author_email' => 'sypets@gmx.de',

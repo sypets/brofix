@@ -1,7 +1,7 @@
 {
 	"name": "sypets/brofix",
 	"type": "typo3-cms-extension",
-	"description": "Broken Link Fixer for TYPO3, forked from linkvalidator",
+	"description": "Broken Link Fixer for TYPO3 (forked from TYPO3 linkvalidator)",
 	"license": ["GPL-2.0-or-later"],
 	"keywords": [
 		"TYPO3",
