@@ -36,6 +36,14 @@ define(['jquery'], function($) {
       $('#refreshLinkList').click();
     })
 
+    $('#brofix-reset-filter').on('click', function () {
+      $('#uid_searchFilter').attr('value', '');
+      $('#linktype_searchFilter').val('all');
+      $('#url_searchFilter').attr('value', '');
+      $('#url_match_searchFilter').val('partial');
+      $('#refreshLinkList').click();
+    });
+
     // clear input text fields with X button
     $('#uidButton').on('click', function () {
       $('#uid_searchFilter').val('');
