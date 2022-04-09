@@ -1,8 +1,10 @@
+[![Latest Stable Version](https://poser.pugx.org/sypets/brofix/v/stable.svg)](https://extensions.typo3.org/extension/brofix/)
 [![TYPO3 11](https://img.shields.io/badge/TYPO3-11-orange.svg)](https://get.typo3.org/version/11)
 [![TYPO3 10](https://img.shields.io/badge/TYPO3-10-orange.svg)](https://get.typo3.org/version/10)
+[![Total Downloads](https://poser.pugx.org/sypets/brofix/d/total.svg)](https://packagist.org/packages/sypets/brofix)
+[![Monthly Downloads](https://poser.pugx.org/sypets/brofix/d/monthly)](https://packagist.org/packages/sypets/brofix)
 [![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
 [![CI Status](https://github.com/sypets/brofix/workflows/CI/badge.svg)](https://github.com/sypets/brofix/actions)
-[![Downloads](https://img.shields.io/packagist/dt/sypets/brofix)](https://packagist.org/packages/sypets/brofix)
 
 # TYPO3 extension `brofix`
 
