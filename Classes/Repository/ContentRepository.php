@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
-use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -51,8 +50,8 @@ class ContentRepository
                     $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
                 )
             )
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchAssociative()}();
+            ->executeQuery()
+            ->fetchAssociative();
         if (!is_array($result)) {
             $result = [];
         }
@@ -85,8 +84,8 @@ class ContentRepository
                     $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
                 )
             )
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
+            ->executeQuery()
+            ->fetchOne();
 
         /**
          * @var DeletedRestriction
@@ -106,8 +105,8 @@ class ContentRepository
                     $queryBuilder->createNamedParameter($parentId, \PDO::PARAM_INT)
                 )
             )
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
+            ->executeQuery()
+            ->fetchOne();
     }
 
     protected function generateQueryBuilder(string $table = ''): QueryBuilder

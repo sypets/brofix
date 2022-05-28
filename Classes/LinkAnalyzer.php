@@ -507,10 +507,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                         ...$constraints
                     );
 
-                $result = $queryBuilder
-                    ->execute();
-
-                while ($row = $result->fetch()) {
+                $result = $queryBuilder->executeQuery();
+                while ($row = $result->fetchAssociative()) {
                     $results = [];
                     $l18nCfg = (int)($row['l18n_cfg'] ?? 0);
                     $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Repository;
 
 use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
-use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -76,7 +75,7 @@ class ExcludeLinkTargetRepository
             }
         }
 
-        $results = array_merge($results, $queryBuilder->execute()->{DoctrineDbalMethodNameHelper::fetchAllAssociative()}());
+        $results = array_merge($results, $queryBuilder->executeQuery()->fetchAllAssociative());
         return $results;
     }
 
@@ -93,7 +92,7 @@ class ExcludeLinkTargetRepository
                 ->where(
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
                 )
-                ->execute();
+                ->executeStatement();
         }
     }
 

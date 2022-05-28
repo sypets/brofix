@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
-use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -90,9 +89,8 @@ class PagesRepository
                 )
             );
         }
-        $result = $queryBuilder->execute();
-
-        while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
+        $result = $queryBuilder->executeQuery();
+        while ($row = $result->fetchAssociative()) {
             $id = (int)$row['uid'];
             $isHidden = (bool)$row['hidden'];
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
@@ -204,8 +202,8 @@ class PagesRepository
                     $queryBuilder->createNamedParameter($pageInfo['pid'], \PDO::PARAM_INT)
                 )
             )
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
 
         if ($row !== false) {
             return $this->getRootLineIsHidden($row);
@@ -261,9 +259,9 @@ class PagesRepository
             ->select('uid', 'title', 'hidden')
             ->from(self::TABLE)
             ->where(...$constraints)
-            ->execute();
+            ->executeQuery();
 
-        while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
+        while ($row = $result->fetchAssociative()) {
             $id = (int)$row['uid'];
             $pageList[$id] = $id;
         }

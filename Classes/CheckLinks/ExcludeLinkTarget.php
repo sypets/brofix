@@ -17,7 +17,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\CheckLinks;
 
-use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -65,7 +64,7 @@ class ExcludeLinkTarget
 
         $matchConstraints = [
             // match by: exact
-            $queryBuilder->expr()->andX(
+            $queryBuilder->expr()->and(
                 $queryBuilder->expr()->eq(
                     'linktarget',
                     $queryBuilder->createNamedParameter($url)
@@ -81,7 +80,7 @@ class ExcludeLinkTarget
         $parts = parse_url($url);
         if ($parts['host'] ?? false) {
             // match by: domain
-            $matchConstraints[] = $queryBuilder->expr()->andX(
+            $matchConstraints[] = $queryBuilder->expr()->and(
                 $queryBuilder->expr()->like(
                     'linktarget',
                     $queryBuilder->createNamedParameter($parts['host'])
@@ -94,7 +93,7 @@ class ExcludeLinkTarget
         }
         $constraints = [
             $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
-            $queryBuilder->expr()->orX(...$matchConstraints)
+            $queryBuilder->expr()->or(...$matchConstraints)
         ];
 
         if ($this->excludeLinkTargetsPid !== 0) {
@@ -110,8 +109,8 @@ class ExcludeLinkTarget
             ->where(
                 ...$constraints
             )
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchOne()}());
+            ->executeQuery()
+            ->fetchOne());
         return $count > 0;
     }
 
@@ -137,8 +136,8 @@ class ExcludeLinkTarget
                         $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
                     )
                 )
-                ->execute()
-                ->{DoctrineDbalMethodNameHelper::fetchAssociative()}();
+                ->executeQuery()
+                ->fetchAssociative();
 
             return $GLOBALS['BE_USER']->doesUserHaveAccess($row, 16);
         }

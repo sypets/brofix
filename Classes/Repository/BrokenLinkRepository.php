@@ -9,7 +9,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
-use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
@@ -87,15 +86,15 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
                 )
                 ->where(
-                    $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->or(
+                        $queryBuilder->expr()->and(
                             $queryBuilder->expr()->in(
                                 self::TABLE . '.record_uid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
                             $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
                         ),
-                        $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->and(
                             $queryBuilder->expr()->in(
                                 self::TABLE . '.record_pid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
@@ -176,7 +175,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
-            $results = array_merge($results, $queryBuilder->execute()->{DoctrineDbalMethodNameHelper::fetchAllAssociative()}());
+            $results = array_merge($results, $queryBuilder->executeQuery()->fetchAllAssociative());
         }
         return $results;
     }
@@ -209,19 +208,19 @@ class BrokenLinkRepository implements LoggerAwareInterface
     {
         $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
-        $count = $queryBuilder
+        return (int)$queryBuilder
             ->count('uid')
             ->from(self::TABLE)
             ->where(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->eq(
                             self::TABLE . '.record_uid',
                             $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
                         ),
                         $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
                     ),
-                    $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->eq(
                             self::TABLE . '.record_pid',
                             $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
@@ -230,9 +229,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     )
                 )
             )
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
-        return $count ?: 0;
+            ->executeQuery()
+            ->fetchOne();
     }
 
     /**
@@ -274,15 +272,15 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
                 )
                 ->where(
-                    $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->or(
+                        $queryBuilder->expr()->and(
                             $queryBuilder->expr()->in(
                                 self::TABLE . '.record_uid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
                             $queryBuilder->expr()->eq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
                         ),
-                        $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->and(
                             $queryBuilder->expr()->in(
                                 self::TABLE . '.record_pid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
@@ -292,9 +290,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     )
                 )
                 ->groupBy(self::TABLE . '.link_type')
-                ->execute();
+                ->executeQuery();
 
-            while ($row = $result->{DoctrineDbalMethodNameHelper::fetchAssociative()}()) {
+            while ($row = $result->fetchAssociative()) {
                 if (!isset($markerArray[$row['link_type']])) {
                     $markerArray[$row['link_type']] = 0;
                 }
@@ -325,8 +323,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $constraints = [];
 
         if ($tableName === 'pages') {
-            $constraints[] = $queryBuilder->expr()->orX(
-                $queryBuilder->expr()->andX(
+            $constraints[] = $queryBuilder->expr()->or(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_uid',
                         $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
@@ -336,7 +334,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                         $queryBuilder->createNamedParameter('pages')
                     )
                 ),
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_pid',
                         $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
@@ -362,7 +360,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
             ->where(
                 ...$constraints
             )
-            ->execute();
+            ->executeStatement();
     }
 
     public function removeForRecordUrl(string $tableName, int $recordUid, string $url, string $linkType): int
@@ -370,8 +368,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $queryBuilder = $this->generateQueryBuilder(static::TABLE);
 
         if ($tableName === 'pages') {
-            $constraints[] = $queryBuilder->expr()->orX(
-                $queryBuilder->expr()->andX(
+            $constraints[] = $queryBuilder->expr()->or(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_uid',
                         $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
@@ -381,7 +379,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                         $queryBuilder->createNamedParameter('pages')
                     )
                 ),
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_pid',
                         $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
@@ -415,7 +413,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
             ->where(
                 ...$constraints
             )
-            ->execute();
+            ->executeStatement();
     }
 
     public function removeBrokenLinksForRecordBeforeTime(string $tableName, int $recordUid, int $time): void
@@ -434,7 +432,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ),
                 $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -454,15 +452,15 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
             $queryBuilder->delete(self::TABLE)
                 ->where(
-                    $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->or(
+                        $queryBuilder->expr()->and(
                             $queryBuilder->expr()->in(
                                 'record_uid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                             ),
                             $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
                         ),
-                        $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->and(
                             $queryBuilder->expr()->in(
                                 'record_pid',
                                 $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
@@ -479,7 +477,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     ),
                     $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
                 )
-                ->execute();
+                ->executeStatement();
         }
     }
 
@@ -502,8 +500,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
                 );
             return (bool)$queryBuilder
-                ->execute()
-                ->{DoctrineDbalMethodNameHelper::fetchOne()}();
+                ->executeQuery()
+                ->fetchOne();
         } catch (TableNotFoundException $e) {
             return false;
         }
@@ -534,7 +532,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->createNamedParameter($linkTarget)
             );
         } elseif ($matchBy === ExcludeLinkTarget::MATCH_BY_DOMAIN) {
-            $constraints[] = $queryBuilder->expr()->orX(
+            $constraints[] = $queryBuilder->expr()->or(
                 $queryBuilder->expr()->like(
                     'url',
                     $queryBuilder->createNamedParameter('%://' . $linkTarget . '/%')
@@ -562,7 +560,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
         return (int)$queryBuilder->delete(static::TABLE)
             ->where(...$constraints)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -593,8 +591,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->createNamedParameter($record['url'])
                 )
             )
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchOne()}();
+            ->executeQuery()
+            ->fetchOne();
         if ($count > 0) {
             $identifier = [
                 'record_uid' => $record['record_uid'],

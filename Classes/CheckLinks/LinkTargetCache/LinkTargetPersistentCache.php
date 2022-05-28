@@ -16,7 +16,6 @@ namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Sypets\Brofix\DoctrineDbalMethodNameHelper;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -57,12 +56,12 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             );
         }
 
-        return $queryBuilder
+        return (int)$queryBuilder
             ->count('uid')
             ->from(static::TABLE)
             ->where(...$constraints)
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchOne()}() ? true : false;
+            ->executeQuery()
+            ->fetchOne() > 0;
     }
 
     /**
@@ -88,8 +87,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 $queryBuilder->expr()->gt('last_check', $queryBuilder->createNamedParameter(\time()-$expire, \PDO::PARAM_INT))
             );
         $row = $queryBuilder
-            ->execute()
-            ->{DoctrineDbalMethodNameHelper::fetchAssociative()}();
+            ->executeQuery()
+            ->fetchAssociative();
         if (!$row) {
             return [];
         }
@@ -134,7 +133,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                     'last_check' => \time()
                 ]
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -155,7 +154,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             ->set('url_response', \json_encode($urlResponse))
             ->set('check_status', (string)$checkStatus)
             ->set('last_check', (string)\time())
-            ->execute();
+            ->executeStatement();
     }
 
     public function remove(string $linkTarget, string $linkType): void
@@ -168,7 +167,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
                 $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
             )
-            ->execute();
+            ->executeStatement();
     }
 
     protected function generateQueryBuilder(string $table = ''): QueryBuilder
