@@ -25,7 +25,7 @@ checked:
 5. functional tests
 
 For more information, see the file .github/workflows/tests.yml and
-the documentation on https://docs.typo3.org/m/typo3/reference-coreapi/10.4/en-us/Testing/ExtensionTesting.html.
+the documentation on https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/Testing/ExtensionTesting.html.
 
 ### CGL
 

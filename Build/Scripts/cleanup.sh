@@ -13,4 +13,5 @@ git diff composer.json
 echo "--------------------------------------------------------------------------------"
 
 rm -rf .Build
-rm composer.lock
+rm -f composer.lock
+rm -f Build/testing-docker/.env
