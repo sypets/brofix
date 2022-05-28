@@ -1,7 +1,6 @@
 <?php
 
-// @todo
-//declare(strict_types=1);
+declare(strict_types=1);
 
 namespace Sypets\Brofix;
 
@@ -81,46 +80,26 @@ class LinkAnalyzer implements LoggerAwareInterface
      *
      * @var array<string|int>
      */
-    protected $pids = [];
+    protected array $pids = [];
 
     /**
      * Array for hooks for own checks
      *
      * @var \Sypets\Brofix\Linktype\AbstractLinktype[]
      */
-    protected $hookObjectsArr = [];
+    protected array $hookObjectsArr = [];
 
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /**
-     * @var BrokenLinkRepository
-     */
+    protected ?Configuration $configuration = null;
     protected BrokenLinkRepository  $brokenLinkRepository;
-
-    /**
-     * @var ContentRepository
-     */
-    protected $contentRepository;
-
-    /**
-     * @var PagesRepository
-     */
-    protected $pagesRepository;
-
-    /**
-     * @var FormDataCompiler
-     */
-    protected $formDataCompiler;
-
+    protected ContentRepository $contentRepository;
+    protected PagesRepository $pagesRepository;
+    protected FormDataCompiler $formDataCompiler;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
 
     /**
-     * @var CheckLinksStatistics
+     * @var CheckLinksStatistics|null
      */
-    protected $statistics;
+    protected ?CheckLinksStatistics $statistics = null;
 
     /**
      * Fill hookObjectsArr with different link types and possible XClasses.
