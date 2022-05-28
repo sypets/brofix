@@ -343,7 +343,7 @@ services:
         fi
         mkdir -p .Build/.cache
         php -v | grep '^PHP';
-        php -dxdebug.mode=off .Build/bin/phpstan analyse --no-progress --no-interaction --memory-limit 4G -c Build/phpstan/phpstan.neon --generate-baseline=Build/phpstan/phpstan-baseline.neon ${EXTRA_TEST_OPTIONS}
+        php -dxdebug.mode=off .Build/bin/phpstan analyse --no-progress --no-interaction --memory-limit 4G -c Build/phpstan/phpstan.neon --generate-baseline=Build/phpstan/phpstan-baseline.neon --allow-empty-baseline ${EXTRA_TEST_OPTIONS}
       "
 
   unit:
