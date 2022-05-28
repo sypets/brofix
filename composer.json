@@ -42,8 +42,10 @@
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^3.2",
 		"jangregor/phpstan-prophecy": "^1.0.0",
+		"phpspec/prophecy": "^1.15.0",
+		"phpspec/prophecy-phpunit": "^2.0.1",
 		"phpstan/phpstan": "^1.7.2",
-		"phpunit/phpunit": "^8.5.21",
+		"phpunit/phpunit": "^9.5.20",
 		"typo3/testing-framework": "^6.16.5"
 	},
 	"suggest": {
