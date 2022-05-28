@@ -19,6 +19,7 @@ namespace Sypets\Brofix\Tests\Unit\Linktype;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
@@ -29,6 +30,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ExternalLinktypeTest extends AbstractUnitTest
 {
+    use ProphecyTrait;
+
     protected function setUp(): void
     {
         parent::setUp();

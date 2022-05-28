@@ -17,6 +17,7 @@ namespace Sypets\Brofix\Tests\Unit;
  */
 
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Localization\LanguageService;
@@ -25,6 +26,7 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 abstract class AbstractUnitTest extends UnitTestCase
 {
+    use ProphecyTrait;
 
     /**
      * @var Configuration

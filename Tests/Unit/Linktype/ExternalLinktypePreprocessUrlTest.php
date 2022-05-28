@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Tests\Unit\Linktype;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ExternalLinktype;
@@ -24,6 +25,8 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class ExternalLinktypePreprocessUrlTest extends UnitTestCase
 {
+    use ProphecyTrait;
+
     /**
      * @return \Generator<string,string[]>
      */
