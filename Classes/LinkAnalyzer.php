@@ -34,6 +34,8 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
+use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
 use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -96,7 +98,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * @var BrokenLinkRepository
      */
-    protected $brokenLinkRepository;
+    protected BrokenLinkRepository  $brokenLinkRepository;
 
     /**
      * @var ContentRepository
@@ -113,6 +115,8 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     protected $formDataCompiler;
 
+    protected SoftReferenceParserFactory $softReferenceParserFactory;
+
     /**
      * @var CheckLinksStatistics
      */
@@ -124,12 +128,14 @@ class LinkAnalyzer implements LoggerAwareInterface
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
-        PagesRepository $pagesRepository
+        PagesRepository $pagesRepository,
+        SoftReferenceParserFactory $softReferenceParserFactory
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
         $this->contentRepository = $contentRepository;
         $this->pagesRepository = $pagesRepository;
+        $this->softReferenceParserFactory = $softReferenceParserFactory;
 
         // Hook to handle own checks
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
@@ -635,37 +641,16 @@ class LinkAnalyzer implements LoggerAwareInterface
                     continue;
                 }
 
-                // Explode the list of soft references/parameters
-                $softRefs = BackendUtility::explodeSoftRefParserList($conf['softref']);
-                if ($softRefs === false) {
-                    continue;
-                }
-
-                // Traverse soft references
-                foreach ($softRefs as $spKey => $spParams) {
-                    /** @var \TYPO3\CMS\Core\Database\SoftReferenceIndex $softRefObj */
-                    $softRefObj = BackendUtility::softRefParserObj($spKey);
-
-                    // If there is an object returned...
-                    if (!is_object($softRefObj)) {
+                $softRefParams = ['subst'];
+                foreach ($this->softReferenceParserFactory->getParsersBySoftRefParserList($conf['softref'], $softRefParams) as $softReferenceParser) {
+                    $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
+                    if (!$parserResult->hasMatched()) {
                         continue;
                     }
-                    $softRefParams = $spParams;
-                    if (!is_array($softRefParams)) {
-                        // set subst such that findRef will return substitutes for urls, emails etc
-                        $softRefParams = ['subst'];
-                    }
-
-                    // Do processing
-                    $resultArray = $softRefObj->findRef($table, $field, $idRecord, $valueField, $spKey, $softRefParams);
-                    if (empty($resultArray['elements'])) {
-                        continue;
-                    }
-
-                    if ($spKey === 'typolink_tag') {
-                        $this->analyzeTypoLinks($resultArray, $results, $htmlParser, $record, $field, $table);
+                    if ($softReferenceParser->getParserKey() === 'typolink_tag') {
+                        $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
                     } else {
-                        $this->analyzeLinks($resultArray, $results, $record, $field, $table);
+                        $this->analyzeLinks($parserResult, $results, $record, $field, $table);
                     }
                 }
             }
@@ -691,15 +676,15 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Find all supported broken links for a specific link list
      *
-     * @param mixed[] $resultArray findRef parsed records
+     * @param SoftReferenceParserResult $parserResult findRef parsed records
      * @param mixed[] $results Array of broken links
      * @param mixed[] $record UID of the current record
      * @param string $field The current field
      * @param string $table The current table
      */
-    protected function analyzeLinks(array $resultArray, array &$results, array $record, string $field, string $table): void
+    protected function analyzeLinks(SoftReferenceParserResult $parserResult, array &$results, array $record, string $field, string $table): void
     {
-        foreach ($resultArray['elements'] as $element) {
+        foreach ($parserResult->getMatchedElements() as $element) {
             $r = $element['subst'];
             $type = '';
             $idRecord = $record['uid'];
@@ -727,7 +712,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Find all supported broken links for a specific typoLink
      *
-     * @param mixed[] $resultArray findRef parsed records
+     * @param SoftReferenceParserResult $parserResult findRef parsed records
      * @param mixed[] $results Array of broken links
      * @param HtmlParser $htmlParser Instance of html parser
      * @param mixed[] $record The current record
@@ -735,7 +720,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param string $table The current table
      */
     protected function analyzeTypoLinks(
-        array $resultArray,
+        SoftReferenceParserResult $parserResult,
         array &$results,
         $htmlParser,
         array $record,
@@ -743,14 +728,14 @@ class LinkAnalyzer implements LoggerAwareInterface
         $table
     ): void {
         $currentR = [];
-        $linkTags = $htmlParser->splitIntoBlock('a,link', $resultArray['content']);
+        $linkTags = $htmlParser->splitIntoBlock('a,link', $parserResult->getContent());
         $idRecord = $record['uid'];
         $type = '';
         $title = '';
         $countLinkTags = count($linkTags);
         for ($i = 1; $i < $countLinkTags; $i += 2) {
             $referencedRecordType = '';
-            foreach ($resultArray['elements'] as $element) {
+            foreach ($parserResult->getMatchedElements() as $element) {
                 $type = '';
                 $r = $element['subst'];
                 if (empty($r['tokenID']) || substr_count($linkTags[$i], $r['tokenID']) === 0) {
@@ -772,6 +757,14 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
                 $title = strip_tags($linkTags[$i]);
             }
+
+            // @todo Should be checked why it could be that $currentR stays empty which breaks further processing with
+            //       chained PHP array access errors in hooks fetchType() and the $result[] build lines below. Further
+            //       $currentR could be overwritten in the inner loop, thus not checking all elements.
+            if (empty($currentR)) {
+                continue;
+            }
+
             /** @var \Sypets\Brofix\Linktype\AbstractLinktype $hookObj */
             foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
                 $type = $hookObj->fetchType($currentR, $type, $keyArr);
