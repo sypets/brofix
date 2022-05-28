@@ -378,14 +378,14 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['record_uid'] = (int)$entryValue['uid'];
                 $record['table_name'] = $table;
                 $record['link_type'] = $key;
-                $record['link_title'] = $entryValue['link_title'];
+                $record['link_title'] = $entryValue['link_title'] ?? '';
                 $record['field'] = $entryValue['field'];
                 $typeField = $GLOBALS['TCA'][$table]['ctrl']['type'] ?? false;
                 if ($entryValue['row'][$typeField] ?? false) {
                     $record['element_type'] = $entryValue['row'][$typeField];
                 }
                 $record['exclude_link_targets_pid'] = $this->configuration->getExcludeLinkTargetStoragePid();
-                $pageWithAnchor = $entryValue['pageAndAnchor'];
+                $pageWithAnchor = $entryValue['pageAndAnchor'] ?? '';
                 if (!empty($pageWithAnchor)) {
                     // Page with anchor, e.g. 18#1580
                     $url = $pageWithAnchor;
