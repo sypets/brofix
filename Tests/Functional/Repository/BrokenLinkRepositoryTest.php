@@ -197,7 +197,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
 
     /**
      * @param array<mixed> $beuser
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<int,int> $pidList
      * @param array<string,int> $expectedOutput
      * @throws \TYPO3\TestingFramework\Core\Exception
@@ -219,7 +219,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $linkTypes = ['db', 'file', 'external'];
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
-        $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
+        $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture'] ?? '');
         $this->importDataSet($inputFile);
         $brokenLinksRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class, $brokenLinksRepository);
@@ -325,7 +325,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
 
     /**
      * @param array<mixed> $beuser
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<int,int> $pidList
      * @param int $expectedCount
      * @throws \TYPO3\TestingFramework\Core\Exception
@@ -613,7 +613,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
 
     /**
      * @param array<mixed> $beuser
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<int,int> $pidList
      * @param array<string,mixed> $expectedResult
      * @throws \TYPO3\TestingFramework\Core\Exception
@@ -656,7 +656,12 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         self::assertEquals($expectedResult, $results);
     }
 
-    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile): void
+    /**
+     * @param int $uid
+     * @param non-empty-string $fixtureFile
+     * @param string $groupFixtureFile
+     */
+    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
     {
         if ($groupFixtureFile) {
             $this->importDataSet($groupFixtureFile);

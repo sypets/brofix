@@ -86,7 +86,7 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
      * @test
      * @dataProvider findAllBrokenLinksDataProvider
      *
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
@@ -136,7 +136,7 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
      * @test
      * @dataProvider findFindOnlyFileBrokenLinksDataProvider
      *
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
@@ -189,7 +189,7 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
      * @test
      * @dataProvider findFindOnlyPageBrokenLinksDataProvider
      *
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      *
@@ -243,7 +243,7 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
      * @test
      * @dataProvider findFindOnlyExternalBrokenLinksDataProvider
      *
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
@@ -295,7 +295,7 @@ class LinkAnalyzerTest extends AbstractFunctionalTest
      * @test
      * @dataProvider checkContentByTypeDataProvider
      *
-     * @param string $inputFile
+     * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      *

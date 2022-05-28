@@ -24,7 +24,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 abstract class AbstractFunctionalTest extends FunctionalTestCase
 {
     /**
-     * @var array<int,string>
+     * @var non-empty-string[]
      */
     protected $coreExtensionsToLoad = [
         'backend',
@@ -34,7 +34,7 @@ abstract class AbstractFunctionalTest extends FunctionalTestCase
     ];
 
     /**
-     * @var array<string>
+     * @var non-empty-string[]
      */
     protected $testExtensionsToLoad = [
         'typo3conf/ext/brofix',
