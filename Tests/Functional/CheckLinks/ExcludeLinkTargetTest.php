@@ -48,6 +48,11 @@ class ExcludeLinkTargetTest extends AbstractFunctionalTest
     /**
      * @test
      * @dataProvider isExcludedDataProvider
+     *
+     * @param non-empty-string $inputFile
+     * @param non-empty-string $url
+     * @param non-empty-string $linkType
+     * @param bool $expectedResult
      */
     public function isExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult): void
     {

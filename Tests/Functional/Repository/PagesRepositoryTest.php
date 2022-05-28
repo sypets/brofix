@@ -149,7 +149,7 @@ class PagesRepositoryTest extends AbstractFunctionalTest
     }
 
     /**
-     * @param string $fixture
+     * @param non-empty-string $fixture
      * @param int $startPage
      * @param int $depth
      * @param string $permsClause

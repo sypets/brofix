@@ -340,9 +340,9 @@ class ManageExclusionsController extends AbstractBrofixController
             if (isset($sortActions[$key])) {
                 // sorting available, add url
                 if ($this->orderBy === $key) {
-                    $tableHeadData[$key]['url'] = $sortActions[$key . '_reverse'] ?? '';
+                    $tableHeadData[$key]['url'] = $sortActions[$key . '_reverse'];
                 } else {
-                    $tableHeadData[$key]['url'] = $sortActions[$key] ?? '';
+                    $tableHeadData[$key]['url'] = $sortActions[$key];
                 }
 
                 // add icon only if this is the selected sort order
