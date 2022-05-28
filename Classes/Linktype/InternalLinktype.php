@@ -149,8 +149,8 @@ class InternalLinktype extends AbstractLinktype
                     $queryBuilder->createNamedParameter($pageUid, \PDO::PARAM_INT)
                 )
             )
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
 
         $customParams = [];
 
@@ -235,8 +235,8 @@ class InternalLinktype extends AbstractLinktype
                     $queryBuilder->createNamedParameter($contentUid, \PDO::PARAM_INT)
                 )
             )
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
         $this->responseContent = true;
 
         $customParams = [];
