@@ -75,9 +75,7 @@ Options:
     -t <composer-core-version-constraint>
         Only with -s composerCoreVersion
         Specifies the Typo3 core version to be used
-            - '^10.4' (default)
-            - '^11.5'
-            - '^11.5.3'
+            - '^11.5' (default)
             - ...
 
     -d <mariadb|mssql|postgres|sqlite>
@@ -130,17 +128,17 @@ Options:
         Show this help.
 
 Examples:
-    # Run unit tests using PHP 7.2
+    # Run unit tests using default PHP
     ./Build/Scripts/runTests.sh
 
-    # Run unit tests using PHP 7.3
-    ./Build/Scripts/runTests.sh -p 7.3
+    # Run unit tests using PHP 8.1
+    ./Build/Scripts/runTests.sh -p 8.1
 
-    # Run functional tests using PHP 7.4 and sqlite
-    ./Build/Scripts/runTests.sh -s functional -p 7.4 -d sqlite
+    # Run functional tests using sqlite
+    ./Build/Scripts/runTests.sh -s functional -d sqlite
 
-    # Run functional tests in phpunit with a filtered test method name in a specified file, php 7.4 and xdebug enabled.
-    ./Build/Scripts/runTests.sh -s functional -p 7.4 -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
+    # Run functional tests in phpunit with a filtered test method name in a specified file and xdebug enabled.
+    ./Build/Scripts/runTests.sh -s functional -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
 
 # Test if docker-compose exists, else exit out with error
@@ -164,10 +162,10 @@ if ! command -v realpath &> /dev/null; then
 else
   ROOT_DIR=`realpath ${PWD}/../../`
 fi
-CORE_VERSION="10.4"
+CORE_VERSION="11.5"
 TEST_SUITE="unit"
 DBMS="mariadb"
-PHP_VERSION="7.2"
+PHP_VERSION="8.1"
 PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 EXTRA_TEST_OPTIONS=""
