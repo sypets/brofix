@@ -22,10 +22,11 @@ use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BrokenLinkRepositoryTest extends AbstractFunctionalTest
 {
+    protected ?BrokenLinkRepository $brokenLinkRepository = null;
+
     /**
      * @var array<string,array<mixed>>
      */
@@ -72,6 +73,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         parent::setUp();
 
         $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'] = 'explicitAllow';
+        $this->brokenLinkRepository = new BrokenLinkRepository();
     }
 
     /**
@@ -221,14 +223,13 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture'] ?? '');
         $this->importDataSet($inputFile);
-        $brokenLinksRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class, $brokenLinksRepository);
+        $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
         $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
         // get result
-        $result = $brokenLinksRepository->getLinkCounts(
+        $result = $this->brokenLinkRepository->getLinkCounts(
             $pidList,
             $linkTypes,
             $searchFields
@@ -348,12 +349,11 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
         $this->importDataSet($inputFile);
-        $brokenLinksRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class, $brokenLinksRepository);
+        $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
         $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
-        $results = $brokenLinksRepository->getBrokenLinks(
+        $results = $this->brokenLinkRepository->getBrokenLinks(
             $pidList,
             $linkTypes,
             $searchFields,
@@ -637,13 +637,12 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
         $this->importDataSet($inputFile);
-        $brokenLinksRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class, $brokenLinksRepository);
+        $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
         $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
         // get results
-        $results = $brokenLinksRepository->getBrokenLinks(
+        $results = $this->brokenLinkRepository->getBrokenLinks(
             $pidList,
             $linkTypes,
             $searchFields,

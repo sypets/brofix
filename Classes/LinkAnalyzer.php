@@ -122,14 +122,14 @@ class LinkAnalyzer implements LoggerAwareInterface
      * Fill hookObjectsArr with different link types and possible XClasses.
      */
     public function __construct(
-        BrokenLinkRepository $brokenLinkRepository = null,
-        ContentRepository $contentRepository = null,
-        PagesRepository $pagesRepository = null
+        BrokenLinkRepository $brokenLinkRepository,
+        ContentRepository $contentRepository,
+        PagesRepository $pagesRepository
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
-        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $this->contentRepository = $contentRepository ?: GeneralUtility::makeInstance(ContentRepository::class);
-        $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
+        $this->brokenLinkRepository = $brokenLinkRepository;
+        $this->contentRepository = $contentRepository;
+        $this->pagesRepository = $pagesRepository;
 
         // Hook to handle own checks
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
