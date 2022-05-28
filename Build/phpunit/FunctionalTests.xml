@@ -12,9 +12,10 @@
     TYPO3 CMS functional test suite also needs phpunit bootstrap code, the
     file is located next to this .xml as FunctionalTestsBootstrap.php
 
-    @todo: Make phpunit v9 compatible, compare with core Build/phpunit/ version.
 -->
 <phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
     backupGlobals="true"
     bootstrap="FunctionalTestsBootstrap.php"
     cacheResult="false"
@@ -24,6 +25,7 @@
     convertDeprecationsToExceptions="true"
     convertNoticesToExceptions="true"
     forceCoversAnnotation="false"
+    processIsolation="false"
     stopOnError="false"
     stopOnFailure="false"
     stopOnIncomplete="false"
@@ -43,16 +45,18 @@
         </testsuite>
     </testsuites>
     <php>
-        <!-- @deprecated: will be removed with next major version, constant TYPO3_MODE is deprecated -->
-        <const name="TYPO3_MODE" value="BE" />
         <!--
             @deprecated: Set this to not suppress warnings, notices and deprecations in functional tests
                          with TYPO3 core v11 and up.
                          Will always be done with next major version.
                          To still suppress warnings, notices and deprecations, do NOT define the constant at all.
+            @todo Upgrade BrokenLinkRepository to incorporate core v11 changes and avoid deprecation messages, which
+                  are silenced away. Afterwards define following constant to find out which other places needs to be
+                  fixed and are silenced through error handler usage.
             <const name="TYPO3_TESTING_FUNCTIONAL_REMOVE_ERROR_HANDLER" value="true" />
          -->
         <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="E_ALL" />
         <env name="TYPO3_CONTEXT" value="Testing" />
     </php>
 </phpunit>
