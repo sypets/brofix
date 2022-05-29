@@ -238,12 +238,11 @@ class ManageExclusionsController extends AbstractBrofixController
 
         // to prevent deleting session, when user sort the records
         if (!is_null(GeneralUtility::_GP('excludeLinkType_filter')) || !is_null(GeneralUtility::_GP('excludeUrl_filter')) || !is_null(GeneralUtility::_GP('excludeReason_filter'))) {
-            $this->backendSession->store('filterKey_excludeLinks', $this->filter);
+            $this->backendSession->store(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS, $this->filter);
         }
         // create session, if it the first time
-        if (is_null($this->backendSession->get('filterKey_excludeLinks'))) {
-            $this->backendSession->setStorageKey('filterKey_excludeLinks');
-            $this->backendSession->store('filterKey_excludeLinks', new ManageExclusionsFilter());
+        if (is_null($this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS))) {
+            $this->backendSession->store(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS, new ManageExclusionsFilter());
         }
     }
 
@@ -254,10 +253,12 @@ class ManageExclusionsController extends AbstractBrofixController
     {
         $items = [];
         // build the search filter from the backendSession session
-        $searchFilter = new ManageExclusionsFilter();
-        $searchFilter->setExcludeUrlFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeUrlFilter());
-        $searchFilter->setExcludeLinkTypeFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeLinkTypeFilter());
-        $searchFilter->setExcludeReasonFilter($this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
+        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS);
+        if ($arrayable) {
+            $searchFilter = ManageExclusionsFilter::getInstanceFromArray($arrayable->toArray());
+        } else {
+            $searchFilter = new ManageExclusionsFilter();
+        }
         $searchFilter->setExcludeStoragePid($this->storagePid);
 
         // Get Records from the database
@@ -306,9 +307,15 @@ class ManageExclusionsController extends AbstractBrofixController
         $this->view->assign('sortActions', $sortActions);
         $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
         // assign the filters value in the inputs
-        $this->view->assign('excludeUrl_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeUrlFilter());
-        $this->view->assign('excludeLinkType_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeLinkTypeFilter());
-        $this->view->assign('excludeReason_filter', $this->backendSession->get('filterKey_excludeLinks')->getExcludeReasonFilter());
+        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS);
+        if ($arrayable) {
+            $searchFilter = ManageExclusionsFilter::getInstanceFromArray($arrayable->toArray());
+        } else {
+            $searchFilter = new ManageExclusionsFilter();
+        }
+        $this->view->assign('excludeUrl_filter', $searchFilter->getExcludeUrlFilter());
+        $this->view->assign('excludeLinkType_filter', $searchFilter->getExcludeLinkTypeFilter());
+        $this->view->assign('excludeReason_filter', $searchFilter->getExcludeReasonFilter());
     }
 
     /**

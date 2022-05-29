@@ -105,7 +105,7 @@ class BrokenLinkListController extends AbstractBrofixController
     protected $linkAnalyzer;
 
     /**
-     * @var BrokenLinkListFilter
+     * @var BrokenLinkListFilter|null
      */
     protected $filter;
 
@@ -283,8 +283,10 @@ class BrokenLinkListController extends AbstractBrofixController
         $depth = GeneralUtility::_GP('depth');
 
         // store filter parameters in the Filter Object
-        $this->filter = $this->backendSession->get('filterKey');
-        if (!$this->filter) {
+        $filter = $this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST);
+        if ($filter) {
+            $this->filter = BrokenLinkListFilter::getInstanceFromArray($filter->toArray());
+        } else {
             $this->filter = new BrokenLinkListFilter();
         }
         $uid = GeneralUtility::_GP('uid_searchFilter');
@@ -310,13 +312,12 @@ class BrokenLinkListController extends AbstractBrofixController
 
         // to prevent deleting session, when user sort the records
         if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
-            $this->backendSession->store('filterKey', $this->filter);
+            $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
         }
 
         // create session, if it the first time
-        if (is_null($this->backendSession->get('filterKey'))) {
-            $this->backendSession->setStorageKey('filterKey');
-            $this->backendSession->store('filterKey', $this->filter);
+        if (is_null($this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST))) {
+            $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
         }
 
         /**
@@ -582,11 +583,17 @@ class BrokenLinkListController extends AbstractBrofixController
         }
         $this->view->assign('totalCount', $totalCount);
         // send the search filters to the view
-        $this->view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
-        $this->view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
-        $this->view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
-        $this->view->assign('url_match_searchFilter', $this->backendSession->get('filterKey')->getUrlFilterMatch());
-        $this->view->assign('view_mode', $this->backendSession->get('filterKey')->getViewMode() ?: BrokenLinkListFilter::VIEW_MODE_MIN);
+        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST);
+        if ($arrayable) {
+            $filter = BrokenLinkListFilter::getInstanceFromArray($arrayable->toArray());
+        } else {
+            $filter = new BrokenLinkListFilter();
+        }
+        $this->view->assign('uid_filter', $filter->getUidFilter());
+        $this->view->assign('linktype_filter', $filter->getLinktypeFilter());
+        $this->view->assign('url_filter', $filter->getUrlFilter());
+        $this->view->assign('url_match_searchFilter', $filter->getUrlFilterMatch());
+        $this->view->assign('view_mode', $filter->getViewMode() ?: BrokenLinkListFilter::VIEW_MODE_MIN);
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
