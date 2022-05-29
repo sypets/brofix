@@ -29,27 +29,26 @@ class ExcludeLinkTargetRepository
 
         $queryBuilder
             ->select(self::TABLE . '.*')
-            ->from(self::TABLE)
-            ->join(
-                self::TABLE,
-                'pages',
-                'pages',
-                // @todo record_pid is not always page id
-                $queryBuilder->expr()->eq(self::TABLE . '.pid', $queryBuilder->quoteIdentifier('pages.uid'))
-            )
+            ->from(self::TABLE);
+        $urlFilter = $filter->getExcludeUrlFilter();
+        if ($urlFilter) {
             // SQL Filter
-            ->andWhere(
+            $queryBuilder->andWhere(
                 $queryBuilder->expr()->like(
                     self::TABLE . '.linktarget',
-                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getExcludeUrlFilter()) . '%')
-                )
-            )
-            ->andWhere(
-                $queryBuilder->expr()->like(
-                    self::TABLE . '.link_type',
-                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getExcludeLinkTypeFilter()) . '%')
+                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
                 )
             );
+        }
+        $linktypeFilter = $filter->getExcludeLinkTypeFilter();
+        if ($linktypeFilter) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->like(
+                    self::TABLE . '.link_type',
+                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($linktypeFilter) . '%')
+                )
+            );
+        }
         $storagePid = $filter->getExcludeStoragePid();
         if ($storagePid !== -1) {
             $queryBuilder->andWhere(

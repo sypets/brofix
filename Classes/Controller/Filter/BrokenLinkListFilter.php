@@ -4,13 +4,28 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller\Filter;
 
-class BrokenLinkListFilter
+use Sypets\Brofix\Util\Arrayable;
+
+class BrokenLinkListFilter implements Arrayable
 {
+    /** @var string  */
+    protected const KEY_UID = 'uid';
+    /** @var string */
+    protected const KEY_URL = 'url';
+    /** @var string */
+    protected const KEY_LINKTYPE = 'linktype';
+    /** @var string */
+    protected const KEY_URL_MATCH = 'urlMatch';
+
     public const VIEW_MODE_MIN = 'view_table_min';
     public const VIEW_MODE_COMPLEX = 'view_table_complex';
 
     /** @var string */
-    protected const LINK_TYPE_FILTER = 'all';
+    protected const LINK_TYPE_FILTER_DEFAULT = 'all';
+
+    protected const URL_MATCH_DEFAULT = 'partial';
+
+    protected const LINK_TYPE_DEFAULT = 'all';
 
     /** @var int */
     public const PAGE_DEPTH_INFINITE = 999;
@@ -21,7 +36,7 @@ class BrokenLinkListFilter
     protected $uid_filtre = '';
 
     /** @var string */
-    protected $linktype_filter = 'all';
+    protected $linktype_filter = self::LINK_TYPE_DEFAULT;
 
     /**
      * @var string
@@ -29,7 +44,7 @@ class BrokenLinkListFilter
     protected $url_filtre = '';
 
     /** @var string  */
-    protected $urlFilterMatch = 'partial';
+    protected $urlFilterMatch = self::URL_MATCH_DEFAULT;
 
     /**
      * @var string
@@ -39,6 +54,38 @@ class BrokenLinkListFilter
 
     /** @var string */
     protected $viewMode = self::VIEW_MODE_MIN;
+
+    public function __construct(
+        string $uid = '',
+        string $linkType = self::LINK_TYPE_DEFAULT,
+        string $url = '',
+        string $urlMatch = self::URL_MATCH_DEFAULT
+    ) {
+        $this->uid_filtre = $uid;
+        $this->linktype_filter = $linkType;
+        $this->url_filtre = $url;
+        $this->urlFilterMatch = $urlMatch;
+    }
+
+    public static function getInstanceFromArray(array $values): BrokenLinkListFilter
+    {
+        return new BrokenLinkListFilter(
+            $values[self::KEY_UID] ?? '',
+            $values[self::KEY_LINKTYPE] ?? self::LINK_TYPE_DEFAULT,
+            $values[self::KEY_URL] ?? '',
+            $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT
+        );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            self::KEY_UID => $this->getUidFilter(),
+            self::KEY_LINKTYPE => $this->getLinktypeFilter(),
+            self::KEY_URL => $this->getUrlFilter(),
+            self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
+        ];
+    }
 
     /**
      * Check if any filter is active
@@ -51,7 +98,7 @@ class BrokenLinkListFilter
     public function hasConstraintsForNumberOfResults(): bool
     {
         if ($this->getUidFilter()
-            || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER
+            || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER_DEFAULT
             || $this->getUrlFilter()
         ) {
             return true;
