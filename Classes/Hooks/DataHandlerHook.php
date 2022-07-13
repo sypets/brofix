@@ -76,7 +76,7 @@ final class DataHandlerHook
         if (($status === 'new' || $status === 'update')
             && $table === ExcludeLinkTarget::TABLE
             && (isset($changedValues['link_type']) || isset($changedValues['linktarget']) || isset($changedValues['match']))
-            ) {
+        ) {
             if ($status === 'update') {
                 // because we are not sure we can get all record values from DataHandler, we do a new
                 // query here (which is also what is customary in the core)
