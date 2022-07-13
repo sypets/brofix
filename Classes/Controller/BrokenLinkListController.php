@@ -901,7 +901,7 @@ class BrokenLinkListController extends AbstractBrofixController
                     )
                 ),
                 nl2br(
-                // Encode for output
+                    // Encode for output
                     htmlspecialchars(
                         $hookObj->getErrorMessage($errorParams),
                         ENT_QUOTES,
