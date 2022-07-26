@@ -52,7 +52,7 @@ jobs:
 
       - name: "phpstan"
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github"
 
       - name: "Unit tests"
         if: always()

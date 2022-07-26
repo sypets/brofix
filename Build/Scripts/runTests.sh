@@ -94,7 +94,7 @@ Options:
             - 8.0: use PHP 8.0
             - 8.1: use PHP 8.1
 
-    -e "<phpunit options>"
+    -e "<phpunit|phpstan options>"
         Only with -s functional|unit|phpstan
         Additional options to send to phpunit tests.
         For phpunit, options starting with "--" must be added after options starting with "-".
