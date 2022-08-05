@@ -369,9 +369,9 @@ class LinkAnalyzer implements LoggerAwareInterface
                     // Page with anchor, e.g. 18#1580
                     $url = $pageWithAnchor;
                 } else {
-                    $url = $entryValue['substr']['tokenValue'];
+                    $url = $entryValue['substr']['tokenValue'] ?? '';
                 }
-                $record['url'] = $url;
+                $record['url'] = (string)$url;
 
                 $this->debug("checkLinks: before checking $url");
                 $checkUrl = $hookObj->checkLink($url, $entryValue, $mode);
