@@ -665,7 +665,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             $r = $element['subst'];
             $type = '';
             $idRecord = $record['uid'];
-            if (empty($r)) {
+            if (empty($r) || !is_array($r)) {
                 continue;
             }
 
