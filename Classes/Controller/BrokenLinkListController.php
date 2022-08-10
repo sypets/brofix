@@ -312,9 +312,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->filter->setLinktypeFilter($linkType ?: 'all');
         }
 
-        $this->userSettings = UserSettings::initializeFromSettingsAndGetParameters( $this->pObj->MOD_SETTINGS);
-
-
+        $this->userSettings = UserSettings::initializeFromSettingsAndGetParameters($this->pObj->MOD_SETTINGS);
 
         // to prevent deleting session, when user sort the records
         if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
