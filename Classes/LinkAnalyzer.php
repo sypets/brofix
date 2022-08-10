@@ -374,7 +374,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['url'] = (string)$url;
 
                 $this->debug("checkLinks: before checking $url");
-                $checkUrl = $hookObj->checkLink($url, $entryValue, $mode);
+                $checkUrl = $hookObj->checkLink((string)$url, $entryValue, $mode);
                 $this->debug("checkLinks: after checking $url");
 
                 if ($hookObj->isExcludeUrl()) {
