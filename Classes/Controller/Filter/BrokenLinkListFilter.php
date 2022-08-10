@@ -17,9 +17,6 @@ class BrokenLinkListFilter implements Arrayable
     /** @var string */
     protected const KEY_URL_MATCH = 'urlMatch';
 
-    public const VIEW_MODE_MIN = 'view_table_min';
-    public const VIEW_MODE_COMPLEX = 'view_table_complex';
-
     /** @var string */
     protected const LINK_TYPE_FILTER_DEFAULT = 'all';
 
@@ -51,9 +48,6 @@ class BrokenLinkListFilter implements Arrayable
      * @deprecated
      */
     protected $title_filter = '';
-
-    /** @var string */
-    protected $viewMode = self::VIEW_MODE_MIN;
 
     public function __construct(
         string $uid = '',
@@ -150,22 +144,6 @@ class BrokenLinkListFilter implements Arrayable
     public function setUrlFilterMatch(string $urlFilterMatch): void
     {
         $this->urlFilterMatch = $urlFilterMatch;
-    }
-
-    /**
-     * @return string
-     */
-    public function getViewMode(): string
-    {
-        return $this->viewMode;
-    }
-
-    /**
-     * @param string $viewMode
-     */
-    public function setViewMode(string $viewMode): void
-    {
-        $this->viewMode = $viewMode;
     }
 
     /** @deprecated */

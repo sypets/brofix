@@ -9,6 +9,7 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Controller\BackendUser\BackendUserInformation;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
+use Sypets\Brofix\Controller\UiHelper\UserSettings;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
@@ -108,6 +109,11 @@ class BrokenLinkListController extends AbstractBrofixController
      * @var BrokenLinkListFilter|null
      */
     protected $filter;
+
+    /**
+     * @var UserSettings
+     */
+    protected $userSettings;
 
     /**
      * @var array<string>
@@ -305,10 +311,10 @@ class BrokenLinkListController extends AbstractBrofixController
         if ($linkType !== null) {
             $this->filter->setLinktypeFilter($linkType ?: 'all');
         }
-        $viewMode = GeneralUtility::_GP('view_mode');
-        if ($viewMode !== null) {
-            $this->filter->setViewMode($viewMode ?: BrokenLinkListFilter::VIEW_MODE_MIN);
-        }
+
+        $this->userSettings = UserSettings::initializeFromSettingsAndGetParameters( $this->pObj->MOD_SETTINGS);
+
+
 
         // to prevent deleting session, when user sort the records
         if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
@@ -334,7 +340,6 @@ class BrokenLinkListController extends AbstractBrofixController
             }
         }
         $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
-        $this->pObj->MOD_SETTINGS['viewMode'] = $this->filter->getViewMode();
 
         $this->route = GeneralUtility::_GP('route') ?? '';
         $this->token = GeneralUtility::_GP('token') ?? '';
@@ -373,8 +378,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->pObj->MOD_SETTINGS['currentPage'] = $this->id;
         $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
 
-        // save settings
-        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
+        $this->persistUserSettings();
     }
 
     /**
@@ -593,7 +597,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->view->assign('linktype_filter', $filter->getLinktypeFilter());
         $this->view->assign('url_filter', $filter->getUrlFilter());
         $this->view->assign('url_match_searchFilter', $filter->getUrlFilterMatch());
-        $this->view->assign('view_mode', $filter->getViewMode() ?: BrokenLinkListFilter::VIEW_MODE_MIN);
+        $this->view->assign('view_mode', $this->userSettings->getViewMode());
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
@@ -971,5 +975,13 @@ class BrokenLinkListController extends AbstractBrofixController
             return $text;
         }
         return '';
+    }
+
+    protected function persistUserSettings(): void
+    {
+        // initialize MOD_SETTINGS with current values
+        $this->userSettings->persistToArray($this->pObj->MOD_SETTINGS);
+        // save settings
+        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
     }
 }

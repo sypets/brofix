@@ -1,0 +1,1584 @@
+Classes/DoctrineDbalMethodNameHelper.php:        $this->coreVersion = new Typo3Version();
+Classes/DoctrineDbalMethodNameHelper.php:        $map = $this->methodMap[$this->coreVersion->getMajorVersion()] ?? [];
+Classes/DoctrineDbalMethodNameHelper.php:        return self::get()->getMethodName('fetchAssociative');
+Classes/DoctrineDbalMethodNameHelper.php:        return self::get()->getMethodName('fetchAllAssociative');
+Classes/DoctrineDbalMethodNameHelper.php:        return self::get()->getMethodName('fetchOne');
+Classes/Command/CheckLinksCommand.php: * The TYPO3 project - inspiring people to share!
+Classes/Command/CheckLinksCommand.php:     * @var int -1: means use default (from configuration),
+Classes/Command/CheckLinksCommand.php:        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
+Classes/Command/CheckLinksCommand.php:        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
+Classes/Command/CheckLinksCommand.php:        $this->pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
+Classes/Command/CheckLinksCommand.php:        $this->statistics = [];
+Classes/Command/CheckLinksCommand.php:        $this->setDescription('Check links')
+Classes/Command/CheckLinksCommand.php:            ->addOption(
+Classes/Command/CheckLinksCommand.php:                'start-pages',
+Classes/Command/CheckLinksCommand.php:            ->addOption(
+Classes/Command/CheckLinksCommand.php:            ->addOption(
+Classes/Command/CheckLinksCommand.php:            ->addOption(
+Classes/Command/CheckLinksCommand.php:                'dry-run',
+Classes/Command/CheckLinksCommand.php:            ->addOption(
+Classes/Command/CheckLinksCommand.php:                'send-email',
+Classes/Command/CheckLinksCommand.php:            ->addOption(
+Classes/Command/CheckLinksCommand.php:                'exclude-uid',
+Classes/Command/CheckLinksCommand.php:                'Page id (and subpages), which will not be checked. Use several -x options if more than one, e.g -x1 -x2'
+Classes/Command/CheckLinksCommand.php:        $this->io = new SymfonyStyle($input, $output);
+Classes/Command/CheckLinksCommand.php:        $this->dryRun = (bool)($input->getOption('dry-run') ?: false);
+Classes/Command/CheckLinksCommand.php:        if ($this->dryRun) {
+Classes/Command/CheckLinksCommand.php:            $this->io->writeln('Dry run is activated, do not check and do not send email');
+Classes/Command/CheckLinksCommand.php:        $this->sendEmail = (int)($input->getOption('send-email') ?? -1);
+Classes/Command/CheckLinksCommand.php:        if ($this->sendEmail === 0) {
+Classes/Command/CheckLinksCommand.php:            $this->io->writeln('Do not send email.');
+Classes/Command/CheckLinksCommand.php:        $this->excludedPages = [];
+Classes/Command/CheckLinksCommand.php:        foreach ($input->getOption('exclude-uid') ?: [] as $value) {
+Classes/Command/CheckLinksCommand.php:            $this->excludedPages[$id] = $id;
+Classes/Command/CheckLinksCommand.php:        $startPageString = (string)($input->getOption('start-pages') ?? '');
+Classes/Command/CheckLinksCommand.php:            $sites = $siteFinder->getAllSites();
+Classes/Command/CheckLinksCommand.php:                $startPages[] = $site->getRootPageId();
+Classes/Command/CheckLinksCommand.php:            $this->io->writeln('Use page ids (from site configuration): ' . implode(',', $startPages));
+Classes/Command/CheckLinksCommand.php:            // @extensionScannerIgnoreLine problem with ->error()
+Classes/Command/CheckLinksCommand.php:            $this->io->error('No pages to check ... abort');
+Classes/Command/CheckLinksCommand.php:        $depthOption = $input->getOption('depth');
+Classes/Command/CheckLinksCommand.php:            $this->depth = (int)($depthOption);
+Classes/Command/CheckLinksCommand.php:            $this->depth = -1;
+Classes/Command/CheckLinksCommand.php:        $this->sendTo = $input->getOption('to') ?: '';
+Classes/Command/CheckLinksCommand.php:            $this->io->title('Start checking page ' . $pageId);
+Classes/Command/CheckLinksCommand.php:                $this->io->warning('Page id ' . $pageId . ' not allowed ... skipping');
+Classes/Command/CheckLinksCommand.php:            $this->configuration->loadPageTsConfig($pageId);
+Classes/Command/CheckLinksCommand.php:            if ($this->depth !== -1) {
+Classes/Command/CheckLinksCommand.php:                $this->configuration->setDepth($this->depth);
+Classes/Command/CheckLinksCommand.php:            $depth = $this->configuration->getDepth();
+Classes/Command/CheckLinksCommand.php:            if ($this->sendTo !== '') {
+Classes/Command/CheckLinksCommand.php:                $this->configuration->setMailRecipientsAsString($this->sendTo);
+Classes/Command/CheckLinksCommand.php:            if ($this->sendEmail === 0) {
+Classes/Command/CheckLinksCommand.php:                $this->configuration->setMailSendOnCheckLinks(0);
+Classes/Command/CheckLinksCommand.php:            if ($this->configuration->getMailSendOnCheckLinks()) {
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Configuration: Send mail: true');
+Classes/Command/CheckLinksCommand.php:                $recipients = $this->configuration->getMailRecipients();
+Classes/Command/CheckLinksCommand.php:                    $to .= $recipient->toString();
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Configuration: Email recipients: ' . $to);
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Configuration: Email sender (email address): '
+Classes/Command/CheckLinksCommand.php:                    . $this->configuration->getMailFromEmail());
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Configuration: Email sender (name): '
+Classes/Command/CheckLinksCommand.php:                    . $this->configuration->getMailFromName());
+Classes/Command/CheckLinksCommand.php:                if ($this->configuration->getMailReplyToEmail()) {
+Classes/Command/CheckLinksCommand.php:                    $this->io->writeln('Configuration: Email replyTo (email address): '
+Classes/Command/CheckLinksCommand.php:                        . $this->configuration->getMailReplyToEmail());
+Classes/Command/CheckLinksCommand.php:                    if ($this->configuration->getMailReplyToName()) {
+Classes/Command/CheckLinksCommand.php:                        $this->io->writeln('Configuration: Email replyTo (name): '
+Classes/Command/CheckLinksCommand.php:                            . $this->configuration->getMailReplyToName());
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Configuration: Email template: '
+Classes/Command/CheckLinksCommand.php:                    . $this->configuration->getMailTemplate());
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Configuration: Send mail: false');
+Classes/Command/CheckLinksCommand.php:            $result = $this->checkPageLinks($pageId);
+Classes/Command/CheckLinksCommand.php:            if ($this->dryRun) {
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Dry run is enabled: Do not check and do not send email.');
+Classes/Command/CheckLinksCommand.php:                || !isset($this->statistics[$pageId])
+Classes/Command/CheckLinksCommand.php:                $this->io->warning(sprintf('No result for checking %d ... abort', $pageId));
+Classes/Command/CheckLinksCommand.php:            $stats = $this->statistics[$pageId];
+Classes/Command/CheckLinksCommand.php:            $this->io->writeln(sprintf(
+Classes/Command/CheckLinksCommand.php:                $stats->getPageTitle(),
+Classes/Command/CheckLinksCommand.php:                $stats->getCountBrokenLinks()
+Classes/Command/CheckLinksCommand.php:            if ($this->configuration->getMailSendOnCheckLinks()) {
+Classes/Command/CheckLinksCommand.php:                $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+Classes/Command/CheckLinksCommand.php:                $this->io->writeln('Do not send mail, because sending was deactivated.');
+Classes/Command/CheckLinksCommand.php:        return $this->statistics[$pageUid];
+Classes/Command/CheckLinksCommand.php:        $depth = $this->configuration->getDepth();
+Classes/Command/CheckLinksCommand.php:        $linkTypes = $this->configuration->getLinkTypes();
+Classes/Command/CheckLinksCommand.php:        $this->io->writeln(
+Classes/Command/CheckLinksCommand.php:        if ($this->dryRun) {
+Classes/Command/CheckLinksCommand.php:        $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($pageRow);
+Classes/Command/CheckLinksCommand.php:        $checkHidden = $this->configuration->isCheckHidden();
+Classes/Command/CheckLinksCommand.php:            $this->pagesRepository->getPageList(
+Classes/Command/CheckLinksCommand.php:                $this->excludedPages,
+Classes/Command/CheckLinksCommand.php:                $this->configuration->getDoNotCheckPagesDoktypes(),
+Classes/Command/CheckLinksCommand.php:                $this->configuration->getDoNotTraversePagesDoktypes()
+Classes/Command/CheckLinksCommand.php:            $this->io->warning(
+Classes/Command/CheckLinksCommand.php:            $linkAnalyzer->init($pageIds, $this->configuration);
+Classes/Command/CheckLinksCommand.php:            $linkAnalyzer->generateBrokenLinkRecords($linkTypes, $checkHidden);
+Classes/Command/CheckLinksCommand.php:            $stats = $linkAnalyzer->getStatistics();
+Classes/Command/CheckLinksCommand.php:            $stats->setPageTitle($pageRow['title']);
+Classes/Command/CheckLinksCommand.php:            $this->statistics[$pageUid] = $stats;
+Classes/Linktype/FileLinktype.php: * The TYPO3 project - inspiring people to share!
+Classes/Linktype/FileLinktype.php:        $this->initializeErrorParams();
+Classes/Linktype/FileLinktype.php:        $this->initializeErrorParams();
+Classes/Linktype/FileLinktype.php:            $file = $resourceFactory->retrieveFileOrFolderObject($url);
+Classes/Linktype/FileLinktype.php:        return (bool)(($file !== null) ? !$file->isMissing() : false);
+Classes/Linktype/FileLinktype.php:        return $this->getLanguageService()->getLL('list.report.error.file.notexisting');
+Classes/Linktype/FileLinktype.php:        return $this->getLanguageService()->getLL('list.report.url.file');
+Classes/Linktype/ErrorParams.php:* The TYPO3 project - inspiring people to share!
+Classes/Linktype/ErrorParams.php:        $this->initialize($errorParams);
+Classes/Linktype/ErrorParams.php:            $this->errorType    = $params['errorType'] ?? '';
+Classes/Linktype/ErrorParams.php:            $this->errno        = $params['errno'] ?? 0;
+Classes/Linktype/ErrorParams.php:            $this->exceptionMsg = $params['exceptionMsg'] ?? '';
+Classes/Linktype/ErrorParams.php:            $this->message      = $params['message'] ?? '';
+Classes/Linktype/ErrorParams.php:            $this->custom       = $params['custom'] ?? [];
+Classes/Linktype/ErrorParams.php:            $this->errorType = '';
+Classes/Linktype/ErrorParams.php:            $this->errno = 0;
+Classes/Linktype/ErrorParams.php:            $this->exceptionMsg = '';
+Classes/Linktype/ErrorParams.php:            $this->message = '';
+Classes/Linktype/ErrorParams.php:            $this->custom = [];
+Classes/Linktype/ErrorParams.php:        return $this->errorType === '';
+Classes/Linktype/ErrorParams.php:        return $this->errorType;
+Classes/Linktype/ErrorParams.php:        $this->errorType = $errorType;
+Classes/Linktype/ErrorParams.php:        return $this->errno;
+Classes/Linktype/ErrorParams.php:        $this->errno = $errno;
+Classes/Linktype/ErrorParams.php:        return $this->exceptionMsg;
+Classes/Linktype/ErrorParams.php:        $this->exceptionMsg = $exceptionMsg;
+Classes/Linktype/ErrorParams.php:        return $this->custom;
+Classes/Linktype/ErrorParams.php:        $this->custom = $custom;
+Classes/Linktype/ErrorParams.php:        $this->custom = array_merge($this->custom, $custom);
+Classes/Linktype/ErrorParams.php:        return $this->message;
+Classes/Linktype/ErrorParams.php:        $this->message = $message;
+Classes/Linktype/ErrorParams.php:            'isValid'   => $this->isValid(),
+Classes/Linktype/ErrorParams.php:            'errorType' => $this->errorType,
+Classes/Linktype/ErrorParams.php:            'errno'     => $this->errno,
+Classes/Linktype/ErrorParams.php:            'exceptionMsg' => $this->exceptionMsg,
+Classes/Linktype/ErrorParams.php:            'message'   => $this->message,
+Classes/Linktype/ErrorParams.php:            'custom' => $this->custom
+Classes/Linktype/AbstractLinktype.php: * The TYPO3 project - inspiring people to share!
+Classes/Linktype/AbstractLinktype.php:     * a faster check - e.g. always retrieve from link target cache and
+Classes/Linktype/AbstractLinktype.php:     * Synchronous checking is currently used for On-the-fly checking after editing
+Classes/Linktype/AbstractLinktype.php:        $this->configuration = $configuration;
+Classes/Linktype/AbstractLinktype.php:        $this->errorParams = new ErrorParams($params);
+Classes/Linktype/AbstractLinktype.php:        return $this->errorParams;
+Classes/Linktype/ExternalLinktype.php: * The TYPO3 project - inspiring people to share!
+Classes/Linktype/ExternalLinktype.php:    // HTTP status code was delivered (and can be found in $errorParams->errno)
+Classes/Linktype/ExternalLinktype.php:    // An error occurred in lowlevel handler and a cURL error code can be found in $errorParams->errno
+Classes/Linktype/ExternalLinktype.php:     * Current URL is excluded from checking - handle as valid.
+Classes/Linktype/ExternalLinktype.php:        $this->initializeErrorParams();
+Classes/Linktype/ExternalLinktype.php:        $this->requestFactory = $requestFactory ?: GeneralUtility::makeInstance(RequestFactory::class);
+Classes/Linktype/ExternalLinktype.php:        $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+Classes/Linktype/ExternalLinktype.php:        $this->linkTargetCache = $linkTargetCache ?: GeneralUtility::makeInstance(LinkTargetPersistentCache::class);
+Classes/Linktype/ExternalLinktype.php:        $this->crawlDelay = $crawlDelay ?: GeneralUtility::makeInstance(CrawlDelay::class);
+Classes/Linktype/ExternalLinktype.php:        $this->excludeLinkTarget->setExcludeLinkTargetsPid($this->configuration->getExcludeLinkTargetStoragePid());
+Classes/Linktype/ExternalLinktype.php:        $this->crawlDelay->setConfiguration($this->configuration);
+Classes/Linktype/ExternalLinktype.php:        $urlResponse = $this->linkTargetCache->getUrlResponseForUrl($url, 'external');
+Classes/Linktype/ExternalLinktype.php:        $this->errorParams->initialize($urlResponse['errorParams'] ?? []);
+Classes/Linktype/ExternalLinktype.php:        $this->lastChecked = $urlResponse['lastChecked'] ?? 0;
+Classes/Linktype/ExternalLinktype.php:        $urlResponse = $this->linkTargetCache->generateUrlResponse($isValid, $this->errorParams);
+Classes/Linktype/ExternalLinktype.php:        $this->linkTargetCache->setResult($url, 'external', $urlResponse);
+Classes/Linktype/ExternalLinktype.php:        $this->initializeErrorParams();
+Classes/Linktype/ExternalLinktype.php:        if ($this->excludeLinkTarget->isExcluded($origUrl, 'external')) {
+Classes/Linktype/ExternalLinktype.php:            $this->isExcludeUrl = true;
+Classes/Linktype/ExternalLinktype.php:        $this->isExcludeUrl = false;
+Classes/Linktype/ExternalLinktype.php:            //&& $this->linkTargetCache->hasEntryForUrl($origUrl, 'external', true, $this->configuration->getLinkTargetCacheExpires($flags))
+Classes/Linktype/ExternalLinktype.php:            $urlResponse = $this->linkTargetCache->getUrlResponseForUrl(
+Classes/Linktype/ExternalLinktype.php:                $this->configuration->getLinkTargetCacheExpires($flags)
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->initialize($urlResponse['errorParams'] ?? []);
+Classes/Linktype/ExternalLinktype.php:                $this->lastChecked = $urlResponse['lastChecked'] ?? 0;
+Classes/Linktype/ExternalLinktype.php:                    $this->initializeErrorParams();
+Classes/Linktype/ExternalLinktype.php:                    $this->lastChecked = 0;
+Classes/Linktype/ExternalLinktype.php:                'max' => $this->configuration->getLinktypesConfigExternalRedirects(),
+Classes/Linktype/ExternalLinktype.php:            'headers'         => $this->configuration->getLinktypesConfigExternalHeaders(),
+Classes/Linktype/ExternalLinktype.php:            'timeout' => $this->configuration->getLinktypesConfigExternalTimeout(),
+Classes/Linktype/ExternalLinktype.php:        $url = $this->preprocessUrl($origUrl);
+Classes/Linktype/ExternalLinktype.php:                $delayed = $this->crawlDelay->crawlDelay($this->domain);
+Classes/Linktype/ExternalLinktype.php:                $this->logger->debug('crawl delay=' . $delayed . ' for URL=' . $url);
+Classes/Linktype/ExternalLinktype.php:            $isValidUrl = $this->requestUrl($url, 'HEAD', $options);
+Classes/Linktype/ExternalLinktype.php:                $options['headers']['Range'] = 'bytes=0-4048';
+Classes/Linktype/ExternalLinktype.php:                $isValidUrl = $this->requestUrl($url, 'GET', $options);
+Classes/Linktype/ExternalLinktype.php:            $this->crawlDelay->setLastCheckedTime($this->domain);
+Classes/Linktype/ExternalLinktype.php:        $this->lastChecked = \time();
+Classes/Linktype/ExternalLinktype.php:        $this->insertIntoLinkTargetCache($url, $isValidUrl);
+Classes/Linktype/ExternalLinktype.php:        $this->initializeErrorParams();
+Classes/Linktype/ExternalLinktype.php:            $response = $this->requestFactory->request($url, $method, $options);
+Classes/Linktype/ExternalLinktype.php:            if ($response->getStatusCode() >= 300) {
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrorType(self::ERROR_TYPE_HTTP_STATUS_CODE);
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrno($response->getStatusCode());
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+Classes/Linktype/ExternalLinktype.php:            * ----....├── BadResponseException
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setErrorType(self::ERROR_TYPE_TOO_MANY_REDIRECTS);
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setExceptionMsg($e->getMessage());
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+Classes/Linktype/ExternalLinktype.php:            // ClientException - A GuzzleHttp\Exception\ClientException is thrown for 400 level errors if the http_errors request option is set to true.
+Classes/Linktype/ExternalLinktype.php:            // ServerException - A GuzzleHttp\Exception\ServerException is thrown for 500 level errors if the http_errors request option is set to true.
+Classes/Linktype/ExternalLinktype.php:            if ($e->hasResponse()) {
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrorType(self::ERROR_TYPE_HTTP_STATUS_CODE);
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrno($e->getResponse()->getStatusCode());
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setExceptionMsg($e->getMessage());
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+Classes/Linktype/ExternalLinktype.php:            // RequestException - In the event of a networking error (connection timeout, DNS errors, etc.), a GuzzleHttp\Exception\RequestException is thrown.
+Classes/Linktype/ExternalLinktype.php:            // ConnectException - A GuzzleHttp\Exception\ConnectException exception is thrown in the event of a networking error.
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setExceptionMsg($e->getMessage());
+Classes/Linktype/ExternalLinktype.php:            $handlerContext = $e->getHandlerContext();
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->getExceptionMsg(),
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrorType(self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO);
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrno((int)($handlerContext['errno']));
+Classes/Linktype/ExternalLinktype.php:                    $this->errorParams->setExceptionMsg($handlerContext['error'] ?? $this->errorParams['exception'] ?? '');
+Classes/Linktype/ExternalLinktype.php:                $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setErrorType(self::ERROR_TYPE_UNABLE_TO_PARSE);
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setExceptionMsg($e->getMessage());
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setExceptionMsg($e->getMessage());
+Classes/Linktype/ExternalLinktype.php:            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+Classes/Linktype/ExternalLinktype.php:        return $this->isExcludeUrl;
+Classes/Linktype/ExternalLinktype.php:        return $this->lastChecked;
+Classes/Linktype/ExternalLinktype.php:            $errorParams = $this->errorParams;
+Classes/Linktype/ExternalLinktype.php:        $lang = $this->getLanguageService();
+Classes/Linktype/ExternalLinktype.php:        $errorType = $errorParams->getErrorType();
+Classes/Linktype/ExternalLinktype.php:        $errno = $errorParams->getErrno();
+Classes/Linktype/ExternalLinktype.php:        $exception = $errorParams->getExceptionMsg();
+Classes/Linktype/ExternalLinktype.php:                $message = $lang->getLL('list.report.error.httpstatus.' . $errno);
+Classes/Linktype/ExternalLinktype.php:                        $message = sprintf($lang->getLL('list.report.error.httpstatus.general'), (string)$errno);
+Classes/Linktype/ExternalLinktype.php:                    $message = $lang->getLL('list.report.error.libcurl.' . $errno);
+Classes/Linktype/ExternalLinktype.php:                    $message = $lang->getLL('list.report.error.networkexception');
+Classes/Linktype/ExternalLinktype.php:                    $lang->getLL('list.report.error.redirectloop'),
+Classes/Linktype/ExternalLinktype.php:                $message = $lang->getLL('list.report.error.tooManyRedirects');
+Classes/Linktype/ExternalLinktype.php:     * Convert given URL to punycode to handle domains with non-ASCII characters
+Classes/Linktype/ExternalLinktype.php:        $this->domain = $parts['host'] ?? '';
+Classes/Linktype/InternalLinktype.php: * The TYPO3 project - inspiring people to share!
+Classes/Linktype/InternalLinktype.php:     * @param string $url Url to check as page-id or page-id#anchor (if anchor is present)
+Classes/Linktype/InternalLinktype.php:        $this->initializeErrorParams();
+Classes/Linktype/InternalLinktype.php:        $this->responseContent = true;
+Classes/Linktype/InternalLinktype.php:        $this->responsePage = $this->checkPage($pageUid);
+Classes/Linktype/InternalLinktype.php:            $this->responseContent = $this->checkContent($pageUid, $contentUid);
+Classes/Linktype/InternalLinktype.php:        return  $this->responsePage && $this->responseContent;
+Classes/Linktype/InternalLinktype.php:        $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
+Classes/Linktype/InternalLinktype.php:        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+Classes/Linktype/InternalLinktype.php:        $queryBuilder->getRestrictions()->removeAll();
+Classes/Linktype/InternalLinktype.php:            ->select('uid', 'title', 'deleted', 'hidden', 'starttime', 'endtime')
+Classes/Linktype/InternalLinktype.php:            ->from('pages')
+Classes/Linktype/InternalLinktype.php:            ->where(
+Classes/Linktype/InternalLinktype.php:                $queryBuilder->expr()->eq(
+Classes/Linktype/InternalLinktype.php:                    $queryBuilder->createNamedParameter($pageUid, \PDO::PARAM_INT)
+Classes/Linktype/InternalLinktype.php:            ->executeQuery()
+Classes/Linktype/InternalLinktype.php:            ->fetchAssociative();
+Classes/Linktype/InternalLinktype.php:            $this->errorParams->setCustom($customParams);
+Classes/Linktype/InternalLinktype.php:        $this->errorParams->setErrorType($errorType);
+Classes/Linktype/InternalLinktype.php:        $this->errorParams->setErrno($errno);
+Classes/Linktype/InternalLinktype.php:        $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
+Classes/Linktype/InternalLinktype.php:        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
+Classes/Linktype/InternalLinktype.php:        $queryBuilder->getRestrictions()->removeAll();
+Classes/Linktype/InternalLinktype.php:            ->select('uid', 'pid', 'header', 'deleted', 'hidden', 'starttime', 'endtime')
+Classes/Linktype/InternalLinktype.php:            ->from('tt_content')
+Classes/Linktype/InternalLinktype.php:            ->where(
+Classes/Linktype/InternalLinktype.php:                $queryBuilder->expr()->eq(
+Classes/Linktype/InternalLinktype.php:                    $queryBuilder->createNamedParameter($contentUid, \PDO::PARAM_INT)
+Classes/Linktype/InternalLinktype.php:            ->executeQuery()
+Classes/Linktype/InternalLinktype.php:            ->fetchAssociative();
+Classes/Linktype/InternalLinktype.php:        $this->responseContent = true;
+Classes/Linktype/InternalLinktype.php:            $this->errorParams->addCustom($customParams);
+Classes/Linktype/InternalLinktype.php:        // error type content should not override error type page - there is only 1 main errorType
+Classes/Linktype/InternalLinktype.php:        if ($this->errorParams->getErrorType() === '') {
+Classes/Linktype/InternalLinktype.php:            $this->errorParams->setErrorType($errorType);
+Classes/Linktype/InternalLinktype.php:        $this->errorParams->setErrno($errno);
+Classes/Linktype/InternalLinktype.php:            $errorParams = $this->errorParams;
+Classes/Linktype/InternalLinktype.php:        $lang = $this->getLanguageService();
+Classes/Linktype/InternalLinktype.php:        $custom = $errorParams->getCustom();
+Classes/Linktype/InternalLinktype.php:                    $errorPage = $lang->getLL('list.report.error.page.deleted');
+Classes/Linktype/InternalLinktype.php:                    $errorPage = $lang->getLL('list.report.error.page.notvisible');
+Classes/Linktype/InternalLinktype.php:                    $errorPage = $lang->getLL('list.report.error.page.notexisting');
+Classes/Linktype/InternalLinktype.php:                    $errorContent = $lang->getLL('list.report.error.content.deleted');
+Classes/Linktype/InternalLinktype.php:                    $errorContent = $lang->getLL('list.report.error.content.notvisible');
+Classes/Linktype/InternalLinktype.php:                        $lang->getLL('list.report.error.contentmoved')
+Classes/Linktype/InternalLinktype.php:                    $errorContent = $lang->getLL('list.report.error.content.notexisting');
+Classes/Linktype/InternalLinktype.php:            $response = $lang->getLL('list.report.noinformation');
+Classes/Linktype/InternalLinktype.php:        $site = $siteFinder->getSiteByPageId($pageId);
+Classes/Linktype/InternalLinktype.php:        return (string)($site->getBase() . '/index.php?id=' . $row['url']);
+Classes/Linktype/InternalLinktype.php:        $message = $this->getLanguageService()->getLL('list.report.url.page') . ':';
+Classes/Linktype/InternalLinktype.php:            $message .=  ', ' . $this->getLanguageService()->getLL('list.report.url.element') . ':';
+Classes/Linktype/LinktypeInterface.php: * The TYPO3 project - inspiring people to share!
+Classes/BackendSession/BackendSession.php:        $this->sessionObject = $GLOBALS['BE_USER'];
+Classes/BackendSession/BackendSession.php:        $this->registerFilterKey(self::FILTER_KEY_LINKLIST, BrokenLinkListFilter::class);
+Classes/BackendSession/BackendSession.php:        $this->registerFilterKey(self::FILTER_KEY_MANAGE_EXCLUSIONS, ManageExclusionsFilter::class);
+Classes/BackendSession/BackendSession.php:        if (!$this->isClassImplementsInterface($class, Arrayable::class)) {
+Classes/BackendSession/BackendSession.php:        $this->registeredKeys[$key] = $class;
+Classes/BackendSession/BackendSession.php:        if (!isset($this->registeredKeys[$key])) {
+Classes/BackendSession/BackendSession.php:        $valueArray = $value->toArray();
+Classes/BackendSession/BackendSession.php:        $sessionData = $this->sessionObject->getSessionData(self::STORAGE_KEY_DEFAULT);
+Classes/BackendSession/BackendSession.php:        $this->sessionObject->setAndSaveSessionData(self::STORAGE_KEY_DEFAULT, $sessionData);
+Classes/BackendSession/BackendSession.php:        $sessionData = $this->sessionObject->getSessionData(self::STORAGE_KEY_DEFAULT);
+Classes/BackendSession/BackendSession.php:        $this->sessionObject->setAndSaveSessionData(self::STORAGE_KEY_DEFAULT, $sessionData);
+Classes/BackendSession/BackendSession.php:        $sessionData = $this->sessionObject->getSessionData(self::STORAGE_KEY_DEFAULT);
+Classes/BackendSession/BackendSession.php:            $this->delete($key);
+Classes/BackendSession/BackendSession.php:        if (is_array($result) && isset($this->registeredKeys[$key])) {
+Classes/BackendSession/BackendSession.php:            return call_user_func([$this->registeredKeys[$key], 'getInstanceFromArray'], $result);
+Classes/Filter/Filter.php:        return $this->url_filtre;
+Classes/Filter/Filter.php:        return $this->uid_filtre;
+Classes/Filter/Filter.php:        return $this->title_filter;
+Classes/Filter/Filter.php:        return $this->excludeLinkType_filter;
+Classes/Filter/Filter.php:        return $this->excludeUrl_filter;
+Classes/Filter/Filter.php:        return $this->excludeReason_filter;
+Classes/Filter/Filter.php:        $this->url_filtre = $url_filter;
+Classes/Filter/Filter.php:        $this->uid_filtre = $uid_filter;
+Classes/Filter/Filter.php:        $this->title_filter = $title_filter;
+Classes/Filter/Filter.php:        $this->excludeLinkType_filter = $excludeLinkType_filter;
+Classes/Filter/Filter.php:        $this->excludeUrl_filter = $excludeUrl_filter;
+Classes/Filter/Filter.php:        $this->excludeReason_filter = $excludeReason_filter;
+Classes/Filter/Filter.php:        return $this->excludeStoragePid ?: -1;
+Classes/Filter/Filter.php:        $this->excludeStoragePid = $excludeStoragePid;
+Classes/Hooks/DataHandlerHook.php: * The TYPO3 project - inspiring people to share!
+Classes/Hooks/DataHandlerHook.php:        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
+Classes/Hooks/DataHandlerHook.php:        $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+Classes/Hooks/DataHandlerHook.php:        if ($dataHandler->isImporting
+Classes/Hooks/DataHandlerHook.php:            || $dataHandler->BE_USER->workspace > 0
+Classes/Hooks/DataHandlerHook.php:            $this->removeBrokenLinkRecordsForExcludedLinkTarget($row);
+Classes/Hooks/DataHandlerHook.php:            $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
+Classes/Hooks/DataHandlerHook.php:        $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
+Classes/Hooks/DataHandlerHook.php:        $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
+Classes/Hooks/PageCalloutsHook.php: * The TYPO3 project - inspiring people to share!
+Classes/Hooks/PageCalloutsHook.php:        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
+Classes/Hooks/PageCalloutsHook.php:        $lang = $this->getLanguageService();
+Classes/Hooks/PageCalloutsHook.php:        $count = $this->brokenLinkRepository->getLinkCountForPage($pageId);
+Classes/Hooks/PageCalloutsHook.php:        $moduleLoader->load($GLOBALS['TBE_MODULES']);
+Classes/Hooks/PageCalloutsHook.php:        $modules = $moduleLoader->modules;
+Classes/Hooks/PageCalloutsHook.php:        //$title = $lang->getLL('goToListModule');
+Classes/Hooks/PageCalloutsHook.php:        //$message = '<p>' . $lang->getLL('goToListModuleMessage') . '</p>';
+Classes/Hooks/PageCalloutsHook.php:            ($count === 1 ? $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_singular_broken_links_found_for_page')
+Classes/Hooks/PageCalloutsHook.php:                : $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_plural_broken_links_found_for_page'))
+Classes/Hooks/PageCalloutsHook.php:        $message .= '<p>' . ($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:goto') ?: '');
+Classes/Hooks/PageCalloutsHook.php:        $message .= ' <a class="btn btn-info" href="javascript:top.goToModule(\'web_brofix\',1);">'
+Classes/Hooks/PageCalloutsHook.php:            . ($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang_mod.xlf:mlang_tabs_tab') ?: 'Brofix')
+Classes/FormEngine/FieldShouldBeChecked.php: * The TYPO3 project - inspiring people to share!
+Classes/FormEngine/FieldShouldBeChecked.php:        $orderedProviderList->setProviderList(
+Classes/FormEngine/FieldShouldBeChecked.php:        return $orderedProviderList->compile($result);
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php: * The TYPO3 project - inspiring people to share!
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        $queryBuilder = $this->generateQueryBuilder();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $expire = $expire ?: $this->expire;
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $constraints[] = $queryBuilder->expr()->neq(
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $constraints[] = $queryBuilder->expr()->gt(
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->createNamedParameter(\time()-$expire, \PDO::PARAM_INT)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->count('uid')
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->from(static::TABLE)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->where(...$constraints)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->executeQuery()
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->fetchOne() > 0;
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:     * @param int $expire (optional, default is 0, in that case uses $this->expire)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        $expire = $expire ?: $this->expire;
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        $queryBuilder = $this->generateQueryBuilder();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->select('url_response', 'last_check')
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->from(static::TABLE)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->where(
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->neq('last_check', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->gt('last_check', $queryBuilder->createNamedParameter(\time()-$expire, \PDO::PARAM_INT))
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->executeQuery()
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->fetchAssociative();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        if ($this->hasEntryForUrl($linkTarget, $linkType, false)) {
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $this->update($linkTarget, $linkType, $urlResponse, $checkStatus);
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            $this->insert($linkTarget, $linkType, $urlResponse, $checkStatus);
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        $queryBuilder = $this->generateQueryBuilder();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->insert(static::TABLE)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->values(
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->executeStatement();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        $queryBuilder = $this->generateQueryBuilder();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->update(static::TABLE)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->where(
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->set('url_response', \json_encode($urlResponse))
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->set('check_status', (string)$checkStatus)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->set('last_check', (string)\time())
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->executeStatement();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->getQueryBuilderForTable(static::TABLE);
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->delete(static::TABLE)
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->where(
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:                $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:            ->executeStatement();
+Classes/CheckLinks/LinkTargetCache/LinkTargetPersistentCache.php:        return $connectionPool->getQueryBuilderForTable($table);
+Classes/CheckLinks/LinkTargetCache/LinkTargetCacheInterface.php: * The TYPO3 project - inspiring people to share!
+Classes/CheckLinks/LinkTargetCache/LinkTargetCacheInterface.php:     * @param int $expire (optional, default is 0, in that case uses $this->expire)
+Classes/CheckLinks/LinkTargetCache/AbstractLinkTargetCache.php: * The TYPO3 project - inspiring people to share!
+Classes/CheckLinks/LinkTargetCache/AbstractLinkTargetCache.php:     * default: 1 week - 1hour
+Classes/CheckLinks/LinkTargetCache/AbstractLinkTargetCache.php:        $this->expire = $expire;
+Classes/CheckLinks/LinkTargetCache/AbstractLinkTargetCache.php:            'errorParams' => $errorParams->toArray()
+Classes/CheckLinks/ExcludeLinkTarget.php: * The TYPO3 project - inspiring people to share!
+Classes/CheckLinks/ExcludeLinkTarget.php:        $this->excludeLinkTargetsPid = $pid;
+Classes/CheckLinks/ExcludeLinkTarget.php:     * @param string $url - check if this URL is in exclude list
+Classes/CheckLinks/ExcludeLinkTarget.php:        if (!$this->isTableExists()) {
+Classes/CheckLinks/ExcludeLinkTarget.php:        $queryBuilder = $this->generateQueryBuilder();
+Classes/CheckLinks/ExcludeLinkTarget.php:            $queryBuilder->expr()->and(
+Classes/CheckLinks/ExcludeLinkTarget.php:                $queryBuilder->expr()->eq(
+Classes/CheckLinks/ExcludeLinkTarget.php:                    $queryBuilder->createNamedParameter($url)
+Classes/CheckLinks/ExcludeLinkTarget.php:                $queryBuilder->expr()->eq(
+Classes/CheckLinks/ExcludeLinkTarget.php:                    $queryBuilder->createNamedParameter(self::MATCH_BY_EXACT)
+Classes/CheckLinks/ExcludeLinkTarget.php:            $matchConstraints[] = $queryBuilder->expr()->and(
+Classes/CheckLinks/ExcludeLinkTarget.php:                $queryBuilder->expr()->like(
+Classes/CheckLinks/ExcludeLinkTarget.php:                    $queryBuilder->createNamedParameter($parts['host'])
+Classes/CheckLinks/ExcludeLinkTarget.php:                $queryBuilder->expr()->eq(
+Classes/CheckLinks/ExcludeLinkTarget.php:                    $queryBuilder->createNamedParameter(self::MATCH_BY_DOMAIN)
+Classes/CheckLinks/ExcludeLinkTarget.php:            $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
+Classes/CheckLinks/ExcludeLinkTarget.php:            $queryBuilder->expr()->or(...$matchConstraints)
+Classes/CheckLinks/ExcludeLinkTarget.php:        if ($this->excludeLinkTargetsPid !== 0) {
+Classes/CheckLinks/ExcludeLinkTarget.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/CheckLinks/ExcludeLinkTarget.php:                $queryBuilder->createNamedParameter($this->excludeLinkTargetsPid, \PDO::PARAM_INT)
+Classes/CheckLinks/ExcludeLinkTarget.php:            ->count('uid')
+Classes/CheckLinks/ExcludeLinkTarget.php:            ->from(static::TABLE)
+Classes/CheckLinks/ExcludeLinkTarget.php:            ->where(
+Classes/CheckLinks/ExcludeLinkTarget.php:            ->executeQuery()
+Classes/CheckLinks/ExcludeLinkTarget.php:            ->fetchOne());
+Classes/CheckLinks/ExcludeLinkTarget.php:        if ($GLOBALS['BE_USER']->isAdmin()) {
+Classes/CheckLinks/ExcludeLinkTarget.php:        if ($GLOBALS['BE_USER']->check('tables_modify', static::TABLE)
+Classes/CheckLinks/ExcludeLinkTarget.php:            $queryBuilder = $this->generateQueryBuilder('pages');
+Classes/CheckLinks/ExcludeLinkTarget.php:                ->select('*')
+Classes/CheckLinks/ExcludeLinkTarget.php:                ->from('pages')
+Classes/CheckLinks/ExcludeLinkTarget.php:                ->where(
+Classes/CheckLinks/ExcludeLinkTarget.php:                    $queryBuilder->expr()->eq(
+Classes/CheckLinks/ExcludeLinkTarget.php:                        $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+Classes/CheckLinks/ExcludeLinkTarget.php:                ->executeQuery()
+Classes/CheckLinks/ExcludeLinkTarget.php:                ->fetchAssociative();
+Classes/CheckLinks/ExcludeLinkTarget.php:            return $GLOBALS['BE_USER']->doesUserHaveAccess($row, 16);
+Classes/CheckLinks/ExcludeLinkTarget.php:            ->getConnectionForTable(static::TABLE);
+Classes/CheckLinks/ExcludeLinkTarget.php:        if ($connection->getSchemaManager()->tablesExist(static::TABLE)) {
+Classes/CheckLinks/ExcludeLinkTarget.php:        return $connectionPool->getQueryBuilderForTable($table);
+Classes/CheckLinks/CheckLinksStatistics.php: * The TYPO3 project - inspiring people to share!
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->checkStartTime = \time();
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countExcludedLinks = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countBrokenLinks = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countPages = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countLinks = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->percentBrokenLinks = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->percentExcludedLinks = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->pageTitle = '';
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->checkEndTime = \time();
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countLinksChecked = $this->countLinks - $this->countExcludedLinks;
+Classes/CheckLinks/CheckLinksStatistics.php:        if ($this->countExcludedLinks > 0
+Classes/CheckLinks/CheckLinksStatistics.php:            && $this->countLinks > 0
+Classes/CheckLinks/CheckLinksStatistics.php:            $this->percentExcludedLinks = $this->countExcludedLinks / $this->countLinks * 100;
+Classes/CheckLinks/CheckLinksStatistics.php:            $this->percentExcludedLinks = 0;
+Classes/CheckLinks/CheckLinksStatistics.php:        if ($this->countLinksChecked > 0
+Classes/CheckLinks/CheckLinksStatistics.php:            && $this->countBrokenLinks > 0
+Classes/CheckLinks/CheckLinksStatistics.php:            $this->percentBrokenLinks = $this->countBrokenLinks / $this->countLinksChecked * 100;
+Classes/CheckLinks/CheckLinksStatistics.php:            $this->percentBrokenLinks =  0;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countExcludedLinks++;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countBrokenLinks++;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countLinks += $count;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->countPages = $count;
+Classes/CheckLinks/CheckLinksStatistics.php:        $this->pageTitle = $pageTitle;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->pageTitle;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->countPages;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->countLinks;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->countBrokenLinks;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->countExcludedLinks;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->checkStartTime;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->checkEndTime;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->countLinksChecked;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->percentExcludedLinks;
+Classes/CheckLinks/CheckLinksStatistics.php:        return $this->percentBrokenLinks;
+Classes/CheckLinks/CrawlDelay.php: * The TYPO3 project - inspiring people to share!
+Classes/CheckLinks/CrawlDelay.php:        $this->delaySeconds = $config->getCrawlDelaySeconds();
+Classes/CheckLinks/CrawlDelay.php:        $this->noCrawlDelayDomains = $config->getCrawlDelayNodelay();
+Classes/CheckLinks/CrawlDelay.php:        if ($domain === '' || in_array($domain, $this->noCrawlDelayDomains)) {
+Classes/CheckLinks/CrawlDelay.php:        $lastTimestamp = $this->lastCheckedDomainTimestamps[$domain] ?? 0;
+Classes/CheckLinks/CrawlDelay.php:        $wait = $this->delaySeconds - ($current-$lastTimestamp);
+Classes/CheckLinks/CrawlDelay.php:        $this->lastCheckedDomainTimestamps[$domain] = $current;
+Classes/CheckLinks/CrawlDelay.php:     * Store time for last check of this URL - used for crawlDelay.
+Classes/CheckLinks/CrawlDelay.php:        $this->lastCheckedDomainTimestamps[$domain] = $current;
+Classes/Configuration/Configuration.php: * The TYPO3 project - inspiring people to share!
+Classes/Configuration/Configuration.php:            $this->setTsConfig($tsConfig);
+Classes/Configuration/Configuration.php:        $this->tsConfig = $tsConfig;
+Classes/Configuration/Configuration.php:        $this->setTsConfig(BackendUtility::getPagesTSconfig($page)['mod.']['brofix.'] ?? []);
+Classes/Configuration/Configuration.php:     * $this->tsconfig with the values.
+Classes/Configuration/Configuration.php:        $parseObj->parse($tsConfigString);
+Classes/Configuration/Configuration.php:        if (!empty($parseObj->errors)) {
+Classes/Configuration/Configuration.php:            foreach ($parseObj->errors as $errorInfo) {
+Classes/Configuration/Configuration.php:        $tsConfig = $parseObj->setup;
+Classes/Configuration/Configuration.php:            ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $overrideTs);
+Classes/Configuration/Configuration.php:        return $this->tsConfig;
+Classes/Configuration/Configuration.php:        unset($this->tsConfig['searchFields.']);
+Classes/Configuration/Configuration.php:            $this->tsConfig['searchFields.'][$table] = implode(',', $fields);
+Classes/Configuration/Configuration.php:        if (!isset($this->tsConfig['searchFields.'])) {
+Classes/Configuration/Configuration.php:        foreach ($this->tsConfig['searchFields.'] as $table => $fieldList) {
+Classes/Configuration/Configuration.php:        return explode(',', (string)($this->tsConfig['excludeCtype'] ?? ''));
+Classes/Configuration/Configuration.php:        $this->tsConfig['linktypes'] = implode(',', $linkTypes);
+Classes/Configuration/Configuration.php:        return explode(',', $this->tsConfig['linktypes'] ?? 'external,db,file');
+Classes/Configuration/Configuration.php:        $doktypes = explode(',', $this->tsConfig['check.']['doNotCheckContentOnPagesDoktypes'] ?? '3,4');
+Classes/Configuration/Configuration.php:        $doktypes = explode(',', $this->tsConfig['check.']['doNotCheckPagesDoktypes'] ?? '6,7,199,255');
+Classes/Configuration/Configuration.php:        $doktypes = explode(',', $this->tsConfig['check.']['doNotTraversePagesDoktypes'] ?? '6,199,255');
+Classes/Configuration/Configuration.php:        return (bool)($this->tsConfig['checkhidden'] ?? false);
+Classes/Configuration/Configuration.php:        return (bool)($this->tsConfig['reportHiddenRecords'] ?? true);
+Classes/Configuration/Configuration.php:        return $this->tsConfig['linktypesConfig.'][$linktype . '.'] ?? [];
+Classes/Configuration/Configuration.php:        $headers = $this->tsConfig['linktypesConfig.']['external.']['headers.'] ?? [];
+Classes/Configuration/Configuration.php:        if (($headers['User-Agent'] ?? '') === '') {
+Classes/Configuration/Configuration.php:            $headers['User-Agent'] = $this->getUserAgent();
+Classes/Configuration/Configuration.php:        return $this->tsConfig['linktypesConfig.']['external.']['headers.']['User-Agent'] ??
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['linktypesConfig.']['external.']['timeout'] ?? 10);
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['linktypesConfig.']['external.']['redirects'] ?? 5);
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['excludeLinkTarget.']['storagePid'] ?? 0);
+Classes/Configuration/Configuration.php:        return explode(',', $this->tsConfig['excludeLinkTarget.']['allowed'] ?? 'external');
+Classes/Configuration/Configuration.php:            return (int)($this->tsConfig['linkTargetCache.']['expiresHigh'] ?? 604800);
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['linkTargetCache.']['expiresLow'] ?? 518400);
+Classes/Configuration/Configuration.php:        if (isset($this->tsConfig['crawlDelay.']['seconds'])) {
+Classes/Configuration/Configuration.php:            return (int)($this->tsConfig['crawlDelay.']['seconds'] * 1000);
+Classes/Configuration/Configuration.php:        if (isset($this->tsConfig['crawlDelay.']['ms'])) {
+Classes/Configuration/Configuration.php:            return (int)($this->tsConfig['crawlDelay.']['ms']);
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['crawlDelay.']['seconds'] ?? 5);
+Classes/Configuration/Configuration.php:        return explode(',', $this->tsConfig['crawlDelay.']['nodelay'] ?? '');
+Classes/Configuration/Configuration.php:        return $this->tsConfig['report.']['docsurl'] ?? '';
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['report.']['recheckButton'] ?? -1);
+Classes/Configuration/Configuration.php:        return (bool)($this->tsConfig['mail.']['sendOnCheckLinks'] ?? true);
+Classes/Configuration/Configuration.php:        $this->tsConfig['mail.']['sendOnCheckLinks'] = $value;
+Classes/Configuration/Configuration.php:        return (int)($this->tsConfig['depth'] ?? 999);
+Classes/Configuration/Configuration.php:        $this->tsConfig['depth'] = $depth;
+Classes/Configuration/Configuration.php:        $this->tsConfig['mail.']['recipients'] = $recipients;
+Classes/Configuration/Configuration.php:        $recipients = trim($this->tsConfig['mail.']['recipients'] ?? '');
+Classes/Configuration/Configuration.php:        return $this->tsConfig['mail.']['template'] ?? 'CheckLinksResults';
+Classes/Configuration/Configuration.php:        if (($this->tsConfig['mail.']['fromemail'] ?? '') !== '') {
+Classes/Configuration/Configuration.php:            return $this->tsConfig['mail.']['fromemail'];
+Classes/Configuration/Configuration.php:        if (($this->tsConfig['mail.']['from'] ?? '') !== '') {
+Classes/Configuration/Configuration.php:            return explode(' ', $this->tsConfig['mail.']['from'])[0];
+Classes/Configuration/Configuration.php:        if (($this->tsConfig['mail.']['fromname'] ?? '') !== '') {
+Classes/Configuration/Configuration.php:            return $this->tsConfig['mail.']['fromname'];
+Classes/Configuration/Configuration.php:        if (($this->tsConfig['mail.']['replytoemail'] ?? '') !== '') {
+Classes/Configuration/Configuration.php:            return $this->tsConfig['mail.']['replytoemail'];
+Classes/Configuration/Configuration.php:        if (($this->tsConfig['mail.']['replyto'] ?? '') !== '') {
+Classes/Configuration/Configuration.php:            return explode(' ', $this->tsConfig['mail.']['replyto'])[0];
+Classes/Configuration/Configuration.php:        if (($this->tsConfig['mail.']['replytoname'] ?? '') !== '') {
+Classes/Configuration/Configuration.php:            return $this->tsConfig['mail.']['replytoname'];
+Classes/Configuration/Configuration.php:        return $this->tsConfig['mail.']['subject'] ?? '';
+Classes/Configuration/Configuration.php:        return $this->tsConfig['mail.']['language'] ?? 'en';
+Classes/Configuration/Configuration.php:        return $this->tsConfig['custom.'] ?? [];
+Classes/Mail/GenerateCheckResultFluidMail.php: * The TYPO3 project - inspiring people to share!
+Classes/Mail/GenerateCheckResultFluidMail.php:        $recipients = $config->getMailRecipients();
+Classes/Mail/GenerateCheckResultFluidMail.php:        $from = $config->getMailFromEmail();
+Classes/Mail/GenerateCheckResultFluidMail.php:        $fluidEmail->to(...$recipients)
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->from(new Address($from, $config->getMailFromName()))
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->format($GLOBALS['TYPO3_CONF_VARS']['MAIL']['format'] ?? 'both')
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->setTemplate($config->getMailTemplate())
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->assign('stats', $stats)
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->assign('depth', $config->getDepth())
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->assign('subject', $config->getMailSubject())
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->assign('language', $config->getMailLanguage())
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->assign('padLength', 32)
+Classes/Mail/GenerateCheckResultFluidMail.php:            ->assign('pageId', $pageId);
+Classes/Mail/GenerateCheckResultFluidMail.php:        $replyTo = $config->getMailReplyToEmail();
+Classes/Mail/GenerateCheckResultFluidMail.php:            $fluidEmail->replyTo($replyTo);
+Classes/Mail/GenerateCheckResultFluidMail.php:        $subject = $config->getMailSubject();
+Classes/Mail/GenerateCheckResultFluidMail.php:            $fluidEmail->subject($subject);
+Classes/Mail/GenerateCheckResultFluidMail.php:        $this->mailer->send($fluidEmail);
+Classes/Mail/GenerateCheckResultFluidMail.php:        $sentMessage = $this->mailer->getSentMessage();
+Classes/Mail/GenerateCheckResultFluidMail.php:        $this->messageId = $sentMessage->getMessageId();
+Classes/Mail/GenerateCheckResultMailInterface.php: * The TYPO3 project - inspiring people to share!
+Classes/Mail/AbstractGenerateCheckResultMail.php: * The TYPO3 project - inspiring people to share!
+Classes/Mail/AbstractGenerateCheckResultMail.php:        $this->mailer = $mailer ?: GeneralUtility::makeInstance(Mailer::class);
+Classes/Mail/AbstractGenerateCheckResultMail.php:        return $this->messageId;
+Classes/Controller/BackendUser/BackendUserInformation.php:        $this->brokenLinkList = $brokenLinkList;
+Classes/Controller/BackendUser/BackendUserInformation.php:        $this->excludeLinks = $excludeLinks;
+Classes/Controller/BackendUser/BackendUserInformation.php:        return $this->brokenLinkList;
+Classes/Controller/BackendUser/BackendUserInformation.php:        return $this->excludeLinks;
+Classes/Controller/AbstractBrofixController.php:        $this->iconFactory = $iconFactory;
+Classes/Controller/AbstractBrofixController.php:        $this->configuration = $configuration;
+Classes/Controller/AbstractBrofixController.php:        $this->backendSession = $backendSession;
+Classes/Controller/AbstractBrofixController.php:        $this->moduleTemplate = $moduleTemplate;
+Classes/Controller/AbstractBrofixController.php:        $this->excludeLinkTarget = $excludeLinkTarget;
+Classes/Controller/AbstractBrofixController.php:        $this->paginationCurrentPage = 1;
+Classes/Controller/AbstractBrofixController.php:            'id' => $this->id,
+Classes/Controller/AbstractBrofixController.php:            'orderBy' => $this->orderBy,
+Classes/Controller/AbstractBrofixController.php:            'paginationPage', $this->paginationCurrentPage
+Classes/Controller/AbstractBrofixController.php:        return (string)$uriBuilder->buildUriFromRoute($route, $parameters);
+Classes/Controller/AbstractBrofixController.php:     * Fetch the site language objects for the given $pageId and store it in $this->siteLanguages
+Classes/Controller/AbstractBrofixController.php:        $site = $siteMatcher->matchByPageId($pageId);
+Classes/Controller/AbstractBrofixController.php:        $this->siteLanguages = $site->getAvailableLanguages($this->getBackendUser(), true, $pageId);
+Classes/Controller/AbstractBrofixController.php:        return $this->getBackendUser()->isAdmin();
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->setExcludeLinkTypeFilter($linkType);
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->setExcludeUrlFilter($url);
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->setExcludeReasonFilter($reason);
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->setExcludeStoragePid($storagePid);
+Classes/Controller/Filter/ManageExclusionsFilter.php:            self::KEY_LINKTYPE => $this->getExcludeLinkTypeFilter(),
+Classes/Controller/Filter/ManageExclusionsFilter.php:            self::KEY_URL => $this->getExcludeUrlFilter(),
+Classes/Controller/Filter/ManageExclusionsFilter.php:            self::KEY_REASON => $this->getExcludeReasonFilter(),
+Classes/Controller/Filter/ManageExclusionsFilter.php:            self::KEY_STORAGE_PID => $this->getExcludeStoragePid(),
+Classes/Controller/Filter/ManageExclusionsFilter.php:        return $this->excludeLinkType_filter;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        return $this->excludeUrl_filter;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        return $this->excludeReason_filter;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->excludeLinkType_filter = $excludeLinkType_filter;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->excludeUrl_filter = $excludeUrl_filter;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->excludeReason_filter = $excludeReason_filter;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        return $this->excludeStoragePid ?: -1;
+Classes/Controller/Filter/ManageExclusionsFilter.php:        $this->excludeStoragePid = $excludeStoragePid;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->uid_filtre = $uid;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->linktype_filter = $linkType;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->url_filtre = $url;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->urlFilterMatch = $urlMatch;
+Classes/Controller/Filter/BrokenLinkListFilter.php:            self::KEY_UID => $this->getUidFilter(),
+Classes/Controller/Filter/BrokenLinkListFilter.php:            self::KEY_LINKTYPE => $this->getLinktypeFilter(),
+Classes/Controller/Filter/BrokenLinkListFilter.php:            self::KEY_URL => $this->getUrlFilter(),
+Classes/Controller/Filter/BrokenLinkListFilter.php:            self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
+Classes/Controller/Filter/BrokenLinkListFilter.php:     * - we do not include the View mode in this check since this will
+Classes/Controller/Filter/BrokenLinkListFilter.php:        if ($this->getUidFilter()
+Classes/Controller/Filter/BrokenLinkListFilter.php:            || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER_DEFAULT
+Classes/Controller/Filter/BrokenLinkListFilter.php:            || $this->getUrlFilter()
+Classes/Controller/Filter/BrokenLinkListFilter.php:        return $this->uid_filtre;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->uid_filtre = trim($uid_filter);
+Classes/Controller/Filter/BrokenLinkListFilter.php:        return $this->linktype_filter;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->linktype_filter = $linktype_filter;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        return $this->url_filtre;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->url_filtre = trim($url_filter);
+Classes/Controller/Filter/BrokenLinkListFilter.php:        return $this->urlFilterMatch;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->urlFilterMatch = $urlFilterMatch;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        return $this->viewMode;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->viewMode = $viewMode;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        return $this->title_filter;
+Classes/Controller/Filter/BrokenLinkListFilter.php:        $this->title_filter = $title_filter;
+Classes/Controller/ManageExclusionsController.php:        $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
+Classes/Controller/ManageExclusionsController.php:        $this->filter = $filter ?: GeneralUtility::makeInstance(ManageExclusionsFilter::class);
+Classes/Controller/ManageExclusionsController.php:        $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
+Classes/Controller/ManageExclusionsController.php:        $this->localizationUtility = $localizationUtility ?? GeneralUtility::makeInstance(LocalizationUtility::class);
+Classes/Controller/ManageExclusionsController.php:        $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
+Classes/Controller/ManageExclusionsController.php:        $this->pObj = $pObj;
+Classes/Controller/ManageExclusionsController.php:        $this->storagePid = $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid();
+Classes/Controller/ManageExclusionsController.php:            // work-around, because this->id does not work if "Refresh display" is used
+Classes/Controller/ManageExclusionsController.php:            $this->id = (int)$val;
+Classes/Controller/ManageExclusionsController.php:            $this->resolveSiteLanguages($this->id);
+Classes/Controller/ManageExclusionsController.php:            $this->id = 0;
+Classes/Controller/ManageExclusionsController.php:        $this->view = $this->createView(self::TEMPLATE_NAME);
+Classes/Controller/ManageExclusionsController.php:        if ($this->id !== 0) {
+Classes/Controller/ManageExclusionsController.php:            $this->configuration->loadPageTsConfig($this->id);
+Classes/Controller/ManageExclusionsController.php:                = $this->excludeLinkTarget->currentUserHasCreatePermissions(
+Classes/Controller/ManageExclusionsController.php:                    $this->configuration->getExcludeLinkTargetStoragePid()
+Classes/Controller/ManageExclusionsController.php:        $this->backendUserInformation = new BackendUserInformation(false, $hasPermissions);
+Classes/Controller/ManageExclusionsController.php:        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+Classes/Controller/ManageExclusionsController.php:        if ($this->backendUserInformation->hasPermissionExcludeLinks()) {
+Classes/Controller/ManageExclusionsController.php:            $this->getSettingsFromQueryParameters();
+Classes/Controller/ManageExclusionsController.php:            $this->initializeRenderer();
+Classes/Controller/ManageExclusionsController.php:            $this->initializeExclusionView();
+Classes/Controller/ManageExclusionsController.php:            $this->moduleTemplate->addFlashMessage(
+Classes/Controller/ManageExclusionsController.php:                $this->getLanguageService()->getLL('no.access'),
+Classes/Controller/ManageExclusionsController.php:                $this->getLanguageService()->getLL('no.access.title'),
+Classes/Controller/ManageExclusionsController.php:        return $this->view->render();
+Classes/Controller/ManageExclusionsController.php:        $view->setLayoutRootPaths(['EXT:brofix/Resources/Private/Layouts']);
+Classes/Controller/ManageExclusionsController.php:        $view->setPartialRootPaths(['EXT:brofix/Resources/Private/Partials']);
+Classes/Controller/ManageExclusionsController.php:        $view->setTemplateRootPaths(['EXT:brofix/Resources/Private/Templates/Backend']);
+Classes/Controller/ManageExclusionsController.php:        $view->setTemplate($templateName);
+Classes/Controller/ManageExclusionsController.php:        $view->assign('currentPage', $this->id);
+Classes/Controller/ManageExclusionsController.php:        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+Classes/Controller/ManageExclusionsController.php:        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
+Classes/Controller/ManageExclusionsController.php:        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
+Classes/Controller/ManageExclusionsController.php:        // $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/ManageExclusions');
+Classes/Controller/ManageExclusionsController.php:        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+Classes/Controller/ManageExclusionsController.php:        $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+Classes/Controller/ManageExclusionsController.php:        $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage') ?? 1);
+Classes/Controller/ManageExclusionsController.php:        $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
+Classes/Controller/ManageExclusionsController.php:        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
+Classes/Controller/ManageExclusionsController.php:        $this->orderBy = (string)(GeneralUtility::_GP('orderBy') ?? self::ORDER_BY_DEFAULT);
+Classes/Controller/ManageExclusionsController.php:        $this->filter->setExcludeLinkTypeFilter(GeneralUtility::_GP('excludeLinkType_filter') ?? '');
+Classes/Controller/ManageExclusionsController.php:        $this->filter->setExcludeUrlFilter(GeneralUtility::_GP('excludeUrl_filter') ?? '');
+Classes/Controller/ManageExclusionsController.php:        $this->filter->setExcludeReasonFilter(GeneralUtility::_GP('excludeReason_filter') ?? '');
+Classes/Controller/ManageExclusionsController.php:            $this->backendSession->store(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS, $this->filter);
+Classes/Controller/ManageExclusionsController.php:        if (is_null($this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS))) {
+Classes/Controller/ManageExclusionsController.php:            $this->backendSession->store(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS, new ManageExclusionsFilter());
+Classes/Controller/ManageExclusionsController.php:        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS);
+Classes/Controller/ManageExclusionsController.php:            $searchFilter = ManageExclusionsFilter::getInstanceFromArray($arrayable->toArray());
+Classes/Controller/ManageExclusionsController.php:        $searchFilter->setExcludeStoragePid($this->storagePid);
+Classes/Controller/ManageExclusionsController.php:        $exclusions = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(
+Classes/Controller/ManageExclusionsController.php:            self::ORDER_BY_VALUES[$this->orderBy] ?? []
+Classes/Controller/ManageExclusionsController.php:                $this->paginationCurrentPage,
+Classes/Controller/ManageExclusionsController.php:            $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
+Classes/Controller/ManageExclusionsController.php:            foreach ($paginator->getPaginatedItems() as $row) {
+Classes/Controller/ManageExclusionsController.php:                $items[] = $this->renderTableRow($row);
+Classes/Controller/ManageExclusionsController.php:            $this->pagination = null;
+Classes/Controller/ManageExclusionsController.php:        $exclusions = $this->initializeExclusions();
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('totalCount', $exclusions['totalCount']);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('title', 'Excludes Links');
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('brokenLinks', $exclusions['items']);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('pagination', $this->pagination);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('currentPage', $this->id);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('hasPermission', $this->backendUserInformation->hasPermissionExcludeLinks());
+Classes/Controller/ManageExclusionsController.php:            $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('sortActions', $sortActions);
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+Classes/Controller/ManageExclusionsController.php:        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS);
+Classes/Controller/ManageExclusionsController.php:            $searchFilter = ManageExclusionsFilter::getInstanceFromArray($arrayable->toArray());
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('excludeUrl_filter', $searchFilter->getExcludeUrlFilter());
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('excludeLinkType_filter', $searchFilter->getExcludeLinkTypeFilter());
+Classes/Controller/ManageExclusionsController.php:        $this->view->assign('excludeReason_filter', $searchFilter->getExcludeReasonFilter());
+Classes/Controller/ManageExclusionsController.php:        $languageService = $this->getLanguageService();
+Classes/Controller/ManageExclusionsController.php:            $tableHeadData[$key]['label'] = $languageService->getLL('columnHeader.' . $key);
+Classes/Controller/ManageExclusionsController.php:                if ($this->orderBy === $key) {
+Classes/Controller/ManageExclusionsController.php:                if ($this->orderBy === $key) {
+Classes/Controller/ManageExclusionsController.php:                    $tableHeadData[$key]['icon'] = 'status-status-sorting-asc';
+Classes/Controller/ManageExclusionsController.php:                } elseif ($this->orderBy === $key . '_reverse') {
+Classes/Controller/ManageExclusionsController.php:                    $tableHeadData[$key]['icon'] = 'status-status-sorting-desc';
+Classes/Controller/ManageExclusionsController.php:                    '<a href="%s" style="text-decoration: underline;">%s</a>',
+Classes/Controller/ManageExclusionsController.php:            $headerCsv[] = $this->charsetConverter->conv($itemsArray[$i], 'utf-8', 'iso-8859-15');
+Classes/Controller/ManageExclusionsController.php:        $title = 'excluded-links' . date('Y-m-d_H-i');
+Classes/Controller/ManageExclusionsController.php:            ['Content-Type' => 'text/csv; charset=utf-8',
+Classes/Controller/ManageExclusionsController.php:                'Content-Description' => 'File transfer',
+Classes/Controller/ManageExclusionsController.php:                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+Classes/Controller/ManageExclusionsController.php:        //CSV HEADERS Using Translate File and respecting UTF-8 Charset for Special Char
+Classes/Controller/ManageExclusionsController.php:        $headerCsv = $this->generateCsvHeaderArray($LangArrayHeader);
+Classes/Controller/ManageExclusionsController.php:        $excludedLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(new ManageExclusionsFilter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);
+Classes/Controller/ManageExclusionsController.php:        fputcsv($fp, $headerCsv, ';', ' - ');
+Classes/Controller/ManageExclusionsController.php:                $arrayData[] = $this->localizationUtility->translate(Self::MODULE_LANG_FILE . 'records.isHidden');
+Classes/Controller/ManageExclusionsController.php:                $arrayData[] = $this->localizationUtility->translate(Self::MODULE_LANG_FILE . 'records.isNotHidden');
+Classes/Controller/ManageExclusionsController.php:            $arrayData[] = date('Y-m-d - H-i', $item['crdate']);
+Classes/Controller/ManageExclusionsController.php:                $arrayData[] = $this->localizationUtility->translate(Self::MODULE_LANG_FILE . 'records.reason2');
+Classes/Controller/ManageExclusionsController.php:                $arrayData[] = $this->localizationUtility->translate(Self::MODULE_LANG_FILE . 'records.reason1');
+Classes/Controller/ManageExclusionsController.php:        $urlParam = $request->getQueryParams();
+Classes/Controller/ManageExclusionsController.php:        $this->excludeLinkTargetRepository->deleteExcludeLink($urlParam['input']);
+Classes/Controller/ManageExclusionsController.php:        $response->getBody()->write(json_encode($data));
+Classes/Controller/BrokenLinkListController.php: * Module 'Check links' as sub module of Web -> Info
+Classes/Controller/BrokenLinkListController.php:        // -> this means records on the page and record on the content will not necessarily be
+Classes/Controller/BrokenLinkListController.php:     * -1 means not initialized
+Classes/Controller/BrokenLinkListController.php:    protected $depth = -1;
+Classes/Controller/BrokenLinkListController.php:        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
+Classes/Controller/BrokenLinkListController.php:        $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
+Classes/Controller/BrokenLinkListController.php:        $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
+Classes/Controller/BrokenLinkListController.php:        $this->orderBy = BrokenLinkListController::ORDER_BY_DEFAULT;
+Classes/Controller/BrokenLinkListController.php:        $this->pObj = $pObj;
+Classes/Controller/BrokenLinkListController.php:            // work-around, because this->id does not work if "Refresh display" is used
+Classes/Controller/BrokenLinkListController.php:            $this->id = (int)$val;
+Classes/Controller/BrokenLinkListController.php:            $this->resolveSiteLanguages($this->id);
+Classes/Controller/BrokenLinkListController.php:            $this->id = 0;
+Classes/Controller/BrokenLinkListController.php:        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+Classes/Controller/BrokenLinkListController.php:        if ($this->id !== 0) {
+Classes/Controller/BrokenLinkListController.php:            $this->configuration->loadPageTsConfig($this->id);
+Classes/Controller/BrokenLinkListController.php:        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+Classes/Controller/BrokenLinkListController.php:        $this->getSettingsFromQueryParameters();
+Classes/Controller/BrokenLinkListController.php:        $this->view = $this->createView('BrokenLinkList');
+Classes/Controller/BrokenLinkListController.php:        $view->setLayoutRootPaths(['EXT:brofix/Resources/Private/Layouts']);
+Classes/Controller/BrokenLinkListController.php:        $view->setPartialRootPaths(['EXT:brofix/Resources/Private/Partials']);
+Classes/Controller/BrokenLinkListController.php:        $view->setTemplateRootPaths(['EXT:brofix/Resources/Private/Templates/Backend']);
+Classes/Controller/BrokenLinkListController.php:        $view->setTemplate($templateName);
+Classes/Controller/BrokenLinkListController.php:        $view->assign('currentPage', $this->id);
+Classes/Controller/BrokenLinkListController.php:        $view->assign('depth', $this->depth);
+Classes/Controller/BrokenLinkListController.php:        $view->assign('docsurl', $this->configuration->getDocsUrl());
+Classes/Controller/BrokenLinkListController.php:        $view->assign(
+Classes/Controller/BrokenLinkListController.php:            $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord = [];
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord['uid'] = GeneralUtility::_GP('current_record_uid') ?? 0;
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord['table'] = GeneralUtility::_GP('current_record_table') ?? '';
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord['field'] = GeneralUtility::_GP('current_record_field') ?? '';
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord['currentTime'] = GeneralUtility::_GP('current_record_currentTime') ?? 0;
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord['url'] = urldecode(GeneralUtility::_GP('current_record_url') ?? '');
+Classes/Controller/BrokenLinkListController.php:        $this->currentRecord['linkType'] = GeneralUtility::_GP('current_record_linkType') ?? '';
+Classes/Controller/BrokenLinkListController.php:        $filter = $this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST);
+Classes/Controller/BrokenLinkListController.php:            $this->filter = BrokenLinkListFilter::getInstanceFromArray($filter->toArray());
+Classes/Controller/BrokenLinkListController.php:            $this->filter = new BrokenLinkListFilter();
+Classes/Controller/BrokenLinkListController.php:            $this->filter->setUidFilter($uid);
+Classes/Controller/BrokenLinkListController.php:            $this->filter->setUrlFilter($url);
+Classes/Controller/BrokenLinkListController.php:            $this->filter->setUrlFilterMatch($urlMatch ?: 'partial');
+Classes/Controller/BrokenLinkListController.php:            $this->filter->setLinktypeFilter($linkType ?: 'all');
+Classes/Controller/BrokenLinkListController.php:            $this->filter->setViewMode($viewMode ?: BrokenLinkListFilter::VIEW_MODE_MIN);
+Classes/Controller/BrokenLinkListController.php:            $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
+Classes/Controller/BrokenLinkListController.php:        if (is_null($this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST))) {
+Classes/Controller/BrokenLinkListController.php:            $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
+Classes/Controller/BrokenLinkListController.php:        $previousDepth = (int)($this->pObj->MOD_SETTINGS['depth'] ?? 0);
+Classes/Controller/BrokenLinkListController.php:            $this->depth = $previousDepth;
+Classes/Controller/BrokenLinkListController.php:            $this->depth = (int)$depth;
+Classes/Controller/BrokenLinkListController.php:            if ($this->depth !== $previousDepth) {
+Classes/Controller/BrokenLinkListController.php:        $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
+Classes/Controller/BrokenLinkListController.php:        $this->pObj->MOD_SETTINGS['viewMode'] = $this->filter->getViewMode();
+Classes/Controller/BrokenLinkListController.php:        $this->route = GeneralUtility::_GP('route') ?? '';
+Classes/Controller/BrokenLinkListController.php:        $this->token = GeneralUtility::_GP('token') ?? '';
+Classes/Controller/BrokenLinkListController.php:        $this->action = GeneralUtility::_GP('action') ?? '';
+Classes/Controller/BrokenLinkListController.php:            $this->action = 'updateLinkList';
+Classes/Controller/BrokenLinkListController.php:        $this->orderBy = (string)(GeneralUtility::_GP('orderBy')
+Classes/Controller/BrokenLinkListController.php:            ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrokenLinkListController::ORDER_BY_DEFAULT));
+Classes/Controller/BrokenLinkListController.php:        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrokenLinkListController::ORDER_BY_DEFAULT)) {
+Classes/Controller/BrokenLinkListController.php:        $this->pObj->MOD_SETTINGS['orderBy'] = $this->orderBy;
+Classes/Controller/BrokenLinkListController.php:        $this->linkTypes = [];
+Classes/Controller/BrokenLinkListController.php:            $linkTypes = $this->configuration->getLinkTypes();
+Classes/Controller/BrokenLinkListController.php:                $this->linkTypes[] = $linkType;
+Classes/Controller/BrokenLinkListController.php:        $lastCurrentPage = (int)($this->pObj->MOD_SETTINGS['currentPage'] ?? 0);
+Classes/Controller/BrokenLinkListController.php:        if (($this->id !== $lastCurrentPage) || $resetPagination) {
+Classes/Controller/BrokenLinkListController.php:            $this->paginationCurrentPage = 1;
+Classes/Controller/BrokenLinkListController.php:            $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage')
+Classes/Controller/BrokenLinkListController.php:                ?: ($this->pObj->MOD_SETTINGS['paginationPage'] ?? 1));
+Classes/Controller/BrokenLinkListController.php:        $this->pObj->MOD_SETTINGS['currentPage'] = $this->id;
+Classes/Controller/BrokenLinkListController.php:        $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
+Classes/Controller/BrokenLinkListController.php:        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
+Classes/Controller/BrokenLinkListController.php:            'id' => $this->id,
+Classes/Controller/BrokenLinkListController.php:            'depth' => $this->depth,
+Classes/Controller/BrokenLinkListController.php:            'orderBy' => $this->orderBy,
+Classes/Controller/BrokenLinkListController.php:            'paginationPage', $this->paginationCurrentPage
+Classes/Controller/BrokenLinkListController.php:        $uri = (string)$uriBuilder->buildUriFromRoute($route, $parameters);
+Classes/Controller/BrokenLinkListController.php:        $this->initialize();
+Classes/Controller/BrokenLinkListController.php:        if ($this->action === 'updateLinkList') {
+Classes/Controller/BrokenLinkListController.php:            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+Classes/Controller/BrokenLinkListController.php:            $this->createFlashMessage(
+Classes/Controller/BrokenLinkListController.php:                $this->getLanguageService()->getLL('list.status.check.done'),
+Classes/Controller/BrokenLinkListController.php:        if ($this->action === 'recheckUrl') {
+Classes/Controller/BrokenLinkListController.php:            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord);
+Classes/Controller/BrokenLinkListController.php:                $this->moduleTemplate->addFlashMessage(
+Classes/Controller/BrokenLinkListController.php:                    $this->getLanguageService()->getLL('list.recheck.url.title'),
+Classes/Controller/BrokenLinkListController.php:                $this->moduleTemplate->addFlashMessage(
+Classes/Controller/BrokenLinkListController.php:                    $this->getLanguageService()->getLL('list.recheck.url.title'),
+Classes/Controller/BrokenLinkListController.php:        } elseif ($this->action === 'editField') {
+Classes/Controller/BrokenLinkListController.php:            $this->linkAnalyzer->recheckLinks(
+Classes/Controller/BrokenLinkListController.php:                $this->linkTypes,
+Classes/Controller/BrokenLinkListController.php:                (int)$this->currentRecord['uid'],
+Classes/Controller/BrokenLinkListController.php:                $this->currentRecord['table'],
+Classes/Controller/BrokenLinkListController.php:                $this->currentRecord['field'],
+Classes/Controller/BrokenLinkListController.php:                (int)($this->currentRecord['currentTime'] ?? 0),
+Classes/Controller/BrokenLinkListController.php:                $this->configuration->isCheckHidden()
+Classes/Controller/BrokenLinkListController.php:                $this->moduleTemplate->addFlashMessage(
+Classes/Controller/BrokenLinkListController.php:                    $this->getLanguageService()->getLL('list.recheck.links.title'),
+Classes/Controller/BrokenLinkListController.php:        $pageTitle = $this->pageRecord ? BackendUtility::getRecordTitle('pages', $this->pageRecord) : '';
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('title', $pageTitle);
+Classes/Controller/BrokenLinkListController.php:        $this->renderContent();
+Classes/Controller/BrokenLinkListController.php:        return $this->view->render();
+Classes/Controller/BrokenLinkListController.php:        if (!$this->backendUserInformation->hasPermissionBrokenLinkList()) {
+Classes/Controller/BrokenLinkListController.php:            $this->moduleTemplate->addFlashMessage(
+Classes/Controller/BrokenLinkListController.php:                $this->getLanguageService()->getLL('no.access'),
+Classes/Controller/BrokenLinkListController.php:                $this->getLanguageService()->getLL('no.access.title'),
+Classes/Controller/BrokenLinkListController.php:        $this->initializeViewForBrokenLinks();
+Classes/Controller/BrokenLinkListController.php:            $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
+Classes/Controller/BrokenLinkListController.php:        $this->pageRecord = BackendUtility::readPageAccess(
+Classes/Controller/BrokenLinkListController.php:            $this->id,
+Classes/Controller/BrokenLinkListController.php:            $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
+Classes/Controller/BrokenLinkListController.php:        if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
+Classes/Controller/BrokenLinkListController.php:        if ($this->getBackendUser()->workspace !== 0) {
+Classes/Controller/BrokenLinkListController.php:            $this->excludeLinkTarget->currentUserHasCreatePermissions(
+Classes/Controller/BrokenLinkListController.php:                $this->configuration->getExcludeLinkTargetStoragePid()
+Classes/Controller/BrokenLinkListController.php:        $this->backendUserInformation = new BackendUserInformation($isAccessibleForCurrentUser, $excludeLinksPermission);
+Classes/Controller/BrokenLinkListController.php:        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+Classes/Controller/BrokenLinkListController.php:        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
+Classes/Controller/BrokenLinkListController.php:        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+Classes/Controller/BrokenLinkListController.php:        $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+Classes/Controller/BrokenLinkListController.php:        $this->initializeLinkAnalyzer();
+Classes/Controller/BrokenLinkListController.php:        $considerHidden = $this->configuration->isCheckHidden();
+Classes/Controller/BrokenLinkListController.php:        $depth = $this->depth;
+Classes/Controller/BrokenLinkListController.php:        $permsClause = (string)$this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
+Classes/Controller/BrokenLinkListController.php:        if ($this->id !== 0) {
+Classes/Controller/BrokenLinkListController.php:            $this->pageList = [];
+Classes/Controller/BrokenLinkListController.php:            $this->pagesRepository->getPageList(
+Classes/Controller/BrokenLinkListController.php:                $this->pageList,
+Classes/Controller/BrokenLinkListController.php:                $this->id,
+Classes/Controller/BrokenLinkListController.php:                $this->configuration->getDoNotCheckPagesDoktypes(),
+Classes/Controller/BrokenLinkListController.php:                $this->configuration->getDoNotTraversePagesDoktypes()
+Classes/Controller/BrokenLinkListController.php:            $this->pageList = [];
+Classes/Controller/BrokenLinkListController.php:        $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
+Classes/Controller/BrokenLinkListController.php:        $this->linkAnalyzer->init($this->pageList, $this->configuration);
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('depth', $this->depth);
+Classes/Controller/BrokenLinkListController.php:        $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
+Classes/Controller/BrokenLinkListController.php:        if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
+Classes/Controller/BrokenLinkListController.php:            $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
+Classes/Controller/BrokenLinkListController.php:                $this->pageList,
+Classes/Controller/BrokenLinkListController.php:                $this->linkTypes,
+Classes/Controller/BrokenLinkListController.php:                $this->configuration->getSearchFields(),
+Classes/Controller/BrokenLinkListController.php:                $this->filter,
+Classes/Controller/BrokenLinkListController.php:                self::ORDER_BY_VALUES[$this->orderBy] ?? []
+Classes/Controller/BrokenLinkListController.php:                $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
+Classes/Controller/BrokenLinkListController.php:                $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
+Classes/Controller/BrokenLinkListController.php:                foreach ($paginator->getPaginatedItems() as $row) {
+Classes/Controller/BrokenLinkListController.php:                    $items[] = $this->renderTableRow($row['table_name'], $row);
+Classes/Controller/BrokenLinkListController.php:                $this->view->assign('listUri', $this->constructBackendUri());
+Classes/Controller/BrokenLinkListController.php:            $this->pagination = null;
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('totalCount', $totalCount);
+Classes/Controller/BrokenLinkListController.php:        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST);
+Classes/Controller/BrokenLinkListController.php:            $filter = BrokenLinkListFilter::getInstanceFromArray($arrayable->toArray());
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('uid_filter', $filter->getUidFilter());
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('linktype_filter', $filter->getLinktypeFilter());
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('url_filter', $filter->getUrlFilter());
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('url_match_searchFilter', $filter->getUrlFilterMatch());
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('view_mode', $filter->getViewMode() ?: BrokenLinkListFilter::VIEW_MODE_MIN);
+Classes/Controller/BrokenLinkListController.php:        if ($this->id === 0) {
+Classes/Controller/BrokenLinkListController.php:            $this->createFlashMessagesForRootPage();
+Classes/Controller/BrokenLinkListController.php:            $this->createFlashMessagesForNoBrokenLinks();
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('brokenLinks', $items);
+Classes/Controller/BrokenLinkListController.php:        $linktypes = array_merge(['all' => 'all'], $this->linkTypes);
+Classes/Controller/BrokenLinkListController.php:            $this->view->assign('linktypes', $linktypes);
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('pagination', $this->pagination);
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('orderBy', $this->orderBy);
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+Classes/Controller/BrokenLinkListController.php:            $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('sortActions', $sortActions);
+Classes/Controller/BrokenLinkListController.php:        $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+Classes/Controller/BrokenLinkListController.php:        if ($this->filter->hasConstraintsForNumberOfResults()) {
+Classes/Controller/BrokenLinkListController.php:            $message = $this->getLanguageService()->getLL('list.no.broken.links.filter')
+Classes/Controller/BrokenLinkListController.php:        } elseif ($this->depth === 0) {
+Classes/Controller/BrokenLinkListController.php:            $message = $this->getLanguageService()->getLL('list.no.broken.links.this.page')
+Classes/Controller/BrokenLinkListController.php:            $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
+Classes/Controller/BrokenLinkListController.php:        } elseif ($this->depth > 0 && $this->depth < BrokenLinkListFilter::PAGE_DEPTH_INFINITE) {
+Classes/Controller/BrokenLinkListController.php:            $message = $this->getLanguageService()->getLL('list.no.broken.links.current.level')
+Classes/Controller/BrokenLinkListController.php:            $message .= ' (' . $this->depth . ').';
+Classes/Controller/BrokenLinkListController.php:            $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
+Classes/Controller/BrokenLinkListController.php:            $message = $this->getLanguageService()->getLL('list.no.broken.links.level.infinite')
+Classes/Controller/BrokenLinkListController.php:                ?: $this->getLanguageService()->getLL('list.no.broken.links')
+Classes/Controller/BrokenLinkListController.php:        $this->createFlashMessage(
+Classes/Controller/BrokenLinkListController.php:        $this->createFlashMessage($this->getLanguageService()->getLL('list.rootpage'));
+Classes/Controller/BrokenLinkListController.php:        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('brofix');
+Classes/Controller/BrokenLinkListController.php:        $defaultFlashMessageQueue->enqueue($flashMessage);
+Classes/Controller/BrokenLinkListController.php:        $languageService = $this->getLanguageService();
+Classes/Controller/BrokenLinkListController.php:            $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
+Classes/Controller/BrokenLinkListController.php:                if ($this->orderBy === $key) {
+Classes/Controller/BrokenLinkListController.php:                if ($this->orderBy === $key) {
+Classes/Controller/BrokenLinkListController.php:                    $tableHeadData[$key]['icon'] = 'status-status-sorting-asc';
+Classes/Controller/BrokenLinkListController.php:                } elseif ($this->orderBy === $key . '_reverse') {
+Classes/Controller/BrokenLinkListController.php:                    $tableHeadData[$key]['icon'] = 'status-status-sorting-desc';
+Classes/Controller/BrokenLinkListController.php:                    '<a href="%s" style="text-decoration: underline;">%s</a>',
+Classes/Controller/BrokenLinkListController.php:        $languageService = $this->getLanguageService();
+Classes/Controller/BrokenLinkListController.php:        $hookObj = $this->hookObjectsArr[$row['link_type']];
+Classes/Controller/BrokenLinkListController.php:        $isAdmin = $this->isAdmin();
+Classes/Controller/BrokenLinkListController.php:        $backUriEditField = $this->constructBackendUri(
+Classes/Controller/BrokenLinkListController.php:        $variables['editUrl'] = (string)$uriBuilder->buildUriFromRoute('record_edit', [
+Classes/Controller/BrokenLinkListController.php:        $variables['recheckUrl'] = $this->constructBackendUri(
+Classes/Controller/BrokenLinkListController.php:        if (isset($this->currentRecord['uid']) && isset($this->currentRecord['table']) && isset($this->currentRecord['field'])
+Classes/Controller/BrokenLinkListController.php:            && $this->action === 'editField'
+Classes/Controller/BrokenLinkListController.php:            && $row['record_uid'] == $this->currentRecord['uid']
+Classes/Controller/BrokenLinkListController.php:            && $row['table_name'] === $this->currentRecord['table']
+Classes/Controller/BrokenLinkListController.php:            && $row['field'] === $this->currentRecord['field']
+Classes/Controller/BrokenLinkListController.php:        if ($this->action === 'recheckUrl'
+Classes/Controller/BrokenLinkListController.php:            && isset($this->currentRecord['url'])
+Classes/Controller/BrokenLinkListController.php:            && $this->currentRecord['url'] === $row['url']
+Classes/Controller/BrokenLinkListController.php:            && isset($this->currentRecord['linkType'])
+Classes/Controller/BrokenLinkListController.php:            && $this->currentRecord['linkType'] === $row['link_type']
+Classes/Controller/BrokenLinkListController.php:        $excludeLinkTargetStoragePid = $this->configuration->getExcludeLinkTargetStoragePid();
+Classes/Controller/BrokenLinkListController.php:        if (in_array($row['link_type'] ?? 'empty', $this->configuration->getExcludeLinkTargetAllowedTypes())
+Classes/Controller/BrokenLinkListController.php:            && $this->backendUserInformation->hasPermissionExcludeLinks()
+Classes/Controller/BrokenLinkListController.php:            $returnUrl = $this->constructBackendUri();
+Classes/Controller/BrokenLinkListController.php:            $excludeUrl = (string)$uriBuilder->buildUriFromRoute('record_edit', [
+Classes/Controller/BrokenLinkListController.php:        $variables['elementIcon'] = $this->iconFactory->getIconForRecord($table, $row, Icon::SIZE_SMALL)->render();
+Classes/Controller/BrokenLinkListController.php:        if (isset($row['language']) && $row['language'] != -1 && isset($this->siteLanguages[(int)($row['language'])])) {
+Classes/Controller/BrokenLinkListController.php:            $variables['langIcon'] = $this->siteLanguages[(int)($row['language'])]->getFlagIdentifier();
+Classes/Controller/BrokenLinkListController.php:        $variables['elementType'] = $this->getLanguageSplitLabel($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
+Classes/Controller/BrokenLinkListController.php:            $fieldName = $languageService->sL($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']);
+Classes/Controller/BrokenLinkListController.php:            if (substr($fieldName, -1, 1) === ':') {
+Classes/Controller/BrokenLinkListController.php:                $fieldName = substr($fieldName, 0, strlen($fieldName) - 1);
+Classes/Controller/BrokenLinkListController.php:        $path = $this->pagesRepository->getPagePath($pageId, 50);
+Classes/Controller/BrokenLinkListController.php:            $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->getLL('list.msg.ok')) . '</span>';
+Classes/Controller/BrokenLinkListController.php:                        $errorParams->getExceptionMsg(),
+Classes/Controller/BrokenLinkListController.php:                        'UTF-8',
+Classes/Controller/BrokenLinkListController.php:                        $hookObj->getErrorMessage($errorParams),
+Classes/Controller/BrokenLinkListController.php:                        'UTF-8',
+Classes/Controller/BrokenLinkListController.php:        $variables['linktarget'] = $hookObj->getBrokenUrl($row);
+Classes/Controller/BrokenLinkListController.php:        if ($this->filter->getUrlFilter() == $variables['orig_linktarget']
+Classes/Controller/BrokenLinkListController.php:            && $this->filter->getUrlFilterMatch() === 'exact'
+Classes/Controller/BrokenLinkListController.php:        $variables['linktext'] = $hookObj->getBrokenLinkText($row, $errorParams->getCustom());
+Classes/Controller/BrokenLinkListController.php:        $text = $this->getLanguageService()->sL($label);
+Classes/Controller/BrofixController.php:     * A WHERE clause for selection records from the pages table based on read-permissions of the current backend user.
+Classes/Controller/BrofixController.php:     * If type is 'ses' then the data is stored as session-lasting data. This means that it'll be wiped out the next time the user logs in.
+Classes/Controller/BrofixController.php:        $this->moduleTemplate = $moduleTemplate;
+Classes/Controller/BrofixController.php:        $this->uriBuilder = $uriBuilder;
+Classes/Controller/BrofixController.php:        $this->flashMessageService = $flashMessageService;
+Classes/Controller/BrofixController.php:        $this->container = $container;
+Classes/Controller/BrofixController.php:        $languageService = $this->getLanguageService();
+Classes/Controller/BrofixController.php:        //$languageService->includeLLFile('EXT:info/Resources/Private/Language/locallang_mod_web_brofix.xlf');
+Classes/Controller/BrofixController.php:        $this->id = (int)GeneralUtility::_GP('id');
+Classes/Controller/BrofixController.php:        $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
+Classes/Controller/BrofixController.php:        $this->menuConfig();
+Classes/Controller/BrofixController.php:        $this->handleExternalFunctionValue();
+Classes/Controller/BrofixController.php:        $languageService = $this->getLanguageService();
+Classes/Controller/BrofixController.php:        $backendUser = $this->getBackendUser();
+Classes/Controller/BrofixController.php:        $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
+Classes/Controller/BrofixController.php:        if ($this->pageinfo) {
+Classes/Controller/BrofixController.php:            $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation($this->pageinfo);
+Classes/Controller/BrofixController.php:        $access = is_array($this->pageinfo);
+Classes/Controller/BrofixController.php:        if (($this->id && $access) || ($backendUser->isAdmin() && !$this->id)) {
+Classes/Controller/BrofixController.php:            if ($backendUser->isAdmin() && !$this->id) {
+Classes/Controller/BrofixController.php:                $this->pageinfo = ['title' => '[root-level]', 'uid' => 0, 'pid' => 0];
+Classes/Controller/BrofixController.php:            $this->moduleTemplate->addJavaScriptCode(
+Classes/Controller/BrofixController.php:                'if (top.fsMod) top.fsMod.recentIds["web"] = ' . (int)$this->id . ';
+Classes/Controller/BrofixController.php:            $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
+Classes/Controller/BrofixController.php:            $this->view = $this->getFluidTemplateObject();
+Classes/Controller/BrofixController.php:            $this->view->assign('moduleName', (string)$this->uriBuilder->buildUriFromRoute($this->moduleName));
+Classes/Controller/BrofixController.php:            $this->view->assign('functionMenuModuleContent', $this->getExtObjContent());
+Classes/Controller/BrofixController.php:            $this->getButtons();
+Classes/Controller/BrofixController.php:            $this->generateMenu();
+Classes/Controller/BrofixController.php:            $this->content .= $this->view->render();
+Classes/Controller/BrofixController.php:            $this->content = $this->moduleTemplate->header($languageService->getLL('title'));
+Classes/Controller/BrofixController.php:        $this->init();
+Classes/Controller/BrofixController.php:        $this->checkExtObj();
+Classes/Controller/BrofixController.php:        $this->main();
+Classes/Controller/BrofixController.php:        $this->moduleTemplate->setContent($this->content);
+Classes/Controller/BrofixController.php:        return new HtmlResponse($this->moduleTemplate->renderContent());
+Classes/Controller/BrofixController.php:        $languageService = $this->getLanguageService();
+Classes/Controller/BrofixController.php:        $buttonBar = $this->moduleTemplate->getDocHeaderComponent()->getButtonBar();
+Classes/Controller/BrofixController.php:        $viewButton = $buttonBar->makeLinkButton()
+Classes/Controller/BrofixController.php:            ->setHref('#')
+Classes/Controller/BrofixController.php:            ->setOnClick(BackendUtility::viewOnClick(
+Classes/Controller/BrofixController.php:                $this->pageinfo['uid'],
+Classes/Controller/BrofixController.php:                BackendUtility::BEgetRootLine($this->pageinfo['uid'])
+Classes/Controller/BrofixController.php:            ->setTitle($languageService->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage'))
+Classes/Controller/BrofixController.php:            ->setIcon($this->moduleTemplate->getIconFactory()->getIcon('actions-view-page', Icon::SIZE_SMALL));
+Classes/Controller/BrofixController.php:        $buttonBar->addButton($viewButton, ButtonBar::BUTTON_POSITION_LEFT, 1);
+Classes/Controller/BrofixController.php:        $shortCutButton = $buttonBar->makeShortcutButton()
+Classes/Controller/BrofixController.php:            ->setModuleName($this->moduleName)
+Classes/Controller/BrofixController.php:            ->setDisplayName($this->MOD_MENU['function'][$this->MOD_SETTINGS['function']])
+Classes/Controller/BrofixController.php:            ->setGetVariables([
+Classes/Controller/BrofixController.php:            ->setSetVariables(array_keys($this->MOD_MENU));
+Classes/Controller/BrofixController.php:        $buttonBar->addButton($shortCutButton, ButtonBar::BUTTON_POSITION_RIGHT);
+Classes/Controller/BrofixController.php:        $cshButton = $buttonBar->makeHelpButton()
+Classes/Controller/BrofixController.php:            ->setModuleName('xMOD_csh_corebe')
+Classes/Controller/BrofixController.php:            ->setFieldName('pagetree_overview');
+Classes/Controller/BrofixController.php:        $buttonBar->addButton($cshButton);
+Classes/Controller/BrofixController.php:        $menu = $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
+Classes/Controller/BrofixController.php:        $menu->setIdentifier('WebBrofixJumpMenu');
+Classes/Controller/BrofixController.php:        foreach ($this->MOD_MENU['function'] as $controller => $title) {
+Classes/Controller/BrofixController.php:                ->makeMenuItem()
+Classes/Controller/BrofixController.php:                ->setHref(
+Classes/Controller/BrofixController.php:                    (string)$this->uriBuilder->buildUriFromRoute(
+Classes/Controller/BrofixController.php:                        $this->moduleName,
+Classes/Controller/BrofixController.php:                            'id' => $this->id,
+Classes/Controller/BrofixController.php:                ->setTitle($title);
+Classes/Controller/BrofixController.php:            if ($controller === $this->MOD_SETTINGS['function']) {
+Classes/Controller/BrofixController.php:                $item->setActive(true);
+Classes/Controller/BrofixController.php:            $menu->addMenuItem($item);
+Classes/Controller/BrofixController.php:        $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
+Classes/Controller/BrofixController.php:        $view->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Layouts')]);
+Classes/Controller/BrofixController.php:        $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Partials')]);
+Classes/Controller/BrofixController.php:        $view->setTemplateRootPaths([GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Templates')]);
+Classes/Controller/BrofixController.php:        $view->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Layouts')]);
+Classes/Controller/BrofixController.php:        $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Partials')]);
+Classes/Controller/BrofixController.php:        $view->setTemplateRootPaths([GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Templates')]);
+Classes/Controller/BrofixController.php:        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:brofix/Resources/Private/Templates/Backend/Brofix.html'));
+Classes/Controller/BrofixController.php:        //$view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:info/Resources/Private/Templates/Main.html'));
+Classes/Controller/BrofixController.php:        $view->getRequest()->setControllerExtensionName('brofix');
+Classes/Controller/BrofixController.php:        // Page / user TSconfig settings and blinding of menu-items
+Classes/Controller/BrofixController.php:        $this->modTSconfig['properties'] = BackendUtility::getPagesTSconfig($this->id)['mod.']['web_brofix.'] ?? [];
+Classes/Controller/BrofixController.php:        $this->MOD_MENU['function'] = $this->mergeExternalItems('web_brofix', 'function', $this->MOD_MENU['function']);
+Classes/Controller/BrofixController.php:        $blindActions = $this->modTSconfig['properties']['menu.']['function.'] ?? [];
+Classes/Controller/BrofixController.php:            if (!$value && array_key_exists($key, $this->MOD_MENU['function'])) {
+Classes/Controller/BrofixController.php:                unset($this->MOD_MENU['function'][$key]);
+Classes/Controller/BrofixController.php:        $this->MOD_SETTINGS = BackendUtility::getModuleData($this->MOD_MENU, GeneralUtility::_GP('SET'), 'web_brofix', $this->modMenu_type, $this->modMenu_dontValidateList, $this->modMenu_setDefaultList);
+Classes/Controller/BrofixController.php:            $backendUser = $this->getBackendUser();
+Classes/Controller/BrofixController.php:                if (((string)$v['ws'] === '' || $backendUser->workspace === 0 && GeneralUtility::inList($v['ws'], 'online'))
+Classes/Controller/BrofixController.php:                    || $backendUser->workspace === -1 && GeneralUtility::inList($v['ws'], 'offline')
+Classes/Controller/BrofixController.php:                    || $backendUser->workspace > 0 && GeneralUtility::inList($v['ws'], 'custom')
+Classes/Controller/BrofixController.php:                    $menuArr[$k] = $this->getLanguageService()->sL($v['title']);
+Classes/Controller/BrofixController.php:     * Loads $this->extClassConf with the configuration for the CURRENT function of the menu.
+Classes/Controller/BrofixController.php:     * @param string $MS_value The value-key to fetch from the config array. If NULL (default) MOD_SETTINGS[$MM_key] will be used. This is useful if you want to force another function than the one defined in MOD_SETTINGS[function]. Call this in init() function of your Script Class: handleExternalFunctionValue('function', $forcedSubModKey)
+Classes/Controller/BrofixController.php:            $MS_value = $this->MOD_SETTINGS[$MM_key];
+Classes/Controller/BrofixController.php:        $this->extClassConf = $this->getExternalItemConfig('web_brofix', $MM_key, $MS_value);
+Classes/Controller/BrofixController.php:     * @param string $menuKey Menu key, eg. "function" for the function menu. See $this->MOD_MENU
+Classes/Controller/BrofixController.php:     * @param string $value Optionally the value-key to fetch from the array that would otherwise have been returned if this value was not set. Look source...
+Classes/Controller/BrofixController.php:     * Creates an instance of the class found in $this->extClassConf['name'] in $this->extObj if any (this should hold three keys, "name", "path" and "title" if a "Function menu module" tries to connect...)
+Classes/Controller/BrofixController.php:     * The array $this->extClassConf is set in handleExternalFunctionValue() based on the value of MOD_SETTINGS[function]
+Classes/Controller/BrofixController.php:     * If an instance is created it is initiated with $this passed as value and $this->extClassConf as second argument. Further the $this->MOD_SETTING is cleaned up again after calling the init function.
+Classes/Controller/BrofixController.php:        if (is_array($this->extClassConf) && $this->extClassConf['name']) {
+Classes/Controller/BrofixController.php:            if ($this->container->has($this->extClassConf['name'])) {
+Classes/Controller/BrofixController.php:                $this->extObj = $this->container->get($this->extClassConf['name']);
+Classes/Controller/BrofixController.php:                $this->extObj = GeneralUtility::makeInstance($this->extClassConf['name']);
+Classes/Controller/BrofixController.php:            if (is_callable([$this->extObj, 'init'])) {
+Classes/Controller/BrofixController.php:                $this->extObj->init($this);
+Classes/Controller/BrofixController.php:            // Re-write:
+Classes/Controller/BrofixController.php:            $this->MOD_SETTINGS = BackendUtility::getModuleData($this->MOD_MENU, GeneralUtility::_GP('SET'), 'web_brofix', $this->modMenu_type, $this->modMenu_dontValidateList, $this->modMenu_setDefaultList);
+Classes/Controller/BrofixController.php:        if ($this->extObj === null) {
+Classes/Controller/BrofixController.php:            $languageService = $this->getLanguageService();
+Classes/Controller/BrofixController.php:                $languageService->sL('LLL:EXT:backend/Resources/Private/Language/locallang.xlf:no_modules_registered'),
+Classes/Controller/BrofixController.php:                $languageService->getLL('title'),
+Classes/Controller/BrofixController.php:            $defaultFlashMessageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
+Classes/Controller/BrofixController.php:            $defaultFlashMessageQueue->enqueue($flashMessage);
+Classes/Controller/BrofixController.php:            if (is_callable([$this->extObj, 'main'])) {
+Classes/Controller/BrofixController.php:                $main = $this->extObj->main();
+Classes/Controller/BrofixController.php:                    $stream = $main->getBody();
+Classes/Controller/BrofixController.php:                    $stream->rewind();
+Classes/Controller/BrofixController.php:                    $main = $stream->getContents();
+Classes/Controller/BrofixController.php:                $this->content .= $main;
+Classes/Controller/BrofixController.php:        $savedContent = $this->content;
+Classes/Controller/BrofixController.php:        $this->content = '';
+Classes/Controller/BrofixController.php:        $this->extObjContent();
+Classes/Controller/BrofixController.php:        $newContent = $this->content;
+Classes/Controller/BrofixController.php:        $this->content = $savedContent;
+Classes/Exceptions/MissingConfigurationException.php: * The TYPO3 project - inspiring people to share!
+Classes/Repository/ContentRepository.php:        $queryBuilder = $this->generateQueryBuilder($table);
+Classes/Repository/ContentRepository.php:            $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class);
+Classes/Repository/ContentRepository.php:        $result = $queryBuilder->select(...$fields)
+Classes/Repository/ContentRepository.php:            ->from($table)
+Classes/Repository/ContentRepository.php:            ->where(
+Classes/Repository/ContentRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/ContentRepository.php:                    $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
+Classes/Repository/ContentRepository.php:            ->executeQuery()
+Classes/Repository/ContentRepository.php:            ->fetchAssociative();
+Classes/Repository/ContentRepository.php:        $queryBuilder = $this->generateQueryBuilder();
+Classes/Repository/ContentRepository.php:        $queryBuilder->getRestrictions()
+Classes/Repository/ContentRepository.php:            ->removeAll()
+Classes/Repository/ContentRepository.php:            ->add($deletedRestriction);
+Classes/Repository/ContentRepository.php:            ->select('tx_gridelements_container')
+Classes/Repository/ContentRepository.php:            ->from(self::TABLE)
+Classes/Repository/ContentRepository.php:            ->where(
+Classes/Repository/ContentRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/ContentRepository.php:                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
+Classes/Repository/ContentRepository.php:            ->executeQuery()
+Classes/Repository/ContentRepository.php:            ->fetchOne();
+Classes/Repository/ContentRepository.php:        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/ContentRepository.php:        $queryBuilder->getRestrictions()
+Classes/Repository/ContentRepository.php:            ->removeAll()
+Classes/Repository/ContentRepository.php:            ->add($deletedRestriction);
+Classes/Repository/ContentRepository.php:            ->select('hidden')
+Classes/Repository/ContentRepository.php:            ->from(self::TABLE)
+Classes/Repository/ContentRepository.php:            ->where(
+Classes/Repository/ContentRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/ContentRepository.php:                    $queryBuilder->createNamedParameter($parentId, \PDO::PARAM_INT)
+Classes/Repository/ContentRepository.php:            ->executeQuery()
+Classes/Repository/ContentRepository.php:            ->fetchOne();
+Classes/Repository/ContentRepository.php:        return $connectionPool->getQueryBuilderForTable($table);
+Classes/Repository/PagesRepository.php:            $depth = $depth - 1;
+Classes/Repository/PagesRepository.php:        $queryBuilder = $this->generateQueryBuilder('pages');
+Classes/Repository/PagesRepository.php:        $queryBuilder->getRestrictions()
+Classes/Repository/PagesRepository.php:            ->removeAll()
+Classes/Repository/PagesRepository.php:            ->add($deletedRestriction);
+Classes/Repository/PagesRepository.php:            ->select('uid', 'hidden', 'extendToSubpages', 'doktype')
+Classes/Repository/PagesRepository.php:            ->from('pages')
+Classes/Repository/PagesRepository.php:            ->where(
+Classes/Repository/PagesRepository.php:            $queryBuilder->andWhere(
+Classes/Repository/PagesRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/PagesRepository.php:                    $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
+Classes/Repository/PagesRepository.php:            $queryBuilder->andWhere(
+Classes/Repository/PagesRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/PagesRepository.php:                    $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
+Classes/Repository/PagesRepository.php:        $result = $queryBuilder->executeQuery();
+Classes/Repository/PagesRepository.php:        while ($row = $result->fetchAssociative()) {
+Classes/Repository/PagesRepository.php:                $this->getAllSubpagesForPage(
+Classes/Repository/PagesRepository.php:     * - Get subpages
+Classes/Repository/PagesRepository.php:     * - Add the page $id itself (check first if it should be added)
+Classes/Repository/PagesRepository.php:     * - Add the translations for all collected page ids
+Classes/Repository/PagesRepository.php:        $pageList = $this->getAllSubpagesForPage(
+Classes/Repository/PagesRepository.php:        $this->getTranslationForPage(
+Classes/Repository/PagesRepository.php:        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+Classes/Repository/PagesRepository.php:        $queryBuilder->getRestrictions()->removeAll();
+Classes/Repository/PagesRepository.php:            ->select('uid', 'title', 'hidden', 'extendToSubpages')
+Classes/Repository/PagesRepository.php:            ->from('pages')
+Classes/Repository/PagesRepository.php:            ->where(
+Classes/Repository/PagesRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/PagesRepository.php:                    $queryBuilder->createNamedParameter($pageInfo['pid'], \PDO::PARAM_INT)
+Classes/Repository/PagesRepository.php:            ->executeQuery()
+Classes/Repository/PagesRepository.php:            ->fetchAssociative();
+Classes/Repository/PagesRepository.php:            return $this->getRootLineIsHidden($row);
+Classes/Repository/PagesRepository.php:        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/PagesRepository.php:        $queryBuilder->getRestrictions()
+Classes/Repository/PagesRepository.php:            ->removeAll()
+Classes/Repository/PagesRepository.php:            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+Classes/Repository/PagesRepository.php:            $queryBuilder->getRestrictions()->add($hiddenRestriction);
+Classes/Repository/PagesRepository.php:            $queryBuilder->expr()->eq(
+Classes/Repository/PagesRepository.php:                $queryBuilder->createNamedParameter($currentPage, \PDO::PARAM_INT)
+Classes/Repository/PagesRepository.php:            $constraints[] = $queryBuilder->expr()->in(
+Classes/Repository/PagesRepository.php:                $queryBuilder->createNamedParameter($limitToLanguageIds, Connection::PARAM_INT_ARRAY)
+Classes/Repository/PagesRepository.php:            ->select('uid', 'title', 'hidden')
+Classes/Repository/PagesRepository.php:            ->from(self::TABLE)
+Classes/Repository/PagesRepository.php:            ->where(...$constraints)
+Classes/Repository/PagesRepository.php:            ->executeQuery();
+Classes/Repository/PagesRepository.php:        while ($row = $result->fetchAssociative()) {
+Classes/Repository/PagesRepository.php:        return $connectionPool->getQueryBuilderForTable($table);
+Classes/Repository/ExcludeLinkTargetRepository.php:        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/ExcludeLinkTargetRepository.php:            ->select(self::TABLE . '.*')
+Classes/Repository/ExcludeLinkTargetRepository.php:            ->from(self::TABLE);
+Classes/Repository/ExcludeLinkTargetRepository.php:        $urlFilter = $filter->getExcludeUrlFilter();
+Classes/Repository/ExcludeLinkTargetRepository.php:            $queryBuilder->andWhere(
+Classes/Repository/ExcludeLinkTargetRepository.php:                $queryBuilder->expr()->like(
+Classes/Repository/ExcludeLinkTargetRepository.php:                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
+Classes/Repository/ExcludeLinkTargetRepository.php:        $linktypeFilter = $filter->getExcludeLinkTypeFilter();
+Classes/Repository/ExcludeLinkTargetRepository.php:            $queryBuilder->andWhere(
+Classes/Repository/ExcludeLinkTargetRepository.php:                $queryBuilder->expr()->like(
+Classes/Repository/ExcludeLinkTargetRepository.php:                    $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($linktypeFilter) . '%')
+Classes/Repository/ExcludeLinkTargetRepository.php:        $storagePid = $filter->getExcludeStoragePid();
+Classes/Repository/ExcludeLinkTargetRepository.php:        if ($storagePid !== -1) {
+Classes/Repository/ExcludeLinkTargetRepository.php:            $queryBuilder->andWhere(
+Classes/Repository/ExcludeLinkTargetRepository.php:                $queryBuilder->expr()->eq(self::TABLE . '.pid', $queryBuilder->createNamedParameter($storagePid, \PDO::PARAM_INT))
+Classes/Repository/ExcludeLinkTargetRepository.php:        if ($filter->getExcludeReasonFilter() != '') {
+Classes/Repository/ExcludeLinkTargetRepository.php:            $queryBuilder->andWhere(
+Classes/Repository/ExcludeLinkTargetRepository.php:                $queryBuilder->expr()->eq(self::TABLE . '.reason', $queryBuilder->createNamedParameter($filter->getExcludeReasonFilter(), \PDO::PARAM_INT))
+Classes/Repository/ExcludeLinkTargetRepository.php:                $queryBuilder->orderBy($values[0], $values[1]);
+Classes/Repository/ExcludeLinkTargetRepository.php:                    $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
+Classes/Repository/ExcludeLinkTargetRepository.php:        $results = array_merge($results, $queryBuilder->executeQuery()->fetchAllAssociative());
+Classes/Repository/ExcludeLinkTargetRepository.php:            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/ExcludeLinkTargetRepository.php:                ->delete(self::TABLE)
+Classes/Repository/ExcludeLinkTargetRepository.php:                ->where(
+Classes/Repository/ExcludeLinkTargetRepository.php:                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+Classes/Repository/ExcludeLinkTargetRepository.php:                ->executeStatement();
+Classes/Repository/ExcludeLinkTargetRepository.php:        return $connectionPool->getQueryBuilderForTable($table);
+Classes/Repository/BrokenLinkRepository.php:        $connection = $connectionPool->getConnectionForTable(static::TABLE);
+Classes/Repository/BrokenLinkRepository.php:        $this->maxBindParameters = PlatformInformation::getMaxBindParameters($connection->getDatabasePlatform());
+Classes/Repository/BrokenLinkRepository.php:        return $this->maxBindParameters;
+Classes/Repository/BrokenLinkRepository.php:        $max = (int)($this->getMaxBindParameters() /2 - 4);
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            if (!$GLOBALS['BE_USER']->isAdmin()) {
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->getRestrictions()
+Classes/Repository/BrokenLinkRepository.php:                    ->add($editableRestriction);
+Classes/Repository/BrokenLinkRepository.php:                ->select(self::TABLE . '.*')
+Classes/Repository/BrokenLinkRepository.php:                ->from(self::TABLE)
+Classes/Repository/BrokenLinkRepository.php:                ->join(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
+Classes/Repository/BrokenLinkRepository.php:                ->where(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:            if ($filter->getUidFilter() != '') {
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+Classes/Repository/BrokenLinkRepository.php:            $urlFilter = $filter->getUrlFilter();
+Classes/Repository/BrokenLinkRepository.php:                switch ($filter->getUrlFilterMatch()) {
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->like(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($urlFilter)
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->notLike(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->neq(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
+Classes/Repository/BrokenLinkRepository.php:            $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(self::TABLE . '.link_type', $queryBuilder->createNamedParameter($linktypeFilter))
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->orderBy($values[0], $values[1]);
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->andWhere(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:            $results = array_merge($results, $queryBuilder->executeQuery()->fetchAllAssociative());
+Classes/Repository/BrokenLinkRepository.php:        $count = $this->getLinkCountForPage($pageId, $withEditableByUser);
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            ->count('uid')
+Classes/Repository/BrokenLinkRepository.php:            ->from(self::TABLE)
+Classes/Repository/BrokenLinkRepository.php:            ->where(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:            ->executeQuery()
+Classes/Repository/BrokenLinkRepository.php:            ->fetchOne();
+Classes/Repository/BrokenLinkRepository.php:        $max = (int)($this->getMaxBindParameters() /2 - 4);
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder->getRestrictions()->removeAll();
+Classes/Repository/BrokenLinkRepository.php:            if (!$GLOBALS['BE_USER']->isAdmin()) {
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->getRestrictions()
+Classes/Repository/BrokenLinkRepository.php:                    ->add($editableRestriction);
+Classes/Repository/BrokenLinkRepository.php:            $result = $queryBuilder->select(self::TABLE . '.link_type')
+Classes/Repository/BrokenLinkRepository.php:                ->addSelectLiteral($queryBuilder->expr()->count(self::TABLE . '.uid', 'nbBrokenLinks'))
+Classes/Repository/BrokenLinkRepository.php:                ->from(self::TABLE)
+Classes/Repository/BrokenLinkRepository.php:                ->join(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
+Classes/Repository/BrokenLinkRepository.php:                ->where(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->eq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->neq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:                ->groupBy(self::TABLE . '.link_type')
+Classes/Repository/BrokenLinkRepository.php:                ->executeQuery();
+Classes/Repository/BrokenLinkRepository.php:            while ($row = $result->fetchAssociative()) {
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter('pages')
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->neq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter('pages')
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->createNamedParameter($tableName)
+Classes/Repository/BrokenLinkRepository.php:        return $queryBuilder->delete(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:            ->where(
+Classes/Repository/BrokenLinkRepository.php:            ->executeStatement();
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter('pages')
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->neq(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter('pages')
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->createNamedParameter($tableName)
+Classes/Repository/BrokenLinkRepository.php:        $constraints[] = $queryBuilder->expr()->like(
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder->createNamedParameter($url)
+Classes/Repository/BrokenLinkRepository.php:        $constraints[] = $queryBuilder->expr()->like(
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder->createNamedParameter($linkType)
+Classes/Repository/BrokenLinkRepository.php:        return $queryBuilder->delete(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:            ->where(
+Classes/Repository/BrokenLinkRepository.php:            ->executeStatement();
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder->delete(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:            ->where(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter($tableName)
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
+Classes/Repository/BrokenLinkRepository.php:            ->executeStatement();
+Classes/Repository/BrokenLinkRepository.php:        $max = (int)($this->getMaxBindParameters() /2 - 4);
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder->delete(self::TABLE)
+Classes/Repository/BrokenLinkRepository.php:                ->where(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->expr()->and(
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                            $queryBuilder->expr()->neq(
+Classes/Repository/BrokenLinkRepository.php:                                $queryBuilder->createNamedParameter('pages')
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->in(
+Classes/Repository/BrokenLinkRepository.php:                        $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
+Classes/Repository/BrokenLinkRepository.php:                ->executeStatement();
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder = $this->generateQueryBuilder(static::TABLE);
+Classes/Repository/BrokenLinkRepository.php:                ->count('uid')
+Classes/Repository/BrokenLinkRepository.php:                ->from(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:                ->where(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
+Classes/Repository/BrokenLinkRepository.php:                ->executeQuery()
+Classes/Repository/BrokenLinkRepository.php:                ->fetchOne();
+Classes/Repository/BrokenLinkRepository.php:     * @param int $excludeLinkTargetPid Storage pid of excluded link targets, -1 means to not consider the pid
+Classes/Repository/BrokenLinkRepository.php:        int $excludeLinkTargetPid = -1
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder = $this->generateQueryBuilder(static::TABLE);
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->createNamedParameter($linkTarget)
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->or(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->like(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter('%://' . $linkTarget . '/%')
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->like(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter('%://' . $linkTarget)
+Classes/Repository/BrokenLinkRepository.php:        $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:            $queryBuilder->createNamedParameter($linkType)
+Classes/Repository/BrokenLinkRepository.php:        if ($excludeLinkTargetPid !== -1) {
+Classes/Repository/BrokenLinkRepository.php:            $constraints[] = $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->createNamedParameter($excludeLinkTargetPid, \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:        return (int)$queryBuilder->delete(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:            ->where(...$constraints)
+Classes/Repository/BrokenLinkRepository.php:            ->executeStatement();
+Classes/Repository/BrokenLinkRepository.php:        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+Classes/Repository/BrokenLinkRepository.php:        $count = (int)$queryBuilder->count('uid')
+Classes/Repository/BrokenLinkRepository.php:            ->from(self::TABLE)
+Classes/Repository/BrokenLinkRepository.php:            ->where(
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter($record['record_uid'], \PDO::PARAM_INT)
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter($record['table_name'])
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter($record['field'])
+Classes/Repository/BrokenLinkRepository.php:                $queryBuilder->expr()->eq(
+Classes/Repository/BrokenLinkRepository.php:                    $queryBuilder->createNamedParameter($record['url'])
+Classes/Repository/BrokenLinkRepository.php:            ->executeQuery()
+Classes/Repository/BrokenLinkRepository.php:            ->fetchOne();
+Classes/Repository/BrokenLinkRepository.php:            $this->updateBrokenLink($record, $identifier);
+Classes/Repository/BrokenLinkRepository.php:            $this->insertBrokenLink($record);
+Classes/Repository/BrokenLinkRepository.php:     * @param array<string,mixed> $identifier Update criteria (where-statement): key => value pairs
+Classes/Repository/BrokenLinkRepository.php:                ->getConnectionForTable(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:                ->update(self::TABLE, $record, $identifier);
+Classes/Repository/BrokenLinkRepository.php:            // @extensionScannerIgnoreLine problem with ->error()
+Classes/Repository/BrokenLinkRepository.php:            $this->logger->error(
+Classes/Repository/BrokenLinkRepository.php:                . ', exception message=' . $e->getMessage()
+Classes/Repository/BrokenLinkRepository.php:                . ', stack trace=' . $e->getTraceAsString()
+Classes/Repository/BrokenLinkRepository.php:                ->getConnectionForTable(static::TABLE)
+Classes/Repository/BrokenLinkRepository.php:                ->insert(self::TABLE, $record);
+Classes/Repository/BrokenLinkRepository.php:            // @extensionScannerIgnoreLine problem with ->error()
+Classes/Repository/BrokenLinkRepository.php:            $this->logger->error(
+Classes/Repository/BrokenLinkRepository.php:                . ', exception message=' . $e->getMessage()
+Classes/Repository/BrokenLinkRepository.php:                . ', stack trace=' . $e->getTraceAsString()
+Classes/Repository/BrokenLinkRepository.php:        return $connectionPool->getQueryBuilderForTable($table);
+Classes/Repository/EditableRestriction.php: * The TYPO3 project - inspiring people to share!
+Classes/Repository/EditableRestriction.php:        $this->allowedFields = $this->getAllowedFieldsForCurrentUser($searchFields);
+Classes/Repository/EditableRestriction.php:        $this->allowedLanguages = $this->getAllowedLanguagesForCurrentUser();
+Classes/Repository/EditableRestriction.php:                $this->explicitAllowFields[$table][$type] = $this->getExplicitAllowFieldsForCurrentUser($table, $type);
+Classes/Repository/EditableRestriction.php:        $this->queryBuilder = $queryBuilder;
+Classes/Repository/EditableRestriction.php:         * Is string of comma-separated languages, e.g. "0,1"
+Classes/Repository/EditableRestriction.php:        $allowedLanguages = (string)($GLOBALS['BE_USER']->groupData['allowed_languages'] ?? '');
+Classes/Repository/EditableRestriction.php:                if ($GLOBALS['BE_USER']->checkAuthMode($table, $field, $itemIdentifier, $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'])) {
+Classes/Repository/EditableRestriction.php:            if (!$GLOBALS['BE_USER']->isAdmin() && !$GLOBALS['BE_USER']->check('tables_modify', $table)) {
+Classes/Repository/EditableRestriction.php:                if (!$GLOBALS['BE_USER']->isAdmin()
+Classes/Repository/EditableRestriction.php:                    && !$GLOBALS['BE_USER']->check('non_exclude_fields', $table . ':' . $field)) {
+Classes/Repository/EditableRestriction.php:        if ($this->allowedFields) {
+Classes/Repository/EditableRestriction.php:                $expressionBuilder->or(
+Classes/Repository/EditableRestriction.php:                    $expressionBuilder->and(
+Classes/Repository/EditableRestriction.php:                        $expressionBuilder->eq(
+Classes/Repository/EditableRestriction.php:                            $this->queryBuilder->createNamedParameter('pages')
+Classes/Repository/EditableRestriction.php:                        QueryHelper::stripLogicalOperatorPrefix($GLOBALS['BE_USER']->getPagePermsClause(Permission::PAGE_EDIT))
+Classes/Repository/EditableRestriction.php:                    $expressionBuilder->and(
+Classes/Repository/EditableRestriction.php:                        $expressionBuilder->neq(
+Classes/Repository/EditableRestriction.php:                            $this->queryBuilder->createNamedParameter('pages')
+Classes/Repository/EditableRestriction.php:                        QueryHelper::stripLogicalOperatorPrefix($GLOBALS['BE_USER']->getPagePermsClause(Permission::CONTENT_EDIT))
+Classes/Repository/EditableRestriction.php:            foreach ($this->allowedFields as $table => $fields) {
+Classes/Repository/EditableRestriction.php:                    $additionalWhere[] = $expressionBuilder->and(
+Classes/Repository/EditableRestriction.php:                        $expressionBuilder->eq(
+Classes/Repository/EditableRestriction.php:                            $this->queryBuilder->createNamedParameter($table)
+Classes/Repository/EditableRestriction.php:                        $expressionBuilder->eq(
+Classes/Repository/EditableRestriction.php:                            $this->queryBuilder->createNamedParameter($field)
+Classes/Repository/EditableRestriction.php:                $constraints[] = $expressionBuilder->or(...$additionalWhere);
+Classes/Repository/EditableRestriction.php:            $constraints[] = $expressionBuilder->isNull(self::TABLE . '.table_name');
+Classes/Repository/EditableRestriction.php:        foreach ($this->explicitAllowFields as $table => $field) {
+Classes/Repository/EditableRestriction.php:            $additionalWhere[] = $expressionBuilder->and(
+Classes/Repository/EditableRestriction.php:                $expressionBuilder->eq(
+Classes/Repository/EditableRestriction.php:                    $this->queryBuilder->createNamedParameter($table)
+Classes/Repository/EditableRestriction.php:                $expressionBuilder->in(
+Classes/Repository/EditableRestriction.php:                    $this->queryBuilder->createNamedParameter(
+Classes/Repository/EditableRestriction.php:            $additionalWhere[] = $expressionBuilder->neq(
+Classes/Repository/EditableRestriction.php:                $this->queryBuilder->createNamedParameter($table)
+Classes/Repository/EditableRestriction.php:            $constraints[] = $expressionBuilder->or(...$additionalWhere);
+Classes/Repository/EditableRestriction.php:        if ($this->allowedLanguages) {
+Classes/Repository/EditableRestriction.php:            foreach ($this->allowedLanguages as $langId) {
+Classes/Repository/EditableRestriction.php:                $additionalWhere[] = $expressionBuilder->or(
+Classes/Repository/EditableRestriction.php:                    $expressionBuilder->eq(
+Classes/Repository/EditableRestriction.php:                        $this->queryBuilder->createNamedParameter($langId, \PDO::PARAM_INT)
+Classes/Repository/EditableRestriction.php:                    $expressionBuilder->eq(
+Classes/Repository/EditableRestriction.php:                        $this->queryBuilder->createNamedParameter(-1, \PDO::PARAM_INT)
+Classes/Repository/EditableRestriction.php:            $constraints[] = $expressionBuilder->or(...$additionalWhere);
+Classes/Repository/EditableRestriction.php:        return $expressionBuilder->and(...$constraints);
+Classes/EventListener/CheckBrokenRteLinkEventListener.php: * The TYPO3 project - inspiring people to share!
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $this->brokenLinkRepository = $brokenLinkRepository;
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        if ($event->getLinkType() !== LinkService::TYPE_URL) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $url = (string)($event->getLinkData()['url'] ?? '');
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:            && $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'external')) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:            $event->markAsBrokenLink('Broken link');
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $event->markAsCheckedLink();
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $hrefInformation = $event->getLinkData();
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:            if ($this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'db')) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:                $event->markAsBrokenLink('Broken link');
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $event->markAsCheckedLink();
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        if ($event->getLinkType() !== LinkService::TYPE_FILE) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $event->markAsCheckedLink();
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        $hrefInformation = $event->getLinkData();
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:            $event->markAsBrokenLink('Broken link');
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        if (!$file->hasProperty('uid') || (int)$file->getProperty('uid') === 0) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:            $event->markAsBrokenLink('Broken link');
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:        if ($this->brokenLinkRepository->isLinkTargetBrokenLink('file:' . $file->getProperty('uid'), 'file')) {
+Classes/EventListener/CheckBrokenRteLinkEventListener.php:            $event->markAsBrokenLink('Broken link');
+Classes/LinkAnalyzer.php: * The TYPO3 project - inspiring people to share!
+Classes/LinkAnalyzer.php:        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+Classes/LinkAnalyzer.php:        $this->brokenLinkRepository = $brokenLinkRepository;
+Classes/LinkAnalyzer.php:        $this->contentRepository = $contentRepository;
+Classes/LinkAnalyzer.php:        $this->pagesRepository = $pagesRepository;
+Classes/LinkAnalyzer.php:        $this->softReferenceParserFactory = $softReferenceParserFactory;
+Classes/LinkAnalyzer.php:            $this->hookObjectsArr[$key] = GeneralUtility::makeInstance($className);
+Classes/LinkAnalyzer.php:        $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
+Classes/LinkAnalyzer.php:        $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
+Classes/LinkAnalyzer.php:        $this->searchFields = $this->configuration->getSearchFields();
+Classes/LinkAnalyzer.php:        $this->pids = $pidList;
+Classes/LinkAnalyzer.php:        $this->statistics = new CheckLinksStatistics();
+Classes/LinkAnalyzer.php:        foreach ($this->hookObjectsArr as $key => $value) {
+Classes/LinkAnalyzer.php:            $value->setConfiguration($this->configuration);
+Classes/LinkAnalyzer.php:        if ($this->hookObjectsArr[$linkType] ?? false) {
+Classes/LinkAnalyzer.php:            $hookObj = $this->hookObjectsArr[$linkType];
+Classes/LinkAnalyzer.php:            $result = $hookObj->checkLink($url, [], $mode);
+Classes/LinkAnalyzer.php:                $count = $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
+Classes/LinkAnalyzer.php:                    -1
+Classes/LinkAnalyzer.php:                    $this->getLanguageService()->getLL('list.recheck.url.ok.removed'),
+Classes/LinkAnalyzer.php:                $selectFields = $this->getSelectFields($record['table'], [$record['field']]);
+Classes/LinkAnalyzer.php:                $row = $this->contentRepository->getRowForUid($uid, $record['table'], $selectFields);
+Classes/LinkAnalyzer.php:                $this->findLinksForRecord(
+Classes/LinkAnalyzer.php:                    $count = $this->brokenLinkRepository->removeForRecordUrl(
+Classes/LinkAnalyzer.php:                        $this->getLanguageService()->getLL('list.recheck.url.notok.removed'),
+Classes/LinkAnalyzer.php:                    'errorParams' => $hookObj->getErrorParams()->toArray()
+Classes/LinkAnalyzer.php:            $count = $this->brokenLinkRepository->updateBrokenLink($brokenLinkRecord, $identifier);
+Classes/LinkAnalyzer.php:                $this->getLanguageService()->getLL('list.recheck.url.notok.updated'),
+Classes/LinkAnalyzer.php:                $this->getLanguageService()->getLL('list.recheck.url'),
+Classes/LinkAnalyzer.php:     * @param int $beforeEditedTimestamp - when was record last edited, only recheck if timestamp changed
+Classes/LinkAnalyzer.php:        $selectFields = $this->getSelectFields($table, [$field]);
+Classes/LinkAnalyzer.php:        $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+Classes/LinkAnalyzer.php:            $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
+Classes/LinkAnalyzer.php:            $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
+Classes/LinkAnalyzer.php:            $message = $this->getLanguageService()->getLL('list.recheck.message.notchanged');
+Classes/LinkAnalyzer.php:        $this->findLinksForRecord(
+Classes/LinkAnalyzer.php:            self::MASK_CONTENT_CHECK_ALL-self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
+Classes/LinkAnalyzer.php:            $this->checkLinks($resultsLinks, $linkTypes, $flags);
+Classes/LinkAnalyzer.php:        $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
+Classes/LinkAnalyzer.php:        $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.checked'), $header);
+Classes/LinkAnalyzer.php:        foreach ($this->hookObjectsArr as $key => $hookObj) {
+Classes/LinkAnalyzer.php:                    $record['language'] = -1;
+Classes/LinkAnalyzer.php:                $record['exclude_link_targets_pid'] = $this->configuration->getExcludeLinkTargetStoragePid();
+Classes/LinkAnalyzer.php:                $this->debug("checkLinks: before checking $url");
+Classes/LinkAnalyzer.php:                $checkUrl = $hookObj->checkLink((string)$url, $entryValue, $mode);
+Classes/LinkAnalyzer.php:                $this->debug("checkLinks: after checking $url");
+Classes/LinkAnalyzer.php:                if ($hookObj->isExcludeUrl()) {
+Classes/LinkAnalyzer.php:                    $this->statistics->incrementCountExcludedLinks();
+Classes/LinkAnalyzer.php:                        'errorParams' => $hookObj->getErrorParams()->toArray()
+Classes/LinkAnalyzer.php:                    $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
+Classes/LinkAnalyzer.php:                    $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
+Classes/LinkAnalyzer.php:                    $this->statistics->incrementCountBrokenLinks();
+Classes/LinkAnalyzer.php:                    $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
+Classes/LinkAnalyzer.php:                    $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
+Classes/LinkAnalyzer.php:        if (empty($linkTypes) || empty($this->pids)) {
+Classes/LinkAnalyzer.php:        $this->statistics->initialize();
+Classes/LinkAnalyzer.php:        $this->statistics->setCountPages((int)count($this->pids));
+Classes/LinkAnalyzer.php:        foreach ($this->searchFields as $table => $fields) {
+Classes/LinkAnalyzer.php:            $max = (int)($this->brokenLinkRepository->getMaxBindParameters() /2 - 4);
+Classes/LinkAnalyzer.php:            foreach (array_chunk($this->pids, $max)
+Classes/LinkAnalyzer.php:                    ->getQueryBuilderForTable($table);
+Classes/LinkAnalyzer.php:                    $queryBuilder->getRestrictions()
+Classes/LinkAnalyzer.php:                        ->removeAll()
+Classes/LinkAnalyzer.php:                        ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+Classes/LinkAnalyzer.php:                $selectFields = $this->getSelectFields($table, $fields);
+Classes/LinkAnalyzer.php:                        $queryBuilder->expr()->in(
+Classes/LinkAnalyzer.php:                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/LinkAnalyzer.php:                        $queryBuilder->expr()->in(
+Classes/LinkAnalyzer.php:                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+Classes/LinkAnalyzer.php:                    $queryBuilder->join(
+Classes/LinkAnalyzer.php:                        $queryBuilder->expr()->eq('p.uid', $queryBuilder->quoteIdentifier($table . '.pid'))
+Classes/LinkAnalyzer.php:                    foreach ($this->configuration->getDoNotCheckContentOnPagesDoktypes() as $doktype) {
+Classes/LinkAnalyzer.php:                        $constraints[] = $queryBuilder->expr()->neq(
+Classes/LinkAnalyzer.php:                            $queryBuilder->createNamedParameter($doktype, \PDO::PARAM_INT)
+Classes/LinkAnalyzer.php:                $queryBuilder->select(...$selectFields)
+Classes/LinkAnalyzer.php:                    ->from($table)
+Classes/LinkAnalyzer.php:                    ->where(
+Classes/LinkAnalyzer.php:                $result = $queryBuilder->executeQuery();
+Classes/LinkAnalyzer.php:                while ($row = $result->fetchAssociative()) {
+Classes/LinkAnalyzer.php:                    $this->findLinksForRecord(
+Classes/LinkAnalyzer.php:                        self::MASK_CONTENT_CHECK_ALL - self::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
+Classes/LinkAnalyzer.php:                    $this->statistics->addCountLinks($this->countLinks($results));
+Classes/LinkAnalyzer.php:                    $this->checkLinks($results, $linkTypes);
+Classes/LinkAnalyzer.php:        $this->brokenLinkRepository->removeAllBrokenLinksForPagesBeforeTime($this->pids, $linkTypes, $checkStart);
+Classes/LinkAnalyzer.php:        $this->statistics->calculateStats();
+Classes/LinkAnalyzer.php:        return $this->statistics;
+Classes/LinkAnalyzer.php:                if ($this->isRecordShouldBeChecked($table, $record) === false) {
+Classes/LinkAnalyzer.php:                if ($this->isRecordsOnPageShouldBeChecked($table, $record) === false) {
+Classes/LinkAnalyzer.php:                $fields = $this->getEditableFields($idRecord, $table, $fields);
+Classes/LinkAnalyzer.php:                foreach ($this->softReferenceParserFactory->getParsersBySoftRefParserList($conf['softref'], $softRefParams) as $softReferenceParser) {
+Classes/LinkAnalyzer.php:                    $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
+Classes/LinkAnalyzer.php:                    if (!$parserResult->hasMatched()) {
+Classes/LinkAnalyzer.php:                    if ($softReferenceParser->getParserKey() === 'typolink_tag') {
+Classes/LinkAnalyzer.php:                        $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
+Classes/LinkAnalyzer.php:                        $this->analyzeLinks($parserResult, $results, $record, $field, $table);
+Classes/LinkAnalyzer.php:            // @extensionScannerIgnoreLine problem with ->error()
+Classes/LinkAnalyzer.php:            $this->error(
+Classes/LinkAnalyzer.php:                . $e->getMessage()
+Classes/LinkAnalyzer.php:                . $e->getTraceAsString()
+Classes/LinkAnalyzer.php:            // @extensionScannerIgnoreLine problem with ->error()
+Classes/LinkAnalyzer.php:            $this->error(
+Classes/LinkAnalyzer.php:                . $e->getMessage()
+Classes/LinkAnalyzer.php:                . $e->getTraceAsString()
+Classes/LinkAnalyzer.php:        foreach ($parserResult->getMatchedElements() as $element) {
+Classes/LinkAnalyzer.php:            foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
+Classes/LinkAnalyzer.php:                $type = $hookObj->fetchType($r, $type, $keyArr);
+Classes/LinkAnalyzer.php:        $linkTags = $htmlParser->splitIntoBlock('a,link', $parserResult->getContent());
+Classes/LinkAnalyzer.php:            foreach ($parserResult->getMatchedElements() as $element) {
+Classes/LinkAnalyzer.php:            foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
+Classes/LinkAnalyzer.php:                $type = $hookObj->fetchType($currentR, $type, $keyArr);
+Classes/LinkAnalyzer.php:            && ((int)($row['colPos'] ?? 0)) == -1
+Classes/LinkAnalyzer.php:            && $this->contentRepository->isGridElementParentHidden($uid)
+Classes/LinkAnalyzer.php:     * - are not rendered in the FE
+Classes/LinkAnalyzer.php:     * - excluded from checking
+Classes/LinkAnalyzer.php:        if ($this->isVisibleFrontendRecord($tablename, $row) === false) {
+Classes/LinkAnalyzer.php:            $excludedCtypes = $this->configuration->getExcludedCtypes();
+Classes/LinkAnalyzer.php:     * - is not hidden
+Classes/LinkAnalyzer.php:     * - is not doktype=3 or 4
+Classes/LinkAnalyzer.php:     * - is not record of default language and cfg_l18n is 1 or 3
+Classes/LinkAnalyzer.php:        if ($this->pagesRepository->getRootLineIsHidden($pageRow)) {
+Classes/LinkAnalyzer.php:        $formData = $this->formDataCompiler->compile($formDataCompilerInput);
+Classes/LinkAnalyzer.php:        if ($this->logger) {
+Classes/LinkAnalyzer.php:            $this->logger->debug($message);
+Classes/LinkAnalyzer.php:        if ($this->logger) {
+Classes/LinkAnalyzer.php:            // @extensionScannerIgnoreLine problem with ->error()
+Classes/LinkAnalyzer.php:            $this->logger->error($message);
