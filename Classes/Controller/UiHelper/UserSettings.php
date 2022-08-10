@@ -27,6 +27,7 @@ class UserSettings
 
     /**
      * Named constructor
+     * @param array<string,mixed> $modSettings
      */
     public static function initializeFromSettings(array $modSettings): UserSettings
     {
@@ -35,12 +36,13 @@ class UserSettings
 
     /**
      * Named constructor
+     * @param array<string,mixed> $modSettings
      */
     public static function initializeFromSettingsAndGetParameters(array $modSettings): UserSettings
     {
         $viewMode = $modSettings[self::KEY_VIEW_MODE] ?: '';
         if (GeneralUtility::_GP('view_mode')) {
-            $viewMode = GeneralUtility::_GP('view_mode') ?: '';
+            $viewMode = GeneralUtility::_GP('view_mode');
         }
         if (!$viewMode) {
             $viewMode = self::VIEW_MODE_VALUE_DEFAULT;
@@ -53,11 +55,18 @@ class UserSettings
         return $this->viewMode;
     }
 
+    /**
+     * @param array<string,mixed> $modSettings
+     * @return string
+     */
     public static function getViewModeFromSettings(array $modSettings): string
     {
         return $modSettings['brofix_' . self::KEY_VIEW_MODE] ?? '';
     }
 
+    /**
+     * @param array<string,mixed> $modSettings
+     */
     public function persistToArray(array &$modSettings): void
     {
         $modSettings[self::KEY_VIEW_MODE] = $this->viewMode;
