@@ -614,7 +614,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
 
                 // Check if a TCA configured field has soft references defined (see TYPO3 Core API document)
-                if (!$conf['softref'] || (string)$valueField === '') {
+                if (!($conf['softref'] ?? false) || (string)$valueField === '') {
                     continue;
                 }
 
