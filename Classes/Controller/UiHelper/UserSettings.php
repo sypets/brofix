@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller\UiHelper;
@@ -26,7 +27,6 @@ class UserSettings
 
     /**
      * Named constructor
-     * @return void
      */
     public static function initializeFromSettings(array $modSettings): UserSettings
     {
@@ -35,7 +35,6 @@ class UserSettings
 
     /**
      * Named constructor
-     * @return void
      */
     public static function initializeFromSettingsAndGetParameters(array $modSettings): UserSettings
     {
@@ -46,7 +45,7 @@ class UserSettings
         if (!$viewMode) {
             $viewMode = self::VIEW_MODE_VALUE_DEFAULT;
         }
-       return new UserSettings($viewMode);
+        return new UserSettings($viewMode);
     }
 
     public function getViewMode(): string
@@ -54,7 +53,7 @@ class UserSettings
         return $this->viewMode;
     }
 
-    static public function getViewModeFromSettings(array $modSettings): string
+    public static function getViewModeFromSettings(array $modSettings): string
     {
         return $modSettings['brofix_' . self::KEY_VIEW_MODE] ?? '';
     }
@@ -63,5 +62,4 @@ class UserSettings
     {
         $modSettings[self::KEY_VIEW_MODE] = $this->viewMode;
     }
-
 }
