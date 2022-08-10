@@ -182,7 +182,7 @@ class PagesRepository
      */
     public function getRootLineIsHidden(array $pageInfo)
     {
-        if ($pageInfo['pid'] === 0) {
+        if (($pageInfo['pid'] ?? 0) === 0) {
             return false;
         }
 
