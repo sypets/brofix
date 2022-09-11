@@ -18,7 +18,7 @@ $EM_CONF[$_EXTKEY] = [
         ],
         'conflicts' => [],
         'suggests' => [
-            'page_callouts' => '1.0.0-2.90.99'
+            'page_callouts' => '3.0.0-3.9.99'
         ],
     ],
 ];
