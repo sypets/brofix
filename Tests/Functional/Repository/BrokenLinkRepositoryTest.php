@@ -626,7 +626,6 @@ class BrokenLinkRepositoryTest extends AbstractFunctionalTest
         array $pidList,
         array $expectedResult
     ): void {
-
         // setup
         $searchFields = [
             'pages' => ['media', 'url', 'canonical_link'],

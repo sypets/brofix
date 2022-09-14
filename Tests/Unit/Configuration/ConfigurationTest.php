@@ -22,7 +22,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ConfigurationTest extends AbstractUnitTest
 {
-
     /**
      * Set up for set up the backend user, initialize the language object
      * and creating the Export instance
