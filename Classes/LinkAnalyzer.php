@@ -278,14 +278,15 @@ class LinkAnalyzer implements LoggerAwareInterface
         $selectFields = $this->getSelectFields($table, [$field]);
         $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
         $startTime = \time();
-        $header = $row['header'] ?: $recordUid;
+
         if (!$row) {
             // missing record: remove existing links
-            $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $header);
+            $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $recordUid);
             // remove existing broken links from table
             $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
             return true;
         }
+        $header = $row['header'] ?: $recordUid;
 
         if ($beforeEditedTimestamp && isset($row['timestamp']) && $beforeEditedTimestamp >= (int)$row['timestamp']) {
             // if timestamp of record is not after $beforeEditedTimestamp: no need to recheck
