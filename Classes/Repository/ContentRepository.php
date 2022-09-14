@@ -23,7 +23,7 @@ class ContentRepository
      * @param string $table
      * @param array<string> $fields
      * @param bool $checkHidden
-     * @return mixed[]
+     * @return array<mixed>
      *
      * @todo additional fields added here should be added in LinkAnalyzer::getSelectFields()
      */

@@ -159,7 +159,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE) === 0)
             //&& $this->linkTargetCache->hasEntryForUrl($origUrl, 'external', true, $this->configuration->getLinkTargetCacheExpires($flags))
         ) {
-
             /**
              *  'valid' => bool,
              *  'isExcluded' => bool,
@@ -290,7 +289,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 $this->errorParams->setErrno((int)($handlerContext['errno']));
                 // use shorter error message
                 if (isset($handlerContext['error'])) {
-                    $this->errorParams->setExceptionMsg($handlerContext['error'] ?? $this->errorParams['exception'] ?? '');
+                    $this->errorParams->setExceptionMsg($handlerContext['error']);
                 }
             } else {
                 $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);

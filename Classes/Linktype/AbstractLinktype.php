@@ -20,7 +20,6 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 
 abstract class AbstractLinktype implements LinktypeInterface
 {
-
     /**
      * Flag used int checkLink() $flags
      * All CHECK_LINK_FLAG_ flags can be combined
