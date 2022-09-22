@@ -1,0 +1,2 @@
+# cat=basic; type=bool; label=Do not use these softreference parsers (comma separated list) when parsing content (default: "url": workaround for TYPO3 core bug)
+excludeSoftrefs = url
