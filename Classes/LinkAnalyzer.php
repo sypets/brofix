@@ -100,6 +100,9 @@ class LinkAnalyzer implements LoggerAwareInterface
     /** @var array */
     protected $excludeSoftrefs;
 
+    /** @var array */
+    protected $excludeSoftrefsInFields;
+
     /**
      * @var CheckLinksStatistics|null
      */
@@ -132,6 +135,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
 
         $this->excludeSoftrefs = explode(',', $extensionConfiguration->get('brofix', 'excludeSoftrefs') ?: '');
+        $this->excludeSoftrefsInFields = explode(',', $extensionConfiguration->get('brofix', 'excludeSoftrefsInFields') ?: '');
     }
 
     /**
@@ -631,12 +635,18 @@ class LinkAnalyzer implements LoggerAwareInterface
                  * @todo can be removed along the the Extension configuration setting  excludeSoftrefs when core
                  *   bug is fixed, see https://forge.typo3.org/issues/97937
                  */
-                foreach ($this->excludeSoftrefs as $excludeSoftref) {
-                    $conf['softref'] = preg_replace(
-                        '#(,|^)' . $excludeSoftref . '(,|$)#',
-                        '',
-                        $conf['softref']
-                    );
+                foreach ($this->excludeSoftrefsInFields as $tableField) {
+                    if ($tableField != ($table . '.' . $field)) {
+                        continue;
+                    }
+                    foreach ($this->excludeSoftrefs as $excludeSoftref) {
+                        $conf['softref'] = preg_replace(
+                            '#(,|^)' . $excludeSoftref . '(,|$)#',
+                            '',
+                            $conf['softref']
+                        );
+                        break;
+                    }
                 }
 
                 $softRefParams = ['subst'];
