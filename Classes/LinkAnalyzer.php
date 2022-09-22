@@ -632,8 +632,11 @@ class LinkAnalyzer implements LoggerAwareInterface
                  *   bug is fixed, see https://forge.typo3.org/issues/97937
                  */
                 foreach ($this->excludeSoftrefs as $excludeSoftref) {
-                    $conf['softref'] = preg_replace('#(,|^)' . $excludeSoftref . '(,|$)#', '',
-                        $conf['softref']);
+                    $conf['softref'] = preg_replace(
+                        '#(,|^)' . $excludeSoftref . '(,|$)#',
+                        '',
+                        $conf['softref']
+                    );
                 }
 
                 $softRefParams = ['subst'];
