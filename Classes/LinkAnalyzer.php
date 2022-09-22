@@ -30,6 +30,7 @@ use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -96,6 +97,12 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected FormDataCompiler $formDataCompiler;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
 
+    /** @var string[] */
+    protected $excludeSoftrefs;
+
+    /** @var string[] */
+    protected $excludeSoftrefsInFields;
+
     /**
      * @var CheckLinksStatistics|null
      */
@@ -108,7 +115,8 @@ class LinkAnalyzer implements LoggerAwareInterface
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
         PagesRepository $pagesRepository,
-        SoftReferenceParserFactory $softReferenceParserFactory
+        SoftReferenceParserFactory $softReferenceParserFactory,
+        ExtensionConfiguration $extensionConfiguration
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
@@ -125,6 +133,9 @@ class LinkAnalyzer implements LoggerAwareInterface
          */
         $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
+
+        $this->excludeSoftrefs = explode(',', $extensionConfiguration->get('brofix', 'excludeSoftrefs') ?: '');
+        $this->excludeSoftrefsInFields = explode(',', $extensionConfiguration->get('brofix', 'excludeSoftrefsInFields') ?: '');
     }
 
     /**
@@ -617,6 +628,24 @@ class LinkAnalyzer implements LoggerAwareInterface
                 // Check if a TCA configured field has soft references defined (see TYPO3 Core API document)
                 if (!($conf['softref'] ?? false) || (string)$valueField === '') {
                     continue;
+                }
+
+                /**
+                 * @todo can be removed along the the Extension configuration setting  excludeSoftrefs when core
+                 *   bug is fixed, see https://forge.typo3.org/issues/97937
+                 */
+                foreach ($this->excludeSoftrefsInFields as $tableField) {
+                    if ($tableField != ($table . '.' . $field)) {
+                        continue;
+                    }
+                    foreach ($this->excludeSoftrefs as $excludeSoftref) {
+                        $conf['softref'] = preg_replace(
+                            '#(,|^)' . $excludeSoftref . '(,|$)#',
+                            '',
+                            $conf['softref']
+                        );
+                        break;
+                    }
                 }
 
                 $softRefParams = ['subst'];
