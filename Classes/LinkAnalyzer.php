@@ -97,10 +97,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected FormDataCompiler $formDataCompiler;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
 
-    /** @var array */
+    /** @var string[] */
     protected $excludeSoftrefs;
 
-    /** @var array */
+    /** @var string[] */
     protected $excludeSoftrefsInFields;
 
     /**
@@ -631,7 +631,6 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
 
                 /**
-                 * @var  $excludeSoftref
                  * @todo can be removed along the the Extension configuration setting  excludeSoftrefs when core
                  *   bug is fixed, see https://forge.typo3.org/issues/97937
                  */
