@@ -331,7 +331,7 @@ class InternalLinktype extends AbstractLinktype
         $lang = $this->getLanguageService();
         $custom = $errorParams->getCustom();
 
-        if ($custom['page']) {
+        if ($custom['page'] ?? false) {
             switch ($custom['page']['errno']) {
                 case self::ERROR_ERRNO_DELETED:
                     $errorPage = $lang->getLL('list.report.error.page.deleted');
@@ -343,8 +343,8 @@ class InternalLinktype extends AbstractLinktype
                     $errorPage = $lang->getLL('list.report.error.page.notexisting');
             }
         }
-        if ($custom['content']) {
-            switch ($custom['content']['errno']) {
+        if ($custom['content'] ?? false) {
+            switch ($custom['content']['errno'] ?? false) {
                 case self::ERROR_ERRNO_DELETED:
                     $errorContent = $lang->getLL('list.report.error.content.deleted');
                     break;
