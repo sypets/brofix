@@ -388,8 +388,18 @@ class ManageExclusionsController extends AbstractBrofixController
     protected function renderTableRow(array $row): array
     {
         $variables['page'] = $row['pid'];
-        $variables['url'] = $row['linktarget'];
-        $variables['link_type'] = $row['link_type'];
+
+        $linktarget_url = $linktarget_text = $row['linktarget'] ?? '';
+        $linkType = $row['link_type'] ?? 'external';
+        $match = $row['match'] ?? 'exact';
+
+        if ($match === 'domain' && $linkType === 'external' && strpos($linktarget_url, 'http') !== 0) {
+            $linktarget_url = 'https://' . $linktarget_url;
+        }
+
+        $variables['linktarget_url'] = $linktarget_url;
+        $variables['linktarget_text'] = $linktarget_text;
+        $variables['link_type'] = $linkType;
         // Reformating excluding link date
         $excludeDate = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['crdate']);
         $excludeTime = date($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $row['crdate']);
