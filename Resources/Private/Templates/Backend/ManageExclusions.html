@@ -156,6 +156,9 @@
                             <core:icon identifier="{tableHeader.reason.icon}"/>
                         </f:if>
                     </th>
+					<f:if condition="{hasPermission}">
+						<th></th>
+					</f:if>
                 </tr>
                 </thead>
                 <tbody class="check">
@@ -178,6 +181,7 @@
                 </a>
                 <br/>
                 <br/>
+
                 <f:for each="{brokenLinks}" as="item">
                     <tr>
 						<f:if condition="{hasPermission}">
@@ -217,6 +221,13 @@
                                 </f:else>
                             </f:if>
                         </td>
+						<f:if condition="{hasPermission}">
+							<td>
+								<be:link.editRecord class="btn btn-primary" uid="{item.uid}" title="" table="tx_brofix_exclude_link_target" returnUrl="{f:be.uri(route: 'web_brofix', parameters: '{id: currentPage}')}">
+									<core:icon identifier="actions-open" size="small"/>
+								</be:link.editRecord>
+							</td>
+						</f:if>
                     </tr>
                 </f:for>
                 </tbody>
