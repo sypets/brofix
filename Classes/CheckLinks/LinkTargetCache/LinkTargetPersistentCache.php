@@ -121,6 +121,13 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      */
     protected function insert(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
     {
+        $errorCode = '';
+        $errorType = $urlResponse['errorParams']['errorType'] ?? '';
+        $errno = (int)($urlResponse['errorParams']['errno'] ?? 0);
+        if ($errorType) {
+            $errorCode = $errorType . '_' . $errno;
+        }
+
         $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
             ->insert(static::TABLE)
@@ -129,6 +136,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                     'url' => $linkTarget,
                     'link_type' => $linkType,
                     'url_response' => \json_encode($urlResponse),
+                    'error_code' => $errorCode,
                     'check_status' => $checkStatus,
                     'last_check' => \time()
                 ]
@@ -144,6 +152,13 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      */
     protected function update(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
     {
+        $errorCode = '';
+        $errorType = $urlResponse['errorParams']['errorType'] ?? '';
+        $errno = (int)($urlResponse['errorParams']['errno'] ?? 0);
+        if ($errorType) {
+            $errorCode = $errorType . '_' . $errno;
+        }
+
         $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
             ->update(static::TABLE)
@@ -152,6 +167,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
             )
             ->set('url_response', \json_encode($urlResponse))
+            ->set('error_code', $errorCode)
             ->set('check_status', (string)$checkStatus)
             ->set('last_check', (string)\time())
             ->executeStatement();

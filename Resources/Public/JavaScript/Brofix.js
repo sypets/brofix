@@ -40,6 +40,7 @@ define(['jquery'], function($) {
       $('#uid_searchFilter').attr('value', '');
       $('#linktype_searchFilter').val('all');
       $('#url_searchFilter').attr('value', '');
+      $('#errorcode_searchFilter').attr('value', '');
       $('#url_match_searchFilter').val('partial');
       $('#refreshLinkList').click();
     });

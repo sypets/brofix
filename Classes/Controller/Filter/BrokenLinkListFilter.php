@@ -6,16 +6,28 @@ namespace Sypets\Brofix\Controller\Filter;
 
 use Sypets\Brofix\Util\Arrayable;
 
+/**
+ * Stores current filter settings for filtering in broken link list.
+ *
+ * If a new item is added, it must be added to constructor,
+ * getInstanceFromArray and toArray()
+ */
 class BrokenLinkListFilter implements Arrayable
 {
     /** @var string  */
     protected const KEY_UID = 'uid';
+
     /** @var string */
     protected const KEY_URL = 'url';
+
     /** @var string */
     protected const KEY_LINKTYPE = 'linktype';
+
     /** @var string */
     protected const KEY_URL_MATCH = 'urlMatch';
+
+    /** @var string */
+    protected const KEY_ERRORCODE_MATCH = 'errorCode';
 
     /** @var string */
     protected const LINK_TYPE_FILTER_DEFAULT = 'all';
@@ -45,6 +57,11 @@ class BrokenLinkListFilter implements Arrayable
 
     /**
      * @var string
+     */
+    protected $errorcodeFilter = '';
+
+    /**
+     * @var string
      * @deprecated
      */
     protected $title_filter = '';
@@ -53,12 +70,14 @@ class BrokenLinkListFilter implements Arrayable
         string $uid = '',
         string $linkType = self::LINK_TYPE_DEFAULT,
         string $url = '',
-        string $urlMatch = self::URL_MATCH_DEFAULT
+        string $urlMatch = self::URL_MATCH_DEFAULT,
+        string $errorCode = ''
     ) {
         $this->uid_filtre = $uid;
         $this->linktype_filter = $linkType;
         $this->url_filtre = $url;
         $this->urlFilterMatch = $urlMatch;
+        $this->errorcodeFilter = $errorCode;
     }
 
     public static function getInstanceFromArray(array $values): BrokenLinkListFilter
@@ -67,7 +86,8 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_UID] ?? '',
             $values[self::KEY_LINKTYPE] ?? self::LINK_TYPE_DEFAULT,
             $values[self::KEY_URL] ?? '',
-            $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT
+            $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
+            $values[self::KEY_ERRORCODE_MATCH] ?? ''
         );
     }
 
@@ -78,6 +98,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_LINKTYPE => $this->getLinktypeFilter(),
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
+            self::KEY_ERRORCODE_MATCH => $this->getErrorcodeFilter(),
         ];
     }
 
@@ -144,6 +165,22 @@ class BrokenLinkListFilter implements Arrayable
     public function setUrlFilterMatch(string $urlFilterMatch): void
     {
         $this->urlFilterMatch = $urlFilterMatch;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorcodeFilter(): string
+    {
+        return $this->errorcodeFilter;
+    }
+
+    /**
+     * @param string $errorcodeFilter
+     */
+    public function setErrorcodeFilter(string $errorcodeFilter): void
+    {
+        $this->errorcodeFilter = $errorcodeFilter;
     }
 
     /** @deprecated */

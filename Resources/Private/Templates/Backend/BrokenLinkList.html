@@ -95,6 +95,16 @@
 						</option>
 					</select>
 				</div>
+
+				<div class="form-group form-group-border">
+					<label for="url_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.errorcode"/>:</label>
+					<div class="form-control-clearable">
+						<input type="text" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="errorcode_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.errorcode')}" id="errorcode_searchFilter" value="{errorcode_filter}"/>
+						<button type="button" tabindex="-1" class="close" id="errorcodeButton" style="visibility: visible;">
+							<core:icon identifier="actions-close" size="small" />
+						</button>
+					</div>
+				</div>
 			</row>
 			<br/>
 
@@ -226,7 +236,22 @@
 							</f:if>
 						</div>
 					</td>
-					<td>{item.linkmessage -> f:format.raw()}</td>
+					<td>{item.linkmessage -> f:format.raw()}
+						<div class="inline-action">
+							<f:if condition="{errorcode_filter}">
+								<f:then>
+									<a href="{listUri}&errorcode_searchFilter=" title="">
+										<core:icon identifier="actions-close"/>
+									</a>
+								</f:then>
+								<f:else>
+									<a href="{listUri}&errorcode_searchFilter={item.error_code}" title="">
+										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+									</a>
+								</f:else>
+							</f:if>
+						</div>
+					</td>
 					<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
 						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
 						<f:if condition="{item.freshness} == 'stale'>">

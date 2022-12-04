@@ -89,6 +89,11 @@ abstract class AbstractLinktype implements LinktypeInterface
         return $this->errorParams;
     }
 
+    public function getErrorShortcut(ErrorParams $errorParams = null): string
+    {
+        return $errorParams->getErrorType() . '_' . $errorParams->getErrno();
+    }
+
     /**
      * Base type fetching method, based on the type that softRefParserObj returns
      *

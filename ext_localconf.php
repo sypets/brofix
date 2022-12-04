@@ -121,4 +121,8 @@ defined('TYPO3_MODE') or die();
         \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
         ['source' => 'EXT:brofix/Resources/Public/Icons/view-table-complex.svg']
     );
+
+    // upgrade wizards
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['brofix_errorCodeUpdateWizard']
+        = \Sypets\Brofix\Updates\ErrorCodeUpdateWizard::class;
 })();

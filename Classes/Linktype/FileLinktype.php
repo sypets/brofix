@@ -26,6 +26,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileLinktype extends AbstractLinktype
 {
+    /**
+     * @var string
+     */
+    protected const ERROR_TYPE_FILE = 'file';
+
+    /**
+     * @var int
+     */
+    protected const ERROR_ERRNO_FILE_MISSING = 1;
+
     public function __construct()
     {
         $this->initializeErrorParams();
@@ -69,13 +79,21 @@ class FileLinktype extends AbstractLinktype
         $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         try {
             $file = $resourceFactory->retrieveFileOrFolderObject($url);
+            $isMissing = (bool)(($file !== null) ? $file->isMissing() : true);
         } catch (FileDoesNotExistException $e) {
-            return false;
+            $isMissing = true;
         } catch (FolderDoesNotExistException $e) {
-            return false;
+            $isMissing = true;
         }
 
-        return (bool)(($file !== null) ? !$file->isMissing() : false);
+        if ($isMissing === false) {
+            return true;
+        }
+
+        // file is missing
+        $this->errorParams->setErrorType(self::ERROR_TYPE_FILE);
+        $this->errorParams->setErrno(self::ERROR_ERRNO_FILE_MISSING);
+        return false;
     }
 
     /**
