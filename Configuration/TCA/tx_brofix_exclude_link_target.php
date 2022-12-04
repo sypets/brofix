@@ -90,7 +90,7 @@ return [
                 'placeholder' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_target.placeholder',
                 'cols' => 30,
                 'rows' => 5,
-                'eval' => 'trim,required',
+                'eval' => 'trim,required,' . \Sypets\Brofix\FormEngine\CustomEvaluation\ExcludeLinkTargetsLinkTargetEvaluation::class,
             ]
         ],
         'editlock' => [
