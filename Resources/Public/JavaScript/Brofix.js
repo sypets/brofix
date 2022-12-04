@@ -28,11 +28,7 @@ define(['jquery'], function($) {
       $('#refreshLinkList').click();
     })
 
-    $('#view_table_complex').on('change', function () {
-      $('#refreshLinkList').click();
-    })
-
-    $('#view_table_min').on('change', function () {
+    $('.view_mode').on('change', function () {
       $('#refreshLinkList').click();
     })
 
