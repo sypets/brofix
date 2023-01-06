@@ -158,7 +158,7 @@ class InternalLinktype extends AbstractLinktype
 
         if ($row) {
             if ($row['deleted'] == '1') {
-                $errorType = self::ERROR_ERRNO_DELETED;
+                $errorType = self::ERROR_TYPE_PAGE;
                 $errno = self::ERROR_ERRNO_DELETED;
 
                 $customParams = [
