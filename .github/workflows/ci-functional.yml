@@ -14,6 +14,7 @@ jobs:
   testsuite:
     name: Functional tests on all DBs
     runs-on: ubuntu-20.04
+    timeout-minutes: 15
     strategy:
       matrix:
         php: [ '7.2', '7.3', '7.4' ]
