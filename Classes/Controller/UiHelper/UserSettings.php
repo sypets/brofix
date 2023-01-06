@@ -40,7 +40,7 @@ class UserSettings
      */
     public static function initializeFromSettingsAndGetParameters(array $modSettings): UserSettings
     {
-        $viewMode = $modSettings[self::KEY_VIEW_MODE] ?: '';
+        $viewMode = $modSettings[self::KEY_VIEW_MODE] ?? '';
         if (GeneralUtility::_GP('view_mode')) {
             $viewMode = GeneralUtility::_GP('view_mode');
         }
