@@ -35,10 +35,22 @@ use TYPO3\CMS\Core\Utility\MailUtility;
  */
 class Configuration
 {
+    public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
+
     /**
      * @var mixed[]
      */
     protected $tsConfig = [];
+
+    /**
+     * Limit number of pages traversed in backend. This limit is only active when displaying
+     * and checking links in the Backend, not when checking links via CLI or scheduler
+     *
+     * We set to 0 here by default (which means no limit) to not limit link checking via CLI.
+     *
+     * @var int
+     */
+    protected int $traverseMaxNumberOfPagesInBackend = 0;
 
     /**
      * Configuration constructor.
@@ -459,6 +471,23 @@ class Configuration
     }
 
     /**
+     * @return int
+     */
+    public function getTraverseMaxNumberOfPagesInBackend(): int
+    {
+        return $this->traverseMaxNumberOfPagesInBackend;
+    }
+
+    /**
+     * @param int $traverseMaxNumberOfPagesInBackend
+     */
+    public function setTraverseMaxNumberOfPagesInBackend(int $traverseMaxNumberOfPagesInBackend): void
+    {
+        $this->traverseMaxNumberOfPagesInBackend = $traverseMaxNumberOfPagesInBackend;
+    }
+
+    /**
+     * Get custom configuration (user defined)
      * @return mixed[]
      */
     public function getCustom(): array
