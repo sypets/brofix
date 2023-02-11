@@ -38,7 +38,8 @@ class PagesRepository
      * @param array<int,int> $excludedPages
      * @param array<int,int> $doNotCheckPageTypes
      * @param array<int,int> $doNotTraversePageTypes
- *
+     * @param int $traverseMaxNumberOfPages Maximum number of pages to traverse - hard limit
+     *
      * @return array<int,int>
      */
     protected function getAllSubpagesForPage(
@@ -50,13 +51,19 @@ class PagesRepository
         bool $considerHidden = false,
         array $excludedPages = [],
         array $doNotCheckPageTypes = [],
-        array $doNotTraversePageTypes = []
+        array $doNotTraversePageTypes = [],
+        int $traverseMaxNumberOfPages = 0
     ): array {
         if (!$useStartPage) {
             if ($depth === 0) {
                 return $pageList;
             }
             $depth = $depth - 1;
+        }
+
+        // we abort when limit + 1 is reached so we can determine that limit was reached and surpassed
+        if ($traverseMaxNumberOfPages && count($pageList) > $traverseMaxNumberOfPages) {
+            return $pageList;
         }
 
         $queryBuilder = $this->generateQueryBuilder('pages');
@@ -111,8 +118,13 @@ class PagesRepository
                     $considerHidden,
                     $excludedPages,
                     $doNotCheckPageTypes,
-                    $doNotTraversePageTypes
+                    $doNotTraversePageTypes,
+                    $traverseMaxNumberOfPages
                 );
+            }
+            // we abort when limit + 1 is reached so we can determine that limit was reached and surpassed
+            if ($traverseMaxNumberOfPages && count($pageList) > $traverseMaxNumberOfPages) {
+                return $pageList;
             }
         }
         return $pageList;
@@ -137,6 +149,7 @@ class PagesRepository
      * @param array<int,int> $excludedPages
      * @param array<int,int> $doNotCheckPageTypes
      * @param array<int,int> $doNotTraversePageTypes
+     * @param int $traverseMaxNumberOfPages
      *
      * @return array<int,int>
      */
@@ -148,7 +161,8 @@ class PagesRepository
         bool $considerHidden = false,
         array $excludedPages = [],
         array $doNotCheckPageTypes = [],
-        array $doNotTraversePageTypes = []
+        array $doNotTraversePageTypes = [],
+        int $traverseMaxNumberOfPages = 0
     ): array {
         if (in_array($id, $excludedPages)) {
             // do not add page, if in list of excluded pages
@@ -163,7 +177,8 @@ class PagesRepository
             $considerHidden,
             $excludedPages,
             $doNotCheckPageTypes,
-            $doNotTraversePageTypes
+            $doNotTraversePageTypes,
+            $traverseMaxNumberOfPages
         );
         $this->getTranslationForPage(
             $pageList,

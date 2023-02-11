@@ -3,3 +3,7 @@ excludeSoftrefs = url
 
 # cat=basic; type=bool; label=In which fields should excludeSoftrefs apply (comma separated list of table.field) (default: tt_content.bodytext)
 excludeSoftrefsInFields = tt_content.bodytext
+
+# cat=basic; type=int; label= Maximum number of pages to traverse in Backend. Limit is disabled if =0. This should be set to a hard limit for performance reasons.
+traverseMaxNumberOfPagesInBackend = 10000
+

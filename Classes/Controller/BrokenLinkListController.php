@@ -19,6 +19,7 @@ use Sypets\Brofix\Util\StringUtil;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -196,7 +197,8 @@ class BrokenLinkListController extends AbstractBrofixController
         FlashMessageService $flashMessageService = null,
         BackendSession $backendSession = null,
         ModuleTemplate $moduleTemplate = null,
-        IconFactory $iconFactory = null
+        IconFactory $iconFactory = null,
+        ExtensionConfiguration $extensionConfiguration = null
     ) {
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
@@ -215,6 +217,14 @@ class BrokenLinkListController extends AbstractBrofixController
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $this->orderBy = BrokenLinkListController::ORDER_BY_DEFAULT;
+        if (!$extensionConfiguration) {
+            $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        }
+        $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
+        $this->configuration->setTraverseMaxNumberOfPagesInBackend(
+            (int)($extConfArray['traverseMaxNumberOfPagesInBackend']
+            ?? Configuration::TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT)
+        );
     }
 
     /**
@@ -539,8 +549,10 @@ class BrokenLinkListController extends AbstractBrofixController
                 $considerHidden,
                 [],
                 $this->configuration->getDoNotCheckPagesDoktypes(),
-                $this->configuration->getDoNotTraversePagesDoktypes()
+                $this->configuration->getDoNotTraversePagesDoktypes(),
+                $this->configuration->getTraverseMaxNumberOfPagesInBackend()
             );
+            {}
         } else {
             $this->pageList = [];
         }
@@ -579,6 +591,18 @@ class BrokenLinkListController extends AbstractBrofixController
                     $items[] = $this->renderTableRow($row['table_name'], $row);
                 }
                 $this->view->assign('listUri', $this->constructBackendUri());
+            }
+            if (count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
+                //$this->view->assign('maxLimitReached', true);
+                $this->createFlashMessage(
+                    $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
+                    sprintf(
+                        $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached')
+                        ?: 'The limit of %s number of pages was reached. Some broken links may not be displayed. To see more broken links for further subpages, go to a subpage of this page.',
+                        $this->configuration->getTraverseMaxNumberOfPagesInBackend()
+                    ),
+                    FlashMessage::WARNING
+                );
             }
         } else {
             $this->pagination = null;

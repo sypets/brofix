@@ -141,6 +141,14 @@
 				<source>Edit element containing this broken link</source>
 			</trans-unit>
 
+			<!-- Warning messages for list -->
+			<trans-unit id="list.report.warning.max_limit_pages_reached.title" resname="list.report.warning.max_limit_pages_reached.title">
+				<source>Limit for maximum number of pages reached</source>
+			</trans-unit>
+			<trans-unit id="list.report.warning.max_limit_pages_reached" resname="list.report.warning.max_limit_pages_reached">
+				<source>The limit of %s number of pages was reached. Some broken links may not be displayed. Go to a subpage of this page or limit the levels displayed ("Show this level").</source>
+			</trans-unit>
+
 			<!-- Error messages for pages -->
 
 			<trans-unit id="list.report.error.content.notexisting" resname="list.report.error.content.notexisting">
