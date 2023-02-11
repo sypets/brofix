@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns:t3="http://typo3.org/schemas/xliff" version="1.0">
+  <file t3:id="1605200483" source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf" date="2020-11-12T15:22:34Z" product-name="brofix" target-language="fr">
+    <header/>
+    <body>
+      <trans-unit id="tx_brofix_exclude_link_target" resname="tx_brofix_exclude_link_target" approved="yes">
+        <source>Exclude URLs</source>
+        <target state="final">URLs exclues</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type" resname="tx_brofix_exclude_link_target.link_type" approved="yes">
+        <source>Link type</source>
+        <target state="final">Type de lien</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type.external" resname="tx_brofix_exclude_link_target.link_type.external" approved="yes">
+        <source>External</source>
+        <target state="final">Externe</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type.db" resname="tx_brofix_exclude_link_target.link_type.db" approved="yes">
+        <source>Internal (Pages, content, ...)</source>
+        <target state="final">Interne (Pages, contenu, ...)</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_type.file" resname="tx_brofix_exclude_link_target.link_type.file" approved="yes">
+        <source>File</source>
+        <target state="final">Fichier</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by" resname="tx_brofix_exclude_link_target.link_type.match_by" approved="yes">
+        <source>Rule is applied if the following matches</source>
+        <target state="final">La règle est appliquée si ce qui suit correspond</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by.exact" resname="tx_brofix_exclude_link_target.match_by.exact" approved="yes">
+        <source>URL</source>
+        <target state="final">URL</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.match_by.domain" resname="tx_brofix_exclude_link_target.match_by.domain" approved="yes">
+        <source>domain</source>
+        <target state="final">domaine</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_target" resname="tx_brofix_exclude_link_target.link_target" approved="yes">
+        <source>Link target</source>
+        <target state="final">Cible du lien</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.link_target.placeholder" resname="tx_brofix_exclude_link_target.link_target.placeholder" approved="yes">
+        <source>Enter the URL or domain to match with.</source>
+        <target state="final">Entrez l'URL ou le domaine correspondant.</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.notes.placeholder" resname="tx_brofix_exclude_link_target.notes.placeholder" approved="yes">
+        <source>Why should this URL not be checked?</source>
+        <target state="final">Pourquoi cette URL ne devrait-elle pas être vérifiée?</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.reason" resname="tx_brofix_exclude_link_target.reason" approved="yes">
+        <source>Reason</source>
+        <target state="final">Justification</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.reason.none" resname="tx_brofix_exclude_link_target.reason.none" approved="yes">
+        <source>None given</source>
+        <target state="final">Aucune</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.reason.noBrokenLink" resname="tx_brofix_exclude_link_target.reason.noBrokenLink" approved="yes">
+        <source>URL is available (was falsely detected as broken link)</source>
+        <target state="final">L'URL est disponible (a été faussement détectée comme un lien brisé)</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.notes" resname="tx_brofix_exclude_link_target.notes" approved="yes">
+        <source>Notes</source>
+        <target state="final">Remarques/Notes</target>
+      </trans-unit>
+      <trans-unit id="tx_brofix_exclude_link_target.disabled" resname="tx_brofix_exclude_link_target.disabled" approved="yes">
+        <source>Disable</source>
+        <target state="final">Désactivé</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
