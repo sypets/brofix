@@ -141,17 +141,27 @@ link checking is performed, using the default template in this extension.
 Extension configuration
 -----------------------
 
+**EXT:backend | loginLogo:**  *Logo ...*
+
 Set the logo used in the Fluid email in the EXT:backend extension configuration:
 
 .. code-block:: php
 
    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['backend']['login.loginLogo'] = 'EXT:my_theme/Resources/Public/Images/login-logo.png or //domain.tld/login-logo.png';
 
-Optional: Set the maximum number of pages traversed in the backend module.
+-----
+
+**EXT:brofix | traverseMaxNumberOfPagesInBackend:** *Maximum number of pages to traverse in Backend ...*
+
+Set the maximum number of pages traversed in the backend module.
 This should be limited so that loading the broken link list in the backend
-does not feel sluggish and slow. A good rule of thumb is to always keep this
-under 1s. Depending on the performance of your site, you should use a limit
-such as 10000 (ten thousand).
+does not feel sluggish and slow. A good rule of thumb is to always keep the
+time required to load a page in the Backend always under 1 second. Depending
+on the performance of your site, you should use a limit such as 1000 (thousand).
+
+.. code-block:: php
+
+   $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['brofix']['traverseMaxNumberOfPagesInBackend'] = 1000;
 
 .. note::
 

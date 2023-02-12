@@ -5,5 +5,5 @@ excludeSoftrefs = url
 excludeSoftrefsInFields = tt_content.bodytext
 
 # cat=basic; type=int; label= Maximum number of pages to traverse in Backend. Limit is disabled if =0. This should be set to a hard limit for performance reasons.
-traverseMaxNumberOfPagesInBackend = 10000
+traverseMaxNumberOfPagesInBackend = 1000
 
