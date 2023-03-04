@@ -592,7 +592,8 @@ class BrokenLinkListController extends AbstractBrofixController
                 }
                 $this->view->assign('listUri', $this->constructBackendUri());
             }
-            if (count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
+            if ($this->configuration->getTraverseMaxNumberOfPagesInBackend()
+                && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
                 $this->createFlashMessage(
                     $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
                     sprintf(
