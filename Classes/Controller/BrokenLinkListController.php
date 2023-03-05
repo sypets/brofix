@@ -725,6 +725,7 @@ class BrokenLinkListController extends AbstractBrofixController
             'page',
             'element',
             'type',
+            'linktext',
             'url',
             'error',
             'last_check',

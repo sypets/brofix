@@ -131,6 +131,9 @@
 							<core:icon identifier="{tableHeader.type.icon}"/>
 						</f:if>
 					</th>
+					<th>
+						<f:format.raw>{tableHeader.linktext.header}</f:format.raw>
+					</th>
 					<th colspan="2">
 						<f:format.raw>{tableHeader.url.header}</f:format.raw>
 						<f:if condition="{tableHeader.url.icon}">
@@ -193,14 +196,14 @@
 					<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
 						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
 					</td>
+					<td>
+						<span>{item.link_title}</span>
+					</td>
 					<td colspan="2">
 						<f:if condition="{item.linktarget}">
 							<f:then>
-								<a href="{item.linktarget}" title="{item.link_title}" target="_blank" rel="noreferrer">{item.linktext}</a>
+								<a href="{item.linktarget}" target="_blank" rel="noreferrer">{item.linktext}</a>
 							</f:then>
-							<f:else>
-								<span title="{item.link_title}">{item.linktext}</span>
-							</f:else>
 						</f:if>
 						<div class="inline-action">
 							<f:if condition="{item.encoded_linktarget}">
