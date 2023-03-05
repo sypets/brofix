@@ -204,7 +204,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 );
                 $urls = [];
                 foreach ($results[$linkType] ?? [] as $entryValue) {
-                    $pageWithAnchor = $entryValue['pageAndAnchor'];
+                    $pageWithAnchor = $entryValue['pageAndAnchor'] ?? '';
                     if (!empty($pageWithAnchor)) {
                         // Page with anchor, e.g. 18#1580
                         $urls[] = $pageWithAnchor;
