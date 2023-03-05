@@ -31,6 +31,11 @@ Info > Brofix (Broken Link Fixer)
     clear: both;
 }
 
+/** mark table row of last checked record */
+#brofix-broken-links-table tr.brofix-lastchecked, #brofix-broken-links-table tr.brofix-lastchecked td  {
+    background-color: #ace9ff;
+}
+
 #brofix-broken-links-table tr td .inline-action {
     margin-top: 5px;
     border-top: 2px solid white;
