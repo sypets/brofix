@@ -148,8 +148,8 @@ class BrofixController
      * @var object
      */
     protected $extObj;
-    private IconFactory $iconFactory;
-    private PageRenderer $pageRenderer;
+    protected IconFactory $iconFactory;
+    protected PageRenderer $pageRenderer;
 
     /**
      * Constructor

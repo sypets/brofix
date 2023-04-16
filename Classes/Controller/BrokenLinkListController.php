@@ -193,7 +193,6 @@ class BrokenLinkListController extends AbstractBrofixController
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
-    protected PageRenderer $pageRenderer;
 
     public function __construct(
         PagesRepository $pagesRepository = null,
@@ -205,9 +204,9 @@ class BrokenLinkListController extends AbstractBrofixController
         ModuleTemplate $moduleTemplate = null,
         IconFactory $iconFactory = null,
         ExtensionConfiguration $extensionConfiguration = null,
-        PageRenderer $pageRenderer
+        PageRenderer $pageRenderer = null
     ) {
-        $this->pageRenderer = $pageRenderer;
+        $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
@@ -531,10 +530,9 @@ class BrokenLinkListController extends AbstractBrofixController
             );
         $this->backendUserInformation = new BackendUserInformation($isAccessibleForCurrentUser, $excludeLinksPermission);
 
-        $pageRenderer = $this->pageRenderer;
-        $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
-        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
-        $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+        $this->pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
+        $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+        $this->pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
 
         $this->initializeLinkAnalyzer();
     }
