@@ -13,7 +13,8 @@ use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -103,6 +104,8 @@ class ManageExclusionsController extends AbstractBrofixController
     /** @var BackendUserInformation */
     protected $backendUserInformation;
 
+    protected PageRenderer $pageRenderer;
+
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         ManageExclusionsFilter $filter = null,
@@ -112,13 +115,15 @@ class ManageExclusionsController extends AbstractBrofixController
         IconFactory $iconFactory = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
-        LocalizationUtility $localizationUtility = null
+        LocalizationUtility $localizationUtility = null,
+        PageRenderer $pageRenderer
     ) {
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        $this->pageRenderer = $pageRenderer;
         parent::__construct(
             $configuration,
             $backendSession,
@@ -186,7 +191,7 @@ class ManageExclusionsController extends AbstractBrofixController
             $this->moduleTemplate->addFlashMessage(
                 $this->getLanguageService()->getLL('no.access'),
                 $this->getLanguageService()->getLL('no.access.title'),
-                FlashMessage::ERROR
+                AbstractMessage::ERROR
             );
         }
         return $this->view->render();
@@ -212,7 +217,7 @@ class ManageExclusionsController extends AbstractBrofixController
 
     protected function initializeRenderer(): void
     {
-        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+        $pageRenderer = $this->pageRenderer;
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
         // $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/ManageExclusions');
@@ -488,7 +493,7 @@ class ManageExclusionsController extends AbstractBrofixController
 
     /**
      * This Function is delete the selected excluded link
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
     public function deleteExcludedLinks(ServerRequestInterface $request): Response
     {

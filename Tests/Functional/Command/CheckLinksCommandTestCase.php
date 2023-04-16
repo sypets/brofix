@@ -20,13 +20,13 @@ namespace Sypets\Brofix\Tests\Functional\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Sypets\Brofix\Command\CheckLinksCommand;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CheckLinksCommandTest extends AbstractFunctionalTest
+class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
 {
     protected function setUp(): void
     {

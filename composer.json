@@ -46,6 +46,7 @@
 		"phpspec/prophecy-phpunit": "^2.0.1",
 		"phpstan/phpstan": "^1.8.2",
 		"phpunit/phpunit": "^9.5.20",
+		"ssch/typo3-rector": "^1.2",
 		"typo3/testing-framework": "^6.16.5"
 	},
 	"suggest": {
@@ -94,6 +95,12 @@
 		],
 		"ci:phpstan": [
 			"Build/Scripts/runTests.sh -p 7.4 -s phpstan -e \"-c ../Build/phpstan.neon\""
+		],
+		"rector:check": [
+			"@php .Build/bin/rector --dry-run"
+		],
+		"rector:fix": [
+			"@php .Build/bin/rector"
 		],
 		"ci:phpunit": [
 			"Build/Scripts/runTests.sh -p 7.4 -s unit"

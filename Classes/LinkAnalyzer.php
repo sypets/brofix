@@ -86,7 +86,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Array for hooks for own checks
      *
-     * @var \Sypets\Brofix\Linktype\AbstractLinktype[]
+     * @var AbstractLinktype[]
      */
     protected array $hookObjectsArr = [];
 
@@ -699,7 +699,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 continue;
             }
 
-            /** @var \Sypets\Brofix\Linktype\AbstractLinktype $hookObj */
+            /** @var AbstractLinktype $hookObj */
             foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
                 $type = $hookObj->fetchType($r, $type, $keyArr);
                 // Store the type that was found
@@ -772,7 +772,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 continue;
             }
 
-            /** @var \Sypets\Brofix\Linktype\AbstractLinktype $hookObj */
+            /** @var AbstractLinktype $hookObj */
             foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
                 $type = $hookObj->fetchType($currentR, $type, $keyArr);
                 // Store the type that was found

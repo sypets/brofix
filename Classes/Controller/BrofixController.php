@@ -14,9 +14,13 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -144,6 +148,8 @@ class BrofixController
      * @var object
      */
     protected $extObj;
+    private IconFactory $iconFactory;
+    private PageRenderer $pageRenderer;
 
     /**
      * Constructor
@@ -152,8 +158,12 @@ class BrofixController
         ModuleTemplate $moduleTemplate,
         UriBuilder $uriBuilder,
         FlashMessageService $flashMessageService,
-        ContainerInterface $container
+        ContainerInterface $container,
+        IconFactory $iconFactory,
+        PageRenderer $pageRenderer
     ) {
+        $this->pageRenderer = $pageRenderer;
+        $this->iconFactory = $iconFactory;
         $this->moduleTemplate = $moduleTemplate;
         $this->uriBuilder = $uriBuilder;
         $this->flashMessageService = $flashMessageService;
@@ -200,7 +210,7 @@ class BrofixController
 				'
             );
             // Setting up the context sensitive menu:
-            $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
+            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
 
             $this->view = $this->getFluidTemplateObject();
             $this->view->assign('moduleName', (string)$this->uriBuilder->buildUriFromRoute($this->moduleName));
@@ -256,7 +266,7 @@ class BrofixController
                 BackendUtility::BEgetRootLine($this->pageinfo['uid'])
             ))
             ->setTitle($languageService->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage'))
-            ->setIcon($this->moduleTemplate->getIconFactory()->getIcon('actions-view-page', Icon::SIZE_SMALL));
+            ->setIcon($this->iconFactory->getIcon('actions-view-page', Icon::SIZE_SMALL));
         $buttonBar->addButton($viewButton, ButtonBar::BUTTON_POSITION_LEFT, 1);
         // Shortcut
         $shortCutButton = $buttonBar->makeShortcutButton()
@@ -449,9 +459,9 @@ class BrofixController
                 FlashMessage::class,
                 $languageService->sL('LLL:EXT:backend/Resources/Private/Language/locallang.xlf:no_modules_registered'),
                 $languageService->getLL('title'),
-                FlashMessage::ERROR
+                AbstractMessage::ERROR
             );
-            /** @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue $defaultFlashMessageQueue */
+            /** @var FlashMessageQueue $defaultFlashMessageQueue */
             $defaultFlashMessageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
             $defaultFlashMessageQueue->enqueue($flashMessage);
         } else {
