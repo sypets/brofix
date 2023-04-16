@@ -20,10 +20,10 @@ namespace Sypets\Brofix\Tests\Functional\Repository;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
-class BrokenLinkRepositoryTest extends AbstractFunctionalTest
+class BrokenLinkRepositoryTestCase extends AbstractFunctionalTestCase
 {
     protected ?BrokenLinkRepository $brokenLinkRepository = null;
 

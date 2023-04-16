@@ -20,9 +20,9 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks\LinkTargetCache;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\ExternalLinktype;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
 
-class LinkTargetPersistentCacheTest extends AbstractFunctionalTest
+class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
 {
     /**
      * @test

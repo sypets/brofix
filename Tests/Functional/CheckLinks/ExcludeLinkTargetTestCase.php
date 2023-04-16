@@ -18,9 +18,9 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks;
  */
 
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
 
-class ExcludeLinkTargetTest extends AbstractFunctionalTest
+class ExcludeLinkTargetTestCase extends AbstractFunctionalTestCase
 {
     /**
      * @return array<string,mixed[]>

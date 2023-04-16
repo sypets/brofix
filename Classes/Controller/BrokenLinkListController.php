@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
-use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
-use TYPO3\CMS\Core\Exception;
-use TYPO3\CMS\Core\Context\Context;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -21,15 +16,20 @@ use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use Sypets\Brofix\Util\StringUtil;
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
@@ -193,6 +193,7 @@ class BrokenLinkListController extends AbstractBrofixController
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
+    private PageRenderer $pageRenderer;
 
     public function __construct(
         PagesRepository $pagesRepository = null,
@@ -204,8 +205,9 @@ class BrokenLinkListController extends AbstractBrofixController
         ModuleTemplate $moduleTemplate = null,
         IconFactory $iconFactory = null,
         ExtensionConfiguration $extensionConfiguration = null,
-        private PageRenderer $pageRenderer
+        PageRenderer $pageRenderer
     ) {
+        $this->pageRenderer = $pageRenderer;
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);

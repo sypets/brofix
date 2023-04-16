@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
-use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,9 +14,13 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -148,6 +148,8 @@ class BrofixController
      * @var object
      */
     protected $extObj;
+    private IconFactory $iconFactory;
+    private PageRenderer $pageRenderer;
 
     /**
      * Constructor
@@ -157,9 +159,11 @@ class BrofixController
         UriBuilder $uriBuilder,
         FlashMessageService $flashMessageService,
         ContainerInterface $container,
-        private IconFactory $iconFactory,
-        private PageRenderer $pageRenderer
+        IconFactory $iconFactory,
+        PageRenderer $pageRenderer
     ) {
+        $this->pageRenderer = $pageRenderer;
+        $this->iconFactory = $iconFactory;
         $this->moduleTemplate = $moduleTemplate;
         $this->uriBuilder = $uriBuilder;
         $this->flashMessageService = $flashMessageService;

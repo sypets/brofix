@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
 use Sypets\Brofix\Repository\PagesRepository;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTest;
+use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class PagesRepositoryTest extends AbstractFunctionalTest
+class PagesRepositoryTestCase extends AbstractFunctionalTestCase
 {
     /**
      * @return \Generator<string,array<mixed>>

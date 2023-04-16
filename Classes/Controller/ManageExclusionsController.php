@@ -2,8 +2,6 @@
 
 namespace Sypets\Brofix\Controller;
 
-use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
@@ -15,7 +13,8 @@ use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -105,6 +104,8 @@ class ManageExclusionsController extends AbstractBrofixController
     /** @var BackendUserInformation */
     protected $backendUserInformation;
 
+    protected PageRenderer $pageRenderer;
+
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         ManageExclusionsFilter $filter = null,
@@ -115,13 +116,14 @@ class ManageExclusionsController extends AbstractBrofixController
         ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
         LocalizationUtility $localizationUtility = null,
-        private PageRenderer $pageRenderer
+        PageRenderer $pageRenderer
     ) {
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        $this->pageRenderer = $pageRenderer;
         parent::__construct(
             $configuration,
             $backendSession,

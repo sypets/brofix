@@ -21,7 +21,7 @@ use Sypets\Brofix\LinkAnalyzer;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LinkAnalyzerTest extends AbstractFunctionalTest
+class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
 {
     protected function setUp(): void
     {

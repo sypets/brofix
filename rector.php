@@ -2,38 +2,33 @@
 /**
  * copied from cp .Build/vendor/ssch/typo3-rector/templates/rector.php.dist for v11
  * Documentation: https://github.com/sabbelasichon/typo3-rector/blob/main/docs/configuration_and_processing.md
- *
  */
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Core\Configuration\Option;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\PostRector\Rector\NameImportingPostRector;
-use Ssch\TYPO3Rector\Configuration\Typo3Option;
 use Ssch\TYPO3Rector\Rector\General\ConvertImplicitVariablesToExplicitGlobalsRector;
 use Ssch\TYPO3Rector\Rector\General\ExtEmConfRector;
 use Ssch\TYPO3Rector\Set\Typo3LevelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
-
     // If you want to override the number of spaces for your typoscript files you can define it here, the default value is 4
     // $parameters = $rectorConfig->parameters();
     // $parameters->set(Typo3Option::TYPOSCRIPT_INDENT_SIZE, 2);
 
     $rectorConfig->sets([
         Typo3LevelSetList::UP_TO_TYPO3_11
-        //Typo3LevelSetList::UP_TO_TYPO3_12
     ]);
 
     // Define your target version which you want to support
-    $rectorConfig->phpVersion(PhpVersion::PHP_81);
+    $rectorConfig->phpVersion(PhpVersion::PHP_74);
 
     // If you only want to process one/some TYPO3 extension(s), you can specify its path(s) here.
     // If you use the option --config change __DIR__ to getcwd()
-     $rectorConfig->paths([
-        __DIR__ . '/Classes/',
-     ]);
+    $rectorConfig->paths([
+       __DIR__ . '/Classes/',
+    ]);
 
     // When you use rector there are rules that require some more actions like creating UpgradeWizards for outdated TCA types.
     // To fully support you we added some warnings. So watch out for them.
