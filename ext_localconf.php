@@ -2,7 +2,7 @@
 
 use Sypets\Brofix\FormEngine\CustomEvaluation\ExcludeLinkTargetsLinkTargetEvaluation;
 
-defined('TYPO3_MODE') or die();
+defined('TYPO3') or die();
 
 (function () {
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
