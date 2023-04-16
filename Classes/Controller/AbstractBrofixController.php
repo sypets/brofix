@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Controller;
 
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -99,7 +100,7 @@ abstract class AbstractBrofixController
      * @param array<string,mixed> $additionalQueryParameters
      * @param string $route
      * @return string
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * @throws RouteNotFoundException
      */
     protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_brofix'): string
     {

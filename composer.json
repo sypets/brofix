@@ -96,6 +96,12 @@
 		"ci:phpstan": [
 			"Build/Scripts/runTests.sh -p 7.4 -s phpstan -e \"-c ../Build/phpstan.neon\""
 		],
+		"rector:check": [
+			"@php .Build/bin/rector --dry-run"
+		],
+		"rector:fix": [
+			"@php .Build/bin/rector"
+		],
 		"ci:phpunit": [
 			"Build/Scripts/runTests.sh -p 7.4 -s unit"
 		],

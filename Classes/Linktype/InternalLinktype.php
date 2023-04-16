@@ -15,7 +15,7 @@ namespace Sypets\Brofix\Linktype;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -177,8 +177,8 @@ class InternalLinktype extends AbstractLinktype
                 ];
             } elseif ($reportHiddenRecords
                 && ($row['hidden'] == '1'
-                || $GLOBALS['EXEC_TIME'] < (int)$row['starttime']
-                || ($row['endtime'] && (int)$row['endtime'] < $GLOBALS['EXEC_TIME']))
+                || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
+                || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
                 $errorType = self::ERROR_TYPE_PAGE;
                 $errno = self::ERROR_ERRNO_HIDDEN;
@@ -280,8 +280,8 @@ class InternalLinktype extends AbstractLinktype
                 ];
             } elseif ($reportHiddenRecords
                 && ($row['hidden'] == '1'
-                || $GLOBALS['EXEC_TIME'] < (int)$row['starttime']
-                || ($row['endtime'] && (int)$row['endtime'] < $GLOBALS['EXEC_TIME']))
+                || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
+                || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
                 $errorType = self::ERROR_TYPE_CONTENT;
                 $errno = self::ERROR_ERRNO_HIDDEN;

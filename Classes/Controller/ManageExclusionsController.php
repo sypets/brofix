@@ -2,6 +2,8 @@
 
 namespace Sypets\Brofix\Controller;
 
+use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
@@ -112,7 +114,8 @@ class ManageExclusionsController extends AbstractBrofixController
         IconFactory $iconFactory = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
-        LocalizationUtility $localizationUtility = null
+        LocalizationUtility $localizationUtility = null,
+        private PageRenderer $pageRenderer
     ) {
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
@@ -186,7 +189,7 @@ class ManageExclusionsController extends AbstractBrofixController
             $this->moduleTemplate->addFlashMessage(
                 $this->getLanguageService()->getLL('no.access'),
                 $this->getLanguageService()->getLL('no.access.title'),
-                FlashMessage::ERROR
+                AbstractMessage::ERROR
             );
         }
         return $this->view->render();
@@ -212,7 +215,7 @@ class ManageExclusionsController extends AbstractBrofixController
 
     protected function initializeRenderer(): void
     {
-        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+        $pageRenderer = $this->pageRenderer;
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
         // $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/ManageExclusions');
@@ -488,7 +491,7 @@ class ManageExclusionsController extends AbstractBrofixController
 
     /**
      * This Function is delete the selected excluded link
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
     public function deleteExcludedLinks(ServerRequestInterface $request): Response
     {

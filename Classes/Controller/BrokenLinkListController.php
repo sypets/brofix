@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
+use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Context\Context;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -198,7 +203,8 @@ class BrokenLinkListController extends AbstractBrofixController
         BackendSession $backendSession = null,
         ModuleTemplate $moduleTemplate = null,
         IconFactory $iconFactory = null,
-        ExtensionConfiguration $extensionConfiguration = null
+        ExtensionConfiguration $extensionConfiguration = null,
+        private PageRenderer $pageRenderer
     ) {
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
@@ -393,7 +399,7 @@ class BrokenLinkListController extends AbstractBrofixController
      * @param array<string,mixed> $additionalQueryParameters
      * @param string $route
      * @return string
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * @throws RouteNotFoundException
      */
     protected function constructBackendUri(array $additionalQueryParameters = [], string $route = 'web_brofix'): string
     {
@@ -431,7 +437,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
-                FlashMessage::OK
+                AbstractMessage::OK
             );
         }
 
@@ -442,13 +448,13 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->moduleTemplate->addFlashMessage(
                     $message,
                     $this->getLanguageService()->getLL('list.recheck.url.title'),
-                    FlashMessage::OK
+                    AbstractMessage::OK
                 );
             } else {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
                     $this->getLanguageService()->getLL('list.recheck.url.title'),
-                    FlashMessage::OK
+                    AbstractMessage::OK
                 );
             }
         } elseif ($this->action === 'editField') {
@@ -467,7 +473,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->moduleTemplate->addFlashMessage(
                     $message,
                     $this->getLanguageService()->getLL('list.recheck.links.title'),
-                    FlashMessage::OK
+                    AbstractMessage::OK
                 );
             }
         }
@@ -488,7 +494,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->moduleTemplate->addFlashMessage(
                 $this->getLanguageService()->getLL('no.access'),
                 $this->getLanguageService()->getLL('no.access.title'),
-                FlashMessage::ERROR
+                AbstractMessage::ERROR
             );
             return;
         }
@@ -523,7 +529,7 @@ class BrokenLinkListController extends AbstractBrofixController
             );
         $this->backendUserInformation = new BackendUserInformation($isAccessibleForCurrentUser, $excludeLinksPermission);
 
-        $pageRenderer = $this->moduleTemplate->getPageRenderer();
+        $pageRenderer = $this->pageRenderer;
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
         $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
@@ -601,7 +607,7 @@ class BrokenLinkListController extends AbstractBrofixController
                         ?: 'The limit of %s number of pages was reached. Some broken links may not be displayed. To see more broken links for further subpages, go to a subpage of this page.',
                         $this->configuration->getTraverseMaxNumberOfPagesInBackend()
                     ),
-                    FlashMessage::WARNING
+                    AbstractMessage::WARNING
                 );
             }
         } else {
@@ -651,22 +657,22 @@ class BrokenLinkListController extends AbstractBrofixController
     protected function createFlashMessagesForNoBrokenLinks(): void
     {
         $message = '';
-        $status = FlashMessage::OK;
+        $status = AbstractMessage::OK;
         if ($this->filter->hasConstraintsForNumberOfResults()) {
-            $status = FlashMessage::WARNING;
+            $status = AbstractMessage::WARNING;
             $message = $this->getLanguageService()->getLL('list.no.broken.links.filter')
                 ?: 'No broken links found if current filter is applied!';
         } elseif ($this->depth === 0) {
             $message = $this->getLanguageService()->getLL('list.no.broken.links.this.page')
                 ?: 'No broken links on this page!';
             $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
-            $status = FlashMessage::INFO;
+            $status = AbstractMessage::INFO;
         } elseif ($this->depth > 0 && $this->depth < BrokenLinkListFilter::PAGE_DEPTH_INFINITE) {
             $message = $this->getLanguageService()->getLL('list.no.broken.links.current.level')
                 ?: 'No broken links for current level';
             $message .= ' (' . $this->depth . ').';
             $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
-            $status = FlashMessage::INFO;
+            $status = AbstractMessage::INFO;
         } else {
             $message = $this->getLanguageService()->getLL('list.no.broken.links.level.infinite')
                 ?: $this->getLanguageService()->getLL('list.no.broken.links')
@@ -690,9 +696,9 @@ class BrokenLinkListController extends AbstractBrofixController
      * @param string $message
      * @param string $title
      * @param int $type
-     * @throws \TYPO3\CMS\Core\Exception
+     * @throws Exception
      */
-    protected function createFlashMessage(string $message, string $title = '', int $type = FlashMessage::INFO): void
+    protected function createFlashMessage(string $message, string $title = '', int $type = AbstractMessage::INFO): void
     {
         /**
          * @var FlashMessage $flashMessage
@@ -800,7 +806,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 'current_record_uid' => $row['record_uid'],
                 'current_record_table' => $row['table_name'],
                 'current_record_field' => $row['field'],
-                'current_record_currentTime' => $GLOBALS['EXEC_TIME'],
+                'current_record_currentTime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
             ]
         );
 
@@ -829,7 +835,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 'current_record_uid' => $row['record_uid'],
                 'current_record_table' => $row['table_name'],
                 'current_record_field' => $row['field'],
-                'current_record_currentTime' => $GLOBALS['EXEC_TIME'],
+                'current_record_currentTime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
             ]
         );
 

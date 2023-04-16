@@ -15,7 +15,7 @@ namespace Sypets\Brofix\Mail;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
@@ -36,7 +36,7 @@ class GenerateCheckResultFluidMail extends AbstractGenerateCheckResultMail
      * @param int $pageId
      * @return bool
      * @throws MissingConfigurationException
-     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function generateMail(Configuration $config, CheckLinksStatistics $stats, int $pageId): bool
     {

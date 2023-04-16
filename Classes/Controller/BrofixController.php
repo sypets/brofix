@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
+use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -152,7 +156,9 @@ class BrofixController
         ModuleTemplate $moduleTemplate,
         UriBuilder $uriBuilder,
         FlashMessageService $flashMessageService,
-        ContainerInterface $container
+        ContainerInterface $container,
+        private IconFactory $iconFactory,
+        private PageRenderer $pageRenderer
     ) {
         $this->moduleTemplate = $moduleTemplate;
         $this->uriBuilder = $uriBuilder;
@@ -200,7 +206,7 @@ class BrofixController
 				'
             );
             // Setting up the context sensitive menu:
-            $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
+            $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/ContextMenu');
 
             $this->view = $this->getFluidTemplateObject();
             $this->view->assign('moduleName', (string)$this->uriBuilder->buildUriFromRoute($this->moduleName));
@@ -256,7 +262,7 @@ class BrofixController
                 BackendUtility::BEgetRootLine($this->pageinfo['uid'])
             ))
             ->setTitle($languageService->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage'))
-            ->setIcon($this->moduleTemplate->getIconFactory()->getIcon('actions-view-page', Icon::SIZE_SMALL));
+            ->setIcon($this->iconFactory->getIcon('actions-view-page', Icon::SIZE_SMALL));
         $buttonBar->addButton($viewButton, ButtonBar::BUTTON_POSITION_LEFT, 1);
         // Shortcut
         $shortCutButton = $buttonBar->makeShortcutButton()
@@ -449,9 +455,9 @@ class BrofixController
                 FlashMessage::class,
                 $languageService->sL('LLL:EXT:backend/Resources/Private/Language/locallang.xlf:no_modules_registered'),
                 $languageService->getLL('title'),
-                FlashMessage::ERROR
+                AbstractMessage::ERROR
             );
-            /** @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue $defaultFlashMessageQueue */
+            /** @var FlashMessageQueue $defaultFlashMessageQueue */
             $defaultFlashMessageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
             $defaultFlashMessageQueue->enqueue($flashMessage);
         } else {
