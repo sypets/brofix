@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Pagination\PaginationInterface;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
@@ -80,6 +81,8 @@ abstract class AbstractBrofixController
      * @var ExcludeLinkTarget
      */
     protected $excludeLinkTarget;
+
+    protected PageRenderer $pageRenderer;
 
     public function __construct(
         Configuration $configuration,

@@ -104,8 +104,6 @@ class ManageExclusionsController extends AbstractBrofixController
     /** @var BackendUserInformation */
     protected $backendUserInformation;
 
-    protected PageRenderer $pageRenderer;
-
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         ManageExclusionsFilter $filter = null,
@@ -116,14 +114,14 @@ class ManageExclusionsController extends AbstractBrofixController
         ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
         LocalizationUtility $localizationUtility = null,
-        PageRenderer $pageRenderer
+        PageRenderer $pageRenderer = null
     ) {
+        $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
-        $this->pageRenderer = $pageRenderer;
         parent::__construct(
             $configuration,
             $backendSession,
