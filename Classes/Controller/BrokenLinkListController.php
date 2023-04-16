@@ -193,7 +193,7 @@ class BrokenLinkListController extends AbstractBrofixController
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
-    private PageRenderer $pageRenderer;
+    protected PageRenderer $pageRenderer;
 
     public function __construct(
         PagesRepository $pagesRepository = null,
