@@ -61,8 +61,8 @@ final class PageCalloutsHook
         // the following code is loosely based on PageLayoutController::getHeaderFlashMessagesForCurrentPid
         $moduleLoader = GeneralUtility::makeInstance(ModuleLoader::class);
         $moduleLoader->load($GLOBALS['TBE_MODULES']);
-        $modules = $moduleLoader->modules;
-        if (!is_array($modules['web']['sub']['brofix'])) {
+        $modules = $moduleLoader->getModules();
+        if (!isset($modules['web']['sub']['brofix']) || !is_array($modules['web']['sub']['brofix'])) {
             return [];
         }
         //$title = $lang->getLL('goToListModule');
