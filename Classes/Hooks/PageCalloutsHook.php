@@ -17,7 +17,7 @@ namespace Sypets\Brofix\Hooks;
  */
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
-use TYPO3\CMS\Backend\Module\ModuleLoader;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
@@ -49,22 +49,22 @@ final class PageCalloutsHook
         if ($pageId === 0) {
             return [];
         }
+
+        /** @var BackendUserAuthentication $beUser */
+        $beUser = $GLOBALS['BE_USER'];
+        if (!$beUser->check('modules', 'web_brofix')) {
+            // no output in case the user does not have access to the "brofix" module
+            return [];
+        }
+
         $lang = $this->getLanguageService();
 
-        // todo: access check
         $count = $this->brokenLinkRepository->getLinkCountForPage($pageId);
         if ($count == 0) {
             // no broken links to report
             return [];
         }
 
-        // the following code is loosely based on PageLayoutController::getHeaderFlashMessagesForCurrentPid
-        $moduleLoader = GeneralUtility::makeInstance(ModuleLoader::class);
-        $moduleLoader->load($GLOBALS['TBE_MODULES']);
-        $modules = $moduleLoader->getModules();
-        if (!isset($modules['web']['sub']['brofix']) || !is_array($modules['web']['sub']['brofix'])) {
-            return [];
-        }
         //$title = $lang->getLL('goToListModule');
         //$message = '<p>' . $lang->getLL('goToListModuleMessage') . '</p>';
         $message = '<p>' . sprintf(
