@@ -62,7 +62,7 @@ final class PageCalloutsHook
         $moduleLoader = GeneralUtility::makeInstance(ModuleLoader::class);
         $moduleLoader->load($GLOBALS['TBE_MODULES']);
         $modules = $moduleLoader->modules;
-        if (!is_array($modules['web']['sub']['brofix'])) {
+        if (!is_array($modules['web']['sub']['brofix'] ?? false)) {
             return [];
         }
         //$title = $lang->getLL('goToListModule');
