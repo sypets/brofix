@@ -65,8 +65,6 @@ final class PageCalloutsHook
             return [];
         }
 
-        //$title = $lang->getLL('goToListModule');
-        //$message = '<p>' . $lang->getLL('goToListModuleMessage') . '</p>';
         $message = '<p>' . sprintf(
             ($count === 1 ? $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_singular_broken_links_found_for_page')
                 : $lang->sL('LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:count_plural_broken_links_found_for_page'))
