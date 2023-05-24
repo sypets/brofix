@@ -238,7 +238,7 @@ doNotCheckLinksOnWorkspace
       int
 
    Description
-      This option is used to enable or disable checking links that are created in a Workspace, by default,
+      This option is used to enable or disable checking links that are created in Workspace, by default,
       the links created on workspaces will be checked and reported.
 
    Default
