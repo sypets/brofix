@@ -230,7 +230,7 @@ class Configuration
      */
     public function getDoNotCheckLinksOnWorkspace(): bool
     {
-        return $this->tsConfig['check.']['doNotCheckLinksOnWorkspace'] == 1 ?? false;
+        return $this->tsConfig['check.']['doNotCheckLinksOnWorkspace'] == 1;
     }
 
     /**
