@@ -114,7 +114,8 @@ class ContentRepository
      * @param int $uid
      * @return int
      */
-    public function isElementOnWorkspace(int $uid): int {
+    public function isElementOnWorkspace(int $uid): int
+    {
         /**
          * @var DeletedRestriction
          */

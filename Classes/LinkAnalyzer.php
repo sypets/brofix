@@ -847,8 +847,8 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
 
         // Check if the element is on WS
-        if($this->configuration->getDoNotCheckLinksOnWorkspace() == true) {
-            if($this->contentRepository->isElementOnWorkspace($row['uid']) != 0){
+        if ($this->configuration->getDoNotCheckLinksOnWorkspace() == true) {
+            if ($this->contentRepository->isElementOnWorkspace($row['uid']) != 0) {
                 return false;
             }
         }
