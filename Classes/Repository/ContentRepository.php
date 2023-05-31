@@ -109,34 +109,6 @@ class ContentRepository
             ->fetchOne();
     }
 
-    /**
-     * Check if the element is a copy on WS
-     * @param int $uid
-     * @return int
-     */
-    public function isElementOnWorkspace(int $uid): int
-    {
-        /**
-         * @var DeletedRestriction
-         */
-        $deletedRestriction = GeneralUtility::makeInstance(DeletedRestriction::class);
-        $queryBuilder = $this->generateQueryBuilder();
-        $queryBuilder->getRestrictions()
-            ->removeAll()
-            ->add($deletedRestriction);
-        return $queryBuilder
-            ->select('t3ver_wsid')
-            ->from(self::TABLE)
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'uid',
-                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
-                )
-            )
-            ->executeQuery()
-            ->fetchOne();
-    }
-
     protected function generateQueryBuilder(string $table = ''): QueryBuilder
     {
         if ($table === '') {
