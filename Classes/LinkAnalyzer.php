@@ -542,6 +542,9 @@ class LinkAnalyzer implements LoggerAwareInterface
             'uid',
             'pid'
         ];
+        if ($GLOBALS['TCA']['tt_content']['ctrl']['versioningWS'] ?? false) {
+            $defaultFields[] = 't3ver_wsid';
+        }
         if (isset($GLOBALS['TCA'][$table]['ctrl']['label'])) {
             $defaultFields[] = $GLOBALS['TCA'][$table]['ctrl']['label'];
         }
@@ -845,6 +848,15 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
             }
         }
+
+        // Check if the element is on WS
+        if ($this->configuration->getDoNotCheckLinksOnWorkspace() == true) {
+            $workspaceId = (int)($row['t3ver_wsid'] ?? 0);
+            if ($workspaceId !== 0) {
+                return false;
+            }
+        }
+
         return true;
     }
 

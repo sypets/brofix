@@ -228,6 +228,14 @@ class Configuration
     /**
      * @return bool
      */
+    public function getDoNotCheckLinksOnWorkspace(): bool
+    {
+        return $this->tsConfig['check.']['doNotCheckLinksOnWorkspace'] == 1;
+    }
+
+    /**
+     * @return bool
+     */
     public function isCheckHidden(): bool
     {
         return (bool)($this->tsConfig['checkhidden'] ?? false);

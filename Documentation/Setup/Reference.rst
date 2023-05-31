@@ -222,6 +222,28 @@ doNotTraversePagesDoktypes
    Default
       6,199,255 (Backend User section, Menu Separator, Recycler)
 
+.. _tsconfigDoNotCheckLinksOnWorkspace:
+
+doNotCheckLinksOnWorkspace
+--------------------------
+
+*optional*
+
+.. container:: table-row
+
+   Property
+      mod.brofix.check.doNotCheckLinksOnWorkspace
+
+   Data type
+      int
+
+   Description
+      This option is used to enable or disable checking links that are created in Workspace, by default,
+      the links created on workspaces will be checked and reported.
+
+   Default
+      0
+
 
 .. _tsconfigReportHiddenRecords:
 

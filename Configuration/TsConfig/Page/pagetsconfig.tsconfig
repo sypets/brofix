@@ -12,7 +12,8 @@ mod.brofix {
 	  doNotCheckContentOnPagesDoktypes = 3,4
 	  doNotCheckPagesDoktypes = 6,7,199,255
 	  doNotTraversePagesDoktypes = 6,199,255
-	}
+	  doNotCheckLinksOnWorkspace = 0
+  }
 
 	checkhidden = 0
 
