@@ -203,6 +203,14 @@
 				<source>Element</source>
 			</trans-unit>
 
+			<!-- link target error messages: ForbiddenLinktype -->
+
+			<trans-unit id="list.report.error.forbidden" resname="list.report.error.forbidden">
+				<source>It is not allowed to use this URL.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.forbidden.local" resname="list.report.error.forbidden.local">
+				<source>The URL points to a local resource which is only available on your local machine.</source>
+			</trans-unit>
 
 			<!-- link target error messages: external -->
 
