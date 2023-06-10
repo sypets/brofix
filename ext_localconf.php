@@ -5,7 +5,6 @@ use Sypets\Brofix\FormEngine\CustomEvaluation\ExcludeLinkTargetsLinkTargetEvalua
 defined('TYPO3') or die();
 
 (function () {
-
     // ------------------
     // load page TSconfig
     // ------------------

@@ -1,11 +1,7 @@
 <?php
+
 declare(strict_types=1);
 namespace Sypets\Brofix\Linktype;
-
-use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
-use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Generic link types for not allowed link types (e.g. 'applewebdata://')
@@ -34,7 +30,7 @@ class ForbiddenLinktype extends AbstractLinktype
      */
     public function fetchType(array $value, string $type, string $key): string
     {
-        return (self::SUPPORTED_TYPES[$key] ?? '');
+        return self::SUPPORTED_TYPES[$key] ?? '';
     }
 
     /**
@@ -77,5 +73,4 @@ class ForbiddenLinktype extends AbstractLinktype
         // fallback
         return $this->getLanguageService()->getLL('list.report.error.forbidden');
     }
-
 }
