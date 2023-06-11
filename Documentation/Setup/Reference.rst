@@ -135,17 +135,20 @@ linktypes
 
       **Possible values:**
 
-      db: Check links to database records (pages, content elements).
+      **db**: Check links to database records (pages, content elements).
 
-      file: Check links to files located in your local TYPO3 installation.
+      **file**: Check links to files located in your local TYPO3 installation.
 
-      external: Check links to external files.
+      **external**: Check links to external files.
+
+      **applewebdata**: Check links starting with applewebdata:// (will always be
+      marked as broken)
 
       This list may be extended by other extensions providing a linktype
       checker.
 
    Default
-      db,file,external
+      db,file,external,applewebdata
 
 
 .. _tsconfigDoNotCheckContentOnPagesDoktypes:

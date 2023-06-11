@@ -6,7 +6,7 @@ mod.brofix {
 	# do not check these ctypes in tt_content elements (comma separated)
 	excludeCtype = html
 
-	linktypes = db,file,external
+	linktypes = db,file,external,applewebdata
 
 	check {
 	  doNotCheckContentOnPagesDoktypes = 3,4

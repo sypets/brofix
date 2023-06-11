@@ -5,9 +5,17 @@ use Sypets\Brofix\FormEngine\CustomEvaluation\ExcludeLinkTargetsLinkTargetEvalua
 defined('TYPO3') or die();
 
 (function () {
+    // ------------------
+    // load page TSconfig
+    // ------------------
+
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
         "@import 'EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig'"
     );
+
+    // -----
+    // Fluid
+    // -----
 
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths'][901])) {
         $GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths'][901] = 'EXT:brofix/Resources/Private/Templates/Email';
@@ -17,9 +25,16 @@ defined('TYPO3') or die();
         $GLOBALS['TYPO3_CONF_VARS']['MAIL']['partialRootPaths'][901] = 'EXT:brofix/Resources/Private/Partials';
     }
 
+    // --------------------
+    // Configure link types
+    // --------------------
+
     if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? false)) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] = [];
     }
+
+    // link types can be replaced with custom linktypes, custom link types added
+    // should correspond with Page TSconfig mod.brofix.linktypes
 
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['db'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['db'] = \Sypets\Brofix\Linktype\InternalLinktype::class;
@@ -30,6 +45,14 @@ defined('TYPO3') or die();
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['external'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['external'] = \Sypets\Brofix\Linktype\ExternalLinktype::class;
     }
+    if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['applewebdata'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['applewebdata'] = \Sypets\Brofix\Linktype\ForbiddenLinktype::class;
+    }
+
+    // -------------------------------
+    // FormEngine: custom formDataGrup
+    // -------------------------------
+    // used for checking if fields are editable
 
     // for link checking, do not perform user permission checks, only check if field is editable
     // permission checks are done when reading records from tx_brofix_broken_links for report
@@ -106,7 +129,9 @@ defined('TYPO3') or die();
             ['source' => 'EXT:brofix/Resources/Public/Icons/mimetypes-x-exclude-link-target.svg']
         );
 
+    // -----
     // icons
+    // -----
 
     $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
         \TYPO3\CMS\Core\Imaging\IconRegistry::class
