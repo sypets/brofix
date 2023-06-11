@@ -21,6 +21,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
+/**
+ * @internal This class may change without further warnings or increment of major version.
+ */
 class ManageExclusionsController extends AbstractBrofixController
 {
     /**

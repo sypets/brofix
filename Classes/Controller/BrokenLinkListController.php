@@ -38,7 +38,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Module 'Check links' as sub module of Web -> Info
- * @internal
+ * @internal This class may change without further warnings or increment of major version.
  */
 class BrokenLinkListController extends AbstractBrofixController
 {
