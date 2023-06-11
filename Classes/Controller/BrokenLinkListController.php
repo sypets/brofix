@@ -434,7 +434,6 @@ class BrokenLinkListController extends AbstractBrofixController
 
         if ($this->action === 'updateLinkList') {
             $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
-            // todo: localize this
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
@@ -601,12 +600,12 @@ class BrokenLinkListController extends AbstractBrofixController
             if ($this->configuration->getTraverseMaxNumberOfPagesInBackend()
                 && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
                 $this->createFlashMessage(
-                    $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
                     sprintf(
                         $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached')
-                        ?: 'The limit of %s number of pages was reached. Some broken links may not be displayed. To see more broken links for further subpages, go to a subpage of this page.',
+                            ?: 'The limit of %s number of pages was reached. Some broken links may not be displayed. To see more broken links for further subpages, go to a subpage of this page.',
                         $this->configuration->getTraverseMaxNumberOfPagesInBackend()
                     ),
+                    $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
                     AbstractMessage::WARNING
                 );
             }
@@ -705,8 +704,8 @@ class BrokenLinkListController extends AbstractBrofixController
          */
         $flashMessage = GeneralUtility::makeInstance(
             FlashMessage::class,
-            $title,
             $message,
+            $title,
             $type,
             false
         );
