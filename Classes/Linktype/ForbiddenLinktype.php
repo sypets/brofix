@@ -21,19 +21,6 @@ class ForbiddenLinktype extends AbstractLinktype
     ];
 
     /**
-     * Base type fetching method, based on the type that softRefParserObj returns
-     *
-     * @param mixed[] $value Reference properties
-     * @param string $type Current type
-     * @param string $key Validator hook name
-     * @return string Fetched type
-     */
-    public function fetchType(array $value, string $type, string $key): string
-    {
-        return self::SUPPORTED_TYPES[$key] ?? '';
-    }
-
-    /**
      * Checks a given URL + /path/filename.ext for validity
      *
      * @param string $url Url to check
@@ -43,19 +30,17 @@ class ForbiddenLinktype extends AbstractLinktype
      */
     public function checkLink(string $url, array $softRefEntry, int $flags = 0): bool
     {
-        $errno = self::ERRNO_FORBIDDEN_GENERIC;
         $this->initializeErrorParams();
         $this->errorParams->setErrorType(self::ERROR_TYPE_FORBIDDEN);
 
         foreach (self::URLS_START_WITH_ERRNO as $startUrl => $errnoOverride) {
             if (strpos($url, $startUrl) === 0) {
-                $errno = $errnoOverride;
-                break;
+                $this->errorParams->setErrno($errnoOverride);
+                $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+                return false;
             }
         }
-        $this->errorParams->setErrno($errno);
-        $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
-        return false;
+        return true;
     }
 
     /**
