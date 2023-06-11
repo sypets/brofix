@@ -7,6 +7,7 @@ namespace Sypets\Brofix\Controller;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Routing\PreviewUriBuilder;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
@@ -27,6 +28,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Loosely based on InfoModuleController of TYPO3 CMS
+ * @internal This class may change without further warnings or increment of major version.
  */
 class BrofixController
 {
@@ -216,7 +218,7 @@ class BrofixController
             $this->view->assign('moduleName', (string)$this->uriBuilder->buildUriFromRoute($this->moduleName));
             $this->view->assign('functionMenuModuleContent', $this->getExtObjContent());
             // Setting up the buttons and markers for doc header
-            $this->getButtons();
+            $this->createButtonsOnButtonBar();
             $this->generateMenu();
             $this->content .= $this->view->render();
         } else {
@@ -234,13 +236,7 @@ class BrofixController
      */
     public function mainAction(ServerRequestInterface $request): ResponseInterface
     {
-        // @deprecated and will be removed in TYPO3 v10.0.
-        // @todo: PageLayoutView / $dblist used by PageInformationController still relies on this being set at the moment,
-        // @todo: otherwise the "pages_levels" / "depth" information gets lost rendering the Pagetree Overview.
-        $GLOBALS['SOBE'] = $this;
-
         $this->init();
-
         // Checking for first level external objects
         $this->checkExtObj();
 
@@ -253,42 +249,23 @@ class BrofixController
     /**
      * Create the panel of buttons for submitting the form or otherwise perform operations.
      */
-    protected function getButtons(): void
+    protected function createButtonsOnButtonBar(): void
     {
         $languageService = $this->getLanguageService();
         $buttonBar = $this->moduleTemplate->getDocHeaderComponent()->getButtonBar();
-        // View page
+        // create "View page" button
+        $previewDataAttributes = PreviewUriBuilder::create((int)$this->pageinfo['uid'])
+            ->withRootLine(BackendUtility::BEgetRootLine($this->pageinfo['uid']))
+            ->buildDispatcherDataAttributes();
         $viewButton = $buttonBar->makeLinkButton()
             ->setHref('#')
-            ->setOnClick(BackendUtility::viewOnClick(
-                $this->pageinfo['uid'],
-                '',
-                BackendUtility::BEgetRootLine($this->pageinfo['uid'])
-            ))
+            ->setDataAttributes($previewDataAttributes ?? [])
             ->setTitle($languageService->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage'))
-            ->setIcon($this->iconFactory->getIcon('actions-view-page', Icon::SIZE_SMALL));
+            ->setIcon($this->iconFactory->getIcon(
+                'actions-view-page',
+                Icon::SIZE_SMALL
+            ));
         $buttonBar->addButton($viewButton, ButtonBar::BUTTON_POSITION_LEFT, 1);
-        // Shortcut
-        $shortCutButton = $buttonBar->makeShortcutButton()
-            ->setModuleName($this->moduleName)
-            ->setDisplayName($this->MOD_MENU['function'][$this->MOD_SETTINGS['function']])
-            ->setGetVariables([
-                'route',
-                'id',
-                'edit_record',
-                'pointer',
-                'search_field',
-                'search_levels',
-                'showLimit'
-            ])
-            ->setSetVariables(array_keys($this->MOD_MENU));
-        $buttonBar->addButton($shortCutButton, ButtonBar::BUTTON_POSITION_RIGHT);
-
-        // CSH
-        $cshButton = $buttonBar->makeHelpButton()
-            ->setModuleName('xMOD_csh_corebe')
-            ->setFieldName('pagetree_overview');
-        $buttonBar->addButton($cshButton);
     }
 
     /**
