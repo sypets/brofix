@@ -21,6 +21,23 @@ class ForbiddenLinktype extends AbstractLinktype
     ];
 
     /**
+     * Base type fetching method, based on the type that softRefParserObj returns
+     *
+     * @param mixed[] $value Reference properties
+     * @param string $type Current type
+     * @param string $key Validator hook name
+     * @return string Fetched type
+     */
+    public function fetchType(array $value, string $type, string $key): string
+    {
+        if (isset($value['type']) && $value['type'] === 'external' && isset($value['tokenValue']) && strpos($value['tokenValue'], 'applewebdata:') === 0) {
+            // is type "applewebdata" if type is "external" and URL starts with applewebdata:
+            return 'applewebdata';
+        }
+        return 'external';
+    }
+
+    /**
      * Checks a given URL + /path/filename.ext for validity
      *
      * @param string $url Url to check
