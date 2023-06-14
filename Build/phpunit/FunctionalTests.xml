@@ -12,6 +12,12 @@
     TYPO3 CMS functional test suite also needs phpunit bootstrap code, the
     file is located next to this .xml as FunctionalTestsBootstrap.php
 
+    see phpunit configuration: https://docs.phpunit.de/en/9.6/configuration.html
+
+-->
+
+<!-- todo
+     should set beStrictAboutTestsThatDoNotTestAnything to true, but assertCSVDataSet does not seem to count as assertion
 -->
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -26,14 +32,16 @@
     convertNoticesToExceptions="true"
     forceCoversAnnotation="false"
     processIsolation="false"
-    stopOnError="false"
-    stopOnFailure="false"
-    stopOnIncomplete="false"
-    stopOnSkipped="false"
-    verbose="false"
+    stopOnError="true"
+    stopOnFailure="true"
+    stopOnIncomplete="true"
+    stopOnSkipped="true"
+    verbose="true"
     beStrictAboutTestsThatDoNotTestAnything="false"
     failOnWarning="true"
     failOnRisky="true"
+    failOnIncomplete="true"
+    failOnSkipped="true"
 >
     <testsuites>
         <testsuite name="Functional tests">

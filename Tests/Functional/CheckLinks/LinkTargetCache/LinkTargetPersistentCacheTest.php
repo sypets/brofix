@@ -20,14 +20,11 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks\LinkTargetCache;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\ExternalLinktype;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
+use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 
-class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
+class LinkTargetPersistentCacheTest extends AbstractFunctional
 {
-    /**
-     * @test
-     */
-    public function hasEntryForUrlReturnsFalse(): void
+    public function testHasEntryForUrlReturnsFalse(): void
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -38,10 +35,7 @@ class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
         self::assertFalse($result, 'Empty cache should not have entry for url');
     }
 
-    /**
-     * @test
-     */
-    public function getUrlResponseForUrlReturnsEmptyArray(): void
+    public function testGetUrlResponseForUrlReturnsEmptyArray(): void
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -52,10 +46,7 @@ class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
         self::assertEquals([], $result, 'Empty cache should return empty array for url');
     }
 
-    /**
-     * @test
-     */
-    public function generateUrlResponseReturnsCorrectValue(): void
+    public function testGenerateUrlResponseReturnsCorrectValue(): void
     {
         /**
          * @var ErrorParams
@@ -73,10 +64,7 @@ class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
         self::assertEquals($expected, $result, 'generateUrlResponse returns correct result');
     }
 
-    /**
-     * @test
-     */
-    public function removeRemovesEntry(): void
+    public function testRemoveRemovesEntry(): void
     {
         $url = 'https://example.org';
         $type = 'external';
@@ -91,10 +79,7 @@ class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
         self::assertFalse($result, 'Entry should be removed');
     }
 
-    /**
-     * @test
-     */
-    public function setEntrySetsCorrectValue(): void
+    public function testSetEntrySetsCorrectValue(): void
     {
         /**
          * @var ErrorParams
@@ -119,10 +104,8 @@ class LinkTargetPersistentCacheTestCase extends AbstractFunctionalTestCase
 
     /**
      * Set value twice, make sure value returned is last value.
-     *
-     * @test
      */
-    public function setEntrySetsCorrectValueToLastSet(): void
+    public function testSetEntrySetsCorrectValueToLastSet(): void
     {
         /**
          * @var ErrorParams
