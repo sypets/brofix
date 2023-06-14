@@ -21,7 +21,7 @@ use Sypets\Brofix\LinkAnalyzer;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
+class LinkAnalyzerTest extends AbstractFunctional
 {
     protected function setUp(): void
     {
@@ -83,7 +83,6 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
     }
 
     /**
-     * @test
      * @dataProvider findAllBrokenLinksDataProvider
      *
      * @param non-empty-string $inputFile
@@ -91,7 +90,7 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function generateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
+    public function testGenerateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         // setup
         $this->importDataSet($inputFile);
@@ -133,7 +132,6 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
     }
 
     /**
-     * @test
      * @dataProvider findFindOnlyFileBrokenLinksDataProvider
      *
      * @param non-empty-string $inputFile
@@ -141,7 +139,7 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsFindOnlyFileBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
+    public function testGetLinkStatisticsFindOnlyFileBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['file'];
 
@@ -186,7 +184,6 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
     }
 
     /**
-     * @test
      * @dataProvider findFindOnlyPageBrokenLinksDataProvider
      *
      * @param non-empty-string $inputFile
@@ -195,7 +192,7 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
      *
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsFindOnlyPageBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
+    public function testGetLinkStatisticsFindOnlyPageBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['db'];
 
@@ -240,7 +237,6 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
     }
 
     /**
-     * @test
      * @dataProvider findFindOnlyExternalBrokenLinksDataProvider
      *
      * @param non-empty-string $inputFile
@@ -248,7 +244,7 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsFindOnlyExternalBrokenLinksInBodytext(string $inputFile, array $pidList, string $expectedOutputFile): void
+    public function testGetLinkStatisticsFindOnlyExternalBrokenLinksInBodytext(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['external'];
 
@@ -292,7 +288,6 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
     }
 
     /**
-     * @test
      * @dataProvider checkContentByTypeDataProvider
      *
      * @param non-empty-string $inputFile
@@ -301,7 +296,7 @@ class LinkAnalyzerTestCase extends AbstractFunctionalTestCase
      *
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    public function getLinkStatisticsCheckOnlyContentByType(string $inputFile, array $pidList, string $expectedOutputFile): void
+    public function testGetLinkStatisticsCheckOnlyContentByType(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $searchFields = [
             'tt_content' => [

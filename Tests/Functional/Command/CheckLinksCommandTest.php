@@ -20,13 +20,13 @@ namespace Sypets\Brofix\Tests\Functional\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Sypets\Brofix\Command\CheckLinksCommand;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
+use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
+class CheckLinksCommandTest extends AbstractFunctional
 {
     protected function setUp(): void
     {
@@ -35,10 +35,7 @@ class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
         $GLOBALS['LANG'] = $this->getContainer()->get(LanguageServiceFactory::class)->create('default');
     }
 
-    /**
-     * @test
-     */
-    public function checkLinksCommandThrowsExceptionForNotExistingStartpage(): void
+    public function testCheckLinksCommandThrowsExceptionForNotExistingStartpage(): void
     {
         /**
          * @var CheckLinksCommand
@@ -57,9 +54,8 @@ class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
     /**
      * Test for no startpages passed as arguments and no sites configured
      *
-     * @test
      */
-    public function checkLinksCommandReturnsCorrectResultForNoStartpages(): void
+    public function testCheckLinksCommandReturnsCorrectResultForNoStartpages(): void
     {
         /**
          * @var CheckLinksCommand
@@ -75,10 +71,7 @@ class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function checkLinksCommandChecksLinksMissingEmailException(): void
+    public function testCheckLinksCommandChecksLinksMissingEmailException(): void
     {
         $parameters = [
             '--start-pages' => '1'
@@ -97,10 +90,7 @@ class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
         $tester->execute($parameters, []);
     }
 
-    /**
-     * @test
-     */
-    public function checkLinksCommandChecksLinksWithNoSendEmailReturnsOk(): void
+    public function testCheckLinksCommandChecksLinksWithNoSendEmailReturnsOk(): void
     {
         $parameters = [
             '--start-pages' => '1',
@@ -119,10 +109,7 @@ class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
         self::assertEquals(0, $result, 'Console command should return 0 if no errors.');
     }
 
-    /**
-     * @test
-     */
-    public function checkLinksCommandStatsNumberOfPages(): void
+    public function testCheckLinksCommandStatsNumberOfPages(): void
     {
         $parameters = [
             '--start-pages' => '1',
@@ -146,10 +133,7 @@ class CheckLinksCommandTestCase extends AbstractFunctionalTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function checkLinksCommandStatsNumberOfBrokenLinks(): void
+    public function testCheckLinksCommandStatsNumberOfBrokenLinks(): void
     {
         $parameters = [
             '--start-pages' => '1',

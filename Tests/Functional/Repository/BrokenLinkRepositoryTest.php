@@ -20,10 +20,10 @@ namespace Sypets\Brofix\Tests\Functional\Repository;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
+use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
-class BrokenLinkRepositoryTestCase extends AbstractFunctionalTestCase
+class BrokenLinkRepositoryTest extends AbstractFunctional
 {
     protected ?BrokenLinkRepository $brokenLinkRepository = null;
 
@@ -204,10 +204,9 @@ class BrokenLinkRepositoryTestCase extends AbstractFunctionalTestCase
      * @param array<string,int> $expectedOutput
      * @throws \TYPO3\TestingFramework\Core\Exception
      *
-     * @test
      * @dataProvider getLinkCountsForPagesAndLinktypesReturnsCorrectCountForUserDataProvider
      */
-    public function getLinkCountsForPagesAndLinktypesReturnsCorrectCountForUser(
+    public function testGetLinkCountsForPagesAndLinktypesReturnsCorrectCountForUser(
         array $beuser,
         string $inputFile,
         array $pidList,
@@ -330,10 +329,9 @@ class BrokenLinkRepositoryTestCase extends AbstractFunctionalTestCase
      * @param array<int,int> $pidList
      * @param int $expectedCount
      * @throws \TYPO3\TestingFramework\Core\Exception
-     * @test
      * @dataProvider getBrokenLinksReturnsCorrectCountForUserDataProvider
      */
-    public function getBrokenLinksReturnsCorrectCountForUser(
+    public function testGetBrokenLinksReturnsCorrectCountForUser(
         array $beuser,
         string $inputFile,
         array $pidList,
@@ -617,10 +615,9 @@ class BrokenLinkRepositoryTestCase extends AbstractFunctionalTestCase
      * @param array<int,int> $pidList
      * @param array<string,mixed> $expectedResult
      * @throws \TYPO3\TestingFramework\Core\Exception
-     * @test
      * @dataProvider getBrokenLinksReturnsCorrectValuesForUserDataProvider
      */
-    public function getBrokenLinksReturnsCorrectValuesForUser(
+    public function testGetBrokenLinksReturnsCorrectValuesForUser(
         array $beuser,
         string $inputFile,
         array $pidList,

@@ -18,9 +18,9 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks;
  */
 
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
+use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 
-class ExcludeLinkTargetTestCase extends AbstractFunctionalTestCase
+class ExcludeLinkTargetTest extends AbstractFunctional
 {
     /**
      * @return array<string,mixed[]>
@@ -46,7 +46,6 @@ class ExcludeLinkTargetTestCase extends AbstractFunctionalTestCase
     }
 
     /**
-     * @test
      * @dataProvider isExcludedDataProvider
      *
      * @param non-empty-string $inputFile
@@ -54,7 +53,7 @@ class ExcludeLinkTargetTestCase extends AbstractFunctionalTestCase
      * @param non-empty-string $linkType
      * @param bool $expectedResult
      */
-    public function isExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult): void
+    public function testIsExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult): void
     {
         // setup
         $this->importDataSet($inputFile);

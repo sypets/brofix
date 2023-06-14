@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
 use Sypets\Brofix\Repository\PagesRepository;
-use Sypets\Brofix\Tests\Functional\AbstractFunctionalTestCase;
+use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class PagesRepositoryTestCase extends AbstractFunctionalTestCase
+class PagesRepositoryTest extends AbstractFunctional
 {
     /**
      * @return \Generator<string,array<mixed>>
@@ -157,10 +157,9 @@ class PagesRepositoryTestCase extends AbstractFunctionalTestCase
      * @param array<int,int> $excludedPages
      * @param array<int,int> $expectedResult
      *
-     * @test
      * @dataProvider getPageListReturnsCorrectPagesDataProvider()
      */
-    public function getPageListReturnsCorrectPages(
+    public function testGetPageListReturnsCorrectPages(
         string $fixture,
         int $startPage,
         int $depth,

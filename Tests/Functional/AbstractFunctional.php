@@ -21,7 +21,7 @@ use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
-abstract class AbstractFunctionalTestCase extends FunctionalTestCase
+abstract class AbstractFunctional extends FunctionalTestCase
 {
     /**
      * @var non-empty-string[]
