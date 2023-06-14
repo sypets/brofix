@@ -104,7 +104,6 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
 
     /**
      * Set value twice, make sure value returned is last value.
-     *
      */
     public function testSetEntrySetsCorrectValueToLastSet(): void
     {

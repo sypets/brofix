@@ -53,7 +53,6 @@ class CheckLinksCommandTest extends AbstractFunctional
 
     /**
      * Test for no startpages passed as arguments and no sites configured
-     *
      */
     public function testCheckLinksCommandReturnsCorrectResultForNoStartpages(): void
     {
