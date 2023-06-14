@@ -141,9 +141,6 @@ linktypes
 
       **external**: Check links to external files.
 
-      **applewebdata**: Check links starting with applewebdata:// (will always be
-      marked as broken)
-
       This list may be extended by other extensions providing a linktype
       checker.
 

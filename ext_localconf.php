@@ -45,9 +45,6 @@ defined('TYPO3') or die();
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['external'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['external'] = \Sypets\Brofix\Linktype\ExternalLinktype::class;
     }
-    if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['applewebdata'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks']['applewebdata'] = \Sypets\Brofix\Linktype\ForbiddenLinktype::class;
-    }
 
     // -------------------------------
     // FormEngine: custom formDataGrup
