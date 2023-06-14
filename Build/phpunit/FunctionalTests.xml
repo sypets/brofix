@@ -15,6 +15,10 @@
     see phpunit configuration: https://docs.phpunit.de/en/9.6/configuration.html
 
 -->
+
+<!-- todo
+     should set beStrictAboutTestsThatDoNotTestAnything to true, but assertCSVDataSet does not seem to count as assertion
+-->
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
@@ -33,7 +37,7 @@
     stopOnIncomplete="true"
     stopOnSkipped="true"
     verbose="true"
-    beStrictAboutTestsThatDoNotTestAnything="true"
+    beStrictAboutTestsThatDoNotTestAnything="false"
     failOnWarning="true"
     failOnRisky="true"
     failOnIncomplete="true"
