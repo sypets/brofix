@@ -261,6 +261,43 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
+    public function getLinkStatisticsDoNotDetectCorrectLinksAsBrokenDataProvider(): array
+    {
+        $pidList1 = [1];
+
+        return [
+            // Tests with one broken link
+            'Test with one not broken page link' =>
+                [
+                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link.xml',
+                    [1],
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
+                ]
+        ];
+    }
+
+    /**
+     * @dataProvider getLinkStatisticsDoNotDetectCorrectLinksAsBrokenDataProvider
+     *
+     * @param non-empty-string $inputFile
+     * @param array<string|int> $pidList
+     * @param string $expectedOutputFile
+     * @throws \TYPO3\TestingFramework\Core\Exception
+     */
+    public function testGetLinkStatisticsDoNotDetectCorrectLinksAsBroken(string $inputFile, array $pidList, string $expectedOutputFile): void
+    {
+        // setup
+        $this->importDataSet($inputFile);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+
+        // assert
+        $this->assertCSVDataSet($expectedOutputFile);
+    }
+
+    /**
+     * @return array<string,mixed[]>
+     */
     public function checkContentByTypeDataProvider(): array
     {
         $pidList1 = [1];
