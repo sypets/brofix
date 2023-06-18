@@ -32,7 +32,7 @@
     convertNoticesToExceptions="true"
     forceCoversAnnotation="false"
     processIsolation="false"
-    stopOnError="true"
+    stopOnError="false"
     stopOnFailure="true"
     stopOnIncomplete="true"
     stopOnSkipped="true"

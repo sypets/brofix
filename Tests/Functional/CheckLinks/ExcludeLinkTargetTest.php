@@ -23,7 +23,7 @@ use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 class ExcludeLinkTargetTest extends AbstractFunctional
 {
     /**
-     * @return array<string,mixed[]>
+     * @return array<string,array<mixed>>
      */
     public function isExcludedDataProvider(): array
     {

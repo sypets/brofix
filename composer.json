@@ -35,9 +35,9 @@
 	},
 	"require": {
 		"php": "^7.4 || ^8.0 || ^8.1",
-		"typo3/cms-backend": "^11.5.10",
-		"typo3/cms-core": "^11.5.10",
-		"typo3/cms-fluid": "^11.5.10"
+		"typo3/cms-backend": "^11.5.28",
+		"typo3/cms-core": "^11.5.28",
+		"typo3/cms-fluid": "^11.5.28"
 	},
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^3.2",
@@ -47,7 +47,7 @@
 		"phpstan/phpstan": "^1.8.2",
 		"phpunit/phpunit": "^9.5.20",
 		"ssch/typo3-rector": "^1.2",
-		"typo3/testing-framework": "^6.16.5"
+		"typo3/testing-framework": "^7.0.2"
 	},
 	"suggest": {
 		"sypets/page-callouts": "^3.0.0"
