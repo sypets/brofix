@@ -17,10 +17,10 @@ namespace Sypets\Brofix\Tests\Unit\Configuration;
  */
 
 use Sypets\Brofix\CheckLinks\CrawlDelay;
-use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
+use Sypets\Brofix\Tests\Unit\AbstractUnit;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CrawlDelayTest extends AbstractUnitTest
+class CrawlDelayTest extends AbstractUnit
 {
     /**
      * Set up for set up the backend user, initialize the language object

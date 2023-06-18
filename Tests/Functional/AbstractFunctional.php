@@ -23,20 +23,13 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctional extends FunctionalTestCase
 {
-    /**
-     * @var non-empty-string[]
-     */
-    protected $coreExtensionsToLoad = [
+    protected array $coreExtensionsToLoad = [
         'backend',
         'fluid',
         'info',
         'install'
     ];
-
-    /**
-     * @var non-empty-string[]
-     */
-    protected $testExtensionsToLoad = [
+    protected array $testExtensionsToLoad = [
         'typo3conf/ext/brofix',
     ];
 

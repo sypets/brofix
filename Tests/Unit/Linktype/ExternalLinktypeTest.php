@@ -24,11 +24,11 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ExternalLinktype;
-use Sypets\Brofix\Tests\Unit\AbstractUnitTest;
+use Sypets\Brofix\Tests\Unit\AbstractUnit;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ExternalLinktypeTest extends AbstractUnitTest
+class ExternalLinktypeTest extends AbstractUnit
 {
     use ProphecyTrait;
 
