@@ -63,7 +63,7 @@ final class CheckBrokenRteLinkEventListener
             if ($fragment !== '') {
                 $url .= '#c' . $fragment;
             }
-            if ($this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'db')) {
+            if ($this->brokenLinkRepository->isLinkTargetBrokenLink((string)$url, 'db')) {
                 $event->markAsBrokenLink('Broken link');
             }
         }

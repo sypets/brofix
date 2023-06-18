@@ -36,11 +36,67 @@ use TYPO3\CMS\Core\Utility\MailUtility;
 class Configuration
 {
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
+    public const DEFAULT_TSCONFIG = [
+        'searchFields.' => [
+            'pages' => 'media,url',
+            'tt_content' => 'bodytext,header_link,records',
+        ],
+        'excludeCtype' => 'html',
+        'linktypes' => 'db,file,external,applewebdata',
+        'check.' => [
+            'doNotCheckContentOnPagesDoktypes' => '3,4',
+            'doNotCheckPagesDoktypes' => '6,7,199,255',
+            'doNotTraversePagesDoktypes' => '6,199,255',
+            'doNotCheckLinksOnWorkspace' => false,
+        ],
+        'checkhidden' => false,
+        'depth' => 999,
+        'reportHiddenRecords' => true,
+        'linktypesConfig.' => [
+            'external.' => [
+                'headers.' => [
+                    'User-Agent' => '',
+                    'Accept' => '*/*'
+                ],
+                'timeout' => 10,
+                'redirects' => 5,
+            ]
+        ],
+        'excludeLinkTarget.' => [
+            'storagePid' => 0,
+            'allowed' => 'external',
+        ],
+        'linkTargetCache.' => [
+            'expiresLow' => 604800,
+            'expiresHigh' => 691200,
+        ],
+        'crawlDelay.' => [
+            'seconds' => 5,
+            'nodelay' => '',
+        ],
+        'report.' => [
+            'docsurl' => '',
+            'recheckButton' => -1,
+        ],
+        'mail.' => [
+            'sendOnCheckLinks' => 1,
+            'recipients' => '',
+            'fromname' => '',
+            'fromemail' => '',
+            'replytoname' => '',
+            'replytoemail' => '',
+            'subject' => '',
+            'template' => 'CheckLinksResults',
+            'language' => 'en',
+        ],
+        'custom.' => []
+    ];
 
     /**
      * @var mixed[]
+     * @todo replace this array and use member variables for all values
      */
-    protected $tsConfig = [];
+    protected $tsConfig = self::DEFAULT_TSCONFIG;
 
     /**
      * Limit number of pages traversed in backend. This limit is only active when displaying
@@ -89,7 +145,7 @@ class Configuration
      * @param string $tsConfigString
      * @throws \Exception
      *
-     * @todo Create specific exception
+     * @deprecated use overrideTsConfigByArray
      */
     public function overrideTsConfigByString(string $tsConfigString): void
     {
@@ -115,6 +171,14 @@ class Configuration
     }
 
     /**
+     * @param array<mixed> $override
+     */
+    public function overrideTsConfigByArray(array $override): void
+    {
+        ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $override);
+    }
+
+    /**
      * @return mixed[]
      */
     public function getTsConfig(): array
@@ -123,7 +187,7 @@ class Configuration
     }
 
     /**
-     * @param array<string,array<string>> $searchFields, e.g.
+     * @param array<string,array<string>> $searchFields , e.g.
      *   [
      *      'tt_content' => ['bodytext', 'media']
      *   ]
@@ -392,7 +456,7 @@ class Configuration
             if ($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] ?? '') {
                 $fromAddress = $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] ?? '';
                 $fromName = $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName'] ?? '';
-                $result[] =  new Address($fromAddress, $fromName);
+                $result[] = new Address($fromAddress, $fromName);
             }
         } else {
             foreach (explode(',', $recipients) as $recipient) {

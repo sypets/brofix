@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-# copied from EXT:enetcache:
-#  https://github.com/lolli42/enetcache/blob/master/Build/Scripts/runTests.sh
-
-#
-# TYPO3 core test runner based on docker and docker-compose.
-#
+# loosely based on Build/Script files in TYPO3 core
 
 # Function to write a .env file in Build/testing-docker/local
 # This is read by docker-compose and vars defined here are
@@ -35,10 +30,15 @@ setUpDockerComposeDotEnv() {
         echo "PHP_XDEBUG_ON=${PHP_XDEBUG_ON}"
         echo "PHP_XDEBUG_PORT=${PHP_XDEBUG_PORT}"
         echo "PHP_VERSION=${PHP_VERSION}"
+        echo "MARIADB_VERSION=${MARIADB_VERSION}"
+        echo "MYSQL_VERSION=${MYSQL_VERSION}"
+        echo "POSTGRES_VERSION=${POSTGRES_VERSION}"
         echo "DOCKER_PHP_IMAGE=${DOCKER_PHP_IMAGE}"
         echo "EXTRA_TEST_OPTIONS=${EXTRA_TEST_OPTIONS}"
         echo "SCRIPT_VERBOSE=${SCRIPT_VERBOSE}"
         echo "PASSWD_PATH=${PASSWD_PATH}"
+        echo "IMAGE_PREFIX=${IMAGE_PREFIX}"
+
     } > .env
 }
 
@@ -78,21 +78,18 @@ Options:
             - '^11.5' (default)
             - ...
 
-    -d <mariadb|mssql|postgres|sqlite>
+    -d <mariadb|mysql|postgres|sqlite>
         Only with -s functional
         Specifies on which DBMS tests are performed
             - mariadb (default): use mariadb
-            - mssql: use mssql microsoft sql server
+            - mysql: MySQL (currently untested)
             - postgres: use postgres
             - sqlite: use sqlite
 
-    -p <7.2|7.3|7.4|8.0|8.1>
+    -p <8.1|8.2>
         Specifies the PHP minor version to be used
-            - 7.2 (default): use PHP 7.2
-            - 7.3: use PHP 7.3
-            - 7.4: use PHP 7.4
-            - 8.0: use PHP 8.0
             - 8.1: use PHP 8.1
+            - 8.2 (default)
 
     -e "<phpunit|phpstan options>"
         Only with -s functional|unit|phpstan
@@ -116,10 +113,10 @@ Options:
         Activate dry-run in CGL check that does not actively change files and only prints broken ones.
 
     -u
-        Update existing typo3gmbh/phpXY:latest docker images. Maintenance call to docker pull latest
+        Update existing ${TYPO3_DOCKER_IMAGE_BASE}XY:latest docker images. Maintenance call to docker pull latest
         versions of the main php images. The images are updated once in a while and only the youngest
         ones are supported by core testing. Use this if weird test errors occur. Also removes obsolete
-        image versions of typo3gmbh/phpXY.
+        image versions of ${TYPO3_DOCKER_IMAGE_BASE}XY.
 
     -v
         Enable verbose script output. Shows variables and docker commands.
@@ -162,16 +159,21 @@ if ! command -v realpath &> /dev/null; then
 else
   ROOT_DIR=`realpath ${PWD}/../../`
 fi
-CORE_VERSION="11.5"
+CORE_VERSION="12.4"
 TEST_SUITE="unit"
 DBMS="mariadb"
-PHP_VERSION="8.1"
+PHP_VERSION="8.2"
+DATABASE_DRIVER=""
+MARIADB_VERSION="10.3"
+MYSQL_VERSION="8.0"
+POSTGRES_VERSION="10"
 PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 EXTRA_TEST_OPTIONS=""
 SCRIPT_VERBOSE=0
 CGLCHECK_DRY_RUN=""
 PASSWD_PATH=/etc/passwd
+IMAGE_PREFIX="ghcr.io/typo3/"
 
 # Option parsing
 # Reset in case getopts has been used previously in the shell
@@ -192,7 +194,7 @@ while getopts ":s:t:d:p:e:xy:huvn" OPT; do
             ;;
         p)
             PHP_VERSION=${OPTARG}
-            if ! [[ ${PHP_VERSION} =~ ^(7.2|7.3|7.4|8.0|8.1)$ ]]; then
+            if ! [[ ${PHP_VERSION} =~ ^(8.1|8.2)$ ]]; then
                 INVALID_OPTIONS+=("${OPT} ${OPTARG} : unsupported php version")
             fi
             ;;
@@ -244,14 +246,14 @@ DOCKER_PHP_IMAGE=`echo "php${PHP_VERSION}" | sed -e 's/\.//'`
 # Set $1 to first mass argument, this is the optional test file or test directory to execute
 shift $((OPTIND - 1))
 if [ -n "${1}" ]; then
-    TEST_FILE="Web/typo3conf/ext/brofix/${1}"
+    TEST_FILE="../${1}"
 else
     case ${TEST_SUITE} in
         functional)
-            TEST_FILE="Web/typo3conf/ext/brofix/Tests/Functional"
+            TEST_FILE="../Tests/Functional"
             ;;
         unit)
-            TEST_FILE="Web/typo3conf/ext/brofix/Tests/Unit"
+            TEST_FILE="../Tests/Unit"
             ;;
     esac
 fi
@@ -312,15 +314,15 @@ case ${TEST_SUITE} in
         setUpDockerComposeDotEnv
         case ${DBMS} in
             mariadb)
-                docker-compose run functional_mariadb10
+                docker-compose run functional_mariadb
                 SUITE_EXIT_CODE=$?
                 ;;
-            mssql)
-                docker-compose run functional_mssql2019latest
+            mysql)
+                docker-compose run functional_mysql
                 SUITE_EXIT_CODE=$?
                 ;;
             postgres)
-                docker-compose run functional_postgres10
+                docker-compose run functional_postgres
                 SUITE_EXIT_CODE=$?
                 ;;
             sqlite)
@@ -365,11 +367,19 @@ case ${TEST_SUITE} in
         docker-compose down
         ;;
     update)
-        # pull typo3gmbh/phpXY:latest versions of those ones that exist locally
-        docker images typo3gmbh/php*:latest --format "{{.Repository}}:latest" | xargs -I {} docker pull {}
-        # remove "dangling" typo3gmbh/phpXY images (those tagged as <none>)
-        docker images typo3gmbh/php* --filter "dangling=true" --format "{{.ID}}" | xargs -I {} docker rmi {}
-        ;;
+       # prune unused, dangling local volumes
+       echo "> prune unused, dangling local volumes"
+       docker volume ls -q -f driver=local -f dangling=true | awk '$0 ~ /^[0-9a-f]{64}$/ { print }' | xargs -I {} docker volume rm {}
+       echo ""
+       # pull typo3/core-testing-*:latest versions of those ones that exist locally
+       echo "> pull ${IMAGE_PREFIX}core-testing-*:latest versions of those ones that exist locally"
+       docker images ${IMAGE_PREFIX}core-testing-*:latest --format "{{.Repository}}:latest" | xargs -I {} docker pull {}
+       echo ""
+       # remove "dangling" typo3/core-testing-* images (those tagged as <none>)
+       echo "> remove \"dangling\" ${IMAGE_PREFIX}core-testing-* images (those tagged as <none>)"
+       docker images ${IMAGE_PREFIX}core-testing-* --filter "dangling=true" --format "{{.ID}}" | xargs -I {} docker rmi {}
+       echo ""
+       ;;
     *)
         echo "Invalid -s option argument ${TEST_SUITE}" >&2
         echo >&2

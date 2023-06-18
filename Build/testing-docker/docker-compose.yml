@@ -1,25 +1,23 @@
-# copied from EXT:enetcache
-#  https://github.com/lolli42/enetcache/blob/master/Build/testing-docker/docker-compose.yml
-
+# loosely based on Build/testing-docker files in TYPO3 core
 
 version: '2.3'
 services:
-  mariadb10:
-    image: mariadb:10
+  mysql:
+    image: mysql:${MYSQL_VERSION}
     environment:
       MYSQL_ROOT_PASSWORD: funcp
     tmpfs:
       - /var/lib/mysql/:rw,noexec,nosuid
 
-  mssql2019latest:
-    image: typo3/core-testing-mssql2019:latest
+  mariadb:
+    image: mariadb:${MARIADB_VERSION}
     environment:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: "Test1234!"
-      MSSQL_PID: Developer
+      MYSQL_ROOT_PASSWORD: funcp
+    tmpfs:
+      - /var/lib/mysql/:rw,noexec,nosuid
 
-  postgres10:
-    image: postgres:10-alpine
+  postgres:
+    image: postgres:${POSTGRES_VERSION}-alpine
     environment:
       POSTGRES_PASSWORD: funcp
       POSTGRES_USER: ${HOST_USER}
@@ -27,7 +25,7 @@ services:
       - /var/lib/postgresql/data:rw,noexec,nosuid
 
   composer_coreversion_require:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -42,7 +40,7 @@ services:
         composer require --no-progress --no-interaction --no-install typo3/minimal:"${CORE_VERSION}";
       "
   composer_install:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -57,7 +55,7 @@ services:
         composer install --no-progress --no-interaction;
       "
   composer_install_max:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -83,7 +81,7 @@ services:
       "
 
   composer_install_min:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -109,7 +107,7 @@ services:
       "
 
   composer_validate:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -124,18 +122,18 @@ services:
         composer validate;
       "
 
-  functional_mariadb10:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+  functional_mariadb:
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     links:
-      - mariadb10
+      - mariadb
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
     environment:
       typo3DatabaseName: func_test
       typo3DatabaseUsername: root
       typo3DatabasePassword: funcp
-      typo3DatabaseHost: mariadb10
+      typo3DatabaseHost: mariadb
     working_dir: ${ROOT_DIR}/.Build
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -145,7 +143,7 @@ services:
           set -x
         fi
         echo Waiting for database start...;
-        while ! nc -z mariadb10 3306; do
+        while ! nc -z mariadb 3306; do
           sleep 1;
         done;
         echo Database is up;
@@ -161,59 +159,18 @@ services:
         fi
       "
 
-  functional_mssql2019latest:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+  functional_postgres:
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     links:
-      - mssql2019latest
-    volumes:
-      - ${ROOT_DIR}:${ROOT_DIR}
-    environment:
-      typo3DatabaseDriver: sqlsrv
-      typo3DatabaseName: func
-      typo3DatabasePassword: "Test1234!"
-      typo3DatabaseUsername: SA
-      typo3DatabasePort: 1433
-      typo3DatabaseCharset: utf-8
-      typo3DatabaseHost: mssql2019latest
-    working_dir: ${ROOT_DIR}/.Build
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    command: >
-      /bin/sh -c "
-        if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
-          set -x
-        fi
-        echo Waiting for database start...;
-        while ! nc -z mssql2019latest 1433; do
-          sleep 1;
-        done;
-        sleep 5;
-        echo Database is up;
-        php -v | grep '^PHP';
-        if [ ${PHP_XDEBUG_ON} -eq 0 ]; then
-          XDEBUG_MODE=\"off\" \
-          bin/phpunit -c ../Build/phpunit/FunctionalTests.xml ${EXTRA_TEST_OPTIONS} --exclude-group not-mssql ${TEST_FILE};
-        else
-          XDEBUG_MODE=\"debug,develop\" \
-          XDEBUG_TRIGGER=\"foo\" \
-          XDEBUG_CONFIG=\"client_port=${PHP_XDEBUG_PORT} client_host=host.docker.internal\" \
-          bin/phpunit -c ../Build/phpunit/FunctionalTests.xml ${EXTRA_TEST_OPTIONS} --exclude-group not-mssql ${TEST_FILE};
-        fi
-      "
-
-  functional_postgres10:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
-    user: ${HOST_UID}
-    links:
-      - postgres10
+      - postgres
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
     environment:
       typo3DatabaseDriver: pdo_pgsql
       typo3DatabaseName: bamboo
       typo3DatabaseUsername: ${HOST_USER}
-      typo3DatabaseHost: postgres10
+      typo3DatabaseHost: postgres
       typo3DatabasePassword: funcp
     working_dir: ${ROOT_DIR}/.Build
     extra_hosts:
@@ -224,7 +181,7 @@ services:
           set -x
         fi
         echo Waiting for database start...;
-        while ! nc -z postgres10 5432; do
+        while ! nc -z postgres 5432; do
           sleep 1;
         done;
         echo Database is up;
@@ -241,7 +198,7 @@ services:
       "
 
   functional_sqlite:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     tmpfs:
       - ${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/:rw,noexec,nosuid,uid=${HOST_UID}
@@ -270,7 +227,7 @@ services:
       "
 
   cgl_git:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: "${HOST_UID}"
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -284,7 +241,7 @@ services:
       "
 
   cgl_all:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -298,7 +255,7 @@ services:
           --config=Build/.php-cs-fixer.php .
       "
   lint:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -315,7 +272,7 @@ services:
       "
 
   phpstan:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -331,7 +288,7 @@ services:
       "
 
   phpstan_generate_baseline:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}
@@ -347,7 +304,7 @@ services:
       "
 
   unit:
-    image: typo3/core-testing-${DOCKER_PHP_IMAGE}:latest
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
     user: ${HOST_UID}
     volumes:
       - ${ROOT_DIR}:${ROOT_DIR}

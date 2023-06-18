@@ -105,8 +105,11 @@ class EditableRestriction implements QueryRestrictionInterface
         // Check for items
         if ($fieldConfig['type'] === 'select' && is_array($fieldConfig['items'] ?? false)) {
             foreach ($fieldConfig['items'] as $iVal) {
-                $itemIdentifier = (string)$iVal[1];
-                if ($GLOBALS['BE_USER']->checkAuthMode($table, $field, $itemIdentifier, $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'])) {
+                $itemIdentifier = (string)$iVal['value'];
+                if ($itemIdentifier === '--div--') {
+                    continue;
+                }
+                if ($GLOBALS['BE_USER']->checkAuthMode($table, $field, $itemIdentifier)) {
                     $allowDenyOptions[] = $itemIdentifier;
                 }
             }

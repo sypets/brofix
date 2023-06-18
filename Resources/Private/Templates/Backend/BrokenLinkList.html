@@ -1,256 +1,27 @@
-<f:layout name="TabContent"/>
-<f:section name="header">
-	<f:translate key="list.header" extensionName="Brofix">Broken links</f:translate>
-	<f:if condition="{pageTitle}">
-		&quot;{title}&quot;
-	</f:if>
-	({totalCount})
-</f:section>
+<html data-namespace-typo3-fluid="true" xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+<f:comment>
+	Broken link list
+	source (v12): https://docs.typo3.org/m/typo3/reference-coreapi/12.4/en-us/ExtensionArchitecture/HowTo/BackendModule/CreateModule.html
+</f:comment>
+<f:layout name="Module" />
+<f:section name="Content">
+	<h1>
+		<f:translate key="list.header" extensionName="Brofix">Broken links</f:translate>
+		<f:if condition="{pageTitle}">
+			&quot;{title}&quot;
+		</f:if>
+		({totalCount})
+	</h1>
 
-<f:section name="form">
-	<form id="brofix-list-form" class="brofix-list-form">
-		<div class="row row-cols-auto align-items-end g-3 mb-4">
-			<input type="hidden" name="currentPage" value="{currentPage}"/>
-			<input type="hidden" name="id" value="{currentPage}"/>
-			<input type="hidden" name="orderBy" value="{orderBy}"/>
-			<input type="hidden" name="paginationPage" value="{paginationPage}"/>
-			<div class="col">
-				<label for="brofix-list-select-pagedepth">
-					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.func.title"/>:
-				</label>
-				<select id="brofix-list-select-pagedepth" name="depth" class="form-control tceforms-select">
-					<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
-					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0"/>
-					</option>
-					<option value="1" {f:if(condition:'{depth} == 1', then: 'selected')}>
-					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_1"/>
-					</option>
-					<option value="2" {f:if(condition:'{depth} == 2', then: 'selected')}>
-					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_2"/>
-					</option>
-					<option value="3" {f:if(condition:'{depth} == 3', then: 'selected')}>
-					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_3"/>
-					</option>
-					<option value="4" {f:if(condition:'{depth} == 4', then: 'selected')}>
-					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4"/>
-					</option>
-					<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
-					<f:translate key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
-					</option>
-				</select>
-			</div>
-			<div class="col">
-				<label for="view_mode"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.view"/>:</label>
-				<select id="view_mode" name="view_mode" class="form-control tceforms-select view_mode">
-					<option value="view_table_complex" {f:if(condition: "{view_mode} == 'view_table_complex'", then: 'selected')}>
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.extended">|||||</f:translate>
-					</option>
-					<option value="view_table_min" {f:if(condition: "{view_mode} == 'view_table_min'", then: 'selected')}>
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.simple">|||</f:translate>
-					</option>
-				</select>
-			</div>
+	<f:comment>========= form ============</f:comment>
+	<f:render partial="BrokenLinksForm" arguments="{_all}"/>
 
-			<div class="col">
-				<label for="uid_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>:</label>
-				<input type="search" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="uid_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid')}" id="uid_searchFilter" value="{uid_filter}"/>
-			</div>
-			<f:if condition="{linktypes}">
-				<div class="col">
-					<label for="linktype_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:columnHeader.link_type"/>:</label>
-					<select id="linktype_searchFilter" name="linktype_searchFilter" class="form-control tceforms-select">
-						<f:for each="{linktypes}" as="linktype">
-							<option value="{linktype}" {f:if(condition:'{linktype} == {linktype_filter}', then: 'selected')}>
-							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.{linktype}">{linktype}</f:translate>
-							</option>
-						</f:for>
-					</select>
-				</div>
-			</f:if>
-
-			<div class="col">
-				<label for="url_searchFilter"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.url"/>:</label>
-				<input type="search" size="30" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="url_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.placeholder')}" id="url_searchFilter" value="{url_filter}"/>
-			</div>
-			<div class="col">
-				<select id="url_match_searchFilter" name="url_match_searchFilter" class="form-control tceforms-select">
-					<option value="partial" {f:if(condition:'{url_match_searchFilter} == partial', then: 'selected')}>
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.partial">partial match</f:translate>
-					</option>
-					<option value="exact" {f:if(condition:'{url_match_searchFilter} == exact', then: 'selected')}>
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.exact">exact match</f:translate>
-					</option>
-					<option value="partialnot" {f:if(condition:'{url_match_searchFilter} == partialnot', then: 'selected')}>
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.partialnot">no partial match</f:translate>
-					</option>
-					<option value="exactnot" {f:if(condition:'{url_match_searchFilter} == exactnot', then: 'selected')}>
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url.match.exactnot">no exact match</f:translate>
-					</option>
-				</select>
-			</div>
-		</div>
-		<div class="form-group">
-			<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"
-				   value="{f:translate(key: 'label_refresh', extensionName: 'Brofix')}"
-				   data-notification-message="{f:translate(key: 'label_refresh-link-list', extensionName: 'Brofix')}"/>
-			<button type="button" class="btn btn-default" id="brofix-reset-filter">
-				<f:translate key="button-remove-all-filter" extensionName="Brofix">Remove all filter</f:translate>
-			</button>
-			<f:if condition="{showRecheckButton}">
-				<input type="submit" class="btn btn-default t3js-update-button" name="updateLinkList" id="updateLinkList"
-					   value="{f:translate(key: 'list.button.checkLinks', extensionName: 'Brofix')}"
-					   data-notification-message="{f:translate(key: 'list.action.checkLinks', extensionName: 'Brofix')}"/>
-			</f:if>
-			<f:if condition="{docsurl}">
-				<f:link.external class="btn btn-default" uri="{docsurl}" target="_blank">
-					<core:icon identifier="actions-document-info" size="small"/>
-				</f:link.external>
-			</f:if>
-		</div>
-
-	</form>
-</f:section>
-
-<f:section name="Main">
 	<f:flashMessages queueIdentifier="brofix"/>
-	<f:if condition="{brokenLinks -> f:count()}">
-		<f:then>
-			<table class="table table-striped table-hover {view_mode}" id="brofix-broken-links-table">
-				<thead>
-				<tr>
-					<th>
-						<f:format.raw>{tableHeader.page.header}</f:format.raw>
-						<f:if condition="{tableHeader.page.icon}">
-							<core:icon identifier="{tableHeader.page.icon}"/>
-						</f:if>
-					</th>
-					<th>{tableHeader.element.header}</th>
-					<th class="mobile-optional">
-						<f:format.raw>{tableHeader.type.header}</f:format.raw>
-						<f:if condition="{tableHeader.type.icon}">
-							<core:icon identifier="{tableHeader.type.icon}"/>
-						</f:if>
-					</th>
-					<th>
-						<f:format.raw>{tableHeader.linktext.header}</f:format.raw>
-					</th>
-					<th colspan="2">
-						<f:format.raw>{tableHeader.url.header}</f:format.raw>
-						<f:if condition="{tableHeader.url.icon}">
-							<core:icon identifier="{tableHeader.url.icon}"/>
-						</f:if>
-					</th>
-					<th>
-						<f:format.raw>{tableHeader.error.header}</f:format.raw>
-						<f:if condition="{tableHeader.error.icon}">
-							<core:icon identifier="{tableHeader.error.icon}"/>
-						</f:if>
-					</th>
-					<th class="mobile-optional">
-						<f:format.raw> {tableHeader.last_check.header}</f:format.raw>
-						<f:if condition="{tableHeader.last_check.icon}">
-							<core:icon identifier="{tableHeader.last_check.icon}"/>
-						</f:if>
-						<br/>
-					<th>
-						{tableHeader.action.header}
-					</th>
-				</tr>
-				</thead>
-				<tbody>
-				<f:for each="{brokenLinks}" as="item">
-					<f:if condition="{item.lastChecked}">
-						<f:then>
-							<tr class="brofix-lastchecked">
-						</f:then>
-						<f:else>
-							<tr>
-						</f:else>
-					</f:if>
-					<td>
-						<f:if condition="{item.lastChecked}">
-							lastchecked
-						</f:if>
-						<span title="{item.path -> f:format.raw()}">{item.pagetitle -> f:format.raw()} [{item.pageId}]</span>
-					</td>
-					<td>
-						<f:if condition="{item.langIcon}">
-							<core:icon identifier="{item.langIcon}"/>
-						</f:if>
-						{item.elementHeadline -> f:format.raw()} [{item.record_uid}]
-						<div class="inline-action">
-							<f:if condition="{uid_filter}">
-								<f:then>
-									<a href="{listUri}&uid_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
-										<core:icon identifier="actions-close"/>
-									</a>
-								</f:then>
-								<f:else>
-									<a href="{listUri}&uid_searchFilter={item.record_uid}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.element.uid.tooltip', extensionName: 'Brofix')}">
-										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
-									</a>
-								</f:else>
-							</f:if>
-						</div>
-					</td>
-					<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
-						title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
-					</td>
-					<td>
-						<span>{item.link_title}</span>
-					</td>
-					<td colspan="2">
-						<f:if condition="{item.linktarget}">
-							<f:then>
-								<a href="{item.linktarget}" target="_blank" rel="noreferrer">{item.linktext}</a>
-							</f:then>
-						</f:if>
-						<div class="inline-action">
-							<f:if condition="{item.encoded_linktarget}">
-								<f:then>
-									<a href="{listUri}&url_searchFilter={item.encoded_linktarget}&url_match_searchFilter=exact" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
-										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
-									</a>
-								</f:then>
-								<f:else>
-									<a href="{listUri}&url_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
-										<core:icon identifier="actions-close"/>
-									</a>
-								</f:else>
-							</f:if>
-						</div>
-					</td>
-					<td>{item.linkmessage -> f:format.raw()}</td>
-					<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
-						<span class="freshness_{item.freshness}">{item.lastcheck}</span>
-						<f:if condition="{item.freshness} == 'stale'>">
-							<core:icon identifier="actions-document-synchronize"/>
-						</f:if>
-					</td>
-					<td>
-						<a class="btn btn-primary" href="{item.editUrl}"
-						   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
-							<core:icon identifier="actions-open" size="small"/>
-						</a>
-						<f:if condition="{item.recheckUrl}">
-							<a title="{f:translate(key: 'list.action.recheckUrl', extensionName='Brofix')}"
-							   class="btn btn-default" href="{item.recheckUrl}">
-								<core:icon identifier="actions-synchronize"/>
-							</a>
-						</f:if>
-						<f:if condition="{item.excludeUrl}">
-							<a class="btn btn-default" href="{item.excludeUrl}"
-							   title="{f:translate(key: 'list.action.excludeUrl', extensionName='Brofix')}">
-								<core:icon identifier="mimetypes-x-exclude-link-target" size="small"/>
-							</a>
-						</f:if>
-					</td>
-					</tr>
-				</f:for>
-				</tbody>
-			</table>
-			<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy}"/>
-		</f:then>
-	</f:if>
-</f:section>
 
+	<f:comment>========== list ===========</f:comment>
+	<div>
+		<f:render partial="BrokenLinkList" arguments="{_all}"/>
+	</div>
+
+</f:section>
+</html>

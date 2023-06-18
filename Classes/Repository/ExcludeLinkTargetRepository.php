@@ -80,19 +80,22 @@ class ExcludeLinkTargetRepository
 
     /**
      * Delete Exclude Link
-     * @param array<int> $uids
+     * @param array<int,int> $uids
+     * @return int Affected rows
      */
-    public function deleteExcludeLink(array $uids): void
+    public function deleteExcludeLink(array $uids): int
     {
+        $affectedRows = 0;
         foreach ($uids as $uid) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
-            $affectedRows = $queryBuilder
+            $affectedRows += $queryBuilder
                 ->delete(self::TABLE)
                 ->where(
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
                 )
                 ->executeStatement();
         }
+        return $affectedRows;
     }
 
     protected function generateQueryBuilder(string $table = ''): QueryBuilder

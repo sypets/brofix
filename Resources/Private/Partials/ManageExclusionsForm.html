@@ -1,0 +1,113 @@
+<div class="manage-exclusions-form" xmlns="http://www.w3.org/1999/html">
+	<p>
+		<form method="post" id="brofix-list-form" class="brofix-list-form">
+			<div class="row row-cols-auto align-items-end g-3 mb-4">
+				<input type="hidden" name="currentPage" value="{currentPage}"/>
+				<input type="hidden" name="id" value="{currentPage}"/>
+				<input type="hidden" name="orderBy" value="{orderBy}"/>
+				<input type="hidden" name="paginationPage" value="{paginationPage}"/>
+
+
+				<div class="col">
+					<label for="excludeUrl_filter">
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url"/>:</label>
+					<input type="search" size="30"
+						   id="excludeUrl_filter"
+						   class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized"
+						   name="excludeUrl_filter"
+						   placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.url')}"
+						   id="excludeUrl_filter"
+						   value="{f:if(condition: excludeUrl_filter, then: excludeUrl_filter, else: '')}"/>
+				</div>
+
+				<div class="col">
+					<label for="brofix-list-select-linktype">
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.selectLinkType" extensionName="Brofix"/>:
+					</label>
+					<select id="brofix-list-select-linktype" name="excludeLinkType_filter" class="form-control input-sm">
+						<option selected="selected" value="">
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.selectLinkType"/>
+						</option>
+						<f:if condition="{excludeLinkType_filter} == 'external'">
+							<f:then>
+								<option value="external" selected>
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.external"/>
+								</option>
+							</f:then>
+							<f:else>
+								<option value="external">
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.external"/>
+
+								</option>
+							</f:else>
+						</f:if>
+
+						<f:if condition="{excludeLinkType_filter} == 'internal'">
+							<f:then>
+								<option value="internal" selected>
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.internal"/>
+
+								</option>
+							</f:then>
+							<f:else>
+								<option value="internal">
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.internal"/>
+
+								</option>
+							</f:else>
+						</f:if>
+					</select>
+				</div>
+
+				<div class="col">
+					<label for="brofix-list-select-pagedepths">
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.selectLinkType" extensionName="Brofix"/>:
+					</label>
+					<select id="brofix-list-select-pagedepths" name="excludeReason_filter" class="form-control input-sm">
+						<option selected="selected" value="">
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.selectReason"/>
+						</option>
+
+						<f:if condition="{excludeReason_filter} == '0'">
+							<f:then>
+								<option value="0" selected>
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:records.reason1"/>
+								</option>
+							</f:then>
+							<f:else>
+								<option value="0">
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:records.reason1"/>
+								</option>
+							</f:else>
+						</f:if>
+						<f:if condition="{excludeReason_filter} == '1'">
+							<f:then>
+								<option value="1" selected>
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:records.reason2"/>
+								</option>
+							</f:then>
+							<f:else>
+								<option value="1">
+									<f:translate
+										key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:records.reason2"/>
+								</option>
+							</f:else>
+						</f:if>
+					</select>
+				</div>
+				<div class="col">
+					<button type="submit" class="btn btn-default" name="Search" id="refreshLinkList">
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:label_refresh" extensionName="Brofix"/>
+					</button>
+				</div>
+			</div>
+		</form>
+	</p>
+</div>

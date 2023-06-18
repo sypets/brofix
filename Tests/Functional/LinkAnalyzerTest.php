@@ -18,8 +18,8 @@ namespace Sypets\Brofix\Tests\Functional;
  */
 
 use Sypets\Brofix\LinkAnalyzer;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LinkAnalyzerTest extends AbstractFunctional
 {
@@ -27,6 +27,26 @@ class LinkAnalyzerTest extends AbstractFunctional
     {
         parent::setUp();
         $GLOBALS['LANG'] = $this->getContainer()->get(LanguageServiceFactory::class)->create('default');
+        $this->setupBackendUserAndGroup(
+            3,
+            'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+        );
+        Bootstrap::initializeLanguageObject();
+    }
+
+    /**
+     * @param int $uid
+     * @param non-empty-string $fixtureFile
+     * @param string $groupFixtureFile
+     */
+    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
+    {
+        if ($groupFixtureFile) {
+            $this->importDataSet($groupFixtureFile);
+        }
+        $this->backendUserFixture = $fixtureFile;
+        $this->setUpBackendUserFromFixture($uid);
     }
 
     /**
@@ -35,7 +55,7 @@ class LinkAnalyzerTest extends AbstractFunctional
      */
     protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
     {
-        $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
+        $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
         return $linkAnalyzer;
@@ -92,10 +112,13 @@ class LinkAnalyzerTest extends AbstractFunctional
      */
     public function testGenerateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
+        $linkTypes = ['db', 'file', 'external'];
+
         // setup
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+
+        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);

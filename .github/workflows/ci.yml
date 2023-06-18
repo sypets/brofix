@@ -12,30 +12,32 @@ on:
     - cron:  '42 5 * * *'
 
 jobs:
-
-  all_core_11:
+  all_core_12:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
-    name: "all core-11"
+    name: "all core-12"
     runs-on: ubuntu-20.04
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
       # rest matrix jobs be be executed anyway.
       fail-fast: false
       matrix:
-        php: [ '7.4', '8.0', '8.1' ]
-        minMax: [ 'composerInstallMin', 'composerInstallMax' ]
+        php: [ '8.1', '8.2' ]
+        minMax: [ 'composerInstallMax' ]
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
+
+      - name: "show php version"
+        run: php --version
 
       # This must be checked before core version select is run, as this would write this
       # and than the check would fail - obiously.
       - name: "Check if typo3/minimal has been pushed in composer.json"
         run: Build/Scripts/checkComposerJsonForPushedMinimalPackage.sh
 
-      - name: "Set Typo3 core version"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^11.5" -s composerCoreVersion
+      #- name: "Set Typo3 core version"
+      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^11.5" -s composerCoreVersion
 
       - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
@@ -54,15 +56,15 @@ jobs:
 
       - name: "phpstan"
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
 
       - name: "Unit tests"
         if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
 
       - name: "Functional tests with mariadb"
         if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
 
       - name: "Functional tests with sqlite (nightly or pull_request)"
         if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}

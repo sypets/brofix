@@ -1,0 +1,142 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	  data-namespace-typo3-fluid="true">
+<f:if condition="{brokenLinks -> f:count()}">
+	<f:then>
+		<table class="table table-striped table-hover {viewMode}" id="brofix-broken-links-table">
+			<thead>
+			<tr>
+				<th>
+					<f:format.raw>{tableHeader.page.header}</f:format.raw>
+					<f:if condition="{tableHeader.page.icon}">
+						<core:icon identifier="{tableHeader.page.icon}"/>
+					</f:if>
+				</th>
+				<th>{tableHeader.element.header}</th>
+				<th class="mobile-optional">
+					<f:format.raw>{tableHeader.type.header}</f:format.raw>
+					<f:if condition="{tableHeader.type.icon}">
+						<core:icon identifier="{tableHeader.type.icon}"/>
+					</f:if>
+				</th>
+				<th>
+					<f:format.raw>{tableHeader.linktext.header}</f:format.raw>
+				</th>
+				<th colspan="2">
+					<f:format.raw>{tableHeader.url.header}</f:format.raw>
+					<f:if condition="{tableHeader.url.icon}">
+						<core:icon identifier="{tableHeader.url.icon}"/>
+					</f:if>
+				</th>
+				<th>
+					<f:format.raw>{tableHeader.error.header}</f:format.raw>
+					<f:if condition="{tableHeader.error.icon}">
+						<core:icon identifier="{tableHeader.error.icon}"/>
+					</f:if>
+				</th>
+				<th class="mobile-optional">
+					<f:format.raw> {tableHeader.last_check.header}</f:format.raw>
+					<f:if condition="{tableHeader.last_check.icon}">
+						<core:icon identifier="{tableHeader.last_check.icon}"/>
+					</f:if>
+					<br/>
+				<th>
+					{tableHeader.action.header}
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			<f:for each="{brokenLinks}" as="item">
+				<f:if condition="{item.lastChecked}">
+					<f:then>
+						<tr class="brofix-lastchecked">
+					</f:then>
+					<f:else>
+						<tr>
+					</f:else>
+				</f:if>
+				<td>
+					<f:if condition="{item.lastChecked}">
+						lastchecked
+					</f:if>
+					<span title="{item.path -> f:format.raw()}">{item.pagetitle -> f:format.raw()} [{item.pageId}]</span>
+				</td>
+				<td>
+					<f:if condition="{item.langIcon}">
+						<core:icon identifier="{item.langIcon}"/>
+					</f:if>
+					{item.elementHeadline -> f:format.raw()} [{item.record_uid}]
+					<div class="inline-action">
+						<f:if condition="{filter.uidFilter}">
+							<f:then>
+								<a href="{listUri}&uid_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+									<core:icon identifier="actions-close"/>
+								</a>
+							</f:then>
+							<f:else>
+								<a href="{listUri}&uid_searchFilter={item.record_uid}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.element.uid.tooltip', extensionName: 'Brofix')}">
+									<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+								</a>
+							</f:else>
+						</f:if>
+					</div>
+				</td>
+				<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
+					title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
+				</td>
+				<td>
+					<span>{item.link_title}</span>
+				</td>
+				<td colspan="2">
+					<f:if condition="{item.linktarget}">
+						<f:then>
+							<a href="{item.linktarget}" target="_blank" rel="noreferrer">{item.linktext}</a>
+						</f:then>
+					</f:if>
+					<div class="inline-action">
+						<f:if condition="{item.encoded_linktarget}">
+							<f:then>
+								<a href="{listUri}&url_searchFilter={item.encoded_linktarget}&url_match_searchFilter=exact" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
+									<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+								</a>
+							</f:then>
+							<f:else>
+								<a href="{listUri}&url_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+									<core:icon identifier="actions-close"/>
+								</a>
+							</f:else>
+						</f:if>
+					</div>
+				</td>
+				<td>{item.linkmessage -> f:format.raw()}</td>
+				<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
+					<span class="freshness_{item.freshness}">{item.lastcheck}</span>
+					<f:if condition="{item.freshness} == 'stale'>">
+						<core:icon identifier="actions-document-synchronize"/>
+					</f:if>
+				</td>
+				<td>
+					<a class="btn btn-primary" href="{item.editUrl}"
+					   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
+						<core:icon identifier="actions-open" size="small"/>
+					</a>
+					<f:if condition="{item.recheckUrl}">
+						<a title="{f:translate(key: 'list.action.recheckUrl', extensionName='Brofix')}"
+						   class="btn btn-default" href="{item.recheckUrl}">
+							<core:icon identifier="actions-synchronize"/>
+						</a>
+					</f:if>
+					<f:if condition="{item.excludeUrl}">
+						<a class="btn btn-default" href="{item.excludeUrl}"
+						   title="{f:translate(key: 'list.action.excludeUrl', extensionName='Brofix')}">
+							<core:icon identifier="mimetypes-x-exclude-link-target" size="small"/>
+						</a>
+					</f:if>
+				</td>
+				</tr>
+			</f:for>
+			</tbody>
+		</table>
+		<f:render partial="Pagination" arguments="{pagination: pagination, currentPage: currentPage, depth: depth, orderBy: orderBy}"/>
+	</f:then>
+</f:if>
+</html>

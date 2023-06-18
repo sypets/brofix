@@ -13,8 +13,14 @@ services:
   Sypets\Brofix\Repository\BrokenLinkRepository:
     public: true
 
-  # backend modules
-  Sypets\Brofix\Controller\BrofixController:
+  # backend module
+  #Sypets\Brofix\Controller\BrofixController:
+  #  tags: [ 'backend.controller' ]
+
+  Sypets\Brofix\Controller\BrokenLinkListController:
+    tags: [ 'backend.controller' ]
+
+  Sypets\Brofix\Controller\ManageExclusionsController:
     tags: [ 'backend.controller' ]
 
   # EventListeners
