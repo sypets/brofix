@@ -358,7 +358,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $row['uid'],
                     false
                 );
-                $headline = trim($headline);
+                $headline = trim((string)$headline);
 
                 $record['headline'] = $headline;
 
