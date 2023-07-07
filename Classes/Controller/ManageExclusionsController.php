@@ -465,7 +465,7 @@ class ManageExclusionsController extends AbstractBrofixController
         //Open File Based on Function Php To start Write inside the file CSV
         $fp = fopen('php://output', 'wb');
 
-        fputcsv($fp, $headerCsv, ';', ' - ');
+        fputcsv($fp, $headerCsv, ';', '"');
 
         foreach ($excludedLinks as $key => $item) {
             //Fill Array of Excluded Links by Data
