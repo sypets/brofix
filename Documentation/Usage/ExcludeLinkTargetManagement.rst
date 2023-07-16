@@ -40,8 +40,7 @@ the list of broken links.
 
 .. important::
 
-   It is recommended to check the link targets in the list regularly, as
-   these will no longer be checked by brofix.
+   The link targets in the list will no longer be checked by brofix.
 
 .. _usage_exclude_link_target_management:
 
