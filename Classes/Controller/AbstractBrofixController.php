@@ -3,12 +3,13 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Controller;
 
-use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
+use TYPO3\CMS\Backend\Module\ModuleData;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Imaging\IconFactory;
@@ -26,6 +27,8 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 abstract class AbstractBrofixController
 {
+    protected ?ModuleData $moduleData = null;
+
     /**
      * @var string
      */
@@ -50,17 +53,18 @@ abstract class AbstractBrofixController
     protected $siteLanguages = [];
 
     /**
-     * @var BrofixController Contains a reference to the parent calling object
-     */
-    protected $pObj;
-
-    /**
      * @var ModuleTemplate
      */
     protected $moduleTemplate;
 
     /**
+     * @var ModuleTemplateFactory
+     */
+    protected $moduleTemplateFactory;
+
+    /**
      * @var StandaloneView
+     * @deprecated not used?
      */
     protected $view;
 
@@ -68,11 +72,6 @@ abstract class AbstractBrofixController
      * @var Configuration
      */
     protected $configuration;
-
-    /**
-     * @var BackendSession
-     */
-    protected $backendSession;
 
     /** @var PaginationInterface|null */
     protected $pagination;
@@ -87,17 +86,15 @@ abstract class AbstractBrofixController
 
     protected PageRenderer $pageRenderer;
 
-    public function __construct(
+    protected function __construct(
         Configuration $configuration,
-        BackendSession $backendSession,
         IconFactory $iconFactory,
-        ModuleTemplate $moduleTemplate,
+        ModuleTemplateFactory $moduleTemplateFactory,
         ExcludeLinkTarget $excludeLinkTarget
     ) {
         $this->iconFactory = $iconFactory;
         $this->configuration = $configuration;
-        $this->backendSession = $backendSession;
-        $this->moduleTemplate = $moduleTemplate;
+        $this->moduleTemplateFactory = $moduleTemplateFactory;
         $this->excludeLinkTarget = $excludeLinkTarget;
         $this->paginationCurrentPage = 1;
     }

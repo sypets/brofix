@@ -32,7 +32,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
      */
     protected $beusers = [
         'admin' => [
-            'fixture' => 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml',
+            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users_admin.xml',
             'uid' => 1,
             'groupFixture' => ''
         ],
@@ -41,7 +41,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
             'uid' => 2,
             'groupFixture' => ''
         ],
-        // write access to pages, tt_content
+        // write access to pages, tt_content (no non_exclude_fields)
         'group 1' => [
             'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
             'uid' => 3,
@@ -72,7 +72,6 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     {
         parent::setUp();
 
-        $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'] = 'explicitAllow';
         $this->brokenLinkRepository = new BrokenLinkRepository();
     }
 
@@ -130,7 +129,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 'external' => 0,
             ]
         ];
-        yield 'User with permission to pages and to specific tables, but no exclude fields should see 3 of 4 broken links' =>
+        yield 'User with permission to pages and to specific tables, but no non_exclude_fields should see 3 of 4 broken links (no links in header_link)' =>
         [
             // backend user
             $this->beusers['group 1'],
@@ -146,7 +145,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 'total' => 3
             ]
         ];
-        yield 'User with permission to pages, specific tables and exclude fields should see all broken links' =>
+        yield 'User with permission to pages, specific tables and non_exclude_fields=header_link should see all broken links' =>
         [
             // backend user
             $this->beusers['group 2'],

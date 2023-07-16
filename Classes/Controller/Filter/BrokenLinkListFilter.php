@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Controller\Filter;
 
 use Sypets\Brofix\Util\Arrayable;
+use TYPO3\CMS\Backend\Module\ModuleData;
 
 class BrokenLinkListFilter implements Arrayable
 {
@@ -59,6 +60,16 @@ class BrokenLinkListFilter implements Arrayable
         $this->linktype_filter = $linkType;
         $this->url_filtre = $url;
         $this->urlFilterMatch = $urlMatch;
+    }
+
+    public static function getInstanceFromModuleData(ModuleData $moduleData): BrokenLinkListFilter
+    {
+        return new BrokenLinkListFilter(
+            $moduleData->get('uid_searchFilter', ''),
+            $moduleData->get('linktype_searchFilter', 'all'),
+            $moduleData->get('url_searchFilter', ''),
+            $moduleData->get('url_match_searchFilter', 'partial')
+        );
     }
 
     public static function getInstanceFromArray(array $values): BrokenLinkListFilter

@@ -25,7 +25,6 @@ use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Mail\GenerateCheckResultFluidMail;
-use Sypets\Brofix\Mail\GenerateCheckResultMailInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -89,13 +88,21 @@ class CheckLinksCommand extends Command
      */
     protected $excludedPages = [];
 
-    public function __construct(string $name = null)
-    {
-        parent::__construct($name);
+    protected GenerateCheckResultFluidMail $generateCheckResultMail;
 
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $this->pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
+    public function __construct(
+        GenerateCheckResultFluidMail $generateCheckResultMail,
+        Configuration $configuration,
+        BrokenLinkRepository $brokenLinkRepository,
+        PagesRepository $pagesRepository
+    ) {
+        parent::__construct();
+
+        $this->configuration = $configuration;
+        $this->generateCheckResultMail = $generateCheckResultMail;
+        $this->brokenLinkRepository = $brokenLinkRepository;
+        $this->pagesRepository = $pagesRepository;
+
         $this->statistics = [];
     }
 
@@ -286,11 +293,7 @@ class CheckLinksCommand extends Command
                 $stats->getCountBrokenLinks()
             ));
             if ($this->configuration->getMailSendOnCheckLinks()) {
-                /**
-                 * @var GenerateCheckResultMailInterface $generateCheckResultMail
-                 */
-                $generateCheckResultMail = GeneralUtility::makeInstance(GenerateCheckResultFluidMail::class);
-                $generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+                $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
             } else {
                 $this->io->writeln('Do not send mail, because sending was deactivated.');
             }

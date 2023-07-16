@@ -10,9 +10,9 @@ set -x
 # --------
 # defaults
 # --------
-PHP_VERSION_DEFAULT="8.1"
+PHP_VERSION_DEFAULT="8.2"
 INSTALL_MIN_MAX_DEFAULT="composerInstallMax"
-TYPO3_VERSION_DEFAULT="11"
+TYPO3_VERSION_DEFAULT="12"
 
 
 # -------------
@@ -81,8 +81,8 @@ sleep 5
 # echo "Install typo3/cms-core as source. Modifies composer.json! (config:preferred-install)"
 # composer config preferred-install.typo3/cms-core source
 
-if [[ $vt3 == 11 ]];then
-    Build/Scripts/runTests.sh -p ${php} -t "^11.5" -s composerCoreVersion
+if [[ $vt3 == 12 ]];then
+    Build/Scripts/runTests.sh -p ${php} -t "^12.4" -s composerCoreVersion
 else
     echo "wrong TYPO3 version"
     exit 1

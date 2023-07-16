@@ -24,6 +24,7 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
+use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Repository\PagesRepository;
@@ -37,6 +38,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
 use TYPO3\CMS\Core\Html\HtmlParser;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -91,7 +93,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     protected array $hookObjectsArr = [];
 
     protected ?Configuration $configuration = null;
-    protected BrokenLinkRepository  $brokenLinkRepository;
+    protected BrokenLinkRepository $brokenLinkRepository;
     protected ContentRepository $contentRepository;
     protected PagesRepository $pagesRepository;
     protected FormDataCompiler $formDataCompiler;
@@ -126,6 +128,10 @@ class LinkAnalyzer implements LoggerAwareInterface
 
         // Hook to handle own checks
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
+            /**
+             * @var LinktypeInterface $this->hookObjectsArr[$key]
+             * @phpstan-ignore-next-line Ignore next line because of dynamic type for $className
+             */
             $this->hookObjectsArr[$key] = GeneralUtility::makeInstance($className);
         }
         /**
@@ -631,9 +637,27 @@ class LinkAnalyzer implements LoggerAwareInterface
             foreach ($fields as $field) {
                 $conf = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
+                if ($valueField === '') {
+                    continue;
+                }
 
-                // Check if a TCA configured field has soft references defined (see TYPO3 Core API document)
-                if (!($conf['softref'] ?? false) || (string)$valueField === '') {
+                // Check if a TCA configured field can contain links and assign the soft reference parser keys
+                // - has soft references defined (see TYPO3 Core API document)
+                // - has type='link'
+                /**
+                 * @var array<int,string> $softrefParserKeys
+                 */
+                $softrefParserKeys = [];
+                if (($conf['softref'] ?? false)) {
+                    // e.g. typolink_tag,email[subst],url is exploded into array
+                    $softrefParserKeys = explode(',', $conf['softref']);
+                } else {
+                    $type = $conf['type'] ?? false;
+                    if ($type === 'link') {
+                        $softrefParserKeys = ['typolink'];
+                    }
+                }
+                if ($softrefParserKeys === []) {
                     continue;
                 }
 
@@ -645,18 +669,11 @@ class LinkAnalyzer implements LoggerAwareInterface
                     if ($tableField != ($table . '.' . $field)) {
                         continue;
                     }
-                    foreach ($this->excludeSoftrefs as $excludeSoftref) {
-                        $conf['softref'] = preg_replace(
-                            '#(,|^)' . $excludeSoftref . '(,|$)#',
-                            '',
-                            $conf['softref']
-                        );
-                        break;
-                    }
+                    $softrefParserKeys = array_diff($softrefParserKeys, $this->excludeSoftrefs);
                 }
 
                 $softRefParams = ['subst'];
-                foreach ($this->softReferenceParserFactory->getParsersBySoftRefParserList($conf['softref'], $softRefParams) as $softReferenceParser) {
+                foreach ($this->softReferenceParserFactory->getParsersBySoftRefParserList(implode(',', $softrefParserKeys), $softRefParams) as $softReferenceParser) {
                     $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
                     if (!$parserResult->hasMatched()) {
                         continue;
@@ -677,6 +694,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 . $e->getTraceAsString()
             );
         } catch (\Exception | \Throwable $e) {
+            // log exception with more context and throw again so that errors are not obscured
             // @extensionScannerIgnoreLine problem with ->error()
             $this->error(
                 "analyzeRecord: table=$table, uid=$idRecord, exception="
@@ -684,6 +702,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 . ' stack trace:'
                 . $e->getTraceAsString()
             );
+            throw $e;
         }
     }
 
@@ -927,6 +946,12 @@ class LinkAnalyzer implements LoggerAwareInterface
             'vanillaUid' => $uid,
             'command' => 'edit',
         ];
+
+        // todo: workaround, replace this, pass request object
+        $serverRequestFactory = GeneralUtility::makeInstance(ServerRequestFactory::class);
+        $request = $serverRequestFactory->createServerRequest('POST', 'http://t3coredev12');
+        $formDataCompilerInput['request'] = $request;
+
         // we need TcaColumnsProcessShowitem
         $formData = $this->formDataCompiler->compile($formDataCompilerInput);
         $columns = $formData['processedTca']['columns'] ?? [];

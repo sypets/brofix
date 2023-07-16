@@ -1,25 +1,25 @@
 <?php
 
+declare(strict_types=1);
 namespace Sypets\Brofix\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\Controller\BackendUser\BackendUserInformation;
 use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
 use Sypets\Brofix\Repository\ExcludeLinkTargetRepository;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * @internal This class may change without further warnings or increment of major version.
@@ -69,20 +69,13 @@ class ManageExclusionsController extends AbstractBrofixController
 
     protected const ORDER_BY_DEFAULT = 'linktarget';
 
-    /**
-     * @var CharsetConverter
-     */
-    protected $charsetConverter;
+    protected CharsetConverter $charsetConverter;
 
-    /**
-     * @var LocalizationUtility
-     */
-    protected $localizationUtility;
+    protected LocalizationUtility $localizationUtility;
 
-    /**
-     * @var ManageExclusionsFilter
-     */
-    protected $filter;
+    protected ManageExclusionsFilter $filter;
+
+    protected string $action;
 
     /**
      * @var int
@@ -94,25 +87,13 @@ class ManageExclusionsController extends AbstractBrofixController
      */
     protected $excludeLinkTargetRepository;
 
-    /**
-     * Current BE user has access to ExcludeLinkTarget storage. This will
-     * be required for each broken link record and should be calculated
-     * only once.
-     *
-     * @var bool
-     * @deprecated
-     */
-    protected $currentUserHasPermissionsForExcludeLinkTargetStorage = false;
-
-    /** @var BackendUserInformation */
-    protected $backendUserInformation;
+    protected bool $backendUserHasPermissions = false;
 
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         ManageExclusionsFilter $filter = null,
         Configuration $configuration = null,
-        BackendSession $backendSession = null,
-        ModuleTemplate $moduleTemplate = null,
+        ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
@@ -120,16 +101,14 @@ class ManageExclusionsController extends AbstractBrofixController
         PageRenderer $pageRenderer = null
     ) {
         $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
-        $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
-        $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
+        $moduleTemplateFactory = $moduleTemplateFactory;
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
         parent::__construct(
             $configuration,
-            $backendSession,
             $iconFactory,
-            $moduleTemplate,
+            $moduleTemplateFactory,
             $excludeLinkTarget
         );
         $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
@@ -139,137 +118,99 @@ class ManageExclusionsController extends AbstractBrofixController
         $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
     }
 
-    /**
-     * Init, called from parent object
-     *
-     * @param BrofixController $pObj A reference to the parent (calling) object
-     */
-    public function init(BrofixController $pObj): void
+    public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
-        $this->pObj = $pObj;
-        $this->storagePid = $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid();
+        $this->moduleData = $request->getAttribute('moduleData');
 
-        $val = GeneralUtility::_GP('id');
-        if ($val === null) {
-            // work-around, because this->id does not work if "Refresh display" is used
-            $val = GeneralUtility::_GP('currentPage');
+        $this->initialize($request);
+        $this->initializeTemplate($request);
+
+        $this->getSettingsFromQueryParameters();
+        $this->initializePageRenderer();
+        if ($this->backendUserHasPermissions) {
+            return $this->mainAction($this->moduleTemplate);
         }
-        if ($val !== null) {
-            // @extensionScannerIgnoreLine
-            $this->id = (int)$val;
-            // @extensionScannerIgnoreLine
-            $this->resolveSiteLanguages($this->id);
-        } else {
-            $this->id = 0;
-        }
-        $this->view = $this->createView(self::TEMPLATE_NAME);
-        if ($this->id !== 0) {
+        $this->moduleTemplate->addFlashMessage(
+            $this->getLanguageService()->sL(self::MODULE_LANG_FILE . ':no.access'),
+            $this->getLanguageService()->sL(self::MODULE_LANG_FILE . ':no.access.title'),
+            ContextualFeedbackSeverity::ERROR
+        );
+        return $this->emptyAction($this->moduleTemplate);
+    }
+
+    protected function initialize(ServerRequestInterface $request): void
+    {
+        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+        $this->id = (int)($request->getParsedBody()['id'] ?? $request->getQueryParams()['id'] ?? 0);
+        $this->storagePid = $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid();
+        $this->resolveSiteLanguages($this->id);
+
+        if ($this->id) {
             $this->configuration->loadPageTsConfig($this->id);
-            $hasPermissions
+            $this->backendUserHasPermissions
                 = $this->excludeLinkTarget->currentUserHasCreatePermissions(
                     $this->configuration->getExcludeLinkTargetStoragePid()
                 );
         } else {
-            $hasPermissions = false;
+            $this->backendUserHasPermissions = false;
         }
-        $this->backendUserInformation = new BackendUserInformation(false, $hasPermissions);
     }
 
-    /**
-     * Main, called from parent object
-     *
-     * @return string Module content
-     */
-    public function main(): string
+    protected function initializeTemplate(ServerRequestInterface $request): void
     {
-        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+        $this->moduleTemplate = $this->moduleTemplateFactory->create($request);
+        $this->moduleTemplate->makeDocHeaderModuleMenu(['id' => $this->id]);
 
-        if ($this->backendUserInformation->hasPermissionExcludeLinks()) {
-            $this->getSettingsFromQueryParameters();
-            $this->initializeRenderer();
-            $this->initializeExclusionView();
-        } else {
-            $this->moduleTemplate->addFlashMessage(
-                $this->getLanguageService()->getLL('no.access'),
-                $this->getLanguageService()->getLL('no.access.title'),
-                AbstractMessage::ERROR
-            );
-        }
-        return $this->view->render();
+        $this->moduleTemplate->assign('currentPage', $this->id);
     }
 
-    /**
-     * @return StandaloneView
-     * Displays the table of the excluded links
-     */
-    protected function createView(string $templateName): StandaloneView
-    {
-        /**
-         * @var StandaloneView $view
-         */
-        $view = GeneralUtility::makeInstance(StandaloneView::class);
-        $view->setLayoutRootPaths(['EXT:brofix/Resources/Private/Layouts']);
-        $view->setPartialRootPaths(['EXT:brofix/Resources/Private/Partials']);
-        $view->setTemplateRootPaths(['EXT:brofix/Resources/Private/Templates/Backend']);
-        $view->setTemplate($templateName);
-        $view->assign('currentPage', $this->id);
-        return $view;
-    }
-
-    protected function initializeRenderer(): void
+    protected function initializePageRenderer(): void
     {
         $pageRenderer = $this->pageRenderer;
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
         $pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix_manage_exclusions.css', 'stylesheet', 'screen');
-        // $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/ManageExclusions');
-        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+        // todo: use loadJavaScriptModule
+        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/ManageExclusions');
         $pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
     }
 
     protected function getSettingsFromQueryParameters(): void
     {
-        // pagination + currentPage
-        $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage') ?? 1);
+        $this->action = $this->moduleData->get('action');
 
-        $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
-        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
-
-        // orderBy
-        $this->orderBy = (string)(GeneralUtility::_GP('orderBy') ?? self::ORDER_BY_DEFAULT);
+        $this->paginationCurrentPage = (int)$this->moduleData->get('paginationPage', '1');
+        $this->orderBy = $this->moduleData->get('orderBy', self::ORDER_BY_DEFAULT);
 
         // store filter parameters in the Filter Object
-        $this->filter->setExcludeLinkTypeFilter(GeneralUtility::_GP('excludeLinkType_filter') ?? '');
-        $this->filter->setExcludeUrlFilter(GeneralUtility::_GP('excludeUrl_filter') ?? '');
-        $this->filter->setExcludeReasonFilter(GeneralUtility::_GP('excludeReason_filter') ?? '');
+        $this->filter = new ManageExclusionsFilter();
+        $this->filter->setExcludeLinkTypeFilter($this->moduleData->get('excludeLinkType_filter', ''));
+        $this->filter->setExcludeUrlFilter($this->moduleData->get('excludeUrl_filter', ''));
+        $this->filter->setExcludeReasonFilter($this->moduleData->get('excludeReason_filter', ''));
+    }
 
-        // to prevent deleting session, when user sort the records
-        if (!is_null(GeneralUtility::_GP('excludeLinkType_filter')) || !is_null(GeneralUtility::_GP('excludeUrl_filter')) || !is_null(GeneralUtility::_GP('excludeReason_filter'))) {
-            $this->backendSession->store(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS, $this->filter);
-        }
-        // create session, if it the first time
-        if (is_null($this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS))) {
-            $this->backendSession->store(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS, new ManageExclusionsFilter());
-        }
+    protected function mainAction(ModuleTemplate $view): ResponseInterface
+    {
+        $this->initializeExclusionView();
+        return $view->renderResponse('Backend/ManageExclusions');
+    }
+
+    protected function emptyAction(ModuleTemplate $view): ResponseInterface
+    {
+        return $view->renderResponse('Backend/ManageExclusions');
     }
 
     /**
      * @return array<mixed>
      */
-    public function initializeExclusions(): array
+    protected function initializeExclusions(): array
     {
         $items = [];
-        // build the search filter from the backendSession session
-        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS);
-        if ($arrayable) {
-            $searchFilter = ManageExclusionsFilter::getInstanceFromArray($arrayable->toArray());
-        } else {
-            $searchFilter = new ManageExclusionsFilter();
-        }
-        $searchFilter->setExcludeStoragePid($this->storagePid);
+
+        $this->filter->setExcludeStoragePid($this->storagePid);
 
         // Get Records from the database
         $exclusions = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(
-            $searchFilter,
+            $this->filter,
             self::ORDER_BY_VALUES[$this->orderBy] ?? []
         );
 
@@ -297,31 +238,25 @@ class ManageExclusionsController extends AbstractBrofixController
     protected function initializeExclusionView(): void
     {
         $exclusions = $this->initializeExclusions();
-        $this->view->assign('totalCount', $exclusions['totalCount']);
-        $this->view->assign('title', 'Excludes Links');
-        $this->view->assign('brokenLinks', $exclusions['items']);
-        $this->view->assign('pagination', $this->pagination);
-        $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
-        $this->view->assign('currentPage', $this->id);
-        $this->view->assign('hasPermission', $this->backendUserInformation->hasPermissionExcludeLinks());
+        $this->moduleTemplate->assign('totalCount', $exclusions['totalCount']);
+        $this->moduleTemplate->assign('title', 'Excludes Links');
+        $this->moduleTemplate->assign('brokenLinks', $exclusions['items']);
+        $this->moduleTemplate->assign('pagination', $this->pagination);
+        $this->moduleTemplate->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->moduleTemplate->assign('currentPage', $this->id);
+        $this->moduleTemplate->assign('hasPermission', $this->backendUserHasPermissions);
 
         // Table header
         $sortActions = [];
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {
             $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
         }
-        $this->view->assign('sortActions', $sortActions);
-        $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
-        // assign the filters value in the inputs
-        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_MANAGE_EXCLUSIONS);
-        if ($arrayable) {
-            $searchFilter = ManageExclusionsFilter::getInstanceFromArray($arrayable->toArray());
-        } else {
-            $searchFilter = new ManageExclusionsFilter();
-        }
-        $this->view->assign('excludeUrl_filter', $searchFilter->getExcludeUrlFilter());
-        $this->view->assign('excludeLinkType_filter', $searchFilter->getExcludeLinkTypeFilter());
-        $this->view->assign('excludeReason_filter', $searchFilter->getExcludeReasonFilter());
+        $this->moduleTemplate->assign('sortActions', $sortActions);
+        $this->moduleTemplate->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+
+        $this->moduleTemplate->assign('excludeUrl_filter', $this->filter->getExcludeUrlFilter());
+        $this->moduleTemplate->assign('excludeLinkType_filter', $this->filter->getExcludeLinkTypeFilter());
+        $this->moduleTemplate->assign('excludeReason_filter', $this->filter->getExcludeReasonFilter());
     }
 
     /**
@@ -493,14 +428,31 @@ class ManageExclusionsController extends AbstractBrofixController
     }
 
     /**
-     * This Function is delete the selected excluded link
+     * Deletes the selected excluded link
      * @param ServerRequestInterface $request
      */
     public function deleteExcludedLinks(ServerRequestInterface $request): Response
     {
+        $data = [
+            'result' => '',
+            'affectedRows' => 0,
+
+        ];
+
         $urlParam = $request->getQueryParams();
-        $this->excludeLinkTargetRepository->deleteExcludeLink($urlParam['input']);
-        $data = ['result' => ''];
+        $deleteIds = $urlParam['input'] ?? [];
+        if (!is_array($deleteIds)) {
+            $response = new Response('php://output', 200);
+
+            $response->getBody()->write(json_encode($data));
+            return $response;
+        }
+        foreach ($deleteIds as $key => $value) {
+            $deleteIds[$key] = (int)$value;
+        }
+
+        $affectedRows = $this->excludeLinkTargetRepository->deleteExcludeLink($deleteIds);
+        $data['affectedRows'] = $affectedRows;
         $response = new Response('php://output', 200);
         $response->getBody()->write(json_encode($data));
         return $response;

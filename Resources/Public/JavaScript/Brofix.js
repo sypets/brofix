@@ -32,6 +32,7 @@ define(['jquery'], function($) {
       $('#refreshLinkList').click();
     })
 
+    // reset filter
     $('#brofix-reset-filter').on('click', function () {
       $('#uid_searchFilter').attr('value', '');
       $('#linktype_searchFilter').val('all');
@@ -40,49 +41,6 @@ define(['jquery'], function($) {
       $('#refreshLinkList').click();
     });
 
-    // clear input text fields with X button
-    $('#uidButton').on('click', function () {
-      $('#uid_searchFilter').val('');
-      $('#refreshLinkList').click();
-    })
-
-    $('#urlButton').on('click', function (){
-      $('#url_searchFilter').val('');
-      $('#refreshLinkList').click();
-    })
-
-    $('#titleButton').on('click', function (){
-      $('#title_searchFilter').val('');
-      $('#refreshLinkList').click();
-    })
-
-    $('#excludeUrlButton').on('click', function (){
-      $('#excludeUrl_filter').val('');
-      $('#refreshLinkList').click();
-    })
-
-    /** move to extra JavaScript module for "Manage Exclusions" */
-    $('.selectAllLinks').click(function() {
-      var $checkboxes = $('.check').find('input[type=checkbox]');
-      $checkboxes.prop('checked', $(this).is(':checked'));
-    });
-
-    $('#deleteSelectedLinks').click(function(){
-      var selecteditems = [];
-      $(".check").find("input:checked").each(function (i, ob) {
-        selecteditems.push($(ob).val());
-      });
-      require(['TYPO3/CMS/Core/Ajax/AjaxRequest'], function (AjaxRequest) {
-        // Generate a random number between 1 and 32
-        new AjaxRequest(TYPO3.settings.ajaxUrls.delete_excluded_links)
-          .withQueryArguments({input: selecteditems})
-          .get()
-          .then(async function (response) {
-            const resolved = await response.resolve();
-          });
-      });
-
-    })
   })
   var Brofix = {};
 

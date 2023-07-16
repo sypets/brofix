@@ -5,7 +5,9 @@
         <pid>0</pid>
         <tstamp>1366642540</tstamp>
         <tables_modify>pages,tt_content</tables_modify>
-        <explicit_allowdeny>tt_content:CType:text:ALLOW,tt_content:CType:textmedia:ALLOW</explicit_allowdeny>
+        <!-- no exclude fields allowed -->
+        <non_exclude_fields></non_exclude_fields>
+        <explicit_allowdeny>tt_content:CType:text,tt_content:CType:textmedia</explicit_allowdeny>
     </be_groups>
     <be_groups>
         <uid>2</uid>
@@ -13,7 +15,7 @@
         <tstamp>1366642540</tstamp>
         <tables_modify>pages,tt_content</tables_modify>
         <non_exclude_fields>tt_content:header_link</non_exclude_fields>
-        <explicit_allowdeny>tt_content:CType:text:ALLOW,tt_content:CType:textmedia:ALLOW</explicit_allowdeny>
+        <explicit_allowdeny>tt_content:CType:text,tt_content:CType:textmedia</explicit_allowdeny>
     </be_groups>
     <be_groups>
         <uid>3</uid>
@@ -21,7 +23,7 @@
         <tstamp>1366642540</tstamp>
         <tables_modify>pages,tt_content</tables_modify>
         <allowed_languages>0</allowed_languages>
-        <explicit_allowdeny>tt_content:CType:text:ALLOW,tt_content:CType:textmedia:ALLOW</explicit_allowdeny>
+        <explicit_allowdeny>tt_content:CType:text,tt_content:CType:textmedia</explicit_allowdeny>
     </be_groups>
 
     <!-- group 6: editors with access to all, but only CType=textmedia and text via explicit allow -->
@@ -30,6 +32,6 @@
         <pid>0</pid>
         <tstamp>1366642540</tstamp>
         <tables_modify>pages,tt_content</tables_modify>
-        <explicit_allowdeny>tt_content:CType:text:ALLOW,tt_content:CType:textmedia:ALLOW</explicit_allowdeny>
+        <explicit_allowdeny>tt_content:CType:text,tt_content:CType:textmedia</explicit_allowdeny>
     </be_groups>
 </dataset>

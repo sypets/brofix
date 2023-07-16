@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
-use Sypets\Brofix\BackendSession\BackendSession;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\Controller\BackendUser\BackendUserInformation;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
-use Sypets\Brofix\Controller\UiHelper\UserSettings;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
@@ -19,6 +18,7 @@ use Sypets\Brofix\Util\StringUtil;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Context\Context;
@@ -33,15 +33,28 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
- * Module 'Check links' as sub module of Web -> Info
+ * Backend Module 'Check links'
+ *
  * @internal This class may change without further warnings or increment of major version.
+ *
+ * v12: changelogs
+ * - New backend module registration API: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Feature-96733-NewBackendModuleRegistrationAPI.html
+ * - Introduce Module data object: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Feature-96895-IntroduceModuleDataObject.html
  */
 class BrokenLinkListController extends AbstractBrofixController
 {
+    protected const MODULE_NAME = 'web_brofix_broken_links';
+
+    protected const DEFAULT_ORDER_BY = 'page';
+    protected const DEFAULT_DEPTH = 0;
+    public const VIEW_MODE_VALUE_MIN = 'view_table_min';
+    public const VIEW_MODE_VALUE_COMPLEX = 'view_table_complex';
+    public const DEFAULT_VIEW_MODE_VALUE = self::VIEW_MODE_VALUE_COMPLEX;
+
     protected const ORDER_BY_VALUES = [
         // there is an inaccuracy here because for table 'pages', the page is record_uid and
         // record_pid is actually the parent page, while for tables != 'pages' record_pid
@@ -92,17 +105,12 @@ class BrokenLinkListController extends AbstractBrofixController
         ],
     ];
 
-    protected const ORDER_BY_DEFAULT = 'page';
-
     /**
      * Information about the current page record
      *
      * @var mixed[]
      */
     protected $pageRecord = [];
-
-    /** @var BackendUserInformation|null */
-    protected $backendUserInformation;
 
     /**
      * Link validation class
@@ -117,24 +125,23 @@ class BrokenLinkListController extends AbstractBrofixController
     protected $filter;
 
     /**
-     * @var UserSettings
-     */
-    protected $userSettings;
-
-    /**
      * @var array<string>
      */
-    protected $linkTypes = [];
+    protected array $linkTypes = [];
 
     /**
      * Depth for the recursive traversal of pages for the link validation
      * For "Report" tab.
-     *
-     * -1 means not initialized
-     *
      * @var int
      */
-    protected $depth = -1;
+    protected int $depth = self::DEFAULT_DEPTH;
+
+    protected string $viewMode = self::DEFAULT_VIEW_MODE_VALUE;
+
+    /**
+     * @var array<string,mixed>
+     */
+    protected array $pageinfo = [];
 
     /**
      * @var string
@@ -194,36 +201,36 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected $defaultFlashMessageQueue;
 
+    protected bool $backendUserHasPermissionsForBrokenLinklist = false;
+    protected bool $backendUserHasPermissionsForExcludes = false;
+
     public function __construct(
         PagesRepository $pagesRepository = null,
         BrokenLinkRepository $brokenLinkRepository = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         Configuration $configuration = null,
         FlashMessageService $flashMessageService = null,
-        BackendSession $backendSession = null,
-        ModuleTemplate $moduleTemplate = null,
+        ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory = null,
         ExtensionConfiguration $extensionConfiguration = null,
         PageRenderer $pageRenderer = null
     ) {
         $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
-        $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
         $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
-        $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        $moduleTemplateFactory = $moduleTemplateFactory;
         parent::__construct(
             $configuration,
-            $backendSession,
             $iconFactory,
-            $moduleTemplate,
+            $moduleTemplateFactory,
             $excludeLinkTarget
         );
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-        $this->orderBy = BrokenLinkListController::ORDER_BY_DEFAULT;
+        $this->orderBy = BrokenLinkListController::DEFAULT_ORDER_BY;
         if (!$extensionConfiguration) {
             $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         }
@@ -234,144 +241,153 @@ class BrokenLinkListController extends AbstractBrofixController
         );
     }
 
-    /**
-     * Init, called from parent object
-     */
-    public function init(BrofixController $pObj): void
+    public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
-        $this->pObj = $pObj;
+        $this->moduleData = $request->getAttribute('moduleData');
 
-        $val = GeneralUtility::_GP('id');
-        if ($val === null) {
-            // work-around, because this->id does not work if "Refresh display" is used
-            $val = GeneralUtility::_GP('currentPage');
+        $this->initialize($request);
+        $this->initializeTemplate($request);
+
+        $this->initializePageRenderer();
+        $this->initializeLinkAnalyzer();
+
+        $this->action = $this->moduleData->get('action');
+
+        if ($this->action === 'report') {
+            $this->resetModuleData();
+            return $this->mainAction($this->moduleTemplate);
         }
-        if ($val !== null) {
-            // @extensionScannerIgnoreLine
-            $this->id = (int)$val;
-            // @extensionScannerIgnoreLine
-            $this->resolveSiteLanguages($this->id);
-        } else {
-            $this->id = 0;
+
+        if ($this->action === 'checklinks') {
+            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+            $this->createFlashMessage(
+                $this->getLanguageService()->getLL('list.status.check.done'),
+                '',
+                AbstractMessage::OK
+            );
+            $this->resetModuleData();
+            return $this->mainAction($this->moduleTemplate);
         }
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+
+        if ($this->action === 'recheckUrl') {
+            $message = '';
+            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord);
+            if ($count > 0) {
+                $this->moduleTemplate->addFlashMessage(
+                    $message,
+                    $this->getLanguageService()->getLL('list.recheck.url.title'),
+                    ContextualFeedbackSeverity::OK
+                );
+            } else {
+                $this->moduleTemplate->addFlashMessage(
+                    $message,
+                    $this->getLanguageService()->getLL('list.recheck.url.title'),
+                    ContextualFeedbackSeverity::OK
+                );
+            }
+            $this->resetModuleData();
+
+            return $this->mainAction($this->moduleTemplate);
+        }
+        if ($this->action === 'editField') {
+            $message = '';
+            // recheck broken links for last edited reccord
+            $this->linkAnalyzer->recheckLinks(
+                $message,
+                $this->linkTypes,
+                (int)$this->currentRecord['uid'],
+                $this->currentRecord['table'],
+                $this->currentRecord['field'],
+                (int)($this->currentRecord['currentTime'] ?? 0),
+                $this->configuration->isCheckHidden()
+            );
+            if ($message) {
+                $this->moduleTemplate->addFlashMessage(
+                    $message,
+                    $this->getLanguageService()->getLL('list.recheck.links.title'),
+                    ContextualFeedbackSeverity::OK
+                );
+            }
+            $this->resetModuleData();
+            return $this->mainAction($this->moduleTemplate);
+        }
+        return $this->mainAction($this->moduleTemplate);
+    }
+
+    protected function initializeTemplate(ServerRequestInterface $request): void
+    {
+        $this->moduleTemplate = $this->moduleTemplateFactory->create($request);
+        $this->moduleTemplate->makeDocHeaderModuleMenu(['id' => $this->id]);
+
+        $this->moduleTemplate->assign('currentPage', $this->id);
+        $this->moduleTemplate->assign('depth', $this->depth);
+        $this->moduleTemplate->assign('docsurl', $this->configuration->getDocsUrl());
+        $this->moduleTemplate->assign(
+            'showRecheckButton',
+            $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
+        );
+    }
+
+    /**
+     * Create tabs to split the report and the checkLink functions
+     */
+    protected function renderContent(): void
+    {
+        if (!$this->backendUserHasPermissionsForBrokenLinklist) {
+            // If no access or if ID == zero
+            $this->moduleTemplate->addFlashMessage(
+                $this->getLanguageService()->getLL('no.access'),
+                $this->getLanguageService()->getLL('no.access.title'),
+                ContextualFeedbackSeverity::ERROR
+            );
+            return;
+        }
+
+        $this->initializeViewForBrokenLinks();
+    }
+
+    protected function initialize(ServerRequestInterface $request): void
+    {
+        $backendUser = $this->getBackendUser();
+        $this->id = (int)($request->getParsedBody()['id'] ?? $request->getQueryParams()['id'] ?? 0);
+        $this->resolveSiteLanguages($this->id);
+
+        $this->pageinfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW));
         if ($this->id !== 0) {
             $this->configuration->loadPageTsConfig($this->id);
         }
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
-        $this->getSettingsFromQueryParameters();
-        $this->view = $this->createView('BrokenLinkList');
-    }
+        $this->getSettingsFromQueryParameters($request);
+        $this->initializeLinkTypes();
 
-    protected function createView(string $templateName): StandaloneView
-    {
-        /**
-         * @var StandaloneView $view
-         */
-        $view = GeneralUtility::makeInstance(StandaloneView::class);
-        $view->setLayoutRootPaths(['EXT:brofix/Resources/Private/Layouts']);
-        $view->setPartialRootPaths(['EXT:brofix/Resources/Private/Partials']);
-        $view->setTemplateRootPaths(['EXT:brofix/Resources/Private/Templates/Backend']);
-        $view->setTemplate($templateName);
-        $view->assign('currentPage', $this->id);
-        $view->assign('depth', $this->depth);
-        $view->assign('docsurl', $this->configuration->getDocsUrl());
-        $view->assign(
-            'showRecheckButton',
-            $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $linkType => $className) {
+            /**
+             * @var LinktypeInterface $this->hookObjectsArr[$linkType]
+             * @phpstan-ignore-next-line Ignore next line because of dynamic type for $className
+             */
+            $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
+        }
+
+        $this->pageRecord = BackendUtility::readPageAccess(
+            $this->id,
+            $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
         );
-        return $view;
+        $this->backendUserHasPermissionsForBrokenLinklist = false;
+        if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
+            $this->backendUserHasPermissionsForBrokenLinklist = true;
+        }
+        // Don't access in workspace
+        if ($this->getBackendUser()->workspace !== 0) {
+            $this->backendUserHasPermissionsForBrokenLinklist = false;
+        }
+        $this->backendUserHasPermissionsForExcludes =
+            $this->excludeLinkTarget->currentUserHasCreatePermissions(
+                $this->configuration->getExcludeLinkTargetStoragePid()
+            );
     }
 
-    /**
-     * Checks for incoming GET/POST parameters to update the module settings
-     */
-    protected function getSettingsFromQueryParameters(): void
+    protected function initializeLinkTypes(): void
     {
-        $this->currentRecord = [];
-        /**
-         * @var bool $resetPagination
-         */
-        $resetPagination = false;
-
-        // get information for last edited record
-        $this->currentRecord['uid'] = GeneralUtility::_GP('current_record_uid') ?? 0;
-        $this->currentRecord['table'] = GeneralUtility::_GP('current_record_table') ?? '';
-        $this->currentRecord['field'] = GeneralUtility::_GP('current_record_field') ?? '';
-        $this->currentRecord['currentTime'] = GeneralUtility::_GP('current_record_currentTime') ?? 0;
-        $this->currentRecord['url'] = urldecode(GeneralUtility::_GP('current_record_url') ?? '');
-        $this->currentRecord['linkType'] = GeneralUtility::_GP('current_record_linkType') ?? '';
-
-        // get searchLevel (number of levels of pages to check / show results)
-        $depth = GeneralUtility::_GP('depth');
-
-        // store filter parameters in the Filter Object
-        $filter = $this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST);
-        if ($filter) {
-            $this->filter = BrokenLinkListFilter::getInstanceFromArray($filter->toArray());
-        } else {
-            $this->filter = new BrokenLinkListFilter();
-        }
-        $uid = GeneralUtility::_GP('uid_searchFilter');
-        if ($uid !== null) {
-            $this->filter->setUidFilter($uid);
-        }
-        $url = GeneralUtility::_GP('url_searchFilter');
-        if ($url !== null) {
-            $this->filter->setUrlFilter($url);
-        }
-        $urlMatch = GeneralUtility::_GP('url_match_searchFilter');
-        if ($urlMatch !== null) {
-            $this->filter->setUrlFilterMatch($urlMatch ?: 'partial');
-        }
-        $linkType = GeneralUtility::_GP('linktype_searchFilter');
-        if ($linkType !== null) {
-            $this->filter->setLinktypeFilter($linkType ?: 'all');
-        }
-
-        $this->userSettings = UserSettings::initializeFromSettingsAndGetParameters($this->pObj->MOD_SETTINGS);
-
-        // to prevent deleting session, when user sort the records
-        if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
-            $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
-        }
-
-        // create session, if it the first time
-        if (is_null($this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST))) {
-            $this->backendSession->store(BackendSession::FILTER_KEY_LINKLIST, $this->filter);
-        }
-
-        /**
-         * @var int $previousDepth
-         */
-        $previousDepth = (int)($this->pObj->MOD_SETTINGS['depth'] ?? 0);
-        if (is_null($depth)) {
-            // not set, set to stored value or 0 (default)
-            $this->depth = $previousDepth;
-        } else {
-            $this->depth = (int)$depth;
-            if ($this->depth !== $previousDepth) {
-                $resetPagination = true;
-            }
-        }
-        $this->pObj->MOD_SETTINGS['depth'] = $this->depth;
-
-        $this->route = GeneralUtility::_GP('route') ?? '';
-        $this->token = GeneralUtility::_GP('token') ?? '';
-        $this->action = GeneralUtility::_GP('action') ?? '';
-
-        if (GeneralUtility::_GP('updateLinkList') ?? '') {
-            $this->action = 'updateLinkList';
-        }
-
-        // orderBy
-        $this->orderBy = (string)(GeneralUtility::_GP('orderBy')
-            ?: ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrokenLinkListController::ORDER_BY_DEFAULT));
-        if ($this->orderBy != ($this->pObj->MOD_SETTINGS['orderBy'] ?? BrokenLinkListController::ORDER_BY_DEFAULT)) {
-            $resetPagination = true;
-        }
-        $this->pObj->MOD_SETTINGS['orderBy'] = $this->orderBy;
-
         $this->linkTypes = [];
         foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $linkType => $value) {
             $linkTypes = $this->configuration->getLinkTypes();
@@ -380,20 +396,55 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->linkTypes[] = $linkType;
             }
         }
+    }
 
-        // pagination + currentPage
-        $lastCurrentPage = (int)($this->pObj->MOD_SETTINGS['currentPage'] ?? 0);
-        if (($this->id !== $lastCurrentPage) || $resetPagination) {
-            // pagination (reset pagination if page id changed!)
-            $this->paginationCurrentPage = 1;
+    protected function initializePageRenderer(): void
+    {
+        $this->pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
+        // todo: use loadJavaScriptModule
+        $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+        $this->pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+    }
+
+    /**
+     * Injects the request object for the current request or subrequest
+     * Then checks for module functions that have hooked in, and renders menu etc.
+     */
+    public function mainAction(ModuleTemplate $view): ResponseInterface
+    {
+        $this->renderContent();
+        return $view->renderResponse('Backend/BrokenLinkList');
+    }
+
+    /**
+     * Checks for incoming GET/POST parameters to update the module settings
+     */
+    protected function getSettingsFromQueryParameters(ServerRequestInterface $request): void
+    {
+        // get information for last edited record
+        $this->currentRecord = [];
+        $this->currentRecord['uid'] = (string)$this->moduleData->get('current_record_uid', '');
+        $this->currentRecord['table'] = (string)$this->moduleData->get('current_record_table', '');
+        $this->currentRecord['field'] = (string)$this->moduleData->get('current_record_field', '');
+        $this->currentRecord['currentTime'] = (string)$this->moduleData->get('current_record_currentTime', '');
+        $this->currentRecord['url'] = urldecode((string)$this->moduleData->get('current_record_url', ''));
+        $this->currentRecord['linkType'] = (string)$this->moduleData->get('current_record_linkType', '');
+
+        $this->depth = (int)$this->moduleData->get('depth', self::DEFAULT_DEPTH);
+        $this->orderBy = $this->moduleData->get('orderBy', BrokenLinkListController::DEFAULT_ORDER_BY);
+        $this->viewMode = $this->moduleData->get('viewMode', self::DEFAULT_VIEW_MODE_VALUE);
+
+        $this->filter = BrokenLinkListFilter::getInstanceFromModuleData($this->moduleData);
+
+        $queryParams = $request->getQueryParams();
+        $this->route = $queryParams['route'] ?? '';
+        $this->token = $queryParams['token'] ?? '';
+        $paginationPage = $this->moduleData->get('paginationPage');
+        if ($paginationPage !== null) {
+            $this->paginationCurrentPage = (int)$paginationPage;
         } else {
-            $this->paginationCurrentPage = (int)(GeneralUtility::_GP('paginationPage')
-                ?: ($this->pObj->MOD_SETTINGS['paginationPage'] ?? 1));
+            $this->paginationCurrentPage = 1;
         }
-        $this->pObj->MOD_SETTINGS['currentPage'] = $this->id;
-        $this->pObj->MOD_SETTINGS['paginationPage'] = $this->paginationCurrentPage;
-
-        $this->persistUserSettings();
     }
 
     /**
@@ -424,126 +475,13 @@ class BrokenLinkListController extends AbstractBrofixController
     }
 
     /**
-     * Main, called from parent object
-     *
-     * @return string Module content
-     */
-    public function main(): string
-    {
-        $this->initialize();
-
-        if ($this->action === 'updateLinkList') {
-            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
-            $this->createFlashMessage(
-                $this->getLanguageService()->getLL('list.status.check.done'),
-                '',
-                AbstractMessage::OK
-            );
-        }
-
-        if ($this->action === 'recheckUrl') {
-            $message = '';
-            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord);
-            if ($count > 0) {
-                $this->moduleTemplate->addFlashMessage(
-                    $message,
-                    $this->getLanguageService()->getLL('list.recheck.url.title'),
-                    AbstractMessage::OK
-                );
-            } else {
-                $this->moduleTemplate->addFlashMessage(
-                    $message,
-                    $this->getLanguageService()->getLL('list.recheck.url.title'),
-                    AbstractMessage::OK
-                );
-            }
-        } elseif ($this->action === 'editField') {
-            $message = '';
-            // recheck broken links for last edited reccord
-            $this->linkAnalyzer->recheckLinks(
-                $message,
-                $this->linkTypes,
-                (int)$this->currentRecord['uid'],
-                $this->currentRecord['table'],
-                $this->currentRecord['field'],
-                (int)($this->currentRecord['currentTime'] ?? 0),
-                $this->configuration->isCheckHidden()
-            );
-            if ($message) {
-                $this->moduleTemplate->addFlashMessage(
-                    $message,
-                    $this->getLanguageService()->getLL('list.recheck.links.title'),
-                    AbstractMessage::OK
-                );
-            }
-        }
-
-        $pageTitle = $this->pageRecord ? BackendUtility::getRecordTitle('pages', $this->pageRecord) : '';
-        $this->view->assign('title', $pageTitle);
-        $this->renderContent();
-        return $this->view->render();
-    }
-
-    /**
-     * Create tabs to split the report and the checkLink functions
-     */
-    protected function renderContent(): void
-    {
-        if (!$this->backendUserInformation->hasPermissionBrokenLinkList()) {
-            // If no access or if ID == zero
-            $this->moduleTemplate->addFlashMessage(
-                $this->getLanguageService()->getLL('no.access'),
-                $this->getLanguageService()->getLL('no.access.title'),
-                AbstractMessage::ERROR
-            );
-            return;
-        }
-
-        $this->initializeViewForBrokenLinks();
-    }
-
-    /**
-     * Initializes the Module
-     */
-    protected function initialize(): void
-    {
-        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $linkType => $className) {
-            $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
-        }
-
-        $this->pageRecord = BackendUtility::readPageAccess(
-            $this->id,
-            $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
-        );
-        $isAccessibleForCurrentUser = false;
-        if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
-            $isAccessibleForCurrentUser = true;
-        }
-        // Don't access in workspace
-        if ($this->getBackendUser()->workspace !== 0) {
-            $isAccessibleForCurrentUser = false;
-        }
-        $excludeLinksPermission =
-            $this->excludeLinkTarget->currentUserHasCreatePermissions(
-                $this->configuration->getExcludeLinkTargetStoragePid()
-            );
-        $this->backendUserInformation = new BackendUserInformation($isAccessibleForCurrentUser, $excludeLinksPermission);
-
-        $this->pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
-        $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
-        $this->pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
-
-        $this->initializeLinkAnalyzer();
-    }
-
-    /**
      * Updates the table of stored broken links
      */
     protected function initializeLinkAnalyzer(): void
     {
         $considerHidden = $this->configuration->isCheckHidden();
         $depth = $this->depth;
-        $permsClause = (string)$this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
+        $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
         if ($this->id !== 0) {
             $this->pageList = [];
             $this->pagesRepository->getPageList(
@@ -570,13 +508,13 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function initializeViewForBrokenLinks(): void
     {
-        $this->view->assign('depth', $this->depth);
+        $this->moduleTemplate->assign('depth', $this->depth);
 
         $items = [];
         $totalCount = 0;
         // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
         // @extensionScannerIgnoreLine problem with getRootLineIsHidden
-        $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pObj->pageinfo);
+        $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
@@ -589,13 +527,16 @@ class BrokenLinkListController extends AbstractBrofixController
                 $totalCount = count($brokenLinks);
 
                 $itemsPerPage = 100;
+                if (($this->paginationCurrentPage - 1) * $itemsPerPage >= $totalCount) {
+                    $this->resetPagination();
+                }
                 $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
                 $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
                 // move end
                 foreach ($paginator->getPaginatedItems() as $row) {
                     $items[] = $this->renderTableRow($row['table_name'], $row);
                 }
-                $this->view->assign('listUri', $this->constructBackendUri());
+                $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
             }
             if ($this->configuration->getTraverseMaxNumberOfPagesInBackend()
                 && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
@@ -612,42 +553,32 @@ class BrokenLinkListController extends AbstractBrofixController
         } else {
             $this->pagination = null;
         }
-        $this->view->assign('totalCount', $totalCount);
-        // send the search filters to the view
-        $arrayable = $this->backendSession->get(BackendSession::FILTER_KEY_LINKLIST);
-        if ($arrayable) {
-            $filter = BrokenLinkListFilter::getInstanceFromArray($arrayable->toArray());
-        } else {
-            $filter = new BrokenLinkListFilter();
-        }
-        $this->view->assign('uid_filter', $filter->getUidFilter());
-        $this->view->assign('linktype_filter', $filter->getLinktypeFilter());
-        $this->view->assign('url_filter', $filter->getUrlFilter());
-        $this->view->assign('url_match_searchFilter', $filter->getUrlFilterMatch());
-        $this->view->assign('view_mode', $this->userSettings->getViewMode());
+        $this->moduleTemplate->assign('totalCount', $totalCount);
+        $this->moduleTemplate->assign('filter', $this->filter);
+        $this->moduleTemplate->assign('viewMode', $this->viewMode);
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
         } elseif (empty($items)) {
             $this->createFlashMessagesForNoBrokenLinks();
         }
-        $this->view->assign('brokenLinks', $items);
+        $this->moduleTemplate->assign('brokenLinks', $items);
         $linktypes = array_merge(['all' => 'all'], $this->linkTypes);
         if (count($linktypes) > 2) {
-            $this->view->assign('linktypes', $linktypes);
+            $this->moduleTemplate->assign('linktypes', $linktypes);
         }
 
-        $this->view->assign('pagination', $this->pagination);
-        $this->view->assign('orderBy', $this->orderBy);
-        $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->moduleTemplate->assign('pagination', $this->pagination);
+        $this->moduleTemplate->assign('orderBy', $this->orderBy);
+        $this->moduleTemplate->assign('paginationPage', $this->paginationCurrentPage ?: 1);
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {
             $sortActions[$key] = $this->constructBackendUri(['orderBy' => $key]);
         }
-        $this->view->assign('sortActions', $sortActions);
+        $this->moduleTemplate->assign('sortActions', $sortActions);
 
         // Table header
-        $this->view->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+        $this->moduleTemplate->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
     }
 
     /**
@@ -655,7 +586,6 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function createFlashMessagesForNoBrokenLinks(): void
     {
-        $message = '';
         $status = AbstractMessage::OK;
         if ($this->filter->hasConstraintsForNumberOfResults()) {
             $status = AbstractMessage::WARNING;
@@ -862,7 +792,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $excludeLinkTargetStoragePid = $this->configuration->getExcludeLinkTargetStoragePid();
         // show exclude link target button
         if (in_array($row['link_type'] ?? 'empty', $this->configuration->getExcludeLinkTargetAllowedTypes())
-            && $this->backendUserInformation->hasPermissionExcludeLinks()
+            && $this->backendUserHasPermissionsForExcludes
         ) {
             $returnUrl = $this->constructBackendUri();
             $excludeUrl = (string)$uriBuilder->buildUriFromRoute('record_edit', [
@@ -897,7 +827,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $variables['table'] = $table;
             $variables['field'] = $row['field'] ?? '';
         }
-        $variables['elementType'] = $this->getLanguageSplitLabel($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
+        $variables['elementType'] = $this->getLanguageService()->sL($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
         // Get the language label for the field from TCA
         $fieldName = '';
         if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']) {
@@ -989,27 +919,39 @@ class BrokenLinkListController extends AbstractBrofixController
         return true;
     }
 
-    protected function getLanguageSplitLabel(string $label): string
+    protected function resetPagination(int $pageNr = 1): void
     {
-        static $languageCache = [];
-
-        if (isset($languageCache[$label])) {
-            return $languageCache[$label];
-        }
-
-        $text = $this->getLanguageService()->sL($label);
-        if ($text) {
-            $languageCache[$label] = $text;
-            return $text;
-        }
-        return '';
+        $this->paginationCurrentPage = $pageNr;
     }
 
-    protected function persistUserSettings(): void
+    protected function resetModuleData(): void
     {
-        // initialize MOD_SETTINGS with current values
-        $this->userSettings->persistToArray($this->pObj->MOD_SETTINGS);
-        // save settings
-        $this->getBackendUser()->pushModuleData('web_brofix', $this->pObj->MOD_SETTINGS);
+        $persist = false;
+        if ($this->moduleData->get('current_record_uid')) {
+            $this->moduleData->set('current_record_uid', '');
+            $this->moduleData->set('current_record_table', '');
+            $this->moduleData->set('current_record_field', '');
+            $this->moduleData->set('current_record_currentTime', '');
+            $this->moduleData->set('current_record_url', '');
+            $this->moduleData->set('current_record_linkType', '');
+            $this->currentRecord = [
+                'uid' => 0,
+                'table' => '',
+                'field' => '',
+                'currentTime' => 0,
+                'url' => '',
+                'linkType' => ''
+            ];
+            $persist = true;
+        }
+        if ($this->moduleData->get('action', 'report') !== 'report') {
+            $this->moduleData->set('action', 'report');
+            $this->action = 'report';
+            $persist = true;
+        }
+
+        if ($persist) {
+            $this->getBackendUser()->pushModuleData(self::MODULE_NAME, $this->moduleData->toArray());
+        }
     }
 }

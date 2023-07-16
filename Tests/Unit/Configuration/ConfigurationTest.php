@@ -38,8 +38,12 @@ class ConfigurationTest extends AbstractUnit
      */
     public function overrideSearchFieldsSetsCorrectValues(): void
     {
-        $tsconfig = 'mod.brofix.searchFields.pages = url' . "\n" .
-            'mod.brofix.searchFields.sometable = somefield1,somefield2';
+        $tsconfig = [
+            'searchFields.' => [
+                'pages' => 'url',
+                'sometable' => 'somefield1,somefield2',
+            ]
+        ];
 
         $expectedSearchFields = [
             'pages' => [
@@ -52,7 +56,7 @@ class ConfigurationTest extends AbstractUnit
         ];
 
         $this->configuration->setSearchFields([]);
-        $this->configuration->overrideTsConfigByString($tsconfig);
+        $this->configuration->overrideTsConfigByArray($tsconfig);
 
         $actualResult = $this->configuration->getSearchFields();
         self::assertEquals(
@@ -134,8 +138,11 @@ class ConfigurationTest extends AbstractUnit
     public function getMailFromEmailReturnsCorrectTsconfig(): void
     {
         $emailExpected = 'system@example.org';
+        $tsconfig = [
+            'mail.fromemail' => $emailExpected,
+        ];
 
-        $this->configuration->overrideTsConfigByString('mod.brofix.mail.fromemail = ' . $emailExpected);
+        $this->configuration->overrideTsConfigByArray($tsconfig);
         $emailActual = $this->configuration->getMailFromEmail();
 
         self::assertEquals(
@@ -164,8 +171,13 @@ class ConfigurationTest extends AbstractUnit
     public function getMailFromNameReturnsCorrectTsconfig(): void
     {
         $nameExpected = 'Webmaster';
+        $tsconfig = [
+            'mail.' => [
+                'fromname' => $nameExpected,
+            ]
+        ];
 
-        $this->configuration->overrideTsConfigByString('mod.brofix.mail.fromname = ' . $nameExpected);
+        $this->configuration->overrideTsConfigByArray($tsconfig);
         $nameActual = $this->configuration->getMailFromName();
 
         self::assertEquals(
@@ -195,8 +207,13 @@ class ConfigurationTest extends AbstractUnit
     {
         $email = 'system@example.org';
         $valueExpected = [new Address($email)];
+        $tsconfig = [
+           'mail.' => [
+               'recipients' => $email,
+           ]
+        ];
 
-        $this->configuration->overrideTsConfigByString('mod.brofix.mail.recipients = ' . $email);
+        $this->configuration->overrideTsConfigByArray($tsconfig);
 
         // expected, actual, message
         self::assertEquals(
@@ -216,8 +233,13 @@ class ConfigurationTest extends AbstractUnit
             new Address('system@example.org'),
             new Address('system2@example.org')
         ];
+        $tsconfig = [
+            'mail.' => [
+                'recipients' => $email,
+            ]
+        ];
 
-        $this->configuration->overrideTsConfigByString('mod.brofix.mail.recipients = ' . $email);
+        $this->configuration->overrideTsConfigByArray($tsconfig);
 
         // expected, actual, message
         self::assertEquals($valueExpected, $this->configuration->getMailRecipients(), 'getMailRecipients() should return correct value');

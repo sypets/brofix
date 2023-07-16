@@ -15,8 +15,11 @@
  * Module: TYPO3/CMS/Brofix/ManageExclusions
  */
 
+
+
 define(['jquery'], function($) {
   'use strict';
+
   $(document).ready(function () {
 
     $('#excludeUrlButton').on('click', function (){
@@ -24,77 +27,35 @@ define(['jquery'], function($) {
     })
 
     $('.selectAllLinks').click(function() {
-      console.log('selectAllLinks');
       var $checkboxes = $('.check').find('input[type=checkbox]');
       $checkboxes.prop('checked', $(this).is(':checked'));
     });
 
-    $('#deleteSelectedLinks').click(function(){
+    $('#deleteSelectedLinks').click(function() {
       var selecteditems = [];
+
       $(".check").find("input:checked").each(function (i, ob) {
         selecteditems.push($(ob).val());
       });
-      require(['TYPO3/CMS/Core/Ajax/AjaxRequest'], function (AjaxRequest) {
-        // Generate a random number between 1 and 32
-        new AjaxRequest(TYPO3.settings.ajaxUrls.delete_excluded_links)
-          .withQueryArguments({input: selecteditems})
-          .get()
-          .then(async function (response) {
-            const resolved = await response.resolve();
-          });
-      });
+      if (selecteditems.length > 0) {
+        require(['TYPO3/CMS/Core/Ajax/AjaxRequest'], function (AjaxRequest) {
+          new AjaxRequest(TYPO3.settings.ajaxUrls.delete_excluded_links)
+            .withQueryArguments({input: selecteditems})
+            .get()
+            .then(async function (response) {
+              const resolved = await response.resolve();
+              $('#refreshLinkList').click();
+              // todo: show flash message, return number of affected froms from ExcludeLinkTargetRepository
+              //top.TYPO3.Notification.info('', '');
+            });
+        });
+      } else {
+        // todo: show flash message (with localized message)
+      }
 
     })
   })
   var ManageExclusions = {};
-
-  /**
-   *
-   * @param {String} prefix
-   */
-  ManageExclusions.toggleActionButton = function(prefix) {
-    var buttonDisable = true;
-    $('.' + prefix).each(function() {
-      if ($(this).prop('checked')) {
-        buttonDisable = false;
-      }
-    });
-
-    if (prefix === 'check') {
-      $('#updateLinkList').prop('disabled', buttonDisable);
-    } else {
-      $('#refreshLinkList').prop('disabled', buttonDisable);
-    }
-  };
-
-  /**
-   * Registers listeners
-   */
-  ManageExclusions.initializeEvents = function() {
-    $('.refresh').on('click', function() {
-      ManageExclusions.toggleActionButton('refresh');
-    });
-
-    $('.check').on('click', function() {
-      ManageExclusions.toggleActionButton('check');
-    });
-
-    $('#ManageExclusions-list-select-pagedepth').on('change', function() {
-      $('#refreshLinkList').click();
-    });
-
-    $('.t3js-update-button').on('click', function() {
-      var $element = $(this);
-      var name = $element.attr('name');
-      var message = 'Event triggered';
-      if (name === 'refreshLinkList' || name === 'updateLinkList') {
-        message = $element.data('notification-message');
-      }
-      top.TYPO3.Notification.success(message);
-    });
-  };
-
-  $(ManageExclusions.initializeEvents);
 
 
   return ManageExclusions;

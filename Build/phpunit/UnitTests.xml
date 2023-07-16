@@ -11,7 +11,6 @@
 
     TYPO3 CMS functional test suite also needs phpunit bootstrap code, the
     file is located next to this .xml as FunctionalTestsBootstrap.php
-
 -->
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -54,10 +53,6 @@
     </coverage>
     <php>
         <ini name="display_errors" value="1" />
-        <!--
-            Set E_ALL after tests failing for E_ALL are fixed.
-        <ini name="error_reporting" value="E_ALL" />
-        -->
         <ini name="error_reporting" value="E_ALL" />
         <env name="TYPO3_CONTEXT" value="Testing" />
     </php>
