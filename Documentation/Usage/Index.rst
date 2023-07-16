@@ -15,7 +15,6 @@ editor.
    :titlesonly:
 
    Quickstart
-   Pitfalls
    ExcludeLinkTargetManagement
 
 

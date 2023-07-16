@@ -50,8 +50,10 @@ available from `www.typo3.org <https://www.typo3.org/>`_
    Installation/Index
    Setup/Index
    Usage/Index
+   KnownProblems/Index
    BestPractices/Index
    HowItWorks/Index
+   Developers/Index
    Changelog/Index
    Sitemap
 
