@@ -1,12 +1,13 @@
 mod.brofix {
 	searchFields {
+	  # check all links in table "pages", fields "media" and "url"
 		pages = media,url
 		tt_content = bodytext,header_link,records
 	}
-	# do not check these ctypes in tt_content elements (comma separated)
+	# do not check these tt_content CTypes (comma separated)
 	excludeCtype = html
 
-	linktypes = db,file,external,applewebdata
+	linktypes = db,file,external
 
 	check {
 	  doNotCheckContentOnPagesDoktypes = 3,4
@@ -15,8 +16,10 @@ mod.brofix {
 	  doNotCheckLinksOnWorkspace = 0
   }
 
+  # check links in hidden records
 	checkhidden = 0
 
+  # default depth when running console command (brofix:checklinks)
 	depth = 999
 
 	# 1: links to hidden records are reported as errors
@@ -25,7 +28,7 @@ mod.brofix {
   linktypesConfig {
       external {
         headers {
-          # !!! fill out User-Agent reasonably with at least a working URL and / or email,
+          # !!! fill out User-Agent reasonably with at least a working URL to contact information or email,
           # e.g.
           # User-Agent = Mozilla/5.0 (compatible; Site link checker; +https://gratesturff.com/imprint.html)
           #
@@ -33,39 +36,59 @@ mod.brofix {
           Accept = */*
         }
         timeout = 10
+        # follow maximum this number of redirects when checking an external link target
         redirects = 5
       }
   }
 
   excludeLinkTarget {
+    # pid of page where the "exclude" DB records are stored (BE user must have permission for this if they should get
+    # permission to edit excludes
     storagePid = 0
-    # allowed link types, e.g. external,db
+
+    # link types for which exclusions can be added, e.g. external,db
     allowed = external
   }
 
   linkTargetCache {
     # 7 days : typically used for full recheck
     expiresLow = 604800
+
     # 8 days : typically use for on-the-fly checking
     expiresHigh = 691200
   }
 
   crawlDelay {
+    # minimum number of second delay between checking URLs of the same domain
     seconds = 5
+
+    # comma separated list of domains to not use crawlDelay (can be used for internal sites)
     nodelay =
   }
 
   report {
+    # URL to documentation (if this should be displayed in the BE module)
     docsurl =
+
+    # Show "Check links" button
+    # -1:
+    # >= 0: show button if depth <= recheckButton
+    # 9999: always show button
     recheckButton = -1
   }
 
 	mail {
+	  # always send mail after checking links with command brofix:checklinks
     sendOnCheckLinks = 1
+    # should contain email address(es) of recipients
 	  recipients =
+	  # "From" name. If this is empty, $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']  is used
 		fromname =
+		# "From" email address. If this is empty, $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromEmail'] is used
 		fromemail =
+		# "Reply-To" name
 		replytoname =
+		# "Reply-To" email
 		replytoemail =
 		subject =
 		template = CheckLinksResults
