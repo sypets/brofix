@@ -109,7 +109,7 @@ class InternalLinktype extends AbstractLinktype
             if ($parsedTypoLinkUrl['host'] === 'page') {
                 parse_str($parsedTypoLinkUrl['query'], $query);
                 if (isset($query['uid'])) {
-                    $page = (int)$query['uid'];
+                    $pageUid = (int)$query['uid'];
                     $contentUid = (int)$url;
                 }
             }
