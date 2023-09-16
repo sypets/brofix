@@ -266,13 +266,24 @@ class LinkAnalyzerTest extends AbstractFunctional
         $pidList1 = [1];
 
         return [
-            // Tests with one broken link
             'Test with one not broken page link' =>
                 [
                     __DIR__ . '/Fixtures/input_content_with_not_broken_page_link.xml',
-                    [1],
+                    $pidList1,
                     'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
-                ]
+                ],
+            'Test with one not broken page link with anchor' =>
+                [
+                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link_with_anchor.xml',
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
+                ],
+            'Test with one not broken page link with anchor in header_link' =>
+                [
+                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link_with_anchor_in_header_link.xml',
+                    $pidList1,
+                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
+                ],
         ];
     }
 
