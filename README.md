@@ -1,4 +1,5 @@
 [![TYPO3 11](https://img.shields.io/badge/TYPO3-11-orange.svg)](https://get.typo3.org/version/11)
+[![TYPO3 12](https://img.shields.io/badge/TYPO3-12-orange.svg)](https://get.typo3.org/version/12)
 [![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
 [![CI Status](https://github.com/sypets/brofix/workflows/CI/badge.svg)](https://github.com/sypets/brofix/actions)
 [![Downloads](https://img.shields.io/packagist/dt/sypets/brofix)](https://packagist.org/packages/sypets/brofix)
