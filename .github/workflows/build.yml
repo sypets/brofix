@@ -1,0 +1,28 @@
+# build css / js
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: "build (yarn)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@main
+
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          #cache: 'npm'
+
+      - name: "yarn install"
+        run: yarn install
+
+      - name: "yarn install"
+        run: yarn build
+
+      - name: "check git"
+        run: git update-index --refresh || git diff-index --quiet HEAD -- || echo "Uncommitted changes after build";
