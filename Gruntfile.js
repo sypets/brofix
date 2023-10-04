@@ -58,6 +58,8 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('build', ['sass', 'watch']);
+  grunt.registerTask('watch', ['sass', 'watch']);
+
+  grunt.registerTask('build', ['sass']);
 
 };
