@@ -208,7 +208,6 @@ class BrokenLinkListController extends AbstractBrofixController
         PagesRepository $pagesRepository = null,
         BrokenLinkRepository $brokenLinkRepository = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
-        Configuration $configuration = null,
         FlashMessageService $flashMessageService = null,
         ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory = null,
@@ -216,28 +215,27 @@ class BrokenLinkListController extends AbstractBrofixController
         PageRenderer $pageRenderer = null
     ) {
         $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
-        $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
         $moduleTemplateFactory = $moduleTemplateFactory;
-        parent::__construct(
-            $configuration,
-            $iconFactory,
-            $moduleTemplateFactory,
-            $excludeLinkTarget
-        );
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $this->orderBy = BrokenLinkListController::DEFAULT_ORDER_BY;
+
+        // configuration / extension configuration
         if (!$extensionConfiguration) {
             $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         }
         $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
-        $this->configuration->setTraverseMaxNumberOfPagesInBackend(
-            (int)($extConfArray['traverseMaxNumberOfPagesInBackend']
-            ?? Configuration::TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT)
+        $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
+
+        parent::__construct(
+            $configuration,
+            $iconFactory,
+            $moduleTemplateFactory,
+            $excludeLinkTarget
         );
     }
 
@@ -259,7 +257,13 @@ class BrokenLinkListController extends AbstractBrofixController
         }
 
         if ($this->action === 'checklinks') {
-            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+            // todo set considerHidden
+            $considerHidden = false;
+            $this->linkAnalyzer->generateBrokenLinkRecords(
+                $request,
+                $this->configuration->getLinkTypes(),
+                $considerHidden
+            );
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
@@ -271,7 +275,7 @@ class BrokenLinkListController extends AbstractBrofixController
 
         if ($this->action === 'recheckUrl') {
             $message = '';
-            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord);
+            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord, $request);
             if ($count > 0) {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
@@ -299,6 +303,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->currentRecord['table'],
                 $this->currentRecord['field'],
                 (int)($this->currentRecord['currentTime'] ?? 0),
+                $request,
                 $this->configuration->isCheckHidden()
             );
             if ($message) {

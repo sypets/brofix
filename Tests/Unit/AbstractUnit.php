@@ -28,6 +28,12 @@ abstract class AbstractUnit extends UnitTestCase
 {
     use ProphecyTrait;
 
+    protected const EXTENSION_CONFIGURATION_ARRAY = [
+        'excludeSoftrefs' => 'url',
+        'excludeSoftrefsInFields' => 'tt_content.bodytext',
+        'traverseMaxNumberOfPagesInBackend' => 100,
+    ];
+
     /**
      * @var Configuration
      */
@@ -38,16 +44,11 @@ abstract class AbstractUnit extends UnitTestCase
      */
     protected function initializeConfiguration(): void
     {
-        /*
-        $tsConfigPath = __DIR__ . '/../../Configuration/TsConfig/Page/pagetsconfig.tsconfig';
-
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        // load default values
-        $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
-        */
-
         // use defaults
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
+        $this->configuration = GeneralUtility::makeInstance(
+            Configuration::class,
+            self::EXTENSION_CONFIGURATION_ARRAY
+        );
         $this->configuration->overrideTsConfigByArray(
             [
                     'linktypesConfig.external.headers.User-Agent'
