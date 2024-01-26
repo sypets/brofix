@@ -19,6 +19,7 @@ namespace Sypets\Brofix\Configuration;
 
 use Symfony\Component\Mime\Address;
 use Sypets\Brofix\Linktype\AbstractLinktype;
+use Sypets\Brofix\Linktype\LinktypeInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
@@ -53,13 +54,45 @@ class Configuration
     protected int $traverseMaxNumberOfPagesInBackend = 0;
 
     /**
-     * Configuration constructor.
-     * @param mixed[]|null $tsConfig
+     * @var string[]
+     *
+     * Do not use these softreference parsers (only in fields $excludeSoftrefsInFields)
      */
-    public function __construct(array $tsConfig = null)
+    protected $excludeSoftrefs;
+
+    /** @var string[] */
+    protected $excludeSoftrefsInFields;
+
+    /**
+     * Array for hooks for own checks
+     *
+     * @var array<string,LinktypeInterface>
+     */
+    protected array $hookObjectsArr = [];
+
+    /**
+     * Configuration constructor.
+     * @param array<mixed> $extConfArray
+     */
+    public function __construct(array $extConfArray)
     {
-        if ($tsConfig !== null) {
-            $this->setTsConfig($tsConfig);
+        // initialize from extension configuration
+        $this->excludeSoftrefs = explode(',', $extConfArray['excludeSoftrefs'] ?? '');
+        $this->excludeSoftrefsInFields = explode(',', $extConfArray['excludeSoftrefsInFields'] ?? '');
+        $this->setTraverseMaxNumberOfPagesInBackend(
+            (int)($extConfArray['traverseMaxNumberOfPagesInBackend']
+                ?? self::TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT)
+        );
+
+        // initialize from global configuration
+        // Hook to handle own checks
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
+            /**
+             * @var LinktypeInterface $linktype
+             */
+            $linktype = GeneralUtility::makeInstance($className); // @phpstan-ignore-line
+            $this->hookObjectsArr[$key] = $linktype;
+            $linktype->setConfiguration($this);
         }
     }
 
@@ -529,6 +562,35 @@ class Configuration
     public function setTraverseMaxNumberOfPagesInBackend(int $traverseMaxNumberOfPagesInBackend): void
     {
         $this->traverseMaxNumberOfPagesInBackend = $traverseMaxNumberOfPagesInBackend;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExcludeSoftrefs(): array
+    {
+        return $this->excludeSoftrefs;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExcludeSoftrefsInFields(): array
+    {
+        return $this->excludeSoftrefsInFields;
+    }
+
+    public function getLinktypeObject(string $linktype): ?LinktypeInterface
+    {
+        return $this->hookObjectsArr[$linktype] ?? null;
+    }
+
+    /**
+     * @return array<string,LinktypeInterface>
+     */
+    public function getLinktypeObjects(): array
+    {
+        return $this->hookObjectsArr;
     }
 
     /**

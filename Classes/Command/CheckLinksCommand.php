@@ -29,6 +29,7 @@ use Sypets\Brofix\Mail\GenerateCheckResultMailInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -42,6 +43,8 @@ class CheckLinksCommand extends Command
      * @var SymfonyStyle
      */
     protected $io;
+
+    protected string $backendUri = 'https://localhost/typo3';
 
     /**
      * @var bool
@@ -89,9 +92,21 @@ class CheckLinksCommand extends Command
      */
     protected $excludedPages = [];
 
-    public function __construct(string $name = null)
-    {
-        parent::__construct($name);
+    protected GenerateCheckResultFluidMail $generateCheckResultMail;
+
+    public function __construct(
+        GenerateCheckResultFluidMail $generateCheckResultMail,
+        ExtensionConfiguration $extensionConfiguration,
+        BrokenLinkRepository $brokenLinkRepository,
+        PagesRepository $pagesRepository
+    ) {
+        parent::__construct();
+
+        $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
+        $this->configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
+        $this->generateCheckResultMail = $generateCheckResultMail;
+        $this->brokenLinkRepository = $brokenLinkRepository;
+        $this->pagesRepository = $pagesRepository;
 
         $this->configuration = GeneralUtility::makeInstance(Configuration::class);
         $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
@@ -105,6 +120,13 @@ class CheckLinksCommand extends Command
     protected function configure(): void
     {
         $this->setDescription('Check links')
+            ->addOption(
+                'backend-uri',
+                '',
+                InputOption::VALUE_REQUIRED,
+                'Backend URI (e.g. https://mysite/typo3), is used to generate a request.',
+                'https://localhost/typo3'
+            )
             ->addOption(
                 'start-pages',
                 'p',
@@ -157,6 +179,8 @@ class CheckLinksCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
+
+        $this->backendUri = $input->getOption('backend-uri');
 
         $this->dryRun = (bool)($input->getOption('dry-run') ?: false);
         if ($this->dryRun) {
@@ -368,7 +392,11 @@ class CheckLinksCommand extends Command
             /** @var LinkAnalyzer $linkAnalyzer */
             $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
             $linkAnalyzer->init($pageIds, $this->configuration);
-            $linkAnalyzer->generateBrokenLinkRecords($linkTypes, $checkHidden);
+            $linkAnalyzer->generateBrokenLinkRecords(
+                CommandUtility::createFakeWebRequest($this->backendUri),
+                $linkTypes,
+                $checkHidden
+            );
 
             $stats = $linkAnalyzer->getStatistics();
             $stats->setPageTitle($pageRow['title']);
