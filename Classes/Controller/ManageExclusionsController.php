@@ -12,6 +12,7 @@ use Sypets\Brofix\Repository\ExcludeLinkTargetRepository;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -92,7 +93,7 @@ class ManageExclusionsController extends AbstractBrofixController
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         ManageExclusionsFilter $filter = null,
-        Configuration $configuration = null,
+        ExtensionConfiguration $extensionConfiguration = null,
         ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
@@ -101,21 +102,25 @@ class ManageExclusionsController extends AbstractBrofixController
         PageRenderer $pageRenderer = null
     ) {
         $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
-        $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $moduleTemplateFactory = $moduleTemplateFactory;
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
+        $this->filter = $filter ?: GeneralUtility::makeInstance(ManageExclusionsFilter::class);
+        $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
+        $this->localizationUtility = $localizationUtility ?? GeneralUtility::makeInstance(LocalizationUtility::class);
+        $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
+
+        $extensionConfiguration = $extensionConfiguration ?: GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
+        $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
+
         parent::__construct(
             $configuration,
             $iconFactory,
             $moduleTemplateFactory,
             $excludeLinkTarget
         );
-        $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
-        $this->filter = $filter ?: GeneralUtility::makeInstance(ManageExclusionsFilter::class);
-        $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
-        $this->localizationUtility = $localizationUtility ?? GeneralUtility::makeInstance(LocalizationUtility::class);
-        $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
     }
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface

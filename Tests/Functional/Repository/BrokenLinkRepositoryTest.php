@@ -224,7 +224,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         // get result
         $result = $this->brokenLinkRepository->getLinkCounts(
@@ -348,7 +348,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         $results = $this->brokenLinkRepository->getBrokenLinks(
             $pidList,
@@ -634,7 +634,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         // get results
         $results = $this->brokenLinkRepository->getBrokenLinks(
