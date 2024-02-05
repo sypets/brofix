@@ -1,5 +1,5 @@
 # Configuration for running GitHub actions
-#  based on EXT:enetcache: .github/workflows/tests.yml
+#  based on EXT:enetcache: .github/workflows/tests.yml.not-used-yet
 #    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
 #  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
 
