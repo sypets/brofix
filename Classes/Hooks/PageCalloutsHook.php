@@ -86,7 +86,7 @@ final class PageCalloutsHook
     protected function createBackendUri(int $pageId, string $route = 'web_brofix'): string
     {
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        return (string) $uriBuilder->buildUriFromRoute($route, ['id' => $pageId]);
+        return (string)$uriBuilder->buildUriFromRoute($route, ['id' => $pageId]);
     }
 
     /**
