@@ -17,6 +17,7 @@ namespace Sypets\Brofix\Hooks;
  */
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -72,7 +73,7 @@ final class PageCalloutsHook
             $count . '</p>'
         );
         $message .= '<p>' . ($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:goto') ?: '');
-        $message .= ' <a class="btn btn-info" href="javascript:top.goToModule(\'web_brofix\',1);">'
+        $message .= ' <a class="btn btn-info" href="' . $this->createBackendUri($pageId) . '">'
             . ($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang_mod.xlf:mlang_tabs_tab') ?: 'Brofix')
             . '</a></p>';
         return [
@@ -80,6 +81,12 @@ final class PageCalloutsHook
             'message' => $message,
             'state' => InfoboxViewHelper::STATE_WARNING
         ];
+    }
+
+    protected function createBackendUri(int $pageId, string $route = 'web_brofix'): string
+    {
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        return (string) $uriBuilder->buildUriFromRoute($route, ['id' => $pageId]);
     }
 
     /**
