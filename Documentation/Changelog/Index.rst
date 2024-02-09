@@ -10,7 +10,9 @@ Changelog
 
    Since version 2.3.0 and higher, we list only the important changes here
    (specifically breaking changes).
-   For more changes, please see the respective release notes and commit messages
+   For more changes, please see the respective
+   `release notes <https://github.com/sypets/brofix/releases>`__ and
+   `commit messages <https://github.com/sypets/brofix/commits/main/>`__
    in the GitHub repository: https://github.com/sypets/brofix
 
 3.2.0
