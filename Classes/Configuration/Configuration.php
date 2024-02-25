@@ -445,6 +445,10 @@ class Configuration
         }
     }
 
+    /**
+     * Return crawlDelay.nodelay domains.
+     * @return array<string>awlDelayNodelayDomains
+     */
     public function getCrawlDelayNodelayDomains(): array
     {
         $noDelayString = $this->getCrawlDelayNodelayString();

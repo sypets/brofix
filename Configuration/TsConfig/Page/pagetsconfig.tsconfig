@@ -65,7 +65,7 @@ mod.brofix {
     # comma separated list of domains or regeix to not use crawlDelay (should be used for internal sites only!)
     # e.g. nodelay = example.org, example.com
     # e.g. nodelay = regex:/(.*\.)?example.(org|com)/
-    nodelay = 
+    nodelay =
   }
 
   report {
