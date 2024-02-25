@@ -14,3 +14,4 @@ Setup
 
    Quickstart
    Reference
+   TsconfigReference
