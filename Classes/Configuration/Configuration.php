@@ -431,11 +431,46 @@ class Configuration
     }
 
     /**
+     * Return crawlDelay nodelay domains.
      * @return array<string>
+     * @deprecated Use getCrawlDelayNodelayDomains
      */
     public function getCrawlDelayNodelay(): array
     {
-        return explode(',', $this->tsConfig['crawlDelay.']['nodelay'] ?? '');
+        $noDelayString = $this->getCrawlDelayNodelayString();
+        if (str_starts_with($noDelayString, 'regex:')) {
+            return [];
+        } else {
+            return explode(',', $$noDelayString);
+        }
+    }
+
+    public function getCrawlDelayNodelayDomains(): array
+    {
+        $noDelayString = $this->getCrawlDelayNodelayString();
+        if (str_starts_with($noDelayString, 'regex:')) {
+            return [];
+        } else {
+            return explode(',', $noDelayString);
+        }
+    }
+
+    public function isCrawlDelayNoDelayRegex(): bool
+    {
+        return str_starts_with($this->getCrawlDelayNodelayString(), 'regex:');
+    }
+
+    public function getCrawlDelayNoDelayRegex(): string
+    {
+        if ($this->isCrawlDelayNoDelayRegex()) {
+            return trim(substr($this->getCrawlDelayNodelayString(), strlen('regex:')));
+        }
+        return '';
+    }
+
+    public function getCrawlDelayNodelayString(): string
+    {
+        return trim($this->tsConfig['crawlDelay.']['nodelay'] ?? '');
     }
 
     public function getDocsUrl(): string

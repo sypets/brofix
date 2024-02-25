@@ -616,6 +616,10 @@ crawlDelay.nodelay
 
          crawlDelay.nodelay = example.org,example.com
 
+      .. code-block:: typoscript
+         :caption: regex example
+         crawlDelay.nodelay = regex:/(.*\.)?example.(org|com)/
+
    Default
       empty
 
