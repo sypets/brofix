@@ -25,11 +25,6 @@ use Sypets\Brofix\Configuration\Configuration;
 class CrawlDelay
 {
     /**
-     * @var int
-     */
-    protected $delaySeconds;
-
-    /**
      * @var array<string>
      */
     protected $noCrawlDelayDomains;
@@ -41,10 +36,11 @@ class CrawlDelay
      */
     protected $lastCheckedDomainTimestamps = [];
 
+    protected Configuration $configuration;
+
     public function setConfiguration(Configuration $config): void
     {
-        $this->delaySeconds = $config->getCrawlDelaySeconds();
-        $this->noCrawlDelayDomains = $config->getCrawlDelayNodelay();
+        $this->configuration = $config;
     }
 
     /**
@@ -56,8 +52,8 @@ class CrawlDelay
      */
     public function crawlDelay(string $domain): int
     {
-        if ($domain === '' || in_array($domain, $this->noCrawlDelayDomains)) {
-            // skip delay
+        $delaySeconds = $this->getCrawlDelayByDomain($domain);
+        if ($delaySeconds === 0) {
             return 0;
         }
         /**
@@ -67,7 +63,7 @@ class CrawlDelay
         $current = \time();
 
         // check if delay necessary
-        $wait = $this->delaySeconds - ($current-$lastTimestamp);
+        $wait = $delaySeconds - ($current-$lastTimestamp);
         if ($wait > 0) {
             // wait now
             sleep($wait);
@@ -92,5 +88,23 @@ class CrawlDelay
         $current = \time();
         $this->lastCheckedDomainTimestamps[$domain] = $current;
         return true;
+    }
+
+    protected function getCrawlDelayByDomain(string $domain): int
+    {
+        if ($domain === '') {
+            return 0;
+        }
+
+        // check if domain should be skipped: do not use crawlDelay
+        if ($this->configuration->isCrawlDelayNoDelayRegex()) {
+            if (preg_match($this->configuration->getCrawlDelayNoDelayRegex(), $domain)) {
+                return 0;
+            }
+        } elseif (in_array($domain, $this->configuration->getCrawlDelayNodelayDomains())) {
+            // skip delay
+            return 0;
+        }
+        return $this->configuration->getCrawlDelaySeconds();
     }
 }

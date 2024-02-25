@@ -62,7 +62,9 @@ mod.brofix {
     # minimum number of second delay between checking URLs of the same domain
     seconds = 5
 
-    # comma separated list of domains to not use crawlDelay (can be used for internal sites)
+    # comma separated list of domains or regeix to not use crawlDelay (should be used for internal sites only!)
+    # e.g. nodelay = example.org, example.com
+    # e.g. nodelay = regex:/(.*\.)?example.(org|com)/
     nodelay =
   }
 
