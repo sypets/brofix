@@ -98,10 +98,10 @@ class CrawlDelay
 
         // check if domain should be skipped: do not use crawlDelay
         if ($this->configuration->isCrawlDelayNoDelayRegex()) {
-            if (preg_match ($this->configuration->getCrawlDelayNoDelayRegex(), $domain)) {
+            if (preg_match($this->configuration->getCrawlDelayNoDelayRegex(), $domain)) {
                 return 0;
             }
-        } else if (in_array($domain, $this->configuration->getCrawlDelayNodelayDomains())) {
+        } elseif (in_array($domain, $this->configuration->getCrawlDelayNodelayDomains())) {
             // skip delay
             return 0;
         }

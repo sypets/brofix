@@ -440,9 +440,8 @@ class Configuration
         $noDelayString = $this->getCrawlDelayNodelayString();
         if (str_starts_with($noDelayString, 'regex:')) {
             return [];
-        } else {
-            return explode(',', $$noDelayString);
         }
+        return explode(',', $$noDelayString);
     }
 
     /**
@@ -454,9 +453,8 @@ class Configuration
         $noDelayString = $this->getCrawlDelayNodelayString();
         if (str_starts_with($noDelayString, 'regex:')) {
             return [];
-        } else {
-            return explode(',', $noDelayString);
         }
+        return explode(',', $noDelayString);
     }
 
     public function isCrawlDelayNoDelayRegex(): bool
