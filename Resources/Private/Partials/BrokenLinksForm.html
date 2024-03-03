@@ -82,6 +82,32 @@
 				</option>
 			</select>
 		</div>
+
+		<div class="col">
+			<label for="brofix-list-select-check_status">
+				<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.label" extensionName="Brofix"/>:
+			</label>
+			<select id="brofix-list-select-check_status" name="check_status" class="form-control tceforms-select">
+				<option value="-1" {f:if(condition:'{filter.checkStatusFilter} == -1', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.all"/>
+				</option>
+				<option value="1" {f:if(condition:'{filter.checkStatusFilter} == 1', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.1"/>
+				</option>
+				<option value="2" {f:if(condition:'{filter.checkStatusFilter} == 2', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.2"/>
+				</option>
+				<option value="3" {f:if(condition:'{filter.checkStatusFilter} == 3', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.3"/>
+				</option>
+				<f:for each="{checkStatusOptions}" as="checkStatusOption">
+					<option value="{key}">{checkStatusOption}</option>
+				</f:for>
+			</select>
+		</div>
+
+
+
 	</div>
 	<div class="form-group">
 		<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"

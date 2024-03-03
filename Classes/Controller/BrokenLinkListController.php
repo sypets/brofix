@@ -7,10 +7,10 @@ namespace Sypets\Brofix\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
-use Sypets\Brofix\Linktype\ErrorParams;
 use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
@@ -96,6 +96,7 @@ class BrokenLinkListController extends AbstractBrofixController
         ],
         // sort by error type
         'error' => [
+            ['check_status', 'ASC'],
             ['link_type', 'ASC'],
             ['url_response', 'ASC']
         ],
@@ -526,7 +527,8 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
                 $this->filter,
-                self::ORDER_BY_VALUES[$this->orderBy] ?? []
+                self::ORDER_BY_VALUES[$this->orderBy] ?? [],
+                $this->filter->getCheckStatusFilter()
             );
             if ($brokenLinks) {
                 $totalCount = count($brokenLinks);
@@ -728,6 +730,7 @@ class BrokenLinkListController extends AbstractBrofixController
     {
         $languageService = $this->getLanguageService();
         $variables = [];
+        $linkTargetResponse = LinkTargetResponse::createInstanceFromJson($row['url_response']);
         // Restore the linktype object
         $hookObj = $this->hookObjectsArr[$row['link_type']];
         $isAdmin = $this->isAdmin();
@@ -798,6 +801,7 @@ class BrokenLinkListController extends AbstractBrofixController
         // show exclude link target button
         if (in_array($row['link_type'] ?? 'empty', $this->configuration->getExcludeLinkTargetAllowedTypes())
             && $this->backendUserHasPermissionsForExcludes
+            && !$linkTargetResponse->isExcluded()
         ) {
             $returnUrl = $this->constructBackendUri();
             $excludeUrl = (string)$uriBuilder->buildUriFromRoute('record_edit', [
@@ -852,33 +856,81 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['pagetitle'] = $path[0] ?? '';
 
         // error message
-        $response = $response = json_decode($row['url_response'], true);
-        $errorParams = new ErrorParams($response['errorParams']);
-        if ($response['valid']) {
-            $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->getLL('list.msg.ok')) . '</span>';
-        } else {
-            $linkMessage = sprintf(
-                '<span class="error" title="%s">%s</span>',
-                nl2br(
-                    htmlspecialchars(
-                        $errorParams->getExceptionMsg(),
-                        ENT_QUOTES,
-                        'UTF-8',
-                        false
+        switch ($linkTargetResponse->getStatus()) {
+            case LinkTargetResponse::RESULT_BROKEN:
+                $linkMessage = sprintf(
+                    '<span class="error" title="%s">%s</span>',
+                    nl2br(
+                        htmlspecialchars(
+                            $linkTargetResponse->getExceptionMessage(),
+                            ENT_QUOTES,
+                            'UTF-8',
+                            false
+                        )
+                    ),
+                    nl2br(
+                        // Encode for output
+                        htmlspecialchars(
+                            $hookObj->getErrorMessage($linkTargetResponse),
+                            ENT_QUOTES,
+                            'UTF-8',
+                            false
+                        )
                     )
-                ),
-                nl2br(
-                    // Encode for output
-                    htmlspecialchars(
-                        $hookObj->getErrorMessage($errorParams),
-                        ENT_QUOTES,
-                        'UTF-8',
-                        false
+                );
+                break;
+            case LinkTargetResponse::RESULT_OK:
+                $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->getLL('list.msg.ok')) . '</span>';
+                break;
+
+            case LinkTargetResponse::RESULT_CANNOT_CHECK:
+                // todo add language label
+                $linkMessage = sprintf(
+                    '<span class="status-cannot-check">%s</span>',
+                    htmlspecialchars($languageService->getLL('list.msg.status.cannot_check')) ?: 'Cannot check URL'
+                );
+                if ($linkTargetResponse->getReasonCannotCheck()) {
+                    $linkMessage .= ':' . $linkTargetResponse->getReasonCannotCheck();
+                }
+                $linkMessage .= ': ' . sprintf(
+                    '<span class="error" title="%s">%s</span>',
+                    nl2br(
+                        htmlspecialchars(
+                            $linkTargetResponse->getExceptionMessage(),
+                            ENT_QUOTES,
+                            'UTF-8',
+                            false
+                        )
+                    ),
+                    nl2br(
+                        // Encode for output
+                        htmlspecialchars(
+                            $hookObj->getErrorMessage($linkTargetResponse),
+                            ENT_QUOTES,
+                            'UTF-8',
+                            false
+                        )
                     )
-                )
-            );
+                );
+                break;
+
+            case LinkTargetResponse::RESULT_EXCLUDED:
+                // todo add language label
+                $linkMessage = sprintf(
+                    '<span class="status-excluded">%s</span>',
+                    htmlspecialchars($languageService->getLL('list.msg.status.excluded')) ?: 'URL is excluded, will not be checked'
+                );
+                break;
+            default:
+                // todo add language label
+                $linkMessage = sprintf(
+                    '<span class="status-unknown">%s</span>',
+                    htmlspecialchars($languageService->getLL('list.msg.status.unknown')) ?: 'Unknown status'
+                );
+                break;
         }
         $variables['linkmessage'] = $linkMessage;
+        $variables['status'] = $linkTargetResponse->getStatus();
 
         // link / URL
         $variables['linktarget'] = $hookObj->getBrokenUrl($row);
@@ -896,7 +948,7 @@ class BrokenLinkListController extends AbstractBrofixController
         } else {
             $variables['link_title'] = '';
         }
-        $variables['linktext'] = $hookObj->getBrokenLinkText($row, $errorParams->getCustom());
+        $variables['linktext'] = $hookObj->getBrokenLinkText($row, $linkTargetResponse->getCustom());
 
         // last check of record
         // show the oldest last_check, either for the record or for the link target

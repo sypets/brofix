@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller\Filter;
 
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Util\Arrayable;
 use TYPO3\CMS\Backend\Module\ModuleData;
 
@@ -18,12 +19,16 @@ class BrokenLinkListFilter implements Arrayable
     /** @var string */
     protected const KEY_URL_MATCH = 'urlMatch';
 
+    protected const KEY_CHECK_STATUS = 'checkStatus';
+
     /** @var string */
     protected const LINK_TYPE_FILTER_DEFAULT = 'all';
 
     protected const URL_MATCH_DEFAULT = 'partial';
 
     protected const LINK_TYPE_DEFAULT = 'all';
+
+    protected const CHECK_STATUS_DEFAULT = LinkTargetResponse::RESULT_BROKEN;
 
     /** @var int */
     public const PAGE_DEPTH_INFINITE = 999;
@@ -44,6 +49,8 @@ class BrokenLinkListFilter implements Arrayable
     /** @var string  */
     protected $urlFilterMatch = self::URL_MATCH_DEFAULT;
 
+    protected int $checkStatusFilter = self::CHECK_STATUS_DEFAULT;
+
     /**
      * @var string
      * @deprecated
@@ -54,12 +61,14 @@ class BrokenLinkListFilter implements Arrayable
         string $uid = '',
         string $linkType = self::LINK_TYPE_DEFAULT,
         string $url = '',
-        string $urlMatch = self::URL_MATCH_DEFAULT
+        string $urlMatch = self::URL_MATCH_DEFAULT,
+        int $checkStatus = self::CHECK_STATUS_DEFAULT
     ) {
         $this->uid_filtre = $uid;
         $this->linktype_filter = $linkType;
         $this->url_filtre = $url;
         $this->urlFilterMatch = $urlMatch;
+        $this->checkStatusFilter = $checkStatus;
     }
 
     public static function getInstanceFromModuleData(ModuleData $moduleData): BrokenLinkListFilter
@@ -68,7 +77,8 @@ class BrokenLinkListFilter implements Arrayable
             $moduleData->get('uid_searchFilter', ''),
             $moduleData->get('linktype_searchFilter', 'all'),
             $moduleData->get('url_searchFilter', ''),
-            $moduleData->get('url_match_searchFilter', 'partial')
+            $moduleData->get('url_match_searchFilter', 'partial'),
+            (int)$moduleData->get('check_status', (string)self::CHECK_STATUS_DEFAULT)
         );
     }
 
@@ -78,7 +88,8 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_UID] ?? '',
             $values[self::KEY_LINKTYPE] ?? self::LINK_TYPE_DEFAULT,
             $values[self::KEY_URL] ?? '',
-            $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT
+            $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
+            $values[self::KEY_CHECK_STATUS] ?? self::CHECK_STATUS_DEFAULT,
         );
     }
 
@@ -89,6 +100,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_LINKTYPE => $this->getLinktypeFilter(),
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
+            self::KEY_CHECK_STATUS => $this->getCheckStatusFilter(),
         ];
     }
 
@@ -155,6 +167,16 @@ class BrokenLinkListFilter implements Arrayable
     public function setUrlFilterMatch(string $urlFilterMatch): void
     {
         $this->urlFilterMatch = $urlFilterMatch;
+    }
+
+    public function getCheckStatusFilter(): int
+    {
+        return $this->checkStatusFilter;
+    }
+
+    public function setCheckStatusFilter(int $checkStatusFilter): void
+    {
+        $this->checkStatusFilter = $checkStatusFilter;
     }
 
     /** @deprecated */

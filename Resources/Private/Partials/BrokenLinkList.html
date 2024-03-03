@@ -107,7 +107,11 @@
 						</f:if>
 					</div>
 				</td>
-				<td>{item.linkmessage -> f:format.raw()}</td>
+				<td><f:if condition="{item.status} === 1"><core:icon identifier="actions-exclamation-triangle"/></f:if>
+					<f:if condition="{item.status} === 2"><core:icon identifier="actions-check-circle"/></f:if>
+					<f:if condition="{item.status} === 3"><core:icon identifier="actions-question-circle"/></f:if>
+					<f:if condition="{item.status} === 4"><core:icon identifier="actions-ban"/></f:if>
+					{item.linkmessage -> f:format.raw()}</td>
 				<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
 					<span class="freshness_{item.freshness}">{item.lastcheck}</span>
 					<f:if condition="{item.freshness} == 'stale'>">

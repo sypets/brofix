@@ -72,6 +72,10 @@ Info > Brofix (Broken Link Fixer)
     color: red;
 }
 
+#brofix-broken-links-table td span.status-cannot-check {
+    color: orange;
+}
+
 #brofix-broken-links-table td:first-child {
     border-left: none;
 }

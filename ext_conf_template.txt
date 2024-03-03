@@ -7,3 +7,8 @@ excludeSoftrefsInFields = tt_content.bodytext
 # cat=basic; type=int; label= Maximum number of pages to traverse in Backend. Limit is disabled if =0. This should be set to a hard limit for performance reasons.
 traverseMaxNumberOfPagesInBackend = 1000
 
+# cat=basic; type=bool; label=Show all links, not just broken links
+showalllinks = 1
+
+# cat=basic; type=bool; label=If check result matches this, link target is considered non-checkable, can be a regex if start with regex: or match start of, is errortype:errorcode:exception message
+combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/

@@ -3,19 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -23,6 +11,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * This class implements a persistent link target cache using
  * a database table.
+ * @internal
  */
 class LinkTargetPersistentCache extends AbstractLinkTargetCache
 {
@@ -70,10 +59,9 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
      * @param string $linkTarget
      * @param string $linkType
      * @param int $expire (optional, default is 0, in that case uses $this->expire)
-     * @return mixed[] returns URL response as array or
-     *   empty array if no entry
+     * @return LinkTargetResponse|null
      */
-    public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): array
+    public function getUrlResponseForUrl(string $linkTarget, string $linkType, int $expire = 0): ?LinkTargetResponse
     {
         $expire = $expire ?: $this->expire;
         $queryBuilder = $this->generateQueryBuilder();
@@ -90,36 +78,32 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             ->executeQuery()
             ->fetchAssociative();
         if (!$row) {
-            return [];
+            return null;
         }
-        $urlResponse = json_decode($row['url_response'], true);
-        $urlResponse['lastChecked'] = (int)$row['last_check'];
-        return $urlResponse;
+        return LinkTargetResponse::createInstanceFromJson($row['url_response']);
     }
 
     /**
      * Insert result / update existing result
      * @param string $linkTarget
      * @param string $linkType
-     * @param mixed[] $urlResponse
+     * @param LinkTargetResponse $linkTargetResponse
      */
-    public function setResult(string $linkTarget, string $linkType, array $urlResponse): void
+    public function setResult(string $linkTarget, string $linkType, LinkTargetResponse $linkTargetResponse): void
     {
-        $checkStatus = $urlResponse['valid'] ? self::CHECK_STATUS_OK : self::CHECK_STATUS_ERROR;
         if ($this->hasEntryForUrl($linkTarget, $linkType, false)) {
-            $this->update($linkTarget, $linkType, $urlResponse, $checkStatus);
+            $this->update($linkTarget, $linkType, $linkTargetResponse);
         } else {
-            $this->insert($linkTarget, $linkType, $urlResponse, $checkStatus);
+            $this->insert($linkTarget, $linkType, $linkTargetResponse);
         }
     }
 
     /**
      * @param string $linkTarget
      * @param string $linkType
-     * @param mixed[] $urlResponse
-     * @param int $checkStatus
+     * @param LinkTargetResponse $linkTargetResponse
      */
-    protected function insert(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
+    protected function insert(string $linkTarget, string $linkType, LinkTargetResponse $linkTargetResponse): void
     {
         $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
@@ -128,21 +112,15 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 [
                     'url' => $linkTarget,
                     'link_type' => $linkType,
-                    'url_response' => \json_encode($urlResponse),
-                    'check_status' => $checkStatus,
+                    'url_response' => $linkTargetResponse->toJson(),
+                    'check_status' => $linkTargetResponse->getStatus(),
                     'last_check' => \time()
                 ]
             )
             ->executeStatement();
     }
 
-    /**
-     * @param string $linkTarget
-     * @param string $linkType
-     * @param mixed[] $urlResponse
-     * @param int $checkStatus
-     */
-    protected function update(string $linkTarget, string $linkType, array $urlResponse, int $checkStatus): void
+    protected function update(string $linkTarget, string $linkType, LinkTargetResponse $linkTargetResponse): void
     {
         $queryBuilder = $this->generateQueryBuilder();
         $queryBuilder
@@ -151,8 +129,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                 $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
                 $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
             )
-            ->set('url_response', \json_encode($urlResponse))
-            ->set('check_status', (string)$checkStatus)
+            ->set('url_response', $linkTargetResponse->toJson())
+            ->set('check_status', (string)$linkTargetResponse->getStatus())
             ->set('last_check', (string)\time())
             ->executeStatement();
     }

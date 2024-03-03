@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Linktype;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -26,19 +27,20 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileLinktype extends AbstractLinktype
 {
-    public function __construct()
-    {
-        $this->initializeErrorParams();
-    }
+    public const ERROR_TYPE_MISSING = 'missing';
+
+    public const ERROR_CODE_FILE_MISSING = 1;
+
+    public const ERROR_CODE_FOLDER_MISSING = 2;
 
     /**
-     * Type fetching method, based on the type that softRefParserObj returns
-     *
-     * @param mixed[] $value Reference properties
-     * @param string $type Current type
-     * @param string $key Validator hook name
-     * @return string fetched type
-     */
+    * Type fetching method, based on the type that softRefParserObj returns
+    *
+    * @param mixed[] $value Reference properties
+    * @param string $type Current type
+    * @param string $key Validator hook name
+    * @return string fetched type
+    */
     public function fetchType(array $value, string $type, string $key): string
     {
         $tokenValue = $value['tokenValue'] ?? '';
@@ -57,12 +59,10 @@ class FileLinktype extends AbstractLinktype
      * @param string $url Url to check
      * @param mixed[] $softRefEntry The soft reference entry which builds the context of the url
      * @param int $flags see LinktypeInterface::checkLink(), not used here
-     * @return bool TRUE on success or FALSE on error
+     * @return LinkTargetResponse
      */
-    public function checkLink(string $url, array $softRefEntry, int $flags = 0): bool
+    public function checkLink(string $url, array $softRefEntry, int $flags = 0): LinkTargetResponse
     {
-        $this->initializeErrorParams();
-
         /**
          * @var ResourceFactory $resourceFactory
          */
@@ -70,21 +70,24 @@ class FileLinktype extends AbstractLinktype
         try {
             $file = $resourceFactory->retrieveFileOrFolderObject($url);
         } catch (FileDoesNotExistException $e) {
-            return false;
+            return LinkTargetResponse::createInstanceByError(self::ERROR_TYPE_MISSING, self::ERROR_CODE_FILE_MISSING);
         } catch (FolderDoesNotExistException $e) {
-            return false;
+            return LinkTargetResponse::createInstanceByError(self::ERROR_TYPE_MISSING, self::ERROR_CODE_FOLDER_MISSING);
         }
 
-        return (bool)(($file !== null) ? !$file->isMissing() : false);
+        if (!$file || $file->isMissing()) {
+            return LinkTargetResponse::createInstanceByError(self::ERROR_TYPE_MISSING, self::ERROR_CODE_FILE_MISSING);
+        }
+        return LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
     }
 
     /**
      * Generate the localized error message from the error params saved from the parsing
      *
-     * @param ErrorParams $errorParams All parameters needed for the rendering of the error message
+     * @param LinkTargetResponse|null $linkTargetResponse All parameters needed for the rendering of the error message
      * @return string error message
      */
-    public function getErrorMessage(ErrorParams $errorParams = null): string
+    public function getErrorMessage(?LinkTargetResponse $linkTargetResponse): string
     {
         return $this->getLanguageService()->getLL('list.report.error.file.notexisting');
     }

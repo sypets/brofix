@@ -15,6 +15,8 @@ namespace Sypets\Brofix\Linktype;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\Entity\Site;
@@ -57,34 +59,17 @@ class InternalLinktype extends AbstractLinktype
     protected const ERROR_ERRNO_NOTEXISTING = 4;
 
     /**
-     * Result of the check, if the current page uid is valid or not
-     *
-     * @var bool
-     */
-    protected $responsePage = true;
-
-    /**
-     * Result of the check, if the current content uid is valid or not
-     *
-     * @var bool
-     */
-    protected $responseContent = true;
-
-    /**
      * Checks a given URL + /path/filename.ext for validity
      *
      * @param string $url Url to check as page-id or page-id#anchor (if anchor is present)
      * @param mixed[] $softRefEntry: The soft reference entry which builds the context of that url
      * @param int $flags see LinktypeInterface::checkLink(), not used here
-     * @return bool TRUE on success or FALSE on error
+     * @return LinkTargetResponse
      */
-    public function checkLink(string $url, array $softRefEntry, int $flags = 0): bool
+    public function checkLink(string $url, array $softRefEntry, int $flags = 0): LinkTargetResponse
     {
-        $this->initializeErrorParams();
-
         $contentUid = 0;
         $pageUid = 0;
-        $this->responseContent = true;
 
         // Only check pages records. Content elements will also be checked
         // as we extract the contentUid in the next step.
@@ -94,7 +79,7 @@ class InternalLinktype extends AbstractLinktype
             $table = 'pages';
         }
         if (!in_array($table, ['pages', 'tt_content'], true)) {
-            return true;
+            return LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
         }
         // Defines the linked page and contentUid (if any).
         if (strpos($url, '#c') !== false) {
@@ -117,23 +102,31 @@ class InternalLinktype extends AbstractLinktype
             $pageUid = (int)($url);
         }
         // Check if the linked page is OK
-        $this->responsePage = $this->checkPage($pageUid);
+        $linkTargetResponse = $this->checkPage($pageUid);
+        if ($linkTargetResponse && !$linkTargetResponse->isOk()) {
+            return $linkTargetResponse;
+        }
+
+        // keep checking
         // Check if the linked content element is OK
         if ($contentUid) {
             // Check if the content element is OK
-            $this->responseContent = $this->checkContent($pageUid, $contentUid);
+            $linkTargetResponse = $this->checkContent($pageUid, $contentUid);
+            if ($linkTargetResponse && !$linkTargetResponse->isOk()) {
+                return $linkTargetResponse;
+            }
         }
 
-        return  $this->responsePage && $this->responseContent;
+        return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
     }
 
     /**
      * Checks a given page uid for validity
      *
      * @param int $pageUid Page uid to check
-     * @return bool TRUE on success or FALSE on error
+     * @return LinkTargetResponse return null if ok
      */
-    protected function checkPage(int $pageUid): bool
+    protected function checkPage(int $pageUid): ?LinkTargetResponse
     {
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
@@ -166,50 +159,54 @@ class InternalLinktype extends AbstractLinktype
 
         if ($row) {
             if ($row['deleted'] == '1') {
-                $errorType = self::ERROR_TYPE_PAGE;
-                $errno = self::ERROR_ERRNO_DELETED;
-
                 $customParams = [
                     'page' => [
                         'title' => $row['title'],
                         'uid'   => $row['uid']
                     ]
                 ];
-            } elseif ($reportHiddenRecords
+                return LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_PAGE,
+                    self::ERROR_ERRNO_DELETED,
+                    '',
+                    '',
+                    $customParams
+                );
+            }
+            if ($reportHiddenRecords
                 && ($row['hidden'] == '1'
                 || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
                 || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
-                $errorType = self::ERROR_TYPE_PAGE;
-                $errno = self::ERROR_ERRNO_HIDDEN;
-            }
-
-            if ($errorType !== '') {
                 $customParams = [
                     'page' => [
                         'title' => $row['title'],
                         'uid'   => $row['uid']
                     ]
                 ];
+                return LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_PAGE,
+                    self::ERROR_ERRNO_HIDDEN,
+                    '',
+                    '',
+                    $customParams
+                );
             }
         } else {
-            $errorType = self::ERROR_TYPE_PAGE;
-            $errno = self::ERROR_ERRNO_NOTEXISTING;
             $customParams = [
                 'page' => [
                     'uid' => $pageUid
                 ]
             ];
+            return LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_PAGE,
+                self::ERROR_ERRNO_NOTEXISTING,
+                '',
+                '',
+                $customParams
+            );
         }
-
-        if ($customParams) {
-            $customParams['page']['errno'] = $errno;
-            $this->errorParams->setCustom($customParams);
-        }
-        $this->errorParams->setErrorType($errorType);
-        $this->errorParams->setErrno($errno);
-
-        return $errorType === '';
+        return null;
     }
 
     /**
@@ -217,9 +214,9 @@ class InternalLinktype extends AbstractLinktype
      *
      * @param int $pageUid Uid of the page to which the link is pointing
      * @param int $contentUid Uid of the content element to check
-     * @return bool TRUE on success or FALSE on error
+     * @return LinkTargetResponse|null null on success
      */
-    protected function checkContent(int $pageUid, int $contentUid): bool
+    protected function checkContent(int $pageUid, int $contentUid): ?LinkTargetResponse
     {
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
@@ -237,19 +234,6 @@ class InternalLinktype extends AbstractLinktype
             )
             ->executeQuery()
             ->fetchAssociative();
-        $this->responseContent = true;
-
-        $customParams = [];
-
-        /**
-         * @var string
-         */
-        $errorType = '';
-
-        /**
-         * @var int
-         */
-        $errno = 0;
 
         // this content element exists
         if ($row) {
@@ -258,9 +242,6 @@ class InternalLinktype extends AbstractLinktype
             // Check if the element is on the linked page
             // (The element might have been moved to another page)
             if ($correctPageID !== $pageUid) {
-                $errorType = self::ERROR_TYPE_CONTENT;
-                $errno = self::ERROR_ERRNO_MOVED;
-
                 $customParams = [
                     'content' => [
                         'uid' => $contentUid,
@@ -268,71 +249,85 @@ class InternalLinktype extends AbstractLinktype
                         'rightPage' => $correctPageID
                     ]
                 ];
-            } elseif ($row['deleted'] == '1') {
+                return LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_CONTENT,
+                    self::ERROR_ERRNO_MOVED,
+                    '',
+                    '',
+                    $customParams
+                );
+            }
+            if ($row['deleted'] == '1') {
                 // The element is located on the page to which the link is pointing
-                $errorType = self::ERROR_TYPE_CONTENT;
-                $errno = self::ERROR_ERRNO_DELETED;
                 $customParams = [
                     'content' => [
                         'title' => $row['header'],
                         'uid'   => $row['uid']
                     ]
                 ];
-            } elseif ($reportHiddenRecords
+                return LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_CONTENT,
+                    self::ERROR_ERRNO_DELETED,
+                    '',
+                    '',
+                    $customParams
+                );
+            }
+            if ($reportHiddenRecords
                 && ($row['hidden'] == '1'
                 || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
                 || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
-                $errorType = self::ERROR_TYPE_CONTENT;
-                $errno = self::ERROR_ERRNO_HIDDEN;
                 $customParams = [
                     'content' => [
                         'title' => $row['header'],
                         'uid'   => $row['uid']
                     ]
                 ];
+                return LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_CONTENT,
+                    self::ERROR_ERRNO_HIDDEN,
+                    '',
+                    '',
+                    $customParams
+                );
             }
         } else {
             // The content element does not exist
-            $errorType = self::ERROR_TYPE_CONTENT;
-            $errno = self::ERROR_ERRNO_NOTEXISTING;
             $customParams = [
                 'content' => [
                     'uid' => $contentUid
                 ]
             ];
+            return LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_CONTENT,
+                self::ERROR_ERRNO_NOTEXISTING,
+                '',
+                '',
+                $customParams
+            );
         }
 
-        if ($customParams) {
-            $customParams['content']['errno'] = $errno;
-            $this->errorParams->addCustom($customParams);
-        }
-        // error type content should not override error type page - there is only 1 main errorType
-        if ($this->errorParams->getErrorType() === '') {
-            $this->errorParams->setErrorType($errorType);
-        }
-        $this->errorParams->setErrno($errno);
-
-        return $errorType === '';
+        return null;
     }
 
     /**
      * Generates the localized error message from the error params saved from the parsing
      *
-     * @param ErrorParams $errorParams All parameters needed for the rendering of the error message
+     * @param LinkTargetResponse|null $linkTargetResponse All parameters needed for the rendering of the error message
      * @return string Validation error message
      */
-    public function getErrorMessage(ErrorParams $errorParams = null): string
+    public function getErrorMessage(?LinkTargetResponse $linkTargetResponse): string
     {
-        if ($errorParams === null) {
-            $errorParams = $this->errorParams;
+        if ($linkTargetResponse === null) {
+            return '';
         }
 
         $lang = $this->getLanguageService();
-        $custom = $errorParams->getCustom();
+        $custom = $linkTargetResponse->getCustom();
 
-        if ($custom['page'] ?? false) {
-            switch ($custom['page']['errno']) {
+        if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_PAGE) {
+            switch ($linkTargetResponse->getErrno()) {
                 case self::ERROR_ERRNO_DELETED:
                     $errorPage = $lang->getLL('list.report.error.page.deleted');
                     break;
@@ -342,9 +337,8 @@ class InternalLinktype extends AbstractLinktype
                 default:
                     $errorPage = $lang->getLL('list.report.error.page.notexisting');
             }
-        }
-        if ($custom['content'] ?? false) {
-            switch ($custom['content']['errno'] ?? false) {
+        } elseif ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_CONTENT) {
+            switch ($linkTargetResponse->getErrno()) {
                 case self::ERROR_ERRNO_DELETED:
                     $errorContent = $lang->getLL('list.report.error.content.deleted');
                     break;
