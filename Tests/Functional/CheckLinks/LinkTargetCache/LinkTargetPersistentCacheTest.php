@@ -83,7 +83,8 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
             'errno' => $errno,
             'exceptionMessage' => $exceptionMsg,
             'message' => $errorMessage,
-            'custom' => []
+            'custom' => [],
+            'reasonCannotCheck' => ''
 
         ];
 

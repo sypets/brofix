@@ -313,6 +313,9 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
         $combinedErrorNonCheckableMatch =  $this->configuration->getCombinedErrorNonCheckableMatch();
         $combinedError = $linkTargetResponse->getCombinedError(true);
+        if (!$combinedErrorNonCheckableMatch || $combinedError) {
+            return false;
+        }
 
         if (str_starts_with($combinedErrorNonCheckableMatch, 'regex:')) {
             $regex = trim(substr($combinedErrorNonCheckableMatch, strlen('regex:')));
