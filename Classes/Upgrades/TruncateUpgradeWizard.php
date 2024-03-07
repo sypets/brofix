@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 namespace Sypets\Brofix\Upgrades;
 
@@ -17,7 +18,8 @@ final class TruncateUpgradeWizard implements UpgradeWizardInterface
 
     public function __construct(
         private readonly ConnectionPool $connectionPool,
-    ) {}
+    ) {
+    }
 
     public function getTitle(): string
     {
@@ -46,9 +48,13 @@ final class TruncateUpgradeWizard implements UpgradeWizardInterface
                 ->count('*')
                 ->from($table)
                 ->where(
-                    $queryBuilder->expr()->notLike('url_response',
-                        $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards('{"status":') . '%',
-                            Connection::PARAM_STR))
+                    $queryBuilder->expr()->notLike(
+                        'url_response',
+                        $queryBuilder->createNamedParameter(
+                            '%' . $queryBuilder->escapeLikeWildcards('{"status":') . '%',
+                            Connection::PARAM_STR
+                        )
+                    )
                 )
                 ->executeQuery()
                 ->fetchOne()) {
@@ -62,5 +68,4 @@ final class TruncateUpgradeWizard implements UpgradeWizardInterface
     {
         return [];
     }
-
 }

@@ -62,9 +62,13 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @see LinkTargetResponse
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, BrokenLinkListFilter $filter,
-        array $orderBy = []): array
-    {
+    public function getBrokenLinks(
+        array $pageList,
+        array $linkTypes,
+        array $searchFields,
+        BrokenLinkListFilter $filter,
+        array $orderBy = []
+    ): array {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageList, $max)

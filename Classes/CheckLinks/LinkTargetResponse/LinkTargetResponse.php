@@ -25,7 +25,6 @@ class LinkTargetResponse
 
     public const REASON_CANNOT_CHECK_CLOUDFLARE = 'cloudflare';
 
-
     protected int $status;
     protected int $lastChecked = 0;
 
@@ -262,8 +261,6 @@ class LinkTargetResponse
     {
         $this->reasonCannotCheck = $reasonCannotCheck;
     }
-
-
 
     public function getCombinedError(bool $withExceptionString = false): string
     {
