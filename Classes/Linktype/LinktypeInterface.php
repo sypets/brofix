@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Linktype;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Configuration\Configuration;
 
 /**
@@ -32,9 +33,9 @@ interface LinktypeInterface
      * @param mixed[] $softRefEntry The soft reference entry which builds the context of that url
      * @param int $flags can be a combination of flags, see flags defined in AbstractLinktype, e.g.
      *   e.g. AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY
-     * @return bool true on success
+     * @return LinkTargetResponse
      */
-    public function checkLink(string $url, array $softRefEntry, int $flags = 0): bool;
+    public function checkLink(string $url, array $softRefEntry, int $flags = 0): LinkTargetResponse;
 
     /**
      * Base type fetching method, based on the type that softRefParserObj returns.
@@ -47,33 +48,12 @@ interface LinktypeInterface
     public function fetchType(array $value, string $type, string $key): string;
 
     /**
-     * @param mixed[]|null $params
-     */
-    public function initializeErrorParams(array $params = null): void;
-
-    /**
-     * Get the value of the private property errorParams.
-     *
-     * @return ErrorParams All parameters needed for the rendering of the error message
-     */
-    public function getErrorParams(): ErrorParams;
-
-    /**
      * Generate the localized error message from the error params saved from the parsing
      *
-     * @param ErrorParams $errorParams All parameters needed for the rendering of the error message
+     * @param LinkTargetResponse|null $linkTargetResponse All parameters needed for the rendering of the error message
      * @return string Validation error message
      */
-    public function getErrorMessage(ErrorParams $errorParams = null): string;
-
-    public function getLastChecked(): int;
-
-    /**
-     * Check if URL is being excluded.
-     *
-     * @return bool
-     */
-    public function isExcludeUrl(): bool;
+    public function getErrorMessage(?LinkTargetResponse $linkTargetResponse): string;
 
     /**
      * Construct a valid Url for browser output

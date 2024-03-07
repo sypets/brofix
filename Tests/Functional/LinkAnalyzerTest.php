@@ -17,6 +17,7 @@ namespace Sypets\Brofix\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
@@ -53,9 +54,12 @@ class LinkAnalyzerTest extends AbstractFunctional
      * @param array<string|int> $pidList
      * @return LinkAnalyzer
      */
-    protected function initializeLinkAnalyzer(array $pidList): LinkAnalyzer
+    protected function initializeLinkAnalyzer(array $pidList, ?Configuration $configuration = null): LinkAnalyzer
     {
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
+        if (!$configuration) {
+            $configuration = $this->configuration;
+        }
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
         return $linkAnalyzer;
@@ -322,7 +326,10 @@ class LinkAnalyzerTest extends AbstractFunctional
     {
         // setup
         $this->importDataSet($inputFile);
-        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
+        $configuration = $this->configuration;
+        // make sure no DB entries are created for not broken links
+        $configuration->setShowAllLinks(false);
+        $linkAnalyzer = $this->initializeLinkAnalyzer($pidList, $configuration);
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
 
         // assert

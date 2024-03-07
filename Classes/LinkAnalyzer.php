@@ -22,6 +22,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Parser\LinkParser;
@@ -101,8 +102,6 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param string $message
      * @param mixed[] $record
      * @return int Number of broken link records removed
-     *
-     * @todo make message more flexible, broken link records could get removed or changed
      */
     public function recheckUrl(string &$message, array $record, ServerRequestInterface $request): int
     {
@@ -116,9 +115,9 @@ class LinkAnalyzer implements LoggerAwareInterface
             // get fresh result for URL
             $mode = AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY | AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE
                 | AbstractLinktype::CHECK_LINK_FLAG_SYNCHRONOUS;
-            $result = $linktypeObject->checkLink($url, [], $mode);
-            if ($result === true) {
-                // URL is ok, remove broken link records
+            $linkTargetResponse = $linktypeObject->checkLink($url, [], $mode);
+            if ($linkTargetResponse->isOk() && !$this->configuration->isShowAllLinks()) {
+                // URL is ok and broken link list does not contain unbroken links, remove broken link records
                 $count = $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
                     $url,
                     $linkType,
@@ -174,14 +173,10 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
             }
 
-            // URL is not ok, update records (error type may have changed)
-            $response = [
-                    'valid' => false,
-                    'errorParams' => $linktypeObject->getErrorParams()->toArray()
-                ];
             $brokenLinkRecord = [];
             $brokenLinkRecord['url'] = $url;
-            $brokenLinkRecord['url_response'] = json_encode($response) ?: '';
+            $brokenLinkRecord['check_status'] = $linkTargetResponse->getStatus();
+            $brokenLinkRecord['url_response'] = $linkTargetResponse->toJson();
             // last_check reflects time of last check (is now because URL not fetched from cache)
             $brokenLinkRecord['last_check_url'] = \time();
             $brokenLinkRecord['last_check'] = \time();
@@ -190,11 +185,13 @@ class LinkAnalyzer implements LoggerAwareInterface
                     'link_type' => $linkType
                 ];
             $count = $this->brokenLinkRepository->updateBrokenLink($brokenLinkRecord, $identifier);
-            $message = sprintf(
-                $this->getLanguageService()->getLL('list.recheck.url.notok.updated'),
-                $url,
-                $count
-            );
+            if ($linkTargetResponse->isError()) {
+                $message = sprintf(
+                    $this->getLanguageService()->getLL('list.recheck.url.notok.updated'),
+                    $url,
+                    $count
+                );
+            }
             return $count;
         }
         if ($message === '') {
@@ -337,29 +334,27 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['url'] = (string)$url;
 
                 $this->debug("checkLinks: before checking $url");
-                $checkUrl = $linktypeObject->checkLink((string)$url, $entryValue, $mode);
+                /** @var LinkTargetResponse $linkTargetResponse */
+                $linkTargetResponse = $linktypeObject->checkLink((string)$url, $entryValue, $mode);
                 $this->debug("checkLinks: after checking $url");
 
-                if ($linktypeObject->isExcludeUrl()) {
+                if ($linkTargetResponse->isExcluded()) {
                     $this->statistics->incrementCountExcludedLinks();
                 }
 
                 // Broken link found
-                if (!$checkUrl) {
-                    $response = [
-                        'valid' => false,
-                        'errorParams' => $linktypeObject->getErrorParams()->toArray()
-                    ];
-                    $record['url_response'] = json_encode($response) ?: '';
+                if ($linkTargetResponse->isError() || $linkTargetResponse->isCannotCheck()) {
+                    $record['url_response'] = $linkTargetResponse->toJson();
+                    $record['check_status'] = $linkTargetResponse->getStatus();
                     // last_check reflects time of last check (may be older if URL was in cache)
-                    $record['last_check_url'] = $linktypeObject->getLastChecked() ?: \time();
+                    $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                     $this->statistics->incrementCountBrokenLinks();
-                } elseif (GeneralUtility::_GP('showalllinks')) {
-                    $response = ['valid' => true];
-                    $record['url_response'] = json_encode($response) ?: '';
-                    $record['last_check_url'] = $linktypeObject->getLastChecked() ?: \time();
+                } elseif ($this->configuration->isShowAllLinks()) {
+                    $record['check_status'] = $linkTargetResponse->getStatus();
+                    $record['url_response'] = $linkTargetResponse->toJson();
+                    $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                 }

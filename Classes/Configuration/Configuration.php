@@ -109,6 +109,11 @@ class Configuration
      */
     protected int $traverseMaxNumberOfPagesInBackend = 0;
 
+    /** Show all links, not just the broken links */
+    protected bool $showAllLinks = true;
+
+    protected string $combinedErrorNonCheckableMatch = 'regex:/^httpStatusCode:(401|403):/';
+
     /**
      * @var string[]
      *
@@ -128,11 +133,13 @@ class Configuration
 
     /**
      * Configuration constructor.
-     * @param array<mixed> $extConfArray
+     * @param array<mixed> $extConfArray ExtensionConfiguration array
      */
     public function __construct(array $extConfArray)
     {
         // initialize from extension configuration
+        $this->showAllLinks = (bool)($extConfArray['showalllinks'] ?? true);
+        $this->combinedErrorNonCheckableMatch = $extConfArray['combinedErrorNonCheckableMatch'] ?? '';
         $this->excludeSoftrefs = explode(',', $extConfArray['excludeSoftrefs'] ?? '');
         $this->excludeSoftrefsInFields = explode(',', $extConfArray['excludeSoftrefsInFields'] ?? '');
         $this->setTraverseMaxNumberOfPagesInBackend(
@@ -642,6 +649,21 @@ class Configuration
     public function getExcludeSoftrefsInFields(): array
     {
         return $this->excludeSoftrefsInFields;
+    }
+
+    public function isShowAllLinks(): bool
+    {
+        return $this->showAllLinks;
+    }
+
+    public function setShowAllLinks(bool $showAllLinks): void
+    {
+        $this->showAllLinks = $showAllLinks;
+    }
+
+    public function getCombinedErrorNonCheckableMatch(): string
+    {
+        return $this->combinedErrorNonCheckableMatch;
     }
 
     public function getLinktypeObject(string $linktype): ?LinktypeInterface

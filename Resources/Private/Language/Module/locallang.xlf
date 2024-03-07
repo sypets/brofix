@@ -111,7 +111,24 @@
 			<trans-unit id="list.filter.view" resname="list.filter.view">
 				<source>View</source>
 			</trans-unit>
-
+			<trans-unit id="list.filter.check_status.label" resname="list.filter.check_status.label">
+				<source>Check status</source>
+			</trans-unit>
+			<trans-unit id="list.filter.check_status.all" resname="list.filter.check_status.all">
+				<source>all</source>
+			</trans-unit>
+			<trans-unit id="list.filter.check_status.1" resname="list.filter.check_status.1">
+				<source>broken</source>
+			</trans-unit>
+			<trans-unit id="list.filter.check_status.2" resname="list.filter.check_status.2">
+				<source>ok</source>
+			</trans-unit>
+			<trans-unit id="list.filter.check_status.3" resname="list.filter.check_status.3">
+				<source>cannot check</source>
+			</trans-unit>
+			<trans-unit id="list.filter.check_status.4" resname="list.filter.check_status.4">
+				<source>excluded</source>
+			</trans-unit>
 
 			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
 				<source>Recheck links</source>

@@ -54,39 +54,11 @@ abstract class AbstractLinktype implements LinktypeInterface
      */
     public const CHECK_LINK_FLAG_SYNCHRONOUS = 8;
 
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /**
-     * Contains parameters needed for the rendering of the error message
-     *
-     * @var ErrorParams
-     */
-    protected $errorParams;
+    protected ?Configuration $configuration = null;
 
     public function setConfiguration(Configuration $configuration): void
     {
         $this->configuration = $configuration;
-    }
-
-    /**
-     * @param mixed[]|null $params
-     */
-    public function initializeErrorParams(array $params = null): void
-    {
-        $this->errorParams = new ErrorParams($params);
-    }
-
-    /**
-     * Get the value of the private property errorParams
-     *
-     * @return ErrorParams All parameters needed for the rendering of the error message
-     */
-    public function getErrorParams(): ErrorParams
-    {
-        return $this->errorParams;
     }
 
     /**
@@ -108,21 +80,6 @@ abstract class AbstractLinktype implements LinktypeInterface
             $type = $newType;
         }
         return $type;
-    }
-
-    public function getLastChecked(): int
-    {
-        return \time();
-    }
-
-    /**
-     * Check if URL is being excluded.
-     *
-     * @return bool
-     */
-    public function isExcludeUrl(): bool
-    {
-        return false;
     }
 
     /**

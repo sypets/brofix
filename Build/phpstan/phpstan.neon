@@ -21,3 +21,5 @@ parameters:
 
   excludePaths:
     - ../../Classes/Hooks/DataHandlerHook.php
+
+  treatPhpDocTypesAsCertain: false

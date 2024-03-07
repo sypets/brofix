@@ -24,6 +24,10 @@ define(['jquery'], function($) {
       $('#refreshLinkList').click();
     })
 
+    $('#brofix-list-select-check_status').on('change', function () {
+      $('#refreshLinkList').click();
+    })
+
     $('#url_match_searchFilter').on('change', function () {
       $('#refreshLinkList').click();
     })
@@ -38,6 +42,7 @@ define(['jquery'], function($) {
       $('#linktype_searchFilter').val('all');
       $('#url_searchFilter').attr('value', '');
       $('#url_match_searchFilter').val('partial');
+      $('#brofix-list-select-check_status').val('1');
       $('#refreshLinkList').click();
     });
 

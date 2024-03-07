@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -56,10 +57,18 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @param array<string,array<string>> $searchFields
      * @param array<array<string>> $orderBy
      * @param BrokenLinkListFilter $filter
+     * @param array<mixed> $orderBy
      * @return mixed[]
+     *
+     * @see LinkTargetResponse
      */
-    public function getBrokenLinks(array $pageList, array $linkTypes, array $searchFields, BrokenLinkListFilter $filter, array $orderBy = []): array
-    {
+    public function getBrokenLinks(
+        array $pageList,
+        array $linkTypes,
+        array $searchFields,
+        BrokenLinkListFilter $filter,
+        array $orderBy = []
+    ): array {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageList, $max)
@@ -153,6 +162,13 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
+            $checkStatus = $filter->getCheckStatusFilter();
+            if ($checkStatus !== LinkTargetResponse::RESULT_ALL) {
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq(self::TABLE . '.check_status', $queryBuilder->createNamedParameter($checkStatus, Connection::PARAM_INT))
+                );
+            }
+
             if ($orderBy !== []) {
                 $values = array_shift($orderBy);
                 if ($values && is_array($values) && count($values) === 2) {
@@ -191,7 +207,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      */
     public function hasPageBrokenLinks(int $pageId, bool $withEditableByUser = true): bool
     {
-        $count = $this->getLinkCountForPage($pageId, $withEditableByUser);
+        $count = $this->getLinkCountForPage($pageId, $withEditableByUser, LinkTargetResponse::RESULT_BROKEN);
         return $count !== 0;
     }
 
@@ -200,36 +216,40 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @param int $pageId
      * @param bool $withEditableByUser if true, only count broken links for records editable by user
+     * @param int $withStatus (or -1 for all)
      * @return int
      *
-     * @todo use $withEditableByUser
+     * @todo $withEditableByUser is not used
      */
-    public function getLinkCountForPage(int $pageId, bool $withEditableByUser = true): int
+    public function getLinkCountForPage(int $pageId, bool $withEditableByUser = true, int $withStatus = LinkTargetResponse::RESULT_BROKEN): int
     {
         $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
-        return (int)$queryBuilder
+        $stmt = $queryBuilder
             ->count('uid')
             ->from(self::TABLE)
-            ->where(
-                $queryBuilder->expr()->or(
-                    $queryBuilder->expr()->and(
-                        $queryBuilder->expr()->eq(
-                            self::TABLE . '.record_uid',
-                            $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
-                        ),
-                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+            ->where($queryBuilder->expr()->or(
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                        self::TABLE . '.record_uid',
+                        $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
                     ),
-                    $queryBuilder->expr()->and(
-                        $queryBuilder->expr()->eq(
-                            self::TABLE . '.record_pid',
-                            $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
-                        ),
-                        $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
-                    )
+                    $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                ),
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                        self::TABLE . '.record_pid',
+                        $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+                    ),
+                    $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
                 )
-            )
-            ->executeQuery()
+            ));
+
+        if ($withStatus !== -1) {
+            $stmt->andWhere($queryBuilder->expr()->eq('check_status', $withStatus));
+        }
+
+        return (int)$stmt->executeQuery()
             ->fetchOne();
     }
 
@@ -507,7 +527,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         }
     }
 
-    /*
+    /**
      * Remove all broken links that match a link target.
      *
      * @param string $linkTarget

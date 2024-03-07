@@ -15,6 +15,15 @@ Changelog
    `commit messages <https://github.com/sypets/brofix/commits/main/>`__
    in the GitHub repository: https://github.com/sypets/brofix
 
+6.x
+===
+
+.. toctree::
+   :glob:
+   :titlesonly:
+
+   Entries/6.x/*
+
 3.2.0
 =====
 

@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Linktype;
  * The TYPO3 project - inspiring people to share!
  */
 
+use GeorgRinger\News\Domain\Model\Link;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -28,6 +29,7 @@ use Sypets\Brofix\CheckLinks\CrawlDelay;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetCacheInterface;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -57,11 +59,14 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      * Current URL is excluded from checking - handle as valid.
      *
      * @var bool
+     *
+     * @deprecated
      */
     protected $isExcludeUrl = false;
 
     /**
      * @var int
+     * @deprecated
      */
     protected $lastChecked = 0;
 
@@ -91,7 +96,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         LinkTargetCacheInterface $linkTargetCache = null,
         CrawlDelay $crawlDelay = null
     ) {
-        $this->initializeErrorParams();
         $this->requestFactory = $requestFactory ?: GeneralUtility::makeInstance(RequestFactory::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
         $this->linkTargetCache = $linkTargetCache ?: GeneralUtility::makeInstance(LinkTargetPersistentCache::class);
@@ -105,33 +109,9 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         $this->crawlDelay->setConfiguration($this->configuration);
     }
 
-    /**
-     * @param string $url
-     * @return bool
-     */
-    protected function getResultForUrlFromCache(string $url): bool
+    protected function insertIntoLinkTargetCache(string $url, LinkTargetResponse $linkTargetResponse): void
     {
-        /**
-         *  'valid' => bool,
-         *  'isExcluded' => bool,
-         *  'errorParams' => array
-         *  'lastChecked' => int
-         */
-        $urlResponse = $this->linkTargetCache->getUrlResponseForUrl($url, 'external');
-
-        $this->errorParams->initialize($urlResponse['errorParams'] ?? []);
-        $this->lastChecked = $urlResponse['lastChecked'] ?? 0;
-        return (bool)($urlResponse['valid'] ?? false);
-    }
-
-    /**
-     * @param string $url
-     * @param bool $isValid
-     */
-    protected function insertIntoLinkTargetCache(string $url, bool $isValid): void
-    {
-        $urlResponse = $this->linkTargetCache->generateUrlResponse($isValid, $this->errorParams);
-        $this->linkTargetCache->setResult($url, 'external', $urlResponse);
+        $this->linkTargetCache->setResult($url, 'external', $linkTargetResponse);
     }
 
     /**
@@ -140,20 +120,17 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      * @param string $origUrl The URL to check
      * @param mixed[] $softRefEntry The soft reference entry which builds the context of that URL
      * @param int $flags can be a combination of flags defined in AbstractLinktype CHECK_LINK_FLAG_*
-     * @return bool true on success or false on error
+     * @return LinkTargetResponse
      * @throws \InvalidArgumentException
      */
-    public function checkLink(string $origUrl, array $softRefEntry, int $flags = 0): bool
+    public function checkLink(string $origUrl, array $softRefEntry, int $flags = 0): LinkTargetResponse
     {
-        $isValidUrl = false;
-        $this->initializeErrorParams();
+        $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
 
         // check if URL should be excluded, treat excluded URLs as valid URLs
         if ($this->excludeLinkTarget->isExcluded($origUrl, 'external')) {
-            $this->isExcludeUrl = true;
-            return true;
+            return LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_EXCLUDED);
         }
-        $this->isExcludeUrl = false;
 
         // use URL from cache, if available
         if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE) === 0)
@@ -170,25 +147,17 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 'external',
                 $this->configuration->getLinkTargetCacheExpires($flags)
             );
-            if ($urlResponse !== []) {
-                $this->errorParams->initialize($urlResponse['errorParams'] ?? []);
-                $this->lastChecked = $urlResponse['lastChecked'] ?? 0;
-                $result = (bool)($urlResponse['valid'] ?? false);
-
-                if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE_ON_ERROR) !== 0) && $result === false) {
+            if ($urlResponse) {
+                if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE_ON_ERROR) !== 0)
+                    && $urlResponse->getStatus() === LinkTargetResponse::RESULT_BROKEN) {
                     // make sure result is fresh if invalid URL
                     // skip cache result here and continue checking
-                    $this->initializeErrorParams();
-                    $this->lastChecked = 0;
                 } else {
-                    return $result;
+                    return $urlResponse;
                 }
             }
         }
 
-        /**
-         * @todo add typehint
-         */
         $cookieJar = GeneralUtility::makeInstance(CookieJar::class);
 
         $options = [
@@ -209,17 +178,16 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 $this->logger->debug('crawl delay=' . $delayed . ' for URL=' . $url);
             }
 
-            $isValidUrl = $this->requestUrl($url, 'HEAD', $options);
-            if (!$isValidUrl) {
+            $linkTargetResponse = $this->requestUrl($url, 'HEAD', $options);
+            if ($linkTargetResponse->isError()) {
                 // HEAD was not allowed or threw an error, now trying GET
                 $options['headers']['Range'] = 'bytes=0-4048';
-                $isValidUrl = $this->requestUrl($url, 'GET', $options);
+                $linkTargetRespone = $this->requestUrl($url, 'GET', $options);
             }
             $this->crawlDelay->setLastCheckedTime($this->domain);
         }
-        $this->lastChecked = \time();
-        $this->insertIntoLinkTargetCache($url, $isValidUrl);
-        return $isValidUrl;
+        $this->insertIntoLinkTargetCache($url, $linkTargetResponse);
+        return $linkTargetResponse;
     }
 
     /**
@@ -228,20 +196,20 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      * @param string $url
      * @param string $method
      * @param mixed[] $options
-     * @return bool
+     * @return LinkTargetResponse
      */
-    protected function requestUrl(string $url, string $method, array $options): bool
+    protected function requestUrl(string $url, string $method, array $options): LinkTargetResponse
     {
-        $this->initializeErrorParams();
-        $isValidUrl = false;
+        $responseHeaders = [];
         try {
             $response = $this->requestFactory->request($url, $method, $options);
             if ($response->getStatusCode() >= 300) {
-                $this->errorParams->setErrorType(self::ERROR_TYPE_HTTP_STATUS_CODE);
-                $this->errorParams->setErrno($response->getStatusCode());
-                $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+                $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_HTTP_STATUS_CODE,
+                    $response->getStatusCode()
+                );
             } else {
-                $isValidUrl = true;
+                $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
             }
             /* Guzzle Exceptions:
             * . \RuntimeException
@@ -255,87 +223,133 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             * ........└── TooManyRedirectsException
             */
         } catch (TooManyRedirectsException $e) {
-            $this->errorParams->setErrorType(self::ERROR_TYPE_TOO_MANY_REDIRECTS);
-            $this->errorParams->setExceptionMsg($e->getMessage());
-            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+            $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_TOO_MANY_REDIRECTS,
+                0,
+                '',
+                $e->getMessage()
+            );
         } catch (ClientException | ServerException $e) {
             // ClientException - A GuzzleHttp\Exception\ClientException is thrown for 400 level errors if the http_errors request option is set to true.
             // ServerException - A GuzzleHttp\Exception\ServerException is thrown for 500 level errors if the http_errors request option is set to true.
             if ($e->hasResponse()) {
-                $this->errorParams->setErrorType(self::ERROR_TYPE_HTTP_STATUS_CODE);
-                $this->errorParams->setErrno($e->getResponse()->getStatusCode());
+                $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_HTTP_STATUS_CODE,
+                    $e->getResponse()->getStatusCode()
+                );
+                $responseHeaders = $e->getResponse()->getHeaders();
             } else {
-                $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);
+                $linkTargetResponse = LinkTargetResponse::createInstanceByError(self::ERROR_TYPE_UNKNOWN);
             }
-            $this->errorParams->setExceptionMsg($e->getMessage());
-            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+            $linkTargetResponse->setExceptionMessage($e->getMessage());
         } catch (ConnectException | RequestException $e) {
             // RequestException - In the event of a networking error (connection timeout, DNS errors, etc.), a GuzzleHttp\Exception\RequestException is thrown.
             // Catching this exception will catch any exception that can be thrown while transferring requests.
             // ConnectException - A GuzzleHttp\Exception\ConnectException exception is thrown in the event of a networking error.
-            $this->errorParams->setExceptionMsg($e->getMessage());
             // RequestException has getHandlerContext
             // The contents of this array will vary depending on which handler you are
             // * using. It may also be just an empty array. Relying on this data will
             // * couple you to a specific handler, but can give more debug information
             // * when needed.
+            $exceptionMessage = $e->getMessage();
             $handlerContext = $e->getHandlerContext();
             if ((($handlerContext['errno'] ?? 0) !== 0) && (strncmp(
-                $this->errorParams->getExceptionMsg(),
+                $e->getMessage(),
                 'cURL error',
                 strlen('cURL error')
             ) === 0)) {
-                $this->errorParams->setErrorType(self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO);
-                $this->errorParams->setErrno((int)($handlerContext['errno']));
                 // use shorter error message
                 if (isset($handlerContext['error'])) {
-                    $this->errorParams->setExceptionMsg($handlerContext['error']);
+                    $exceptionMessage = $handlerContext['error'];
                 }
+                $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO,
+                    (int)($handlerContext['errno']),
+                    '',
+                    $exceptionMessage
+                );
             } else {
-                $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);
+                $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_UNKNOWN,
+                    0,
+                    '',
+                    $exceptionMessage
+                );
             }
-            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
         } catch (\InvalidArgumentException $e) {
-            $this->errorParams->setErrorType(self::ERROR_TYPE_UNABLE_TO_PARSE);
-            $this->errorParams->setExceptionMsg($e->getMessage());
+            $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_UNABLE_TO_PARSE,
+                0,
+                '',
+                $e->getMessage()
+            );
         } catch (\Exception $e) {
             // Generic catch for anything else that may go wrong
-            $this->errorParams->setErrorType(self::ERROR_TYPE_UNKNOWN);
-            $this->errorParams->setExceptionMsg($e->getMessage());
-            $this->errorParams->setMessage($this->getErrorMessage($this->errorParams));
+            $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_UNKNOWN,
+                0,
+                '',
+                $e->getMessage()
+            );
         }
-        return $isValidUrl;
+
+        if ($this->isCombinedErrorNonCheckable($linkTargetResponse)) {
+            $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+            foreach ($responseHeaders as $headerName => $headerValue) {
+                if (str_starts_with(mb_strtolower($headerName), 'cf-')) {
+                    $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_CLOUDFLARE);
+                }
+            }
+        }
+
+        return $linkTargetResponse;
     }
 
-    /**
-     * @return bool
-     */
-    public function isExcludeUrl(): bool
+    protected function isCombinedErrorNonCheckable(LinkTargetResponse $linkTargetResponse): bool
     {
-        return $this->isExcludeUrl;
-    }
+        if (!$this->configuration) {
+            return false;
+        }
 
-    public function getLastChecked(): int
-    {
-        return $this->lastChecked;
+        $combinedErrorNonCheckableMatch =  $this->configuration->getCombinedErrorNonCheckableMatch();
+        $combinedError = $linkTargetResponse->getCombinedError(true);
+        if (!$combinedErrorNonCheckableMatch || $combinedError) {
+            return false;
+        }
+
+        if (str_starts_with($combinedErrorNonCheckableMatch, 'regex:')) {
+            $regex = trim(substr($combinedErrorNonCheckableMatch, strlen('regex:')));
+            if (preg_match($regex, $combinedError)) {
+                return true;
+            }
+        } else {
+            foreach (explode(',', $combinedErrorNonCheckableMatch) as $match) {
+                if (str_starts_with($combinedError, $match)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
      * Generate the localized error message from the error params saved from the parsing
      *
-     * @param ErrorParams $errorParams All parameters needed for the rendering of the error message
+     * @param ?LinkTargetResponse $linkTargetResponse All parameters needed for the rendering of the error message
      * @return string Validation error message
+     *
+     * @deprecated
      */
-    public function getErrorMessage(ErrorParams $errorParams = null): string
+    public function getErrorMessage(?LinkTargetResponse $linkTargetResponse): string
     {
-        if ($errorParams === null) {
-            $errorParams = $this->errorParams;
+        if ($linkTargetResponse === null) {
+            return '';
         }
 
         $lang = $this->getLanguageService();
-        $errorType = $errorParams->getErrorType();
-        $errno = $errorParams->getErrno();
-        $exception = $errorParams->getExceptionMsg();
+        $errorType = $linkTargetResponse->getErrorType();
+        $errno = $linkTargetResponse->getErrno();
+        $exception = $linkTargetResponse->getExceptionMessage();
 
         switch ($errorType) {
             case self::ERROR_TYPE_HTTP_STATUS_CODE:

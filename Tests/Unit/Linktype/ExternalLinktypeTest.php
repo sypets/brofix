@@ -23,6 +23,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Linktype\ExternalLinktype;
 use Sypets\Brofix\Tests\Unit\AbstractUnit;
 use TYPO3\CMS\Core\Http\RequestFactory;
@@ -41,14 +42,15 @@ class ExternalLinktypeTest extends AbstractUnit
     /**
      * @test
      */
-    public function checkLinkWithExternalUrlNotFoundReturnsFalse(): void
+    public function checkLinkWithExternalUrlNotFoundReturnsCorrectStatus(): void
     {
         $httpMethod = 'GET';
         $options = $this->getRequestHeaderOptions($httpMethod);
-        $url = 'https://example.org/~not-existing-url';
+        $url = 'https://localhost/~not-existing-url';
 
         $responseProphecy = $this->prophesize(Response::class);
         $responseProphecy->getStatusCode()->willReturn(404);
+        $responseProphecy->getHeaders()->willReturn([]);
 
         $exceptionProphecy = $this->prophesize(ClientException::class);
         $exceptionProphecy->hasResponse()
@@ -63,9 +65,10 @@ class ExternalLinktypeTest extends AbstractUnit
 
         $method = new \ReflectionMethod($subject, 'requestUrl');
         $method->setAccessible(true);
-        $result = $method->invokeArgs($subject, [$url, $httpMethod, $options]);
+        /** @var LinkTargetResponse $linkTargetResponse */
+        $linkTargetResponse = $method->invokeArgs($subject, [$url, $httpMethod, $options]);
 
-        self::assertFalse($result);
+        self::assertTrue($linkTargetResponse->isError());
     }
 
     /**
@@ -75,10 +78,11 @@ class ExternalLinktypeTest extends AbstractUnit
     {
         $httpMethod = 'GET';
         $options = $this->getRequestHeaderOptions($httpMethod);
-        $url = 'https://example.org/~not-existing-url';
+        $url = 'http://localhost/~not-existing-url';
 
         $responseProphecy = $this->prophesize(Response::class);
         $responseProphecy->getStatusCode()->willReturn(404);
+        $responseProphecy->getHeaders()->willReturn([]);
 
         $exceptionProphecy = $this->prophesize(ClientException::class);
         $exceptionProphecy->hasResponse()
@@ -93,11 +97,11 @@ class ExternalLinktypeTest extends AbstractUnit
 
         $method = new \ReflectionMethod($subject, 'requestUrl');
         $method->setAccessible(true);
-        $method->invokeArgs($subject, [$url, $httpMethod, $options]);
-        $errorParams = $subject->getErrorParams()->toArray();
+        /** @var LinkTargetResponse $linkTargetResponse */
+        $linkTargetResponse = $method->invokeArgs($subject, [$url, $httpMethod, $options]);
 
-        self::assertSame(ExternalLinktype::ERROR_TYPE_HTTP_STATUS_CODE, $errorParams['errorType']);
-        self::assertSame(404, $errorParams['errno']);
+        self::assertTrue($linkTargetResponse->isError());
+        self::assertTrue($linkTargetResponse->getErrorType() !== '');
     }
 
     /**
