@@ -527,8 +527,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
                 $this->filter,
-                self::ORDER_BY_VALUES[$this->orderBy] ?? [],
-                $this->filter->getCheckStatusFilter()
+                self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
             if ($brokenLinks) {
                 $totalCount = count($brokenLinks);

@@ -50,6 +50,7 @@ class ExternalLinktypeTest extends AbstractUnit
 
         $responseProphecy = $this->prophesize(Response::class);
         $responseProphecy->getStatusCode()->willReturn(404);
+        $responseProphecy->getHeaders()->willReturn([]);
 
         $exceptionProphecy = $this->prophesize(ClientException::class);
         $exceptionProphecy->hasResponse()
@@ -81,6 +82,7 @@ class ExternalLinktypeTest extends AbstractUnit
 
         $responseProphecy = $this->prophesize(Response::class);
         $responseProphecy->getStatusCode()->willReturn(404);
+        $responseProphecy->getHeaders()->willReturn([]);
 
         $exceptionProphecy = $this->prophesize(ClientException::class);
         $exceptionProphecy->hasResponse()
