@@ -16,20 +16,14 @@ namespace Sypets\Brofix\CheckLinks;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
+
 class CheckLinksStatistics
 {
     /**
      * @var string
      */
     protected $pageTitle;
-
-    /** @var int */
-    protected $countExcludedLinks;
-
-    /**
-     * @var int
-     */
-    protected $countBrokenLinks;
 
     /**
      * @var int
@@ -46,77 +40,55 @@ class CheckLinksStatistics
      */
     protected $countPages;
 
-    /**
-     * @var int
-     */
-    protected $countLinks;
+    /** @var array<int,int> */
+    protected array $countLinksByStatus;
 
     /**
      * @var int
      */
-    protected $countLinksChecked;
-
-    /**
-     * @var float
-     */
-    protected $percentExcludedLinks;
-
-    /**
-     * @var float
-     */
-    protected $percentBrokenLinks;
+    protected $countLinksTotal;
 
     public function __construct()
     {
+        $this->initialize();
     }
 
     public function initialize(): void
     {
         $this->checkStartTime = \time();
-        $this->countExcludedLinks = 0;
-        $this->countBrokenLinks = 0;
         $this->countPages = 0;
-        $this->countLinks = 0;
-        $this->percentBrokenLinks = 0;
-        $this->percentExcludedLinks = 0;
+        $this->countLinksTotal = 0;
+        $this->countLinksByStatus = [];
         $this->pageTitle = '';
     }
 
     public function calculateStats(): void
     {
         $this->checkEndTime = \time();
-        // number of links actually checked
-        $this->countLinksChecked = $this->countLinks - $this->countExcludedLinks;
-        if ($this->countExcludedLinks > 0
-            && $this->countLinks > 0
-        ) {
-            $this->percentExcludedLinks = $this->countExcludedLinks / $this->countLinks * 100;
-        } else {
-            $this->percentExcludedLinks = 0;
+    }
+
+    public function incrementCountLinksByStatus(int $status): void
+    {
+        if (!isset($this->countLinksByStatus[$status])) {
+            $this->countLinksByStatus[$status] = 0;
         }
-        // omit the excluded links from this count to get the actual percentage of broken links in checked links
-        if ($this->countLinksChecked > 0
-            && $this->countBrokenLinks > 0
-        ) {
-            $this->percentBrokenLinks = $this->countBrokenLinks / $this->countLinksChecked * 100;
-        } else {
-            $this->percentBrokenLinks =  0;
-        }
+        $this->countLinksByStatus[$status]++;
+        $this->countLinksTotal++;
     }
 
     public function incrementCountExcludedLinks(): void
     {
-        $this->countExcludedLinks++;
+        $this->incrementCountLinksByStatus(LinkTargetResponse::RESULT_EXCLUDED);
     }
 
     public function incrementCountBrokenLinks(): void
     {
-        $this->countBrokenLinks++;
+        $this->incrementCountLinksByStatus(LinkTargetResponse::RESULT_BROKEN);
     }
 
     public function addCountLinks(int $count): void
     {
-        $this->countLinks += $count;
+        $this->countLinksTotal += $count;
     }
 
     public function setCountPages(int $count): void
@@ -142,19 +114,29 @@ class CheckLinksStatistics
         return $this->countPages;
     }
 
+    /**
+     * Get total number of links
+     *
+     * @return int
+     */
     public function getCountLinks(): int
     {
-        return $this->countLinks;
+        return $this->countLinksTotal;
+    }
+
+    public function getCountLinksByStatus(int $status): int
+    {
+        return $this->countLinksByStatus[$status];
     }
 
     public function getCountBrokenLinks(): int
     {
-        return $this->countBrokenLinks;
+        return $this->countLinksByStatus[LinkTargetResponse::RESULT_BROKEN];
     }
 
     public function getCountExcludedLinks(): int
     {
-        return $this->countExcludedLinks;
+        return $this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED];
     }
 
     /**
@@ -174,11 +156,25 @@ class CheckLinksStatistics
     }
 
     /**
+     * Get number of links actually checked. This is the number of links total minus excluded links and non-checkable
+     * links.
+     *
      * @return int
      */
     public function getCountLinksChecked(): int
     {
-        return $this->countLinksChecked;
+        return $this->countLinksTotal - $this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED]
+            - $this->countLinksByStatus[LinkTargetResponse::RESULT_CANNOT_CHECK];
+    }
+
+    public function getPercentLinksByStatus(int $status): float
+    {
+        if ($this->countLinksByStatus[$status] > 0
+            && $this->getCountLinksChecked() > 0
+        ) {
+            return $this->countLinksByStatus[$status] / $this->getCountLinksChecked() * 100;
+        }
+        return 0;
     }
 
     /**
@@ -186,14 +182,16 @@ class CheckLinksStatistics
      */
     public function getPercentExcludedLinks(): float
     {
-        return $this->percentExcludedLinks;
+        return $this->getPercentLinksByStatus(LinkTargetResponse::RESULT_EXCLUDED);
     }
 
     /**
+     * Get % of broken link / number of links checked
+     *
      * @return float
      */
     public function getPercentBrokenLinks(): float
     {
-        return $this->percentBrokenLinks;
+        return $this->getPercentLinksByStatus(LinkTargetResponse::RESULT_BROKEN);
     }
 }

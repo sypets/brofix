@@ -65,6 +65,9 @@
 			<trans-unit id="email.brokenlinksreport.links_not_checked_percent" resname="email.brokenlinksreport.links_not_checked_percent">
 				<source>Percent links not checked</source>
 			</trans-unit>
+			<trans-unit id="email.brokenlinksreport.total" resname="email.brokenlinksreport.total">
+				<source>Total</source>
+			</trans-unit>
 			<trans-unit id="email.brokenlinksreport.header.check" resname="email.brokenlinksreport.header.check">
 				<source>Check</source>
 			</trans-unit>

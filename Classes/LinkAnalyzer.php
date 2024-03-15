@@ -338,9 +338,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $linkTargetResponse = $linktypeObject->checkLink((string)$url, $entryValue, $mode);
                 $this->debug("checkLinks: after checking $url");
 
-                if ($linkTargetResponse->isExcluded()) {
-                    $this->statistics->incrementCountExcludedLinks();
-                }
+                $this->statistics->incrementCountLinksByStatus($linkTargetResponse->getStatus());
 
                 // Broken link found
                 if ($linkTargetResponse->isError() || $linkTargetResponse->isCannotCheck()) {
@@ -350,7 +348,6 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
-                    $this->statistics->incrementCountBrokenLinks();
                 } elseif ($this->configuration->isShowAllLinks()) {
                     $record['check_status'] = $linkTargetResponse->getStatus();
                     $record['url_response'] = $linkTargetResponse->toJson();
@@ -460,7 +457,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $request,
                         LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
                     );
-                    $this->statistics->addCountLinks($this->countLinks($results));
+                    //$this->statistics->addCountLinks($this->countLinks($results));
                     $this->checkLinks($results, $linkTypes);
                 }
             }

@@ -23,23 +23,29 @@
 </style>
 
 <table class="BrokenLinkStats">
-
-
-    <tr class="tableHeader">
-        <th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate></th>
+	<tr class="tableHeader">
+      <th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate></th>
     </tr>
-	<tr>
-		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.percent_broken_links" languageKey="{language}">Percent broken links</f:translate></th>
-		<td><f:format.number decimals="2" decimalSeparator=".">{stats.percentBrokenLinks}</f:format.number>%</td>
-	</tr>
     <tr>
         <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_broken_links" languageKey="{language}">Number of broken links</f:translate></th>
-        <td>{stats.countBrokenLinks}</td>
-    </tr>
+        <td>{stats.countBrokenLinks} (<f:format.number decimals="2" decimalSeparator=".">{stats.percentBrokenLinks}</f:format.number>%)</td>
+	</tr>
+	<tr class="tableHeader">
+		<th colspan="2"></th>
+	</tr>
     <tr>
         <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.number_links_checked" languageKey="{language}">Total links checked</f:translate></th>
         <td>{stats.countLinksChecked}</td>
     </tr>
+	<tr>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked" languageKey="{language}">Links not checked</f:translate></th>
+		<td>{stats.countExcludedLinks}</td>
+	</tr>
+	<tr>
+		<th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.total" languageKey="{language}">Total</f:translate></th>
+		<td>{stats.countLinks}</td>
+	</tr>
+
 
 	<tr class="tableHeader">
 		<th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.pages" languageKey="{language}">Pages checked</f:translate></th>
@@ -58,18 +64,6 @@
 		<td>{stats.countPages}</td>
 	</tr>
 
-
-    <tr class="tableHeader">
-        <th colspan="2"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.excluded_urls" languageKey="{language}">Excluded URLs</f:translate></th>
-    </tr>
-    <tr>
-        <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked" languageKey="{language}">Links not checked</f:translate></th>
-        <td>{stats.countExcludedLinks}</td>
-    </tr>
-    <tr>
-        <th><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.links_not_checked_percent" languageKey="{language}">Percent links not checked</f:translate></th>
-        <td><f:format.number decimals="2" decimalSeparator=".">{stats.percentExcludedLinks}</f:format.number>%</td>
-    </tr>
 
 
 	<tr class="tableHeader">
