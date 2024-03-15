@@ -100,6 +100,9 @@
 				<option value="3" {f:if(condition:'{filter.checkStatusFilter} == 3', then: 'selected')}>
 					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.3"/>
 				</option>
+				<option value="4" {f:if(condition:'{filter.checkStatusFilter} == 4', then: 'selected')}>
+				<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.4"/>
+				</option>
 				<f:for each="{checkStatusOptions}" as="checkStatusOption">
 					<option value="{key}">{checkStatusOption}</option>
 				</f:for>
