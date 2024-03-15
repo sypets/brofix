@@ -30,10 +30,12 @@ use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Session\UserSessionManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -439,7 +441,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $selectFields = $tmpFields;
                 }
 
-                $queryBuilder->select(...$selectFields)
+                //$queryBuilder->select(...$selectFields)
+                $queryBuilder->select($table . '.*')
                     ->from($table)
                     ->where(
                         ...$constraints
@@ -465,6 +468,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
             }
         }
+
         // remove all broken links for pages / linktypes before this check
         $this->brokenLinkRepository->removeAllBrokenLinksForPagesBeforeTime($this->pids, $linkTypes, $checkStart);
 
@@ -472,7 +476,12 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
-     * Return standard fields which should be selected
+     * Return standard fields which should be returned for a table. This will return a combination of fields consisting
+     * of the fields passed in $selectFields and additional fields which are important, such as the uid, pid, type
+     * or language field. The field names are obtained from TCA configuration.
+     *
+     * It should contain the fields which should be checked as well as the fields which are necessary for TCA
+     * evaluation, which should be written to the DB (in tx_brofix_broken_links etc.).
      *
      * @param string $table
      * @param array<string> $selectFields
@@ -493,9 +502,12 @@ class LinkAnalyzer implements LoggerAwareInterface
         if (isset($GLOBALS['TCA'][$table]['ctrl']['languageField'])) {
             $defaultFields[] = $GLOBALS['TCA'][$table]['ctrl']['languageField'];
         }
+        // type, such as CType for tt_content or doktype for pages
+        if (isset($GLOBALS['TCA'][$table]['ctrl']['type'])) {
+            $defaultFields[] = $GLOBALS['TCA'][$table]['ctrl']['type'];
+        }
         if ($table === 'tt_content') {
             $defaultFields[] = 'colPos';
-            $defaultFields[] = 'CType';
         }
         foreach ($selectFields as $field) {
             // field must have TCA configuration

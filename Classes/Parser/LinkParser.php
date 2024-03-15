@@ -6,15 +6,16 @@ namespace Sypets\Brofix\Parser;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Repository\ContentRepository;
+use Sypets\Brofix\Util\TcaUtil;
 use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
+use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
+use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserInterface;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
 use TYPO3\CMS\Core\Html\HtmlParser;
-use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -22,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Parse content for links. This class currently also checks if fields, should be parsed based on
  * - whether they are hidden / editable in the backend
  *
- * @todo possibly separate the actual parsing and checking if fields should be parsed
+ * @internal
  */
 class LinkParser
 {
@@ -55,6 +56,11 @@ class LinkParser
     protected ContentRepository $contentRepository;
 
     /**
+     * @var array<mixed> $processedFormData;
+     */
+    protected array $processedFormData;
+
+    /**
      * static reference to $this (singleton)
      * @var LinkParser|null
      */
@@ -73,10 +79,9 @@ class LinkParser
         }
         $this->contentRepository = $contentRepository;
 
-        /**
-         * @var FieldShouldBeChecked
-         */
-        $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
+
+        //$formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
+        $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
 
         self::$instance = $this;
@@ -107,18 +112,20 @@ class LinkParser
      *
      * @param mixed[] $results Array of broken links
      * @param string $table Table name of the record
-     * @param array<string> $fields Array of fields to analyze
-     * @param mixed[] $record Record to analyze
+     * @param array<string> $fields Array of fields to check
+     * @param mixed[] $record Record to check
      * @param int $checks what checks should be performed. (Default is: all checks enabled)
+     * @return array|string[] Return actual fields which will be checked
+     * @throws \Throwable
      */
     public function findLinksForRecord(
         array &$results,
-        $table,
+        string $table,
         array $fields,
         array $record,
         ServerRequestInterface $request,
         int $checks = self::MASK_CONTENT_CHECK_ALL,
-    ): void {
+    ): array{
         $this->request = $request;
 
         $idRecord = (int)($record['uid'] ?? 0);
@@ -129,63 +136,61 @@ class LinkParser
 
             if ($checks & self::MASK_CONTENT_CHECK_IF_RECORD_SHOULD_BE_CHECKED) {
                 if ($this->isRecordShouldBeChecked($table, $record) === false) {
-                    return;
+                    return [];
                 }
             }
 
+            $processedFormData = $this->getProcessedFormData($idRecord, $table);
+
             if ($checks & self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD) {
-                $fields = $this->getEditableFields($idRecord, $table, $fields);
+                $fields = $this->getEditableFields($idRecord, $table, $fields, $processedFormData);
             }
 
-            // Get all references
+            // Get all links/references
             foreach ($fields as $field) {
-                $conf = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
+                // use the processedTca to also  get overridden configuration (e.g. columnsOverrides)
+                $fieldConfig = $this->processedFormData["processedTca"]['columns'][$field]['config'];
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
                 if ($valueField === '') {
                     continue;
                 }
+                $type = $fieldConfig['type'] ?? '';
+                if ($type === 'flex') {
+                    $flexformFields = TcaUtil::getFlexformFieldsWithConfig( $table, $field, $record, $fieldConfig);
+                    foreach ($flexformFields as $flexformField => $flexformData) {
+                        $valueField = htmlspecialchars_decode($flexformData['value'] ?? '');
+                        $flexformFieldConfig = $flexformData['config'] ?? [];
+                        if (!$valueField || !$flexformFieldConfig || !is_array($flexformFieldConfig)) {
+                            continue;
+                        }
+                        $sofrefParserList = $this->getSoftrefParserListByField($table, $field . '.' . $flexformField, $flexformFieldConfig);
 
-                // Check if a TCA configured field can contain links and assign the soft reference parser keys
-                // - has soft references defined (see TYPO3 Core API document)
-                // - has type='link'
-                /**
-                 * @var array<int,string> $softrefParserKeys
-                 */
-                $softrefParserKeys = [];
-                if (($conf['softref'] ?? false)) {
-                    // e.g. typolink_tag,email[subst],url is exploded into array
-                    $softrefParserKeys = explode(',', $conf['softref']);
+                        foreach ($sofrefParserList as $softReferenceParser) {
+                            $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
+                            if (!$parserResult->hasMatched()) {
+                                continue;
+                            }
+                            if ($softReferenceParser->getParserKey() === 'typolink_tag') {
+                                $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
+                            } else {
+                                $this->analyzeLinks($parserResult, $results, $record, $field, $table);
+                            }
+                        }
+                    }
                 } else {
-                    $type = $conf['type'] ?? false;
-                    if ($type === 'link') {
-                        $softrefParserKeys = ['typolink'];
-                    }
-                }
-                if ($softrefParserKeys === []) {
-                    continue;
-                }
 
-                /**
-                 * @todo can be removed along the the Extension configuration setting  excludeSoftrefs when core
-                 *   bug is fixed, see https://forge.typo3.org/issues/97937
-                 */
-                foreach ($this->configuration->getExcludeSoftrefsInFields() as $tableField) {
-                    if ($tableField != ($table . '.' . $field)) {
-                        continue;
-                    }
-                    $softrefParserKeys = array_diff($softrefParserKeys, $this->configuration->getExcludeSoftrefs());
-                }
+                    $sofrefParserList = $this->getSoftrefParserListByField($table, $field, $fieldConfig);
 
-                $softRefParams = ['subst'];
-                foreach ($this->softReferenceParserFactory->getParsersBySoftRefParserList(implode(',', $softrefParserKeys), $softRefParams) as $softReferenceParser) {
-                    $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
-                    if (!$parserResult->hasMatched()) {
-                        continue;
-                    }
-                    if ($softReferenceParser->getParserKey() === 'typolink_tag') {
-                        $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
-                    } else {
-                        $this->analyzeLinks($parserResult, $results, $record, $field, $table);
+                    foreach ($sofrefParserList as $softReferenceParser) {
+                        $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
+                        if (!$parserResult->hasMatched()) {
+                            continue;
+                        }
+                        if ($softReferenceParser->getParserKey() === 'typolink_tag') {
+                            $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
+                        } else {
+                            $this->analyzeLinks($parserResult, $results, $record, $field, $table);
+                        }
                     }
                 }
             }
@@ -208,6 +213,74 @@ class LinkParser
             );
             throw $e;
         }
+        return $fields;
+    }
+
+    /**
+     * Get list of softref parsers for a particular field.
+     *
+     * Check if a TCA configured field can contain links and assign the soft reference parser keys
+     * - has soft references defined
+     * - has type='link'
+     *
+     * @param string $table
+     * @param string $fieldName
+     * @param array $fieldConfig
+     * @return iterable<SoftReferenceParserInterface>
+     */
+    public function getSoftrefParserListByField(string $table, string $fieldName, array $fieldConfig): iterable
+    {
+        /**
+         * @var array<int,string> $softrefParserKeys
+         */
+        $softrefParserKeys = [];
+        if ($fieldConfig['softref'] ??  false) {
+            $softref = explode(',', $fieldConfig['softref']);
+        } else {
+            $softref = [];
+        }
+        // if softref are set, use these directly (as in rich text field)
+        if ($softref) {
+            // e.g. typolink_tag,email[subst],url is exploded into array
+            $softrefParserKeys = $softref;
+
+            /**
+             * @todo can be removed along with the Extension configuration setting  excludeSoftrefs when core
+             *   bug is fixed, see https://forge.typo3.org/issues/97937
+             */
+            foreach ($this->configuration->getExcludeSoftrefsInFields() as $tableField) {
+                if ($tableField != ($table . '.' . $fieldName)) {
+                    continue;
+                }
+                $softrefParserKeys = array_diff($softrefParserKeys, $this->configuration->getExcludeSoftrefs());
+            }
+        } else if ($fieldConfig['enableRichtext'] ?? false) {
+            $softrefParserKeys = ['typolink_tag'];
+        } else {
+            $type = $fieldConfig['type'] ?? false;
+            switch ($type) {
+                case 'link':
+                    $softrefParserKeys = ['typolink'];
+                    break;
+                case 'input':
+                    // inputLink is deprecated since version 12
+                    if (($fieldConfig['renderType'] ?? '') === 'inputLink') {
+                        $softrefParserKeys = ['typolink'];
+                    } else {
+                        return [];
+                    }
+                    break;
+                default:
+                    return [];
+            }
+        }
+        if ($softrefParserKeys === []) {
+            return [];
+        }
+
+
+        $softRefParams = ['subst'];
+        return $this->softReferenceParserFactory->getParsersBySoftRefParserList(implode(',', $softrefParserKeys), $softRefParams);
     }
 
     /**
@@ -359,19 +432,16 @@ class LinkParser
         return true;
     }
 
-    /**
-     * Return the editable fields of a record (using FormEngine).
-     *
-     * @param int $uid
-     * @param string $tablename
-     * @param string[] $fields
-     * @return string[]
-     */
-    public function getEditableFields(int $uid, string $tablename, array $fields): array
+    public function getProcessedFormData(int $uid, string $tablename): array
     {
-        if ($fields === []) {
-            return [];
+        $isAdmin = true;
+        // form data processing should be performed as admin, because we do not want to apply permission checks here
+        // this should be safe as it is set to admin only for the form processing and not stored
+        if (!$GLOBALS['BE_USER']->isAdmin()) {
+            $isAdmin = false;
+            $GLOBALS['BE_USER']->user['admin'] = 1;
         }
+
         // check if the field to be checked will be rendered in FormEngine
         // if not, the field should not be checked for broken links because it can't be edited in BE
         $formDataCompilerInput = [
@@ -380,16 +450,32 @@ class LinkParser
             'command' => 'edit',
         ];
 
-        /*
-        $serverRequestFactory = GeneralUtility::makeInstance(ServerRequestFactory::class);
-        $request = $serverRequestFactory->createServerRequest('POST', 'http://t3coredev12');
-        */
         $request = $this->request;
         $formDataCompilerInput['request'] = $request;
 
         // we need TcaColumnsProcessShowitem
-        $formData = $this->formDataCompiler->compile($formDataCompilerInput);
-        $columns = $formData['processedTca']['columns'] ?? [];
+        $this->processedFormData = $this->formDataCompiler->compile($formDataCompilerInput);
+        if ($isAdmin === false) {
+            $GLOBALS['BE_USER']->user['admin'] = 0;
+        }
+        return $this->processedFormData;
+    }
+
+    /**
+     * Return the editable fields of a record (using FormEngine).
+     *
+     * @param int $uid
+     * @param string $tablename
+     * @param string[] $fields
+     * @param array<mixed> $processedFormData
+     * @return string[]
+     */
+    public function getEditableFields(int $uid, string $tablename, array $fields, array $processedFormData): array
+    {
+        if ($fields === []) {
+            return [];
+        }
+        $columns = $processedFormData['processedTca']['columns'] ?? [];
         if ($columns === []) {
             return [];
         }
