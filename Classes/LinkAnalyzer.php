@@ -30,12 +30,10 @@ use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Session\UserSessionManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -321,6 +319,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['link_type'] = $key;
                 $record['link_title'] = $entryValue['link_title'] ?? '';
                 $record['field'] = $entryValue['field'];
+                $record['flexform_field'] = $entryValue['flexformField'] ?? '';
+                $record['flexform_field_label'] = $entryValue['flexformFieldLabel'] ?? '';
                 $typeField = $GLOBALS['TCA'][$table]['ctrl']['type'] ?? false;
                 if ($entryValue['row'][$typeField] ?? false) {
                     $record['element_type'] = $entryValue['row'][$typeField];

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 namespace Sypets\Brofix\Util;
 
@@ -7,6 +8,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TcaUtil
 {
+    /**
+     * @param string $table
+     * @param string $field
+     * @param array<string,mixed> $row
+     * @param array<mixed> $processedTca
+     * @return array<mixed>
+     */
     public static function getFlexformFieldsWithConfig(string $table, string $field, array $row, array $processedTca): array
     {
         $results = [];
@@ -26,11 +34,16 @@ class TcaUtil
         return $results;
     }
 
+    /**
+     * @param string $fieldName
+     * @param array<mixed> $data
+     * @return string
+     */
     public static function traverseFlexformArrayForValues(string $fieldName, array $data): string
     {
         foreach ($data as $key => $values) {
             if ($key === $fieldName) {
-                return (string) $values['vDEF'];
+                return (string)$values['vDEF'];
             }
             if ($values && is_array($values)) {
                 $value = self::traverseFlexformArrayForValues($fieldName, $values);
@@ -42,6 +55,10 @@ class TcaUtil
         return '';
     }
 
+    /**
+     * @param array<mixed> $flex
+     * @param array<mixed> $results
+     */
     public static function traverseFlexformArray(array $flex, array &$results): void
     {
         if (!$flex) {

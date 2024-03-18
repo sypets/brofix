@@ -68,9 +68,6 @@ This new feature comes with some caveats:
    be checked. The fields which are checked is derived directly form the field
    configuration (type, renderType, enableRichtext and softref).
 
-#. In the broken link records, the field name for the entire flexform is
-   displayed, not the individual field name.
-
 Some of these caveats may be addressed in future releases.
 
 Combination with extensions

@@ -846,6 +846,13 @@ class BrokenLinkListController extends AbstractBrofixController
             }
         }
         $variables['fieldName'] = !empty($fieldName) ? $fieldName : $row['field'];
+        // flexform field label
+        if ($row['flexform_field_label'] ?? '') {
+            $flexformLabel = $languageService->sL($row['flexform_field_label']);
+            if ($flexformLabel) {
+                $variables['fieldName'] = $flexformLabel;
+            }
+        }
 
         // page title / uid / path
         $pageId = (int)($table === 'pages' ? $row['record_uid'] : $row['record_pid']);

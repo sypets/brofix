@@ -6,6 +6,7 @@ namespace Sypets\Brofix\Parser;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
+use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
@@ -79,9 +80,8 @@ class LinkParser
         }
         $this->contentRepository = $contentRepository;
 
-
-        //$formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
-        $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
+        $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
+        //$formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
 
         self::$instance = $this;
@@ -125,7 +125,7 @@ class LinkParser
         array $record,
         ServerRequestInterface $request,
         int $checks = self::MASK_CONTENT_CHECK_ALL,
-    ): array{
+    ): array {
         $this->request = $request;
 
         $idRecord = (int)($record['uid'] ?? 0);
@@ -140,7 +140,7 @@ class LinkParser
                 }
             }
 
-            $processedFormData = $this->getProcessedFormData($idRecord, $table);
+            $processedFormData = $this->getProcessedFormData($idRecord, $table, $request);
 
             if ($checks & self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD) {
                 $fields = $this->getEditableFields($idRecord, $table, $fields, $processedFormData);
@@ -149,14 +149,14 @@ class LinkParser
             // Get all links/references
             foreach ($fields as $field) {
                 // use the processedTca to also  get overridden configuration (e.g. columnsOverrides)
-                $fieldConfig = $this->processedFormData["processedTca"]['columns'][$field]['config'];
+                $fieldConfig = $this->processedFormData['processedTca']['columns'][$field]['config'];
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
                 if ($valueField === '') {
                     continue;
                 }
                 $type = $fieldConfig['type'] ?? '';
                 if ($type === 'flex') {
-                    $flexformFields = TcaUtil::getFlexformFieldsWithConfig( $table, $field, $record, $fieldConfig);
+                    $flexformFields = TcaUtil::getFlexformFieldsWithConfig($table, $field, $record, $fieldConfig);
                     foreach ($flexformFields as $flexformField => $flexformData) {
                         $valueField = htmlspecialchars_decode($flexformData['value'] ?? '');
                         $flexformFieldConfig = $flexformData['config'] ?? [];
@@ -171,14 +171,13 @@ class LinkParser
                                 continue;
                             }
                             if ($softReferenceParser->getParserKey() === 'typolink_tag') {
-                                $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
+                                $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table, $flexformField, $flexformData['label'] ?? '');
                             } else {
-                                $this->analyzeLinks($parserResult, $results, $record, $field, $table);
+                                $this->analyzeLinks($parserResult, $results, $record, $field, $table, $flexformField, $flexformData['label'] ?? '');
                             }
                         }
                     }
                 } else {
-
                     $sofrefParserList = $this->getSoftrefParserListByField($table, $field, $fieldConfig);
 
                     foreach ($sofrefParserList as $softReferenceParser) {
@@ -225,7 +224,7 @@ class LinkParser
      *
      * @param string $table
      * @param string $fieldName
-     * @param array $fieldConfig
+     * @param array<mixed> $fieldConfig
      * @return iterable<SoftReferenceParserInterface>
      */
     public function getSoftrefParserListByField(string $table, string $fieldName, array $fieldConfig): iterable
@@ -254,7 +253,7 @@ class LinkParser
                 }
                 $softrefParserKeys = array_diff($softrefParserKeys, $this->configuration->getExcludeSoftrefs());
             }
-        } else if ($fieldConfig['enableRichtext'] ?? false) {
+        } elseif ($fieldConfig['enableRichtext'] ?? false) {
             $softrefParserKeys = ['typolink_tag'];
         } else {
             $type = $fieldConfig['type'] ?? false;
@@ -278,7 +277,6 @@ class LinkParser
             return [];
         }
 
-
         $softRefParams = ['subst'];
         return $this->softReferenceParserFactory->getParsersBySoftRefParserList(implode(',', $softrefParserKeys), $softRefParams);
     }
@@ -291,9 +289,18 @@ class LinkParser
      * @param mixed[] $record UID of the current record
      * @param string $field The current field
      * @param string $table The current table
+     * @param string $flexformField = ''
+     * @param string $flexformFieldLabel = ''
      */
-    protected function analyzeLinks(SoftReferenceParserResult $parserResult, array &$results, array $record, string $field, string $table): void
-    {
+    protected function analyzeLinks(
+        SoftReferenceParserResult $parserResult,
+        array &$results,
+        array $record,
+        string $field,
+        string $table,
+        string $flexformField = '',
+        string $flexformFieldLabel = ''
+    ): void {
         foreach ($parserResult->getMatchedElements() as $element) {
             $r = $element['subst'];
             $type = '';
@@ -311,11 +318,14 @@ class LinkParser
                     $r['type'] = $type;
                 }
             }
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['substr'] = $r;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['row'] = $record;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['table'] = $table;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['field'] = $field;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['uid'] = $idRecord;
+            $key = $table . ':' . $field . ':' . $flexformField . ':' . $idRecord . ':' . $r['tokenID'];
+            $results[$type][$key]['substr'] = $r;
+            $results[$type][$key]['row'] = $record;
+            $results[$type][$key]['table'] = $table;
+            $results[$type][$key]['field'] = $field;
+            $results[$type][$key]['flexformField'] = $flexformField;
+            $results[$type][$key]['flexformFieldLabel'] = $flexformFieldLabel;
+            $results[$type][$key]['uid'] = $idRecord;
         }
     }
 
@@ -328,6 +338,8 @@ class LinkParser
      * @param mixed[] $record The current record
      * @param string $field The current field
      * @param string $table The current table
+     * @param string $flexformField
+     * @param string $flexformFieldLabel
      */
     protected function analyzeTypoLinks(
         SoftReferenceParserResult $parserResult,
@@ -335,7 +347,9 @@ class LinkParser
         $htmlParser,
         array $record,
         $field,
-        $table
+        $table,
+        string $flexformField = '',
+        string $flexformFieldLabel = ''
     ): void {
         $currentR = [];
         $linkTags = $htmlParser->splitIntoBlock('a,link', $parserResult->getContent());
@@ -384,13 +398,16 @@ class LinkParser
                     $currentR['type'] = $type;
                 }
             }
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['substr'] = $currentR;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['row'] = $record;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['table'] = $table;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['field'] = $field;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['uid'] = $idRecord;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['link_title'] = $title;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['pageAndAnchor'] = $referencedRecordType;
+            $key = $table . ':' . $field . ':' . $flexformField . ':' . $idRecord . ':' . $currentR['tokenID'];
+            $results[$type][$key]['substr'] = $currentR;
+            $results[$type][$key]['row'] = $record;
+            $results[$type][$key]['table'] = $table;
+            $results[$type][$key]['field'] = $field;
+            $results[$type][$key]['flexformField'] = $flexformField;
+            $results[$type][$key]['flexformFieldLabel'] = $flexformFieldLabel;
+            $results[$type][$key]['uid'] = $idRecord;
+            $results[$type][$key]['link_title'] = $title;
+            $results[$type][$key]['pageAndAnchor'] = $referencedRecordType;
         }
     }
 
@@ -432,8 +449,14 @@ class LinkParser
         return true;
     }
 
-    public function getProcessedFormData(int $uid, string $tablename): array
+    /**
+     * @param int $uid
+     * @param string $tablename
+     * @return array<mixed>
+     */
+    public function getProcessedFormData(int $uid, string $tablename, ServerRequestInterface $request): array
     {
+        // is hack
         $isAdmin = true;
         // form data processing should be performed as admin, because we do not want to apply permission checks here
         // this should be safe as it is set to admin only for the form processing and not stored
@@ -450,14 +473,17 @@ class LinkParser
             'command' => 'edit',
         ];
 
-        $request = $this->request;
-        $formDataCompilerInput['request'] = $request;
+        if ($request) {
+            $formDataCompilerInput['request'] = $request;
+        }
 
-        // we need TcaColumnsProcessShowitem
         $this->processedFormData = $this->formDataCompiler->compile($formDataCompilerInput);
+
+        // undo hack
         if ($isAdmin === false) {
             $GLOBALS['BE_USER']->user['admin'] = 0;
         }
+
         return $this->processedFormData;
     }
 

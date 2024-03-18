@@ -388,6 +388,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 2,
@@ -401,6 +403,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -414,6 +418,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -427,6 +433,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -475,6 +483,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -488,6 +498,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -501,6 +513,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -526,6 +540,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 2,
@@ -539,6 +555,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -552,6 +570,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -565,6 +585,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -590,6 +612,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -616,6 +640,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
