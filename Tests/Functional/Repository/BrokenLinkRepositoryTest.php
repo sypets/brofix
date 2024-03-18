@@ -225,7 +225,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords( $linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
         // get result
         $result = $this->brokenLinkRepository->getLinkCounts(

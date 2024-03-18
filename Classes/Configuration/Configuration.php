@@ -38,10 +38,66 @@ class Configuration
 {
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
 
+    public const DEFAULT_TSCONFIG = [
+        'searchFields.' => [
+            'pages' => 'media,url',
+            'tt_content' => 'bodytext,header_link,records',
+        ],
+        'excludeCtype' => 'html',
+        'linktypes' => 'db,file,external,applewebdata',
+        'check.' => [
+            'doNotCheckContentOnPagesDoktypes' => '3,4',
+            'doNotCheckPagesDoktypes' => '6,7,199,255',
+            'doNotTraversePagesDoktypes' => '6,199,255',
+            'doNotCheckLinksOnWorkspace' => false,
+        ],
+        'checkhidden' => false,
+        'depth' => 999,
+        'reportHiddenRecords' => true,
+        'linktypesConfig.' => [
+            'external.' => [
+                'headers.' => [
+                    'User-Agent' => '',
+                    'Accept' => '*/*'
+                ],
+                'timeout' => 10,
+                'redirects' => 5,
+            ]
+        ],
+        'excludeLinkTarget.' => [
+            'storagePid' => 0,
+            'allowed' => 'external',
+        ],
+        'linkTargetCache.' => [
+            'expiresLow' => 604800,
+            'expiresHigh' => 691200,
+        ],
+        'crawlDelay.' => [
+            'seconds' => 5,
+            'nodelay' => '',
+        ],
+        'report.' => [
+            'docsurl' => '',
+            'recheckButton' => -1,
+        ],
+        'mail.' => [
+            'sendOnCheckLinks' => 1,
+            'recipients' => '',
+            'fromname' => '',
+            'fromemail' => '',
+            'replytoname' => '',
+            'replytoemail' => '',
+            'subject' => '',
+            'template' => 'CheckLinksResults',
+            'language' => 'en',
+        ],
+        'custom.' => []
+    ];
+
     /**
      * @var mixed[]
      */
-    protected $tsConfig = [];
+    protected $tsConfig = self::DEFAULT_TSCONFIG;
 
     /**
      * Limit number of pages traversed in backend. This limit is only active when displaying
@@ -90,7 +146,7 @@ class Configuration
             /**
              * @var LinktypeInterface $linktype
              */
-            $linktype = GeneralUtility::makeInstance($className); // @phpstan-ignore-line
+            $linktype = GeneralUtility::makeInstance($className);
             $this->hookObjectsArr[$key] = $linktype;
             $linktype->setConfiguration($this);
         }
@@ -122,7 +178,7 @@ class Configuration
      * @param string $tsConfigString
      * @throws \Exception
      *
-     * @todo Create specific exception
+     * @todo deprecate, use overrideTsConfigByArray
      */
     public function overrideTsConfigByString(string $tsConfigString): void
     {
@@ -145,6 +201,14 @@ class Configuration
         if (is_array($overrideTs)) {
             ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $overrideTs);
         }
+    }
+
+    /**
+     * @param array<mixed> $override
+     */
+    public function overrideTsConfigByArray(array $override): void
+    {
+        ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $override);
     }
 
     /**

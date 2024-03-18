@@ -3,7 +3,6 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Parser;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
@@ -14,7 +13,6 @@ use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
 use TYPO3\CMS\Core\Html\HtmlParser;
-use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -114,9 +112,8 @@ class LinkParser
         $table,
         array $fields,
         array $record,
-        int $checks = self::MASK_CONTENT_CHECK_ALL,
+        int $checks = self::MASK_CONTENT_CHECK_ALL
     ): void {
-
         $idRecord = (int)($record['uid'] ?? 0);
         try {
             // Put together content of all relevant fields
@@ -218,6 +215,9 @@ class LinkParser
     protected function analyzeLinks(SoftReferenceParserResult $parserResult, array &$results, array $record, string $field, string $table): void
     {
         foreach ($parserResult->getMatchedElements() as $element) {
+            if (!is_array($element['subst'] ?? false)) {
+                continue;
+            }
             $r = $element['subst'];
             $type = '';
             $idRecord = $record['uid'];
@@ -270,6 +270,9 @@ class LinkParser
             $referencedRecordType = '';
             foreach ($parserResult->getMatchedElements() as $element) {
                 $type = '';
+                if (!is_array($element['subst'] ?? false)) {
+                    continue;
+                }
                 $r = $element['subst'];
                 if (empty($r['tokenID']) || substr_count($linkTags[$i], $r['tokenID']) === 0) {
                     continue;
@@ -432,5 +435,4 @@ class LinkParser
             $this->logger->error($message);
         }
     }
-
 }

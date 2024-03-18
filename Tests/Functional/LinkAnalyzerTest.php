@@ -200,7 +200,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords( $this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -252,7 +252,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords( $this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -300,7 +300,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         // setup
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords( $this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -364,7 +364,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->configuration->setLinkTypes($linkTypes);
         $this->configuration->setSearchFields($searchFields);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords( $linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);

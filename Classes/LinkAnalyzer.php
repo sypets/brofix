@@ -17,7 +17,6 @@ namespace Sypets\Brofix;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
@@ -259,7 +258,6 @@ class LinkAnalyzer implements LoggerAwareInterface
             $table,
             [$field],
             $row,
-            $request,
             LinkParser::MASK_CONTENT_CHECK_ALL-LinkParser::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
         );
 
