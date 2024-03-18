@@ -471,11 +471,8 @@ class LinkParser
             'tableName' => $tablename,
             'vanillaUid' => $uid,
             'command' => 'edit',
+            'request' => $request,
         ];
-
-        if ($request) {
-            $formDataCompilerInput['request'] = $request;
-        }
 
         $this->processedFormData = $this->formDataCompiler->compile($formDataCompilerInput);
 
