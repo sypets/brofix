@@ -17,8 +17,6 @@ namespace Sypets\Brofix\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Psr\Http\Message\ServerRequestInterface;
-use Sypets\Brofix\Command\CommandUtility;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
@@ -48,8 +46,6 @@ abstract class AbstractFunctional extends FunctionalTestCase
      */
     protected $configuration;
 
-    protected ServerRequestInterface $request;
-
     /**
      * Set up for set up the backend user, initialize the language object
      * and creating the Export instance
@@ -59,8 +55,6 @@ abstract class AbstractFunctional extends FunctionalTestCase
         parent::setUp();
 
         $this->initializeConfiguration();
-
-        $this->request = CommandUtility::createFakeWebRequest(self::FAKE_BACKEND_URI);
     }
 
     /**

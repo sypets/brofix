@@ -107,10 +107,6 @@ class CheckLinksCommand extends Command
         $this->generateCheckResultMail = $generateCheckResultMail;
         $this->brokenLinkRepository = $brokenLinkRepository;
         $this->pagesRepository = $pagesRepository;
-
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $this->pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
         $this->statistics = [];
     }
 
@@ -393,7 +389,6 @@ class CheckLinksCommand extends Command
             $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
             $linkAnalyzer->init($pageIds, $this->configuration);
             $linkAnalyzer->generateBrokenLinkRecords(
-                CommandUtility::createFakeWebRequest($this->backendUri),
                 $linkTypes,
                 $checkHidden
             );

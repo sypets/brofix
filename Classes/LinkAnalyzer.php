@@ -106,7 +106,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      *
      * @todo make message more flexible, broken link records could get removed or changed
      */
-    public function recheckUrl(string &$message, array $record, ServerRequestInterface $request): int
+    public function recheckUrl(string &$message, array $record): int
     {
         $message = '';
         $url = $record['url'];
@@ -145,7 +145,6 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $table,
                     [$record['field']],
                     $row,
-                    $request,
                     LinkParser::MASK_CONTENT_CHECK_ALL
                 );
                 $urls = [];
@@ -230,7 +229,6 @@ class LinkAnalyzer implements LoggerAwareInterface
         string $table,
         string $field,
         int $beforeEditedTimestamp,
-        ServerRequestInterface $request,
         bool $checkHidden = false
     ): bool {
         $selectFields = $this->getSelectFields($table, [$field]);
@@ -372,11 +370,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * Find all supported broken links and store them in tx_brofix_broken_links
      *
-     * @param ServerRequestInterface $request
      * @param array<int,string> $linkTypes List of link types to check (corresponds to hook object)
      * @param bool $considerHidden Defines whether to look into hidden fields
      */
-    public function generateBrokenLinkRecords(ServerRequestInterface $request, array $linkTypes = [], bool $considerHidden = false): void
+    public function generateBrokenLinkRecords(array $linkTypes = [], bool $considerHidden = false): void
     {
         if (empty($linkTypes) || empty($this->pids)) {
             return;
@@ -464,7 +461,6 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $table,
                         $fields,
                         $row,
-                        $request,
                         LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
                     );
                     $this->statistics->addCountLinks($this->countLinks($results));

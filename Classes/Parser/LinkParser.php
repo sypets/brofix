@@ -47,8 +47,6 @@ class LinkParser
      * @var int
      */
     public const MASK_CONTENT_CHECK_ALL = 0xff;
-
-    protected ?ServerRequestInterface $request;
     protected FormDataCompiler $formDataCompiler;
     protected Configuration $configuration;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
@@ -116,10 +114,8 @@ class LinkParser
         $table,
         array $fields,
         array $record,
-        ServerRequestInterface $request,
         int $checks = self::MASK_CONTENT_CHECK_ALL,
     ): void {
-        $this->request = $request;
 
         $idRecord = (int)($record['uid'] ?? 0);
         try {
@@ -380,13 +376,6 @@ class LinkParser
             'command' => 'edit',
         ];
 
-        /*
-        $serverRequestFactory = GeneralUtility::makeInstance(ServerRequestFactory::class);
-        $request = $serverRequestFactory->createServerRequest('POST', 'http://t3coredev12');
-        */
-        $request = $this->request;
-        $formDataCompilerInput['request'] = $request;
-
         // we need TcaColumnsProcessShowitem
         $formData = $this->formDataCompiler->compile($formDataCompilerInput);
         $columns = $formData['processedTca']['columns'] ?? [];
@@ -443,4 +432,5 @@ class LinkParser
             $this->logger->error($message);
         }
     }
+
 }

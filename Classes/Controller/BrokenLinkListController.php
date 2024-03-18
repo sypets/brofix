@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -23,6 +24,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -198,7 +200,6 @@ class BrokenLinkListController extends AbstractBrofixController
         PagesRepository $pagesRepository = null,
         BrokenLinkRepository $brokenLinkRepository = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
-        Configuration $configuration = null,
         FlashMessageService $flashMessageService = null,
         BackendSession $backendSession = null,
         ModuleTemplate $moduleTemplate = null,
@@ -208,17 +209,11 @@ class BrokenLinkListController extends AbstractBrofixController
     ) {
         $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
-        $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
+
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
-        parent::__construct(
-            $configuration,
-            $backendSession,
-            $iconFactory,
-            $moduleTemplate,
-            $excludeLinkTarget
-        );
+
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
         $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
@@ -228,9 +223,17 @@ class BrokenLinkListController extends AbstractBrofixController
             $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         }
         $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
-        $this->configuration->setTraverseMaxNumberOfPagesInBackend(
+        $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
+        $configuration->setTraverseMaxNumberOfPagesInBackend(
             (int)($extConfArray['traverseMaxNumberOfPagesInBackend']
             ?? Configuration::TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT)
+        );
+        parent::__construct(
+            $configuration,
+            $backendSession,
+            $iconFactory,
+            $moduleTemplate,
+            $excludeLinkTarget
         );
     }
 

@@ -11,6 +11,7 @@ use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
 use Sypets\Brofix\Repository\ExcludeLinkTargetRepository;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -110,18 +111,22 @@ class ManageExclusionsController extends AbstractBrofixController
     public function __construct(
         ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
         ManageExclusionsFilter $filter = null,
-        Configuration $configuration = null,
         BackendSession $backendSession = null,
         ModuleTemplate $moduleTemplate = null,
         IconFactory $iconFactory = null,
         ExcludeLinkTarget $excludeLinkTarget = null,
         CharsetConverter $charsetConverter = null,
         LocalizationUtility $localizationUtility = null,
-        PageRenderer $pageRenderer = null
+        PageRenderer $pageRenderer = null,
+        ExtensionConfiguration $extensionConfiguration = null
     ) {
         $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
         $backendSession = $backendSession ?: GeneralUtility::makeInstance(BackendSession::class);
-        $configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
+        if (!$extensionConfiguration) {
+            $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        }
+        $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
+        $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
         $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
         $moduleTemplate = $moduleTemplate ?: GeneralUtility::makeInstance(ModuleTemplate::class);
         $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
