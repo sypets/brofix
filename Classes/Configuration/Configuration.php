@@ -19,6 +19,7 @@ namespace Sypets\Brofix\Configuration;
 
 use Symfony\Component\Mime\Address;
 use Sypets\Brofix\Linktype\AbstractLinktype;
+use Sypets\Brofix\Linktype\LinktypeInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
@@ -37,10 +38,66 @@ class Configuration
 {
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
 
+    public const DEFAULT_TSCONFIG = [
+        'searchFields.' => [
+            'pages' => 'media,url',
+            'tt_content' => 'bodytext,header_link,records',
+        ],
+        'excludeCtype' => 'html',
+        'linktypes' => 'db,file,external,applewebdata',
+        'check.' => [
+            'doNotCheckContentOnPagesDoktypes' => '3,4',
+            'doNotCheckPagesDoktypes' => '6,7,199,255',
+            'doNotTraversePagesDoktypes' => '6,199,255',
+            'doNotCheckLinksOnWorkspace' => false,
+        ],
+        'checkhidden' => false,
+        'depth' => 999,
+        'reportHiddenRecords' => true,
+        'linktypesConfig.' => [
+            'external.' => [
+                'headers.' => [
+                    'User-Agent' => '',
+                    'Accept' => '*/*'
+                ],
+                'timeout' => 10,
+                'redirects' => 5,
+            ]
+        ],
+        'excludeLinkTarget.' => [
+            'storagePid' => 0,
+            'allowed' => 'external',
+        ],
+        'linkTargetCache.' => [
+            'expiresLow' => 604800,
+            'expiresHigh' => 691200,
+        ],
+        'crawlDelay.' => [
+            'seconds' => 5,
+            'nodelay' => '',
+        ],
+        'report.' => [
+            'docsurl' => '',
+            'recheckButton' => -1,
+        ],
+        'mail.' => [
+            'sendOnCheckLinks' => 1,
+            'recipients' => '',
+            'fromname' => '',
+            'fromemail' => '',
+            'replytoname' => '',
+            'replytoemail' => '',
+            'subject' => '',
+            'template' => 'CheckLinksResults',
+            'language' => 'en',
+        ],
+        'custom.' => []
+    ];
+
     /**
      * @var mixed[]
      */
-    protected $tsConfig = [];
+    protected $tsConfig = self::DEFAULT_TSCONFIG;
 
     /**
      * Limit number of pages traversed in backend. This limit is only active when displaying
@@ -53,13 +110,45 @@ class Configuration
     protected int $traverseMaxNumberOfPagesInBackend = 0;
 
     /**
-     * Configuration constructor.
-     * @param mixed[]|null $tsConfig
+     * @var string[]
+     *
+     * Do not use these softreference parsers (only in fields $excludeSoftrefsInFields)
      */
-    public function __construct(array $tsConfig = null)
+    protected $excludeSoftrefs;
+
+    /** @var string[] */
+    protected $excludeSoftrefsInFields;
+
+    /**
+     * Array for hooks for own checks
+     *
+     * @var array<string,LinktypeInterface>
+     */
+    protected array $hookObjectsArr = [];
+
+    /**
+     * Configuration constructor.
+     * @param array<mixed> $extConfArray
+     */
+    public function __construct(array $extConfArray)
     {
-        if ($tsConfig !== null) {
-            $this->setTsConfig($tsConfig);
+        // initialize from extension configuration
+        $this->excludeSoftrefs = explode(',', $extConfArray['excludeSoftrefs'] ?? '');
+        $this->excludeSoftrefsInFields = explode(',', $extConfArray['excludeSoftrefsInFields'] ?? '');
+        $this->setTraverseMaxNumberOfPagesInBackend(
+            (int)($extConfArray['traverseMaxNumberOfPagesInBackend']
+                ?? self::TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT)
+        );
+
+        // initialize from global configuration
+        // Hook to handle own checks
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
+            /**
+             * @var LinktypeInterface $linktype
+             */
+            $linktype = GeneralUtility::makeInstance($className);
+            $this->hookObjectsArr[$key] = $linktype;
+            $linktype->setConfiguration($this);
         }
     }
 
@@ -89,7 +178,7 @@ class Configuration
      * @param string $tsConfigString
      * @throws \Exception
      *
-     * @todo Create specific exception
+     * @todo deprecate, use overrideTsConfigByArray
      */
     public function overrideTsConfigByString(string $tsConfigString): void
     {
@@ -112,6 +201,14 @@ class Configuration
         if (is_array($overrideTs)) {
             ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $overrideTs);
         }
+    }
+
+    /**
+     * @param array<mixed> $override
+     */
+    public function overrideTsConfigByArray(array $override): void
+    {
+        ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $override);
     }
 
     /**
@@ -529,6 +626,35 @@ class Configuration
     public function setTraverseMaxNumberOfPagesInBackend(int $traverseMaxNumberOfPagesInBackend): void
     {
         $this->traverseMaxNumberOfPagesInBackend = $traverseMaxNumberOfPagesInBackend;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExcludeSoftrefs(): array
+    {
+        return $this->excludeSoftrefs;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExcludeSoftrefsInFields(): array
+    {
+        return $this->excludeSoftrefsInFields;
+    }
+
+    public function getLinktypeObject(string $linktype): ?LinktypeInterface
+    {
+        return $this->hookObjectsArr[$linktype] ?? null;
+    }
+
+    /**
+     * @return array<string,LinktypeInterface>
+     */
+    public function getLinktypeObjects(): array
+    {
+        return $this->hookObjectsArr;
     }
 
     /**

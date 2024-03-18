@@ -23,6 +23,14 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctional extends FunctionalTestCase
 {
+    protected const FAKE_BACKEND_URI = 'https://localhost/typo3';
+
+    protected const EXTENSION_CONFIGURATION_ARRAY = [
+        'excludeSoftrefs' => 'url',
+        'excludeSoftrefsInFields' => 'tt_content.bodytext',
+        'traverseMaxNumberOfPagesInBackend' => 100,
+    ];
+
     protected array $coreExtensionsToLoad = [
         'backend',
         'fluid',
@@ -55,7 +63,7 @@ abstract class AbstractFunctional extends FunctionalTestCase
     protected function initializeConfiguration(): void
     {
         $tsConfigPath = GeneralUtility::getFileAbsFileName('EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig');
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
+        $this->configuration = GeneralUtility::makeInstance(Configuration::class, self::EXTENSION_CONFIGURATION_ARRAY);
         // load default values
         $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
         $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');

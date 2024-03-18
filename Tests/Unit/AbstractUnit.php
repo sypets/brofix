@@ -28,6 +28,12 @@ abstract class AbstractUnit extends UnitTestCase
 {
     use ProphecyTrait;
 
+    protected const EXTENSION_CONFIGURATION_ARRAY = [
+        'excludeSoftrefs' => 'url',
+        'excludeSoftrefsInFields' => 'tt_content.bodytext',
+        'traverseMaxNumberOfPagesInBackend' => 100,
+    ];
+
     /**
      * @var Configuration
      */
@@ -38,15 +44,16 @@ abstract class AbstractUnit extends UnitTestCase
      */
     protected function initializeConfiguration(): void
     {
-        $tsConfigPath = GeneralUtility::getFileAbsFileName(
-            'EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig'
+        // use defaults
+        $this->configuration = GeneralUtility::makeInstance(
+            Configuration::class,
+            self::EXTENSION_CONFIGURATION_ARRAY
         );
-
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
-        // load default values
-        $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
-        $this->configuration->overrideTsConfigByString(
-            'mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)'
+        $this->configuration->overrideTsConfigByArray(
+            [
+                    'linktypesConfig.external.headers.User-Agent'
+                        => 'Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)'
+                ]
         );
     }
 

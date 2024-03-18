@@ -22,23 +22,18 @@ use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
+
+use Sypets\Brofix\Parser\LinkParser;
+
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Repository\PagesRepository;
-use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
-use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
-use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
-use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
-use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -48,26 +43,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class LinkAnalyzer implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
-
-    /**
-     * @var int
-     */
-    protected const MASK_CONTENT_CHECK_IF_EDITABLE_FIELD = 1;
-
-    /**
-     * @var int
-     */
-    protected const MASK_CONTENT_CHECK_IF_RECORD_SHOULD_BE_CHECKED = 2;
-
-    /**
-     * @var int
-     */
-    protected const MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED = 4;
-
-    /**
-     * @var int
-     */
-    protected const MASK_CONTENT_CHECK_ALL = 0xff;
 
     /**
      * Array of tables and fields to search for broken links
@@ -83,75 +58,41 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     protected array $pids = [];
 
-    /**
-     * Array for hooks for own checks
-     *
-     * @var AbstractLinktype[]
-     */
-    protected array $hookObjectsArr = [];
-
     protected ?Configuration $configuration = null;
     protected BrokenLinkRepository  $brokenLinkRepository;
     protected ContentRepository $contentRepository;
     protected PagesRepository $pagesRepository;
-    protected FormDataCompiler $formDataCompiler;
-    protected SoftReferenceParserFactory $softReferenceParserFactory;
-
-    /** @var string[] */
-    protected $excludeSoftrefs;
-
-    /** @var string[] */
-    protected $excludeSoftrefsInFields;
 
     /**
      * @var CheckLinksStatistics|null
      */
     protected ?CheckLinksStatistics $statistics = null;
 
-    /**
-     * Fill hookObjectsArr with different link types and possible XClasses.
-     */
+    protected LinkParser $linkParser;
+
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
-        PagesRepository $pagesRepository,
-        SoftReferenceParserFactory $softReferenceParserFactory,
-        ExtensionConfiguration $extensionConfiguration
+        PagesRepository $pagesRepository
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
         $this->contentRepository = $contentRepository;
         $this->pagesRepository = $pagesRepository;
-        $this->softReferenceParserFactory = $softReferenceParserFactory;
-
-        // Hook to handle own checks
-        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['brofix']['checkLinks'] ?? [] as $key => $className) {
-            $this->hookObjectsArr[$key] = GeneralUtility::makeInstance($className);
-        }
-        /**
-         * @var FieldShouldBeChecked
-         */
-        $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
-        $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
-
-        $this->excludeSoftrefs = explode(',', $extensionConfiguration->get('brofix', 'excludeSoftrefs') ?: '');
-        $this->excludeSoftrefsInFields = explode(',', $extensionConfiguration->get('brofix', 'excludeSoftrefsInFields') ?: '');
     }
 
     /**
      * @param array<string|int> $pidList
-     * @param Configuration|null $configuration
+     * @param Configuration $configuration
      */
-    public function init(array $pidList, Configuration $configuration = null): void
+    public function init(array $pidList, Configuration $configuration): void
     {
-        $this->configuration = $configuration ?: GeneralUtility::makeInstance(Configuration::class);
+        $this->configuration = $configuration;
+
         $this->searchFields = $this->configuration->getSearchFields();
         $this->pids = $pidList;
         $this->statistics = new CheckLinksStatistics();
-
-        foreach ($this->hookObjectsArr as $key => $value) {
-            $value->setConfiguration($this->configuration);
-        }
+        $this->linkParser = LinkParser::initialize($this->configuration);
     }
 
     /**
@@ -169,12 +110,14 @@ class LinkAnalyzer implements LoggerAwareInterface
         $message = '';
         $url = $record['url'];
         $linkType = $record['linkType'];
-        if ($this->hookObjectsArr[$linkType] ?? false) {
-            $hookObj = $this->hookObjectsArr[$linkType];
+        $table = $record['table'];
+
+        $linktypeObject = $this->configuration->getLinktypeObject($linkType);
+        if ($linktypeObject) {
             // get fresh result for URL
             $mode = AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY | AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE
                 | AbstractLinktype::CHECK_LINK_FLAG_SYNCHRONOUS;
-            $result = $hookObj->checkLink($url, [], $mode);
+            $result = $linktypeObject->checkLink($url, [], $mode);
             if ($result === true) {
                 // URL is ok, remove broken link records
                 $count = $this->brokenLinkRepository->removeBrokenLinksForLinkTarget(
@@ -194,13 +137,14 @@ class LinkAnalyzer implements LoggerAwareInterface
                 // check if url still exists in record
                 $uid = (int)$record['uid'];
                 $results = [];
-                $selectFields = $this->getSelectFields($record['table'], [$record['field']]);
-                $row = $this->contentRepository->getRowForUid($uid, $record['table'], $selectFields);
-                $this->findLinksForRecord(
+                $selectFields = $this->getSelectFields($table, [$record['field']]);
+                $row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
+                $this->linkParser->findLinksForRecord(
                     $results,
-                    $record['table'],
+                    $table,
                     [$record['field']],
-                    $row
+                    $row,
+                    LinkParser::MASK_CONTENT_CHECK_ALL
                 );
                 $urls = [];
                 foreach ($results[$linkType] ?? [] as $entryValue) {
@@ -233,7 +177,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             // URL is not ok, update records (error type may have changed)
             $response = [
                     'valid' => false,
-                    'errorParams' => $hookObj->getErrorParams()->toArray()
+                    'errorParams' => $linktypeObject->getErrorParams()->toArray()
                 ];
             $brokenLinkRecord = [];
             $brokenLinkRecord['url'] = $url;
@@ -288,6 +232,7 @@ class LinkAnalyzer implements LoggerAwareInterface
     ): bool {
         $selectFields = $this->getSelectFields($table, [$field]);
         $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+
         $startTime = \time();
 
         if (!$row) {
@@ -308,12 +253,12 @@ class LinkAnalyzer implements LoggerAwareInterface
             return false;
         }
         $resultsLinks = [];
-        $this->findLinksForRecord(
+        $this->linkParser->findLinksForRecord(
             $resultsLinks,
             $table,
             [$field],
             $row,
-            self::MASK_CONTENT_CHECK_ALL-self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
+            LinkParser::MASK_CONTENT_CHECK_ALL-LinkParser::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
         );
 
         if ($resultsLinks) {
@@ -337,7 +282,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             return;
         }
 
-        foreach ($this->hookObjectsArr as $key => $hookObj) {
+        foreach ($this->configuration->getLinktypeObjects() as $key => $linktypeObject) {
             if (!is_array($links[$key] ?? false) || (!in_array($key, $linkTypes, true))) {
                 continue;
             }
@@ -390,10 +335,10 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['url'] = (string)$url;
 
                 $this->debug("checkLinks: before checking $url");
-                $checkUrl = $hookObj->checkLink((string)$url, $entryValue, $mode);
+                $checkUrl = $linktypeObject->checkLink((string)$url, $entryValue, $mode);
                 $this->debug("checkLinks: after checking $url");
 
-                if ($hookObj->isExcludeUrl()) {
+                if ($linktypeObject->isExcludeUrl()) {
                     $this->statistics->incrementCountExcludedLinks();
                 }
 
@@ -401,18 +346,18 @@ class LinkAnalyzer implements LoggerAwareInterface
                 if (!$checkUrl) {
                     $response = [
                         'valid' => false,
-                        'errorParams' => $hookObj->getErrorParams()->toArray()
+                        'errorParams' => $linktypeObject->getErrorParams()->toArray()
                     ];
                     $record['url_response'] = json_encode($response) ?: '';
                     // last_check reflects time of last check (may be older if URL was in cache)
-                    $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
+                    $record['last_check_url'] = $linktypeObject->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                     $this->statistics->incrementCountBrokenLinks();
                 } elseif (GeneralUtility::_GP('showalllinks')) {
                     $response = ['valid' => true];
                     $record['url_response'] = json_encode($response) ?: '';
-                    $record['last_check_url'] = $hookObj->getLastChecked() ?: \time();
+                    $record['last_check_url'] = $linktypeObject->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                 }
@@ -426,7 +371,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array<int,string> $linkTypes List of link types to check (corresponds to hook object)
      * @param bool $considerHidden Defines whether to look into hidden fields
      */
-    public function generateBrokenLinkRecords(array $linkTypes = [], $considerHidden = false): void
+    public function generateBrokenLinkRecords(array $linkTypes = [], bool $considerHidden = false): void
     {
         if (empty($linkTypes) || empty($this->pids)) {
             return;
@@ -458,7 +403,6 @@ class LinkAnalyzer implements LoggerAwareInterface
 
                 $selectFields = $this->getSelectFields($table, $fields);
 
-                // move db query to ContentRepository, unify handling of selectFields in getSelectFields as 'AS' below
                 if ($table === 'pages') {
                     $constraints = [
                         $queryBuilder->expr()->in(
@@ -467,7 +411,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                         )
                     ];
                 } else {
-                    // if table is not 'pages', we join with 'pages' table to exclude content elements on pages with doktype=3 or 4
+                    // if table is not 'pages', we join with 'pages' table to exclude content elements on pages with
+                    // some doktype (e.g. 3 or 4), see Configuration::getDoNotCheckContentOnPagesDoktypes
                     $constraints = [
                         $queryBuilder->expr()->in(
                             $table . '.pid',
@@ -505,22 +450,16 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $result = $queryBuilder->executeQuery();
                 while ($row = $result->fetchAssociative()) {
                     $results = [];
-                    $l18nCfg = (int)($row['l18n_cfg'] ?? 0);
-                    $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
-                    $lang = 0;
-                    if ($languageField) {
-                        $lang = (int)($row[$languageField] ?? 0);
-                    }
-                    if (($l18nCfg === 1 || $l18nCfg === 3) && $lang ===0) {
-                        // do not render records of default language due to setting l18n_cfg in page
+
+                    if ($this->isRecordsOnPageShouldBeChecked($table, $row) === false) {
                         continue;
                     }
-                    $this->findLinksForRecord(
+                    $this->linkParser->findLinksForRecord(
                         $results,
                         $table,
                         $fields,
                         $row,
-                        self::MASK_CONTENT_CHECK_ALL - self::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
+                        LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
                     );
                     $this->statistics->addCountLinks($this->countLinks($results));
                     $this->checkLinks($results, $linkTypes);
@@ -572,6 +511,59 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
+     * Check if records should be checked by checking the page
+     *
+     * - is not hidden
+     * - is not doktype=3 or 4
+     * - is not record of default language and cfg_l18n is 1 or 3
+     *
+     * @param string $table
+     * @param array<mixed> $record
+     * @return bool
+     *
+     * @todo can this already be handledwhen fetching the pagetree in PagesRepository::getPageList
+     * e.g. when checking l18n_cfg
+     */
+    public function isRecordsOnPageShouldBeChecked(string $table, array $record): bool
+    {
+        if ($table === 'pages') {
+            return true;
+        }
+        $pageUid = $record['pid'] ?? 0;
+        if ($pageUid === 0) {
+            return false;
+        }
+
+        // todo: this is inefficient can we pass these fields for the page in $record (we are joining with pages before)
+        // we need pages.(doktype|l18n_cfg)
+        // todo: we need also the language, can be determined previously and passed as parameter
+        $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
+        if (!$pageRow) {
+            return false;
+        }
+        $doktype = (int)($pageRow['doktype'] ?? 0);
+        if ($doktype === 3 || $doktype === 4) {
+            return false;
+        }
+        $l18nCfg = (int)($pageRow['l18n_cfg'] ?? 0);
+        $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
+        $lang = 0;
+        if ($languageField) {
+            $lang = (int)($record[$languageField] ?? 0);
+        }
+        if ((($l18nCfg & 1) === 1) && $lang === 0) {
+            return false;
+        }
+        // todo: this is inefficient, we should not need to do this as the page tree has already been fetched
+        // however fetching the page list does not check if current start page is subpage of hidden / extendToSubpages
+        // should be fixed there
+        if ($this->pagesRepository->getRootLineIsHidden($pageRow)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @param mixed[] $links
      * @return int
      */
@@ -587,358 +579,6 @@ class LinkAnalyzer implements LoggerAwareInterface
     public function getStatistics(): CheckLinksStatistics
     {
         return $this->statistics;
-    }
-
-    /**
-     * Find all supported broken links for a specific record
-     *
-     * @param mixed[] $results Array of broken links
-     * @param string $table Table name of the record
-     * @param array<string> $fields Array of fields to analyze
-     * @param mixed[] $record Record to analyze
-     * @param int $checks what checks should be performed. (Default is: all checks enabled)
-     */
-    public function findLinksForRecord(
-        array &$results,
-        $table,
-        array $fields,
-        array $record,
-        int $checks = self::MASK_CONTENT_CHECK_ALL
-    ): void {
-        $idRecord = (int)($record['uid'] ?? 0);
-        try {
-            // Put together content of all relevant fields
-            /** @var HtmlParser $htmlParser */
-            $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
-
-            if ($checks & self::MASK_CONTENT_CHECK_IF_RECORD_SHOULD_BE_CHECKED) {
-                if ($this->isRecordShouldBeChecked($table, $record) === false) {
-                    return;
-                }
-            }
-
-            if ($checks & self::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED) {
-                if ($this->isRecordsOnPageShouldBeChecked($table, $record) === false) {
-                    return;
-                }
-            }
-
-            if ($checks & self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD) {
-                $fields = $this->getEditableFields($idRecord, $table, $fields);
-            }
-
-            // Get all references
-            foreach ($fields as $field) {
-                $conf = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
-                $valueField = htmlspecialchars_decode((string)($record[$field]));
-
-                // Check if a TCA configured field has soft references defined (see TYPO3 Core API document)
-                if (!($conf['softref'] ?? false) || (string)$valueField === '') {
-                    continue;
-                }
-
-                /**
-                 * @todo can be removed along the the Extension configuration setting  excludeSoftrefs when core
-                 *   bug is fixed, see https://forge.typo3.org/issues/97937
-                 */
-                foreach ($this->excludeSoftrefsInFields as $tableField) {
-                    if ($tableField != ($table . '.' . $field)) {
-                        continue;
-                    }
-                    foreach ($this->excludeSoftrefs as $excludeSoftref) {
-                        $conf['softref'] = preg_replace(
-                            '#(,|^)' . $excludeSoftref . '(,|$)#',
-                            '',
-                            $conf['softref']
-                        );
-                        break;
-                    }
-                }
-
-                $softRefParams = ['subst'];
-                foreach ($this->softReferenceParserFactory->getParsersBySoftRefParserList($conf['softref'], $softRefParams) as $softReferenceParser) {
-                    $parserResult = $softReferenceParser->parse($table, $field, $idRecord, $valueField);
-                    if (!$parserResult->hasMatched()) {
-                        continue;
-                    }
-                    if ($softReferenceParser->getParserKey() === 'typolink_tag') {
-                        $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
-                    } else {
-                        $this->analyzeLinks($parserResult, $results, $record, $field, $table);
-                    }
-                }
-            }
-        } catch (DatabaseDefaultLanguageException $e) {
-            // @extensionScannerIgnoreLine problem with ->error()
-            $this->error(
-                "analyzeRecord: table=$table, uid=$idRecord, DatabaseDefaultLanguageException:"
-                . $e->getMessage()
-                . ' stack trace:'
-                . $e->getTraceAsString()
-            );
-        } catch (\Exception | \Throwable $e) {
-            // @extensionScannerIgnoreLine problem with ->error()
-            $this->error(
-                "analyzeRecord: table=$table, uid=$idRecord, exception="
-                . $e->getMessage()
-                . ' stack trace:'
-                . $e->getTraceAsString()
-            );
-        }
-    }
-
-    /**
-     * Find all supported broken links for a specific link list
-     *
-     * @param SoftReferenceParserResult $parserResult findRef parsed records
-     * @param mixed[] $results Array of broken links
-     * @param mixed[] $record UID of the current record
-     * @param string $field The current field
-     * @param string $table The current table
-     */
-    protected function analyzeLinks(SoftReferenceParserResult $parserResult, array &$results, array $record, string $field, string $table): void
-    {
-        foreach ($parserResult->getMatchedElements() as $element) {
-            $r = $element['subst'];
-            $type = '';
-            $idRecord = $record['uid'];
-            if (empty($r) || !is_array($r)) {
-                continue;
-            }
-
-            /** @var AbstractLinktype $hookObj */
-            foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
-                $type = $hookObj->fetchType($r, $type, $keyArr);
-                // Store the type that was found
-                // This prevents overriding by internal validator
-                if (!empty($type)) {
-                    $r['type'] = $type;
-                }
-            }
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['substr'] = $r;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['row'] = $record;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['table'] = $table;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['field'] = $field;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $r['tokenID']]['uid'] = $idRecord;
-        }
-    }
-
-    /**
-     * Find all supported broken links for a specific typoLink
-     *
-     * @param SoftReferenceParserResult $parserResult findRef parsed records
-     * @param mixed[] $results Array of broken links
-     * @param HtmlParser $htmlParser Instance of html parser
-     * @param mixed[] $record The current record
-     * @param string $field The current field
-     * @param string $table The current table
-     */
-    protected function analyzeTypoLinks(
-        SoftReferenceParserResult $parserResult,
-        array &$results,
-        $htmlParser,
-        array $record,
-        $field,
-        $table
-    ): void {
-        $currentR = [];
-        $linkTags = $htmlParser->splitIntoBlock('a,link', $parserResult->getContent());
-        $idRecord = $record['uid'];
-        $type = '';
-        $title = '';
-        $countLinkTags = count($linkTags);
-        for ($i = 1; $i < $countLinkTags; $i += 2) {
-            $referencedRecordType = '';
-            foreach ($parserResult->getMatchedElements() as $element) {
-                $type = '';
-                $r = $element['subst'];
-                if (empty($r['tokenID']) || substr_count($linkTags[$i], $r['tokenID']) === 0) {
-                    continue;
-                }
-
-                // Type of referenced record
-                if (isset($r['recordRef']) && strpos($r['recordRef'], 'pages') !== false) {
-                    $currentR = $r;
-                    // Contains number of the page
-                    $referencedRecordType = $r['tokenValue'];
-                    $wasPage = true;
-                } elseif (isset($r['recordRef']) && strpos($r['recordRef'], 'tt_content') !== false
-                    && (isset($wasPage) && $wasPage === true)) {
-                    $referencedRecordType = $referencedRecordType . '#c' . $r['tokenValue'];
-                    $wasPage = false;
-                } else {
-                    $currentR = $r;
-                }
-                $title = strip_tags($linkTags[$i]);
-            }
-
-            // @todo Should be checked why it could be that $currentR stays empty which breaks further processing with
-            //       chained PHP array access errors in hooks fetchType() and the $result[] build lines below. Further
-            //       $currentR could be overwritten in the inner loop, thus not checking all elements.
-            if (empty($currentR)) {
-                continue;
-            }
-
-            /** @var AbstractLinktype $hookObj */
-            foreach ($this->hookObjectsArr as $keyArr => $hookObj) {
-                $type = $hookObj->fetchType($currentR, $type, $keyArr);
-                // Store the type that was found
-                // This prevents overriding by internal validator
-                if (!empty($type)) {
-                    $currentR['type'] = $type;
-                }
-            }
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['substr'] = $currentR;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['row'] = $record;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['table'] = $table;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['field'] = $field;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['uid'] = $idRecord;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['link_title'] = $title;
-            $results[$type][$table . ':' . $field . ':' . $idRecord . ':' . $currentR['tokenID']]['pageAndAnchor'] = $referencedRecordType;
-        }
-    }
-
-    /**
-     * Check if a record is visible in the Frontend. This concerns whether
-     * a record has the "hidden" field set, but also considers other factors
-     * such as if the element is in a hidden gridelement.
-     *
-     * This function does not
-     *
-     * @param string $tablename
-     * @param array<mixed> $row
-     * @return bool
-     */
-    public function isVisibleFrontendRecord(string $tablename, array $row): bool
-    {
-        $uid = (int)($row['uid'] ?? 0);
-        if ($row['hidden'] ?? false) {
-            return false;
-        }
-        // if gridelements and in gridelement, check if parent is hidden
-        if ($tablename === 'tt_content'
-            && ((int)($row['colPos'] ?? 0)) == -1
-            && ExtensionManagementUtility::isLoaded('gridelements')
-            && $this->contentRepository->isGridElementParentHidden($uid)
-        ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * When checking links, there are several criteria for records / fields
-     * which should not be checked.
-     *
-     * These are records / fields which
-     * - are not rendered in the FE
-     * - excluded from checking
-     *
-     * @param string $tablename
-     * @param array<mixed> $row
-     * @return bool
-     */
-    public function isRecordShouldBeChecked(string $tablename, array $row): bool
-    {
-        if ($this->isVisibleFrontendRecord($tablename, $row) === false) {
-            return false;
-        }
-
-        if ($tablename === 'tt_content') {
-            $excludedCtypes = $this->configuration->getExcludedCtypes();
-            if ($excludedCtypes !== [] && ($row['CType'] ?? false)) {
-                if (in_array($row['CType'], $excludedCtypes)) {
-                    return false;
-                }
-            }
-        }
-
-        // Check if the element is on WS
-        if ($this->configuration->getDoNotCheckLinksOnWorkspace() == true) {
-            $workspaceId = (int)($row['t3ver_wsid'] ?? 0);
-            if ($workspaceId !== 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if records should be checked by checking the page
-     *
-     * - is not hidden
-     * - is not doktype=3 or 4
-     * - is not record of default language and cfg_l18n is 1 or 3
-     *
-     * @param string $table
-     * @param array<mixed> $record
-     * @return bool
-     */
-    public function isRecordsOnPageShouldBeChecked(string $table, array $record): bool
-    {
-        if ($table === 'pages') {
-            return true;
-        }
-        $pageUid = $record['pid'] ?? 0;
-        if ($pageUid === 0) {
-            return false;
-        }
-        $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
-        if (!$pageRow) {
-            return false;
-        }
-        $doktype = (int)($pageRow['doktype'] ?? 0);
-        if ($doktype === 3 || $doktype === 4) {
-            return false;
-        }
-        $l18nCfg = (int)($pageRow['l18n_cfg'] ?? 0);
-        $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
-        $lang = 0;
-        if ($languageField) {
-            $lang = (int)($record[$languageField] ?? 0);
-        }
-        if (($l18nCfg === 3 || $l18nCfg === 1) && $lang === 0) {
-            return false;
-        }
-        if ($this->pagesRepository->getRootLineIsHidden($pageRow)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Return the editable fields of a record (using FormEngine).
-     *
-     * @param int $uid
-     * @param string $tablename
-     * @param string[] $fields
-     * @return string[]
-     */
-    public function getEditableFields(int $uid, string $tablename, array $fields): array
-    {
-        if ($fields === []) {
-            return [];
-        }
-        // check if the field to be checked will be rendered in FormEngine
-        // if not, the field should not be checked for broken links because it can't be edited in BE
-        $formDataCompilerInput = [
-            'tableName' => $tablename,
-            'vanillaUid' => $uid,
-            'command' => 'edit',
-        ];
-        // we need TcaColumnsProcessShowitem
-        $formData = $this->formDataCompiler->compile($formDataCompilerInput);
-        $columns = $formData['processedTca']['columns'] ?? [];
-        if ($columns === []) {
-            return [];
-        }
-        foreach ($fields as $key => $field) {
-            if (!isset($columns[$field])) {
-                unset($fields[$key]);
-            }
-        }
-        return $fields;
     }
 
     /**
