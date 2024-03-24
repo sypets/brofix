@@ -429,7 +429,6 @@ class BrokenLinkListController extends AbstractBrofixController
 
     /**
      * Main, called from parent object
-     *
      */
     public function main(ServerRequestInterface $request): string
     {
@@ -437,7 +436,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->initialize();
 
         if ($this->action === 'updateLinkList') {
-            $this->linkAnalyzer->generateBrokenLinkRecords($this->request,$this->configuration->getLinkTypes());
+            $this->linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
