@@ -1,6 +1,9 @@
 <?php
 
 use Sypets\Brofix\FormEngine\CustomEvaluation\ExcludeLinkTargetsLinkTargetEvaluation;
+use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessCommon;
+use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessShowitem;
+use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsRemoveUnused;
 
 defined('TYPO3') or die();
 
@@ -53,6 +56,8 @@ defined('TYPO3') or die();
 
     // for link checking, do not perform user permission checks, only check if field is editable
     // permission checks are done when reading records from tx_brofix_broken_links for report
+
+    // legacy: worked but did not include flexform and some other providers
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [
         \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class => [],
         \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class => [
@@ -92,16 +97,16 @@ defined('TYPO3') or die();
                 \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides::class,
             ],
         ],
-        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessShowitem::class => [
+        TcaColumnsProcessShowitem::class => [
             'depends' => [
                 \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class,
                 \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessPlaceholders::class
             ],
         ],
-        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsRemoveUnused::class => [
+        TcaColumnsRemoveUnused::class => [
             'depends' => [
-                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessCommon::class,
-                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessShowitem::class,
+                TcaColumnsProcessCommon::class,
+                TcaColumnsProcessShowitem::class,
             ],
         ],
     ];

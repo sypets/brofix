@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -193,6 +194,8 @@ class BrokenLinkListController extends AbstractBrofixController
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
+
+    protected ServerRequestInterface $request;
 
     public function __construct(
         PagesRepository $pagesRepository = null,
@@ -426,15 +429,14 @@ class BrokenLinkListController extends AbstractBrofixController
 
     /**
      * Main, called from parent object
-     *
-     * @return string Module content
      */
-    public function main(): string
+    public function main(ServerRequestInterface $request): string
     {
+        $this->request = $request;
         $this->initialize();
 
         if ($this->action === 'updateLinkList') {
-            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+            $this->linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
@@ -444,7 +446,7 @@ class BrokenLinkListController extends AbstractBrofixController
 
         if ($this->action === 'recheckUrl') {
             $message = '';
-            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord);
+            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord, $request);
             if ($count > 0) {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
@@ -468,6 +470,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->currentRecord['table'],
                 $this->currentRecord['field'],
                 (int)($this->currentRecord['currentTime'] ?? 0),
+                $request,
                 $this->configuration->isCheckHidden()
             );
             if ($message) {
@@ -901,7 +904,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['elementType'] = $this->getLanguageSplitLabel($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
         // Get the language label for the field from TCA
         $fieldName = '';
-        if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']) {
+        if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label'] ?? false) {
             $fieldName = $languageService->sL($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']);
             // Crop colon from end if present
             if (substr($fieldName, -1, 1) === ':') {
@@ -909,6 +912,13 @@ class BrokenLinkListController extends AbstractBrofixController
             }
         }
         $variables['fieldName'] = !empty($fieldName) ? $fieldName : $row['field'];
+        // flexform field label
+        if ($row['flexform_field_label'] ?? '') {
+            $flexformLabel = $languageService->sL($row['flexform_field_label']);
+            if ($flexformLabel) {
+                $variables['fieldName'] = $flexformLabel;
+            }
+        }
 
         // page title / uid / path
         $pageId = (int)($table === 'pages' ? $row['record_uid'] : $row['record_pid']);

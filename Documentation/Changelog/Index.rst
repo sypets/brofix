@@ -13,6 +13,16 @@ Changelog
    For more changes, please see the respective release notes and commit messages
    in the GitHub repository: https://github.com/sypets/brofix
 
+
+4.5.x
+=====
+
+.. toctree::
+   :glob:
+   :titlesonly:
+
+   Entries/6.x/*
+
 3.2.0
 =====
 

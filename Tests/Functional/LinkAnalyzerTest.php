@@ -18,6 +18,7 @@ namespace Sypets\Brofix\Tests\Functional;
  */
 
 use Sypets\Brofix\LinkAnalyzer;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -27,6 +28,26 @@ class LinkAnalyzerTest extends AbstractFunctional
     {
         parent::setUp();
         $GLOBALS['LANG'] = $this->getContainer()->get(LanguageServiceFactory::class)->create('default');
+        $this->setupBackendUserAndGroup(
+            3,
+            'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+        );
+        Bootstrap::initializeLanguageObject();
+    }
+
+    /**
+     * @param int $uid
+     * @param non-empty-string $fixtureFile
+     * @param string $groupFixtureFile
+     */
+    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
+    {
+        if ($groupFixtureFile) {
+            $this->importDataSet($groupFixtureFile);
+        }
+        $this->backendUserFixture = $fixtureFile;
+        $this->setUpBackendUserFromFixture($uid);
     }
 
     /**
@@ -95,7 +116,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         // setup
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -147,7 +168,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -200,7 +221,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -252,7 +273,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -300,7 +321,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         // setup
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
@@ -364,7 +385,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->configuration->setLinkTypes($linkTypes);
         $this->configuration->setSearchFields($searchFields);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
