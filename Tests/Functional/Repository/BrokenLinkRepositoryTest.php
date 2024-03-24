@@ -225,7 +225,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         // get result
         $result = $this->brokenLinkRepository->getLinkCounts(
@@ -349,7 +349,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         $results = $this->brokenLinkRepository->getBrokenLinks(
             $pidList,
@@ -388,6 +388,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 2,
@@ -400,6 +402,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -412,6 +416,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => '85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -424,6 +430,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -471,6 +479,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -483,6 +493,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => '85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -495,6 +507,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -519,6 +533,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 2,
@@ -531,6 +547,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -543,6 +561,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => '85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -555,6 +575,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -579,6 +601,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -604,6 +628,8 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
+                    'flexform_field' => '',
+                    'flexform_field_label' => '',
                 ],
             ]
         ];
@@ -635,7 +661,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->importDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
-        $linkAnalyzer->generateBrokenLinkRecords($linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         // get results
         $results = $this->brokenLinkRepository->getBrokenLinks(
