@@ -73,7 +73,10 @@ link checking is performed, using the default template in this extension.
 Extension configuration
 =======================
 
-**EXT:backend | loginLogo:**  *Logo ...*
+EXT:backend | loginLogo
+-----------------------
+
+*Logo ...*
 
 Set the logo used in the Fluid email in the EXT:backend extension configuration:
 
@@ -81,9 +84,10 @@ Set the logo used in the Fluid email in the EXT:backend extension configuration:
 
    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['backend']['login.loginLogo'] = 'EXT:my_theme/Resources/Public/Images/login-logo.png or //domain.tld/login-logo.png';
 
------
+EXT:brofix | traverseMaxNumberOfPagesInBackend
+----------------------------------------------
 
-**EXT:brofix | traverseMaxNumberOfPagesInBackend:** *Maximum number of pages to traverse in Backend ...*
+*Maximum number of pages to traverse in Backend ...*
 
 Set the maximum number of pages traversed in the backend module.
 This should be limited so that loading the broken link list in the backend
@@ -101,6 +105,19 @@ on the performance of your site, you should use a limit such as 1000 (thousand).
    always traverse through all subpages of the current page (unless the level
    is restricted in the form). The traversing of the pages is not cached and
    may cause considerable delays.
+
+.. _extensionConfiguation_tcaProcessing:
+
+EXT:brofix | tcaProcessing
+--------------------------
+
+
+*Perform TCA processing*
+
+Changes how the TCA processing is done. The default setting may not work
+for some configurations and especially for Flexforms. In that case, it should
+be set to "full". This setting is still experimental, so it is not on by
+default.
 
 
 Tsconfig
