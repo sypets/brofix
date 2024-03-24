@@ -7,3 +7,11 @@ excludeSoftrefsInFields = tt_content.bodytext
 # cat=basic; type=int; label= Maximum number of pages to traverse in Backend. Limit is disabled if =0. This should be set to a hard limit for performance reasons.
 traverseMaxNumberOfPagesInBackend = 1000
 
+# cat=basic; type=string; label= FormDataGroup for processing TCA
+traverseMaxNumberOfPagesInBackend = 1000
+
+# cat=basic; type=options[None=none,default=default,full=full]; label= Perform TCA processing (see documentation for details)
+tcaProcessing = default
+
+# cat=basic; type=string; label= Override FormDataGroup for processing TCA (see documentation for details)
+overrideFormDataGroup =

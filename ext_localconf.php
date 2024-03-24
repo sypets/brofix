@@ -5,6 +5,7 @@ use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessCommon;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessRecordTitle;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessShowitem;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsRemoveUnused;
+use TYPO3\CMS\Backend\Form\FormDataProvider\TcaText;
 
 defined('TYPO3') or die();
 
@@ -58,73 +59,60 @@ defined('TYPO3') or die();
     // for link checking, do not perform user permission checks, only check if field is editable
     // permission checks are done when reading records from tx_brofix_broken_links for report
 
-    // use core formDataGroup, slightly modified
 
-    if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] =
-            $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'];
+    // legacy: worked but did not include flexform and some other providers
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [
+        \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class => [],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
+            ]
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\PageTsConfig::class,
+                \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabasePageLanguageOverlayRows::class => [
+            'depends' => [
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseLanguageRows::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class,
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseLanguageRows::class,
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class,
+            ],
+        ],
 
-        // todo: find better solution
-        // hack: remove TcaColumnsProcessRecordTitle from provider list because this might write additional fields
-        //  to the list columnsToProcess and processedTcaColumns which should not be displayed in the BE
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'][TcaColumnsProcessRecordTitle::class])) {
-            unset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'][TcaColumnsProcessRecordTitle::class]);
-        }
-    } else {
-        // legacy: worked but did not include flexform and some other providers
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [
-            \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class => [],
-            \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
-                ]
+        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class,
+                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides::class,
             ],
-            \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\PageTsConfig::class,
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
-                ],
+        ],
+        TcaColumnsProcessShowitem::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class,
+                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessPlaceholders::class
             ],
-            \TYPO3\CMS\Backend\Form\FormDataProvider\DatabasePageLanguageOverlayRows::class => [
-                'depends' => [
-                ],
+        ],
+        TcaColumnsRemoveUnused::class => [
+            'depends' => [
+                TcaColumnsProcessCommon::class,
+                TcaColumnsProcessShowitem::class,
             ],
-            \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseLanguageRows::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class,
-                ],
-            ],
-            \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseLanguageRows::class,
-                ],
-            ],
-            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class,
-                ],
-            ],
-
-            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class,
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides::class,
-                ],
-            ],
-            TcaColumnsProcessShowitem::class => [
-                'depends' => [
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class,
-                    \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessPlaceholders::class
-                ],
-            ],
-            TcaColumnsRemoveUnused::class => [
-                'depends' => [
-                    TcaColumnsProcessCommon::class,
-                    TcaColumnsProcessShowitem::class,
-                ],
-            ],
-        ];
-    }
+        ],
+    ];
 
     // -----
     // hooks

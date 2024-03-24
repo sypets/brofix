@@ -7,6 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
+use Sypets\Brofix\FormEngine\FieldShouldBeCheckedFull;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
@@ -81,7 +82,6 @@ class LinkParser
         $this->contentRepository = $contentRepository;
 
         $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
-        //$formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
 
         self::$instance = $this;

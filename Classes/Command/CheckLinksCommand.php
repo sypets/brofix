@@ -394,8 +394,15 @@ class CheckLinksCommand extends Command
             /** @var LinkAnalyzer $linkAnalyzer */
             $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
             $linkAnalyzer->init($pageIds, $this->configuration);
+            if (isset($GLOBALS['REQUEST'])) {
+                $request = $GLOBALS['REQUEST'];
+            } else {
+                $request = CommandUtility::createFakeWebRequest($this->backendUri);
+                // set global variable here because it might be used by FormEngine processing (e.g. FormDataProvider, hooks etc.)
+                $GLOBALS['REQUEST'] = $request;
+            }
             $linkAnalyzer->generateBrokenLinkRecords(
-                CommandUtility::createFakeWebRequest($this->backendUri),
+                $request,
                 $linkTypes,
                 $checkHidden
             );
