@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Controller;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\BackendSession\BackendSession;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Configuration\Configuration;
@@ -193,6 +194,8 @@ class BrokenLinkListController extends AbstractBrofixController
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
+
+    protected ServerRequestInterface $request;
 
     public function __construct(
         PagesRepository $pagesRepository = null,
@@ -427,14 +430,14 @@ class BrokenLinkListController extends AbstractBrofixController
     /**
      * Main, called from parent object
      *
-     * @return string Module content
      */
-    public function main(): string
+    public function main(ServerRequestInterface $request): string
     {
+        $this->request = $request;
         $this->initialize();
 
         if ($this->action === 'updateLinkList') {
-            $this->linkAnalyzer->generateBrokenLinkRecords($this->configuration->getLinkTypes());
+            $this->linkAnalyzer->generateBrokenLinkRecords($this->request,$this->configuration->getLinkTypes());
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
@@ -444,7 +447,7 @@ class BrokenLinkListController extends AbstractBrofixController
 
         if ($this->action === 'recheckUrl') {
             $message = '';
-            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord);
+            $count = $this->linkAnalyzer->recheckUrl($message, $this->currentRecord, $request);
             if ($count > 0) {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
@@ -468,6 +471,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->currentRecord['table'],
                 $this->currentRecord['field'],
                 (int)($this->currentRecord['currentTime'] ?? 0),
+                $request,
                 $this->configuration->isCheckHidden()
             );
             if ($message) {

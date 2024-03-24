@@ -395,6 +395,7 @@ class CheckLinksCommand extends Command
             $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
             $linkAnalyzer->init($pageIds, $this->configuration);
             $linkAnalyzer->generateBrokenLinkRecords(
+                CommandUtility::createFakeWebRequest($this->backendUri),
                 $linkTypes,
                 $checkHidden
             );

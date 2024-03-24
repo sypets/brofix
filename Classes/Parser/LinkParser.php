@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Parser;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
@@ -48,6 +49,8 @@ class LinkParser
      * @var int
      */
     public const MASK_CONTENT_CHECK_ALL = 0xff;
+
+    protected ServerRequestInterface $request;
     protected FormDataCompiler $formDataCompiler;
     protected Configuration $configuration;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
@@ -120,8 +123,10 @@ class LinkParser
         string $table,
         array $fields,
         array $record,
+        ServerRequestInterface $request,
         int $checks = self::MASK_CONTENT_CHECK_ALL
     ): array {
+        $this->request = $request;
         $idRecord = (int)($record['uid'] ?? 0);
         try {
             // Put together content of all relevant fields
@@ -471,7 +476,6 @@ class LinkParser
             'tableName' => $tablename,
             'vanillaUid' => $uid,
             'command' => 'edit',
-            'request' => $request,
         ];
 
         $this->processedFormData = $this->formDataCompiler->compile($formDataCompilerInput);

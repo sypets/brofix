@@ -189,7 +189,7 @@ class BrofixController
     /**
      * Initialize module header etc and call extObjContent function
      */
-    protected function main(): void
+    protected function main(ServerRequestInterface $request): void
     {
         $languageService = $this->getLanguageService();
         $backendUser = $this->getBackendUser();
@@ -216,7 +216,7 @@ class BrofixController
 
             $this->view = $this->getFluidTemplateObject();
             $this->view->assign('moduleName', (string)$this->uriBuilder->buildUriFromRoute($this->moduleName));
-            $this->view->assign('functionMenuModuleContent', $this->getExtObjContent());
+            $this->view->assign('functionMenuModuleContent', $this->getExtObjContent($request));
             // Setting up the buttons and markers for doc header
             $this->createButtonsOnButtonBar();
             $this->generateMenu();
@@ -240,7 +240,7 @@ class BrofixController
         // Checking for first level external objects
         $this->checkExtObj();
 
-        $this->main();
+        $this->main($request);
 
         $this->moduleTemplate->setContent($this->content);
         return new HtmlResponse($this->moduleTemplate->renderContent());
@@ -428,7 +428,7 @@ class BrofixController
     /**
      * Calls the 'main' function inside the "Function menu module" if present
      */
-    protected function extObjContent(): void
+    protected function extObjContent(ServerRequestInterface $request): void
     {
         if ($this->extObj === null) {
             $languageService = $this->getLanguageService();
@@ -443,7 +443,7 @@ class BrofixController
             $defaultFlashMessageQueue->enqueue($flashMessage);
         } else {
             if (is_callable([$this->extObj, 'main'])) {
-                $main = $this->extObj->main();
+                $main = $this->extObj->main($request);
                 if ($main instanceof ResponseInterface) {
                     $stream = $main->getBody();
                     $stream->rewind();
@@ -459,11 +459,11 @@ class BrofixController
      *
      * @return string
      */
-    protected function getExtObjContent(): string
+    protected function getExtObjContent(ServerRequestInterface $request): string
     {
         $savedContent = $this->content;
         $this->content = '';
-        $this->extObjContent();
+        $this->extObjContent($request);
         $newContent = $this->content;
         $this->content = $savedContent;
         return $newContent;

@@ -185,7 +185,7 @@ class ManageExclusionsController extends AbstractBrofixController
      *
      * @return string Module content
      */
-    public function main(): string
+    public function main(ServerRequestInterface $request): string
     {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
 

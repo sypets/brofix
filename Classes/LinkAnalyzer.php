@@ -17,6 +17,7 @@ namespace Sypets\Brofix;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
@@ -105,7 +106,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      *
      * @todo make message more flexible, broken link records could get removed or changed
      */
-    public function recheckUrl(string &$message, array $record): int
+    public function recheckUrl(string &$message, array $record, ServerRequestInterface $request): int
     {
         $message = '';
         $url = $record['url'];
@@ -138,12 +139,18 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $uid = (int)$record['uid'];
                 $results = [];
                 $selectFields = $this->getSelectFields($table, [$record['field']]);
-                $row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
+
+                // todo: for now we get entire record even though it is inefficient
+                // should optimize this in the future
+                // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
+                //$row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
+                $row = $this->contentRepository->getRowForUid($uid, $table, ['*']);
                 $this->linkParser->findLinksForRecord(
                     $results,
                     $table,
                     [$record['field']],
                     $row,
+                    $request,
                     LinkParser::MASK_CONTENT_CHECK_ALL
                 );
                 $urls = [];
@@ -228,10 +235,15 @@ class LinkAnalyzer implements LoggerAwareInterface
         string $table,
         string $field,
         int $beforeEditedTimestamp,
+        ServerRequestInterface $request,
         bool $checkHidden = false
     ): bool {
         $selectFields = $this->getSelectFields($table, [$field]);
-        $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+        // todo: for now we get entire record even though it is inefficient
+        // should optimize this in the future
+        // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
+        //$row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+        $row = $this->contentRepository->getRowForUid($recordUid, $table, ['*'], $checkHidden);
 
         $startTime = \time();
 
@@ -258,6 +270,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             $table,
             [$field],
             $row,
+            $request,
             LinkParser::MASK_CONTENT_CHECK_ALL-LinkParser::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
         );
 
@@ -373,7 +386,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array<int,string> $linkTypes List of link types to check (corresponds to hook object)
      * @param bool $considerHidden Defines whether to look into hidden fields
      */
-    public function generateBrokenLinkRecords(array $linkTypes = [], bool $considerHidden = false): void
+    public function generateBrokenLinkRecords(ServerRequestInterface $request, array $linkTypes = [], bool $considerHidden = false): void
     {
         if (empty($linkTypes) || empty($this->pids)) {
             return;
@@ -462,6 +475,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $table,
                         $fields,
                         $row,
+                        $request,
                         LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
                     );
                     $this->statistics->addCountLinks($this->countLinks($results));
