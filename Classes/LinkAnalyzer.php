@@ -485,7 +485,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             'uid',
             'pid'
         ];
-        if ($GLOBALS['TCA']['tt_content']['ctrl']['versioningWS'] ?? false) {
+        if ($GLOBALS['TCA'][$table]['ctrl']['versioningWS'] ?? false) {
             $defaultFields[] = 't3ver_wsid';
         }
         if (isset($GLOBALS['TCA'][$table]['ctrl']['label'])) {
