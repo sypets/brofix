@@ -48,13 +48,15 @@ class FieldShouldBeCheckedFull implements FormDataGroupInterface
          */
         $orderedProviderList = GeneralUtility::makeInstance(OrderedProviderList::class);
         $orderedProviderList->setProviderList(
-            array_diff_key($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'],
+            array_diff_key(
+                $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'],
                 [
                     [
                         TcaText::class,
                         TcaColumnsProcessRecordTitle::class,
                     ]
-                ])
+                ]
+            )
         );
 
         return $orderedProviderList->compile($result);
