@@ -15,6 +15,7 @@ namespace Sypets\Brofix\Mail;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;

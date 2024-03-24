@@ -838,7 +838,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['elementType'] = $this->getLanguageService()->sL($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
         // Get the language label for the field from TCA
         $fieldName = '';
-        if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']) {
+        if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label'] ?? false) {
             $fieldName = $languageService->sL($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']);
             // Crop colon from end if present
             if (substr($fieldName, -1, 1) === ':') {
@@ -846,6 +846,13 @@ class BrokenLinkListController extends AbstractBrofixController
             }
         }
         $variables['fieldName'] = !empty($fieldName) ? $fieldName : $row['field'];
+        // flexform field label
+        if ($row['flexform_field_label'] ?? '') {
+            $flexformLabel = $languageService->sL($row['flexform_field_label']);
+            if ($flexformLabel) {
+                $variables['fieldName'] = $flexformLabel;
+            }
+        }
 
         // page title / uid / path
         $pageId = (int)($table === 'pages' ? $row['record_uid'] : $row['record_pid']);

@@ -16,7 +16,6 @@ namespace Sypets\Brofix\Linktype;
  * The TYPO3 project - inspiring people to share!
  */
 
-use GeorgRinger\News\Domain\Model\Link;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
