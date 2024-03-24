@@ -56,8 +56,6 @@ defined('TYPO3') or die();
 
     // for link checking, do not perform user permission checks, only check if field is editable
     // permission checks are done when reading records from tx_brofix_broken_links for report
-
-    // legacy: worked but did not include flexform and some other providers
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [
         \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class => [],
         \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class => [
