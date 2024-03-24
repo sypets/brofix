@@ -15,6 +15,7 @@ namespace Sypets\Brofix\Linktype;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Localization\LanguageService;
 

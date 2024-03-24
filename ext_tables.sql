@@ -9,6 +9,8 @@ CREATE TABLE tx_brofix_broken_links (
 	language int(11) DEFAULT '-1' NOT NULL,
 	headline varchar(255) DEFAULT '' NOT NULL,
 	field varchar(255) DEFAULT '' NOT NULL,
+	flexform_field varchar(255) DEFAULT '' NOT NULL,
+	flexform_field_label varchar(255) DEFAULT '' NOT NULL,
 	table_name varchar(255) DEFAULT '' NOT NULL,
 	element_type varchar(255) DEFAULT '' NOT NULL,
 	link_title text,
