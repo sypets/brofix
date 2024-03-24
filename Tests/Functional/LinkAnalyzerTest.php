@@ -385,7 +385,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $this->configuration->setLinkTypes($linkTypes);
         $this->configuration->setSearchFields($searchFields);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
-        $linkAnalyzer->generateBrokenLinkRecords($this->request,$linkTypes);
+        $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
 
         // assert
         $this->assertCSVDataSet($expectedOutputFile);
