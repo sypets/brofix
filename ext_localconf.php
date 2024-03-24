@@ -70,6 +70,12 @@ defined('TYPO3') or die();
         if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'][TcaColumnsProcessRecordTitle::class])) {
             unset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'][TcaColumnsProcessRecordTitle::class]);
         }
+
+        // remove TcaText
+        // it might call brofixFieldShouldBeChecked
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'][TcaText::class])) {
+            unset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'][TcaText::class]);
+        }
     } else {
         // legacy: worked but did not include flexform and some other providers
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [

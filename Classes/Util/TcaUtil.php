@@ -17,17 +17,24 @@ class TcaUtil
      */
     public static function getFlexformFieldsWithConfig(string $table, string $field, array $row, array $processedTca): array
     {
+        if (!$row || !$processedTca) {
+            return [];
+        }
         $results = [];
 
         $flexFormTools = GeneralUtility::makeInstance(FlexFormTools::class);
         $flexFormTools->cleanFlexFormXML($table, $field, $row);
         $flexformArray = $flexFormTools->cleanFlexFormXML;
 
+        if (!($flexformArray['data'] ?? false)) {
+            return [];
+        }
+
         self::traverseFlexformArray($processedTca['ds'], $results);
-        foreach ($results as $field => $values) {
-            $value = self::traverseFlexformArrayForValues($field, $flexformArray['data']);
+        foreach ($results as $flexformField => $values) {
+            $value = self::traverseFlexformArrayForValues($flexformField, $flexformArray['data']);
             if ($value) {
-                $results[$field]['value'] = $value;
+                $results[$flexformField]['value'] = $value;
             }
         }
 

@@ -135,8 +135,14 @@ class LinkAnalyzer implements LoggerAwareInterface
                 // check if url still exists in record
                 $uid = (int)$record['uid'];
                 $results = [];
-                $selectFields = $this->getSelectFields($table, [$record['field']]);
-                $row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
+
+                // todo: for now we get entire record even though it is inefficient
+                // should optimize this in the  or make configurable
+                // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
+                // $selectFields = $this->getSelectFields($table, [$record['field']]);
+                //$row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
+                $row = $this->contentRepository->getRowForUid($uid, $table, ['*']);
+
                 $this->linkParser->findLinksForRecord(
                     $results,
                     $table,
@@ -228,8 +234,12 @@ class LinkAnalyzer implements LoggerAwareInterface
         ServerRequestInterface $request,
         bool $checkHidden = false
     ): bool {
-        $selectFields = $this->getSelectFields($table, [$field]);
-        $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+        // todo: for now we get entire record even though it is inefficient
+        // should optimize this in the future or make configurable
+        // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
+        // $selectFields = $this->getSelectFields($table, [$field]);
+        //$row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+        $row = $this->contentRepository->getRowForUid($recordUid, $table, ['*'], $checkHidden);
 
         $startTime = \time();
 
@@ -438,6 +448,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $selectFields = $tmpFields;
                 }
 
+                // todo: is inefficient, should optimize or make configurable
                 //$queryBuilder->select(...$selectFields)
                 $queryBuilder->select($table . '.*')
                     ->from($table)
