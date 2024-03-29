@@ -18,6 +18,9 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Configuration;
 
 use Symfony\Component\Mime\Address;
+use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
+use Sypets\Brofix\FormEngine\FieldShouldBeCheckedFull;
+use Sypets\Brofix\FormEngine\FieldShouldBeCheckedWithFlexform;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Linktype\LinktypeInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -93,6 +96,12 @@ class Configuration
         'custom.' => []
     ];
 
+    protected const TCA_PROCESSING_DEFAULT_VALUE = self::TCA_PROCESSING_DEFAULT;
+
+    public const TCA_PROCESSING_NONE = 'none';
+    public const TCA_PROCESSING_DEFAULT = 'default';
+    public const TCA_PROCESSING_FULL = 'full';
+
     /**
      * @var mixed[]
      * @todo replace this array and use member variables for all values
@@ -131,6 +140,10 @@ class Configuration
      */
     protected array $hookObjectsArr = [];
 
+    protected string $tcaProcessing = self::TCA_PROCESSING_DEFAULT_VALUE;
+
+    protected string $overrideFormDataGroup = '';
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -146,6 +159,8 @@ class Configuration
             (int)($extConfArray['traverseMaxNumberOfPagesInBackend']
                 ?? self::TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT)
         );
+        $this->tcaProcessing = $extConfArray['tcaProcessing'] ?? self::TCA_PROCESSING_DEFAULT_VALUE;
+        $this->overrideFormDataGroup = $extConfArray['overrideFormDataGroup'] ?? '';
 
         // initialize from global configuration
         // Hook to handle own checks
@@ -664,6 +679,33 @@ class Configuration
     public function getCombinedErrorNonCheckableMatch(): string
     {
         return $this->combinedErrorNonCheckableMatch;
+    }
+
+    public function getTcaProcessing(): string
+    {
+        return $this->tcaProcessing;
+    }
+
+    public function getOverrideFormDataGroup(): string
+    {
+        return $this->overrideFormDataGroup;
+    }
+
+    public function getFormDataGroup(): string
+    {
+        if ($this->overrideFormDataGroup) {
+            return $this->overrideFormDataGroup;
+        }
+        switch ($this->getTcaProcessing()) {
+            case self::TCA_PROCESSING_NONE:
+                return '';
+            case self::TCA_PROCESSING_DEFAULT:
+                return FieldShouldBeChecked::class;
+            case self::TCA_PROCESSING_FULL:
+                //return FieldShouldBeCheckedFull::class;
+                return FieldShouldBeCheckedWithFlexform::class;
+        }
+        return '';
     }
 
     public function getLinktypeObject(string $linktype): ?LinktypeInterface

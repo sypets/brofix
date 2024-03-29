@@ -108,3 +108,15 @@ This is the default value:
 .. code-block:: text
 
    regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/
+
+.. _extensionConfiguation_tcaProcessing:
+
+EXT:brofix | tcaProcessing
+--------------------------
+
+*Perform TCA processing*
+
+Changes how the TCA processing is done. The default setting may not work
+for some configurations and especially for Flexforms. In that case, it should
+be set to "full". This setting is still experimental, so it is not on by
+default.
