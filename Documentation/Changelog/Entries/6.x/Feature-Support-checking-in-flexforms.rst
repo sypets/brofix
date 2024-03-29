@@ -7,6 +7,10 @@ Feature - Support checking in Flexforms
 **This feature can be used and has been tested, but should be considered
 experimental until further notice!**
 
+**For Flexform checking to fully work, you must set
+:ref:`tcaProcessing <extensionConfiguation_tcaProcessing>` to "full"
+in the extension configuration for brofix.**
+
 Since Flexforms consist of nested fields, checking these kind of fields needed
 modified functionality. It is now possible to also check Flexforms for
 broken links.
@@ -43,6 +47,9 @@ Using this new feature
 
       mod.brofix.searchFields.tt_content = bodytext,header_link,records,pi_flexform
 
+#. In the extension configuration for brofix, set tcaProcessing to "full"
+
+
 #. Check your fields in your Flexform configuration, to make sure, you are
    using field configuration which will be checked by brofix (see the
    "Implementation" section), such as type ":ref:`link <t3tca:columns-link>"
@@ -57,7 +64,7 @@ This new feature comes with some caveats:
 
 #. It is not possible to edit the field with the broken link directly: When
    clicking the edit button in the broken link list, an edit dialog is opened
-   for all fields in the flexform. For non-Flexform fields, the edit dialog
+   for all fields in the flexform while for non-Flexform fields, the edit dialog
    will show only the affected field. The advantage of showing only the affected
    field is that it is easier to find the broken link, especially in non-RTE
    fields where the broken link is not highlighted. (The reason for this caveat
@@ -67,6 +74,10 @@ This new feature comes with some caveats:
 #. It is not possible to specify directly which fields in the Flexform will
    be checked. The fields which are checked is derived directly form the field
    configuration (type, renderType, enableRichtext and softref).
+
+#. In order for the Flexform processing to work the full record is fetched from
+   the database. This makes the process possibly slightly slower and less
+   efficient, but should not have a big impact.
 
 Some of these caveats may be addressed in future releases.
 

@@ -6,7 +6,6 @@ namespace Sypets\Brofix\Parser;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
@@ -51,7 +50,7 @@ class LinkParser
     public const MASK_CONTENT_CHECK_ALL = 0xff;
 
     protected ?ServerRequestInterface $request;
-    protected FormDataCompiler $formDataCompiler;
+    protected ?FormDataCompiler $formDataCompiler;
     protected Configuration $configuration;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
     protected ContentRepository $contentRepository;
@@ -99,12 +98,19 @@ class LinkParser
             self::$instance = GeneralUtility::makeInstance(LinkParser::class);
         }
         self::$instance->setConfiguration($configuration);
+
         return self::$instance;
     }
 
     protected function setConfiguration(Configuration $configuration): void
     {
         $this->configuration = $configuration;
+
+        $formDataGroup = GeneralUtility::makeInstance($this->configuration->getFormDataGroup());
+        /** @phpstan-ignore-next-line */
+        if ($formDataGroup) {
+            $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
+        }
     }
 
     /**
@@ -142,14 +148,19 @@ class LinkParser
 
             $processedFormData = $this->getProcessedFormData($idRecord, $table, $request);
 
-            if ($checks & self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD) {
+            if ($checks & self::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD && $processedFormData) {
                 $fields = $this->getEditableFields($idRecord, $table, $fields, $processedFormData);
             }
+            if (!$fields) {
+                return [];
+            }
+
+            $tableTca = $this->processedFormData ? $this->processedFormData['processedTca'] : $GLOBALS['TCA'][$table];
 
             // Get all links/references
             foreach ($fields as $field) {
                 // use the processedTca to also  get overridden configuration (e.g. columnsOverrides)
-                $fieldConfig = $this->processedFormData['processedTca']['columns'][$field]['config'];
+                $fieldConfig = $tableTca['columns'][$field]['config'];
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
                 if ($valueField === '') {
                     continue;
@@ -456,6 +467,10 @@ class LinkParser
      */
     public function getProcessedFormData(int $uid, string $tablename, ServerRequestInterface $request): array
     {
+        if (!$this->formDataCompiler) {
+            return [];
+        }
+
         // is hack
         $isAdmin = true;
         // form data processing should be performed as admin, because we do not want to apply permission checks here

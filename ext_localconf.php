@@ -57,8 +57,38 @@ defined('TYPO3') or die();
 
     // for link checking, do not perform user permission checks, only check if field is editable
     // permission checks are done when reading records from tx_brofix_broken_links for report
-
-    // use core formDataGroup, slightly modified
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] = [
+        \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class => [],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseEditRow::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
+            ]
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\PageTsConfig::class,
+                \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabasePageLanguageOverlayRows::class => [
+            'depends' => [
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseLanguageRows::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class,
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseLanguageRows::class,
+            ],
+        ],
+        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides::class => [
+            'depends' => [
+                \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class,
+            ],
+        ],
 
     if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'])) {
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] =

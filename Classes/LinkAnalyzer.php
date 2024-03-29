@@ -136,12 +136,14 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $uid = (int)$record['uid'];
                 $results = [];
 
-                // todo: for now we get entire record even though it is inefficient
-                // should optimize this in the  or make configurable
+                // todo: for tcaProcessing 'full', we get entire record even though it is inefficient, optimize this
                 // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
-                // $selectFields = $this->getSelectFields($table, [$record['field']]);
-                //$row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
-                $row = $this->contentRepository->getRowForUid($uid, $table, ['*']);
+                if ($this->configuration->getTcaProcessing() === Configuration::TCA_PROCESSING_FULL) {
+                    $row = $this->contentRepository->getRowForUid($uid, $table, ['*']);
+                } else {
+                    $selectFields = $this->getSelectFields($table, [$record['field']]);
+                    $row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
+                }
 
                 $this->linkParser->findLinksForRecord(
                     $results,
@@ -234,12 +236,14 @@ class LinkAnalyzer implements LoggerAwareInterface
         ServerRequestInterface $request,
         bool $checkHidden = false
     ): bool {
-        // todo: for now we get entire record even though it is inefficient
-        // should optimize this in the future or make configurable
+        // todo: for tcaProcessing 'full', we get entire record even though it is inefficient, optimize this
         // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
-        // $selectFields = $this->getSelectFields($table, [$field]);
-        //$row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
-        $row = $this->contentRepository->getRowForUid($recordUid, $table, ['*'], $checkHidden);
+        if ($this->configuration->getTcaProcessing() === Configuration::TCA_PROCESSING_FULL) {
+            $row = $this->contentRepository->getRowForUid($recordUid, $table, ['*'], $checkHidden);
+        } else {
+            $selectFields = $this->getSelectFields($table, [$field]);
+            $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+        }
 
         $startTime = \time();
 
@@ -448,9 +452,14 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $selectFields = $tmpFields;
                 }
 
-                // todo: is inefficient, should optimize or make configurable
-                //$queryBuilder->select(...$selectFields)
-                $queryBuilder->select($table . '.*')
+                // todo: for tcaProcessing 'full', we get entire record even though it is inefficient, optimize this
+                // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
+                if ($this->configuration->getTcaProcessing() === Configuration::TCA_PROCESSING_FULL) {
+                    $queryBuilder->select($table . '.*');
+                } else {
+                    $queryBuilder->select(...$selectFields);
+                }
+                $queryBuilder
                     ->from($table)
                     ->where(
                         ...$constraints
