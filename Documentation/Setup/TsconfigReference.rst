@@ -713,14 +713,20 @@ mail.sendOnCheckLinks
       mod.brofix.mail.sendOnCheckLinks
 
    Data type
-      int
+      string
 
    Description
       Enable sending an email when the brofix:checkLinks console command
       is excecuted. This can be overridden via command line arguments (`-e`).
+      Possible values:
+
+      * "**never**" : never send email (previously: 0)
+      * "**always**": send email (previously: 1)
+      * "**any**"   : send email if any broken links were found
+      * "**new**"   : send email if new broken links were found
 
    Default
-      1
+      always
 
 
 .. _tsconfigMailRecipients:

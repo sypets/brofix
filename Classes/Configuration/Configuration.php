@@ -39,6 +39,25 @@ use TYPO3\CMS\Core\Utility\MailUtility;
  */
 class Configuration
 {
+    public const SEND_EMAIL_NEVER = 'never';
+
+    /** @var string Always send email */
+    public const SEND_EMAIL_ALWAYS = 'always';
+
+    /** @var string Send email if any broken links found */
+    public const SEND_EMAIL_ANY = 'any';
+
+    /** @var string Send email if any NEW broken links found */
+    public const SEND_EMAIL_NEW = 'new';
+
+    /** @var string Do not override configuration for email sending */
+    public const SEND_EMAIL_AUTO = 'auto';
+
+    public const SEND_EMAIL_DEFAULT_VALUE = self::SEND_EMAIL_AUTO;
+
+    public const SEND_EMAIL_AVAILABLE_VALUES = [self::SEND_EMAIL_NEVER, self::SEND_EMAIL_ALWAYS, self::SEND_EMAIL_ANY,
+        self::SEND_EMAIL_NEW, self::SEND_EMAIL_AUTO];
+
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
     public const DEFAULT_TSCONFIG = [
         'searchFields.' => [
@@ -507,14 +526,28 @@ class Configuration
         return (int)($this->tsConfig['report.']['recheckButton'] ?? -1);
     }
 
-    public function getMailSendOnCheckLinks(): bool
+    public function getMailSendOnCheckLinks(): string
     {
-        return (bool)($this->tsConfig['mail.']['sendOnCheckLinks'] ?? true);
+        $value = ($this->tsConfig['mail.']['sendOnCheckLinks'] ?? self::SEND_EMAIL_DEFAULT_VALUE);
+        switch ($value) {
+            case self::SEND_EMAIL_AUTO:
+                return self::SEND_EMAIL_DEFAULT_VALUE;
+            // map old values
+            case '0':
+                return self::SEND_EMAIL_NEVER;
+            case '1':
+                return self::SEND_EMAIL_ALWAYS;
+            case '-1':
+                return self::SEND_EMAIL_DEFAULT_VALUE;
+        }
+        return $value;
     }
 
-    public function setMailSendOnCheckLinks(int $value): void
+    public function setMailSendOnCheckLinks(string $value): void
     {
-        $this->tsConfig['mail.']['sendOnCheckLinks'] = $value;
+        if ($value !== self::SEND_EMAIL_AUTO) {
+            $this->tsConfig['mail.']['sendOnCheckLinks'] = $value;
+        }
     }
 
     /**

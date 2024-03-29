@@ -587,8 +587,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * Update existing record or insert new
      *
      * @param mixed[] $record
+     * @return bool Returns true if new record was inserted
      */
-    public function insertOrUpdateBrokenLink(array $record): void
+    public function insertOrUpdateBrokenLink(array $record): bool
     {
         $queryBuilder = $this->generateQueryBuilder(self::TABLE);
         $count = (int)$queryBuilder->count('uid')
@@ -623,7 +624,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
             $this->updateBrokenLink($record, $identifier);
         } else {
             $this->insertBrokenLink($record);
+            return true;
         }
+        return false;
     }
 
     /**

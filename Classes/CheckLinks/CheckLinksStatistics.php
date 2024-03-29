@@ -46,7 +46,9 @@ class CheckLinksStatistics
     /**
      * @var int
      */
-    protected $countLinksTotal;
+    protected $countLinksTotal = 0;
+
+    protected $countNewBrokenLinks = 0;
 
     public function __construct()
     {
@@ -58,6 +60,7 @@ class CheckLinksStatistics
         $this->checkStartTime = \time();
         $this->countPages = 0;
         $this->countLinksTotal = 0;
+        $this->countNewBrokenLinks = 0;
         $this->countLinksByStatus = [];
         $this->pageTitle = '';
     }
@@ -74,6 +77,16 @@ class CheckLinksStatistics
         }
         $this->countLinksByStatus[$status]++;
         $this->countLinksTotal++;
+    }
+
+    public function incrementNewBrokenLink(): void
+    {
+        $this->countNewBrokenLinks++;
+    }
+
+    public function getCountNewBrokenLinks(): int
+    {
+        return $this->countNewBrokenLinks;
     }
 
     public function incrementCountExcludedLinks(): void
