@@ -43,34 +43,36 @@ class FieldShouldBeCheckedWithFlexform implements FormDataGroupInterface
          */
         $orderedProviderList = GeneralUtility::makeInstance(OrderedProviderList::class);
         $orderedProviderList->setProviderList(
-            array_merge($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'],
-            [
-                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessCommon::class => [
-                    'depends' => [
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class,
+            array_merge(
+                $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'],
+                [
+                    \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessCommon::class => [
+                        'depends' => [
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaInlineExpandCollapseState::class,
+                        ],
                     ],
-                ],
-                \TYPO3\CMS\Backend\Form\FormDataProvider\EvaluateDisplayConditions::class => [
-                    'depends' => [
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaRecordTitle::class,
+                    \TYPO3\CMS\Backend\Form\FormDataProvider\EvaluateDisplayConditions::class => [
+                        'depends' => [
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaRecordTitle::class,
+                        ],
                     ],
-                ],
-                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexPrepare::class => [
-                    'depends' => [
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\UserTsConfig::class,
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\PageTsConfigMerged::class,
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsRemoveUnused::class,
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessFieldLabels::class,
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessFieldDescriptions::class,
+                    \TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexPrepare::class => [
+                        'depends' => [
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\InitializeProcessedTca::class,
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\UserTsConfig::class,
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\PageTsConfigMerged::class,
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsRemoveUnused::class,
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessFieldLabels::class,
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsProcessFieldDescriptions::class,
+                        ],
                     ],
-                ],
-                \TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexProcess::class => [
-                    'depends' => [
-                        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexPrepare::class,
+                    \TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexProcess::class => [
+                        'depends' => [
+                            \TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexPrepare::class,
+                        ],
                     ],
-                ],
-            ])
+                ]
+            )
         );
 
         return $orderedProviderList->compile($result);

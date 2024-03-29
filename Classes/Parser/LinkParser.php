@@ -6,7 +6,6 @@ namespace Sypets\Brofix\Parser;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
-use Sypets\Brofix\FormEngine\FieldShouldBeChecked;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
@@ -78,7 +77,6 @@ class LinkParser
             $contentRepository = GeneralUtility::makeInstance(ContentRepository::class);
         }
         $this->contentRepository = $contentRepository;
-
 
         self::$instance = $this;
     }
