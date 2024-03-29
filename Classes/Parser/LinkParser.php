@@ -102,6 +102,7 @@ class LinkParser
         $this->configuration = $configuration;
 
         $formDataGroup = GeneralUtility::makeInstance($this->configuration->getFormDataGroup());
+        /** @phpstan-ignore-next-line */
         if ($formDataGroup) {
             $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
         }
