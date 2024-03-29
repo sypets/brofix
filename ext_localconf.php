@@ -89,6 +89,7 @@ defined('TYPO3') or die();
                 \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRecordTypeValue::class,
             ],
         ],
+    ];
 
     if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'])) {
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['brofixFieldShouldBeChecked'] =

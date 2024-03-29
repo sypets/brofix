@@ -79,10 +79,6 @@ class LinkParser
         }
         $this->contentRepository = $contentRepository;
 
-        $formDataGroup = GeneralUtility::makeInstance(FieldShouldBeChecked::class);
-        //$formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
-        $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
-
         self::$instance = $this;
     }
 
