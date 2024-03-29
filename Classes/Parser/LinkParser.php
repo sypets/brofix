@@ -11,7 +11,6 @@ use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
 use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
-use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserInterface;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
