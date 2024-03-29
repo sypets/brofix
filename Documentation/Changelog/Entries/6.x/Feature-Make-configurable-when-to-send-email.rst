@@ -17,8 +17,8 @@ The old values (0, 1, -1) are still supported and are mapped to the new values.
 * "**new**"   : send email if new broken links were found
 * "**auto**"  : do not override, use :ref:`TSconfig mail.sendOnCheckLinks <tsconfigSendOnCheckLinks>`
 
-If "auto" is used, the TSconfig will be used which makes it possible to configure
-this for each site individually.
+If "auto" is used, the TSconfig configuration will be used which makes it
+possible to configure this for each site individually.
 
 Migration
 =========

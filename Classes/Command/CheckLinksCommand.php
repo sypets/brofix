@@ -160,7 +160,7 @@ class CheckLinksCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Send email. Possible values: ' . implode(' | ', Configuration::SEND_EMAIL_AVAILABLE_VALUES)
                     . ' (default:' . Configuration::SEND_EMAIL_DEFAULT_VALUE . ')',
-                Configuration::SEND_EMAIL_DEFAULT_VALUE,
+                Configuration::SEND_EMAIL_AUTO,
                 Configuration::SEND_EMAIL_AVAILABLE_VALUES
             )
             ->addOption(
@@ -197,7 +197,7 @@ class CheckLinksCommand extends Command
             $this->io->writeln('Dry run is activated, do not check and do not send email');
         }
 
-        $this->sendEmail = ($input->getOption('send-email') ?? Configuration::SEND_EMAIL_DEFAULT_VALUE);
+        $this->sendEmail = ($input->getOption('send-email') ?? Configuration::SEND_EMAIL_AUTO);
         // map old values
         switch ($this->sendEmail) {
             case '0':
@@ -212,15 +212,15 @@ class CheckLinksCommand extends Command
         }
 
         if ($this->sendEmail === Configuration::SEND_EMAIL_NEVER) {
-            $this->io->writeln('Do not send email.');
+            $this->io->writeln('Do not send email (never).');
         } else if ($this->sendEmail === Configuration::SEND_EMAIL_ALWAYS) {
-            $this->io->writeln('Always send email.');
+            $this->io->writeln('Always send email (always).');
         } if ($this->sendEmail === Configuration::SEND_EMAIL_ANY) {
-            $this->io->writeln('Send email only if broken links found.');
+            $this->io->writeln('Send email only if broken links found (any).');
         } if ($this->sendEmail === Configuration::SEND_EMAIL_NEW) {
-            $this->io->writeln('Send email only if new broken links found.');
+            $this->io->writeln('Send email only if new broken links found (new).');
         } if ($this->sendEmail === Configuration::SEND_EMAIL_AUTO) {
-            $this->io->writeln('Send email based on TSconfig configuration.');
+            $this->io->writeln('Send email based on TSconfig configuration (auto).');
         }
 
         // exluded pages uid

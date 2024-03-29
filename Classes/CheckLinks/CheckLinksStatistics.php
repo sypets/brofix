@@ -48,7 +48,7 @@ class CheckLinksStatistics
      */
     protected $countLinksTotal = 0;
 
-    protected $countNewBrokenLinks = 0;
+    protected int $countNewBrokenLinks = 0;
 
     public function __construct()
     {
