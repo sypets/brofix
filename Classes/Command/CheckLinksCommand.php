@@ -25,7 +25,6 @@ use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Mail\GenerateCheckResultFluidMail;
-use Sypets\Brofix\Mail\GenerateCheckResultMailInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
