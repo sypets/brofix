@@ -80,8 +80,10 @@ mod.brofix {
   }
 
 	mail {
-	  # always send mail after checking links with command brofix:checklinks
-    sendOnCheckLinks = 1
+	  # if we should send mail after checking links with command brofix:checklinks
+	  # values: never | always | any | new
+	  # numeric values are deprecated, use strings
+    sendOnCheckLinks = always
     # should contain email address(es) of recipients
 	  recipients =
 	  # "From" name. If this is empty, $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']  is used

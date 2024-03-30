@@ -61,8 +61,12 @@ class CheckLinksCommand extends Command
     protected $sendTo;
 
     /**
-     * @var int -1: means use default (from configuration),
-     *   1 means send email, 0 means do not send
+     * @var string "never" | "always" | "any" | "new" | "auto"
+     *
+     * older values, deprecated:
+     *   -1 => "auto" : use default (from configuration),
+     *   1 => "always": always send email
+     *   0 => "never" : do not send
      */
     protected $sendEmail;
 
@@ -152,8 +156,11 @@ class CheckLinksCommand extends Command
             ->addOption(
                 'send-email',
                 'e',
-                InputOption::VALUE_OPTIONAL,
-                'Send email (override configuration). 1: send, 0: do not send'
+                InputOption::VALUE_REQUIRED,
+                'Send email. Possible values: ' . implode(' | ', Configuration::SEND_EMAIL_AVAILABLE_VALUES)
+                    . ' (default:' . Configuration::SEND_EMAIL_DEFAULT_VALUE . ')',
+                Configuration::SEND_EMAIL_AUTO,
+                Configuration::SEND_EMAIL_AVAILABLE_VALUES
             )
             ->addOption(
                 'exclude-uid',
@@ -189,9 +196,30 @@ class CheckLinksCommand extends Command
             $this->io->writeln('Dry run is activated, do not check and do not send email');
         }
 
-        $this->sendEmail = (int)($input->getOption('send-email') ?? -1);
-        if ($this->sendEmail === 0) {
-            $this->io->writeln('Do not send email.');
+        $this->sendEmail = ($input->getOption('send-email') ?? Configuration::SEND_EMAIL_AUTO);
+        // map old values
+        switch ($this->sendEmail) {
+            case '0':
+                $this->sendEmail = Configuration::SEND_EMAIL_NEVER;
+                break;
+            case '1':
+                $this->sendEmail = Configuration::SEND_EMAIL_ALWAYS;
+                break;
+            case '-1':
+                $this->sendEmail = Configuration::SEND_EMAIL_AUTO;
+                break;
+        }
+
+        if ($this->sendEmail === Configuration::SEND_EMAIL_NEVER) {
+            $this->io->writeln('Do not send email (never).');
+        } elseif ($this->sendEmail === Configuration::SEND_EMAIL_ALWAYS) {
+            $this->io->writeln('Always send email (always).');
+        } if ($this->sendEmail === Configuration::SEND_EMAIL_ANY) {
+            $this->io->writeln('Send email only if broken links found (any).');
+        } if ($this->sendEmail === Configuration::SEND_EMAIL_NEW) {
+            $this->io->writeln('Send email only if new broken links found (new).');
+        } if ($this->sendEmail === Configuration::SEND_EMAIL_AUTO) {
+            $this->io->writeln('Send email based on TSconfig configuration (auto).');
         }
 
         // exluded pages uid
@@ -255,13 +283,13 @@ class CheckLinksCommand extends Command
             if ($this->sendTo !== '') {
                 $this->configuration->setMailRecipientsAsString($this->sendTo);
             }
-            if ($this->sendEmail === 0) {
-                $this->configuration->setMailSendOnCheckLinks(0);
+            if ($this->sendEmail !== Configuration::SEND_EMAIL_AUTO) {
+                $this->configuration->setMailSendOnCheckLinks($this->sendEmail);
             }
 
             // show configuration
-            if ($this->configuration->getMailSendOnCheckLinks()) {
-                $this->io->writeln('Configuration: Send mail: true');
+            if ($this->configuration->getMailSendOnCheckLinks() !== Configuration::SEND_EMAIL_NEVER) {
+                $this->io->writeln('Configuration: Send mail: ' . $this->configuration->getMailSendOnCheckLinks());
                 $recipients = $this->configuration->getMailRecipients();
                 $to = '';
                 foreach ($recipients as $recipient) {
@@ -311,10 +339,39 @@ class CheckLinksCommand extends Command
                 (string)($depth === 999 ? 'infinite' : $depth),
                 $stats->getCountBrokenLinks()
             ));
-            if ($this->configuration->getMailSendOnCheckLinks()) {
-                $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
-            } else {
-                $this->io->writeln('Do not send mail, because sending was deactivated.');
+            switch ($this->configuration->getMailSendOnCheckLinks()) {
+                case Configuration::SEND_EMAIL_NEVER:
+                    $this->io->writeln('Do not send mail, because sending was deactivated.');
+                    break;
+                case Configuration::SEND_EMAIL_ALWAYS:
+                    $this->io->writeln('Send email');
+                    $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+                    break;
+                case Configuration::SEND_EMAIL_ANY:
+                    if ($stats->getCountBrokenLinks()) {
+                        $this->io->writeln('Broken links found, send email');
+                        $this->generateCheckResultMail->generateMail(
+                            $this->configuration,
+                            $this->statistics[$pageId],
+                            $pageId
+                        );
+                    } else {
+                        $this->io->writeln('No broken links found, do not send email');
+                    }
+                    break;
+                case Configuration::SEND_EMAIL_NEW:
+                    // send email only if new broken links
+                    $newBrokenLinks = $stats->getCountNewBrokenLinks();
+                    if ($newBrokenLinks) {
+                        $this->io->writeln($newBrokenLinks . ' new broken links found, send email');
+                        $this->generateCheckResultMail->generateMail(
+                            $this->configuration,
+                            $this->statistics[$pageId],
+                            $pageId
+                        );
+                    } else {
+                        $this->io->writeln('No new broken links found, do not send email');
+                    }
             }
         }
 
