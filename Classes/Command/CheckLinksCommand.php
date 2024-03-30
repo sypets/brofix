@@ -16,7 +16,6 @@ namespace Sypets\Brofix\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
-use RdKafka\Conf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -213,7 +212,7 @@ class CheckLinksCommand extends Command
 
         if ($this->sendEmail === Configuration::SEND_EMAIL_NEVER) {
             $this->io->writeln('Do not send email (never).');
-        } else if ($this->sendEmail === Configuration::SEND_EMAIL_ALWAYS) {
+        } elseif ($this->sendEmail === Configuration::SEND_EMAIL_ALWAYS) {
             $this->io->writeln('Always send email (always).');
         } if ($this->sendEmail === Configuration::SEND_EMAIL_ANY) {
             $this->io->writeln('Send email only if broken links found (any).');
@@ -351,8 +350,11 @@ class CheckLinksCommand extends Command
                 case Configuration::SEND_EMAIL_ANY:
                     if ($stats->getCountBrokenLinks()) {
                         $this->io->writeln('Broken links found, send email');
-                        $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId],
-                            $pageId);
+                        $this->generateCheckResultMail->generateMail(
+                            $this->configuration,
+                            $this->statistics[$pageId],
+                            $pageId
+                        );
                     } else {
                         $this->io->writeln('No broken links found, do not send email');
                     }
@@ -362,12 +364,14 @@ class CheckLinksCommand extends Command
                     $newBrokenLinks = $stats->getCountNewBrokenLinks();
                     if ($newBrokenLinks) {
                         $this->io->writeln($newBrokenLinks . ' new broken links found, send email');
-                        $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId],
-                            $pageId);
+                        $this->generateCheckResultMail->generateMail(
+                            $this->configuration,
+                            $this->statistics[$pageId],
+                            $pageId
+                        );
                     } else {
                         $this->io->writeln('No new broken links found, do not send email');
                     }
-
             }
         }
 

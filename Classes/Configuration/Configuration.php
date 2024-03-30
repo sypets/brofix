@@ -532,7 +532,7 @@ class Configuration
         switch ($value) {
             case self::SEND_EMAIL_AUTO:
                 return self::SEND_EMAIL_DEFAULT_VALUE;
-            // map old values
+                // map old values
             case '0':
                 return self::SEND_EMAIL_NEVER;
             case '1':
