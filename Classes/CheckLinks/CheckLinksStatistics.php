@@ -66,6 +66,8 @@ class CheckLinksStatistics
      */
     protected $percentBrokenLinks;
 
+    protected int $countNewBrokenLinks = 0;
+
     public function __construct()
     {
     }
@@ -79,6 +81,7 @@ class CheckLinksStatistics
         $this->countLinks = 0;
         $this->percentBrokenLinks = 0;
         $this->percentExcludedLinks = 0;
+        $this->countNewBrokenLinks = 0;
         $this->pageTitle = '';
     }
 
@@ -102,6 +105,16 @@ class CheckLinksStatistics
         } else {
             $this->percentBrokenLinks =  0;
         }
+    }
+
+    public function incrementNewBrokenLink(): void
+    {
+        $this->countNewBrokenLinks++;
+    }
+
+    public function getCountNewBrokenLinks(): int
+    {
+        return $this->countNewBrokenLinks;
     }
 
     public function incrementCountExcludedLinks(): void

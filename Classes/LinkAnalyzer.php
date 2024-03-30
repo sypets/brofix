@@ -372,7 +372,10 @@ class LinkAnalyzer implements LoggerAwareInterface
                     // last_check reflects time of last check (may be older if URL was in cache)
                     $record['last_check_url'] = $linktypeObject->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
-                    $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
+                    if ($this->brokenLinkRepository->insertOrUpdateBrokenLink($record)) {
+                        // new broken link found
+                        $this->statistics->incrementNewBrokenLink();
+                    }
                     $this->statistics->incrementCountBrokenLinks();
                 } elseif (GeneralUtility::_GP('showalllinks')) {
                     $response = ['valid' => true];

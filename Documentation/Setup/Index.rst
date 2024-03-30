@@ -13,5 +13,6 @@ Setup
    :titlesonly:
 
    Quickstart
+   Commands
    Reference
    TsconfigReference
