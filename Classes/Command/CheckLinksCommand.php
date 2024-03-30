@@ -158,8 +158,7 @@ class CheckLinksCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Send email. Possible values: ' . implode(' | ', Configuration::SEND_EMAIL_AVAILABLE_VALUES)
                     . ' (default:' . Configuration::SEND_EMAIL_DEFAULT_VALUE . ')',
-                Configuration::SEND_EMAIL_AUTO,
-                Configuration::SEND_EMAIL_AVAILABLE_VALUES
+                Configuration::SEND_EMAIL_AUTO
             )
             ->addOption(
                 'exclude-uid',
@@ -213,11 +212,11 @@ class CheckLinksCommand extends Command
             $this->io->writeln('Do not send email (never).');
         } elseif ($this->sendEmail === Configuration::SEND_EMAIL_ALWAYS) {
             $this->io->writeln('Always send email (always).');
-        } if ($this->sendEmail === Configuration::SEND_EMAIL_ANY) {
+        } elseif ($this->sendEmail === Configuration::SEND_EMAIL_ANY) {
             $this->io->writeln('Send email only if broken links found (any).');
-        } if ($this->sendEmail === Configuration::SEND_EMAIL_NEW) {
+        } elseif ($this->sendEmail === Configuration::SEND_EMAIL_NEW) {
             $this->io->writeln('Send email only if new broken links found (new).');
-        } if ($this->sendEmail === Configuration::SEND_EMAIL_AUTO) {
+        } elseif ($this->sendEmail === Configuration::SEND_EMAIL_AUTO) {
             $this->io->writeln('Send email based on TSconfig configuration (auto).');
         }
 
