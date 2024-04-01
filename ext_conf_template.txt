@@ -1,14 +1,18 @@
-# cat=basic; type=bool; label=Do not use these softreference parsers (comma separated list) when parsing content (default: "url": workaround for TYPO3 core bug)
+### separate label and description with ":"
+### Things added in later versions, add at the bottom
+### Use category "checking" and "backend"
+
+# cat=checking; type=string; label=Do not use these softreference parsers (comma separated list) when parsing content: This is a workaround for a TYPO3 core bug. The default is "url".
 excludeSoftrefs = url
 
-# cat=basic; type=bool; label=In which fields should excludeSoftrefs apply (comma separated list of table.field) (default: tt_content.bodytext)
+# cat=checking; type=string; label=In which fields should excludeSoftrefs apply: This is a comma separated list of table.field. The default is "tt_content.bodytext".
 excludeSoftrefsInFields = tt_content.bodytext
 
-# cat=basic; type=int; label= Maximum number of pages to traverse in Backend. Limit is disabled if =0. This should be set to a hard limit for performance reasons.
-traverseMaxNumberOfPagesInBackend = 1000
-
-# cat=basic; type=options[default=default,full=full]; label= Perform TCA processing (see documentation for details)
+# cat=checking; type=options[default=default,full=full]; label= How to perform TCA processing: Set this to "full" if Flexform fields should be processed. The default is "default".
 tcaProcessing = default
 
-# cat=basic; type=string; label= Override FormDataGroup for processing TCA (see documentation for details)
+# cat=checking; type=string; label= Override FormDataGroup for processing TCA: The default is empty which means use the FormDataGroup based on tcaProcessing setting.
 overrideFormDataGroup =
+
+# cat=backend; type=int; label= Maximum number of pages to traverse in Backend: Limit is disabled if =0. The default is 1000. This should be set to a hard limit for performance reasons.
+traverseMaxNumberOfPagesInBackend = 1000
