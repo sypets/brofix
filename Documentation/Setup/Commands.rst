@@ -74,10 +74,13 @@ on the start pages and depth, the page tree is traversed to gather all pages
 on which broken links will be checked (omitting hidden pages and subpages of
 hidden pages with extendToSubpages).
 
+In CLI, use several -x options if more than one, e.g -p 1 -p 2 on the command line.
+In the scheduler, seperate several with comma.
+
 .. code-block:: shell
 
    # Use 1 and 123 as start pages
-   vendor/bin/typo3 brofix:checklinks -p 1,123
+   vendor/bin/typo3 brofix:checklinks -p 1 -p 2
 
 .. _command_checklinks_depth:
 
@@ -154,8 +157,8 @@ Example:
 
 Make it possible to omit specific page ids and their subpages when checking.
 
-Use several -x options if more than one, e.g -x1 -x2 on the command line (or
-separate several with comma in the scheduler).
+In CLI, use several -x options if more than one, e.g -x1 -x2 on the command line.
+In the scheduler, seperate several with comma.
 
    # Use 1 and 123 as start pages
    vendor/bin/typo3 brofix:checklinks -p 1,123 -x 55 -x 60

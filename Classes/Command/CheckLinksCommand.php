@@ -16,6 +16,7 @@ namespace Sypets\Brofix\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
+use pq\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -130,9 +131,11 @@ class CheckLinksCommand extends Command
             ->addOption(
                 'start-pages',
                 'p',
-                InputOption::VALUE_REQUIRED,
-                'Page id(s) to start with. Separate with , if several are used, e.g. "1,23".' .
-                'If none are given, the configured site start pages are used.'
+                InputOption::VALUE_REQUIRED  | InputOption::VALUE_IS_ARRAY,
+                'Page id(s) to start with.'
+                . ' In cli: Use several -p options if more than one, e.g -p1 -p2.'
+                . ' In scheduler: Separate several with "," if several used.'
+                . 'If none are given, the configured site start pages are used.'
             )
             ->addOption(
                 'depth',
@@ -166,7 +169,9 @@ class CheckLinksCommand extends Command
                 'exclude-uid',
                 'x',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Page id (and subpages), which will not be checked. Use several -x options if more than one, e.g -x1 -x2'
+                'Page id (and subpages), which will not be checked.'
+                    . ' In cli: Use several -x options if more than one, e.g -x1 -x2.'
+                    . ' In scheduler: Separate several with "," if several used.'
             )
         ;
     }
@@ -229,9 +234,29 @@ class CheckLinksCommand extends Command
             $this->excludedPages[$id] = $id;
         }
 
-        $startPageString = (string)($input->getOption('start-pages') ?? '');
-        if ($startPageString !== '') {
-            $startPages = explode(',', $startPageString);
+        /** @var string|array<int,string>|array<int,int> $startPages */
+        $startPages = ($input->getOption('start-pages') ?? []);
+        if ($startPages) {
+            if (is_string($startPages)) {
+                $startPages = explode(',', $startPages);
+            }
+            // should be an array now
+            if (!is_array($startPages)) {
+                throw new InvalidArgumentException('--start-pages invalid values passed for this option');
+            }
+            $startPagesResults = [];
+            foreach ($startPages as $page) {
+                // option should not contain comma, but someone might still be separating an option with comma (",")
+                // instead of passing several options because that is what used to be documented
+                if (str_contains($page, ',')) {
+                    foreach (explode(',', $page) as $pageExplodedItem) {
+                        $startPagesResults[(int)($pageExplodedItem)] = (int)($pageExplodedItem);
+                    }
+                } else {
+                    $startPagesResults[(int)$page] = (int)$page;
+                }
+            }
+            $startPages = $startPagesResults;
         } else {
             $startPages = [];
         }
