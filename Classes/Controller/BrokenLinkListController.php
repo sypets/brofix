@@ -80,10 +80,10 @@ class BrokenLinkListController extends AbstractBrofixController
             ['table_name', 'DESC'],
             ['field', 'DESC'],
         ],
-        'last_check' => [
+        'last_check_url' => [
             ['last_check_url', 'ASC'],
         ],
-        'last_check_reverse' => [
+        'last_check_url_reverse' => [
             ['last_check_url', 'DESC'],
         ],
         'url' => [
@@ -666,10 +666,11 @@ class BrokenLinkListController extends AbstractBrofixController
             'page',
             'element',
             'type',
+            'last_check_record',
             'linktext',
             'url',
             'error',
-            'last_check',
+            'last_check_url',
             'action'
         ];
 
@@ -681,7 +682,17 @@ class BrokenLinkListController extends AbstractBrofixController
                 'url'   => '',
                 'icon'  => '',
             ];
-            $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
+            if ($key === 'last_check_record') {
+                $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.last_check')
+                . '<br/>'
+                . $languageService->getLL('list.tableHead.last_check.record');
+            } elseif ($key === 'last_check_url') {
+                $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.last_check')
+                . '<br/>'
+                    . $languageService->getLL('list.tableHead.last_check.url');
+            } else {
+                $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
+            }
             if (isset($sortActions[$key])) {
                 // sorting available, add url
                 if ($this->orderBy === $key) {
@@ -958,7 +969,9 @@ class BrokenLinkListController extends AbstractBrofixController
 
         // last check of record
         // show the oldest last_check, either for the record or for the link target
-        $variables['lastcheck'] = StringUtil::formatTimestampAsString($row['last_check'] < $row['last_check_url'] ? $row['last_check'] : $row['last_check_url']);
+        $variables['lastcheck_combined'] = StringUtil::formatTimestampAsString($row['last_check'] < $row['last_check_url'] ? $row['last_check'] : $row['last_check_url']);
+        $variables['last_check'] = StringUtil::formatTimestampAsString($row['last_check']);
+        $variables['last_check_url'] = StringUtil::formatTimestampAsString($row['last_check_url']);
 
         // determine if check is fresh or stale
         $tstamp_field = $GLOBALS['TCA'][$row['table_name']]['ctrl']['tstamp'] ?? '';
