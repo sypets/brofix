@@ -254,9 +254,16 @@ class LinkAnalyzer implements LoggerAwareInterface
             $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
             return true;
         }
-        $header = $row['header'] ?: $recordUid;
+        $headerField = $GLOBALS['TCA'][$table]['ctrl']['label'] ?? '';
+        $header = $row[$headerField] ?? $recordUid;
 
-        if ($beforeEditedTimestamp && isset($row['timestamp']) && $beforeEditedTimestamp >= (int)$row['timestamp']) {
+        $timestampField = $GLOBALS['TCA'][$table]['ctrl']['tstamp'] ?? '';
+        if ($timestampField) {
+            $timestampValue = (int)($row[$timestampField] ?? 0);
+        } else {
+            $timestampValue = 0;
+        }
+        if ($beforeEditedTimestamp && $timestampValue && $beforeEditedTimestamp >= $timestampValue) {
             // if timestamp of record is not after $beforeEditedTimestamp: no need to recheck
             $message = $this->getLanguageService()->getLL('list.recheck.message.notchanged');
             if ($message) {
