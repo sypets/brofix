@@ -51,11 +51,13 @@ mod.brofix {
   }
 
   linkTargetCache {
-    # 7 days : typically used for full recheck
-    expiresLow = 604800
+    # typically used for full recheck
+    # 2592000 seconds = 30 days
+    expiresLow = 2592000
 
-    # 8 days : typically use for on-the-fly checking
-    expiresHigh = 691200
+    # typically use for on-the-fly checking
+    # 2678400 seconds = 31 days
+    expiresHigh = 2678400
   }
 
   crawlDelay {
