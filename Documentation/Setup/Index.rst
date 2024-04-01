@@ -15,4 +15,5 @@ Setup
    Quickstart
    Commands
    Reference
+   ExtensionConfigurationReference
    TsconfigReference
