@@ -537,6 +537,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         if ($table === 'tt_content') {
             $defaultFields[] = 'colPos';
+            $defaultFields[] = 'list_type';
         }
         foreach ($selectFields as $field) {
             // field must have TCA configuration
