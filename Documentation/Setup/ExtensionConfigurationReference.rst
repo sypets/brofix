@@ -41,67 +41,6 @@ Set the logo used in the Fluid email in the EXT:backend extension configuration:
 EXT:brofix
 ==========
 
-.. _extensionConfiguation_brofix_combinedErrorNonCheckableMatch:
-
-EXT:brofix | combinedErrorNonCheckableMatch
--------------------------------------------
-
-(since TYPO3 v12)
-
-*Non-checkable match*
-
-:guilabel:`Checking` tab
-
-default:
-   "regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/"
-available values:
-   either a regex starting with regex: or a string
-
-If result from link target checking match this, consider the link target (URL)
-as non-checkable. This is written to the database table and displayed in the
-backend module. It is possible to filter by this status. By default, these
-links are not displayed (since the default filter in the backend shows only
-broken links).
-
-Currently, these are the known status:
-
-* 1: broken
-* 2: ok
-* 3: not possible to check ("non-checkable")
-* 4: is excluded
-
-This should also improve handling of cloudflare protected sites as these
-typically return 403 HTTP status code. The link checking status is no longer
-considered broken, it is now considered "not-checkable", since the actual
-link check result cannot be obtained.
-
-What kind of results from link checking, make the URL "non-checkable" can
-be configured via Exension Configuration "combinedErrorNonCheckableMatch".
-
-This can be either a regular expression (with prefix "regex:" and enclosing
-delimeters (e.g. "/"). Or it can be a list of strings, separated by comma.
-
-This is matched against a combination of the link checking result, consisting of:
-
-.. code-block:: text
-
-   <errorType> ":" <errorCode> ":" <exceptionMessage>
-
-To match HTTP status code 401, you could use:
-
-.. code-block:: text
-
-   httpStatusCode:401:
-
-The possible errorTypes and errorCodes can be seen in the class ExternalLinktype
-or via the database field tx_brofix_broken_links.url_response.
-
-This is the default value:
-
-.. code-block:: text
-
-   regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/
-
 
 .. _extensionConfiguation_brofix_excludeSoftrefs:
 
@@ -183,26 +122,6 @@ available values:
    any valid class name which implements FormDataGroupInterface as fully qualified class name, for example Myvendor\Myextension\FormEngine\MyFormdatagroup
 
 Changes how the TCA processing is done.
-
-.. _extensionConfiguation_brofix_showalllinks:
-
-EXT:brofix | showalllinks
-----------------------------------------------
-
-(since TYPO3 v12)
-
-*Show all links, not just broken links.*
-
-:guilabel:`Backend` tab
-
-default:
-   1 (on)
-available values:
-   1 (on) | 0 (off)
-
-If this is on, all links can be displayed, not just the broken links. This
-requires a full recheck if the setting was previously off or the feature not
-yet available.
 
 .. _extensionConfiguation_brofix_traverseMaxNumberOfPagesInBackend:
 
