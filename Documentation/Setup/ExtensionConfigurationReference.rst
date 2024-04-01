@@ -41,6 +41,40 @@ Set the logo used in the Fluid email in the EXT:backend extension configuration:
 EXT:brofix
 ==========
 
+.. _extensionConfiguation_brofix_linkTargetCacheExpiresLow:
+
+EXT:brofix | linkTargetCacheExpiresLow
+--------------------------------------
+
+*External link target cache (in seconds) for checking*
+
+:guilabel:`Checking` tab
+
+default:
+   0 (means use TSconfig value :ref:`tsconfigLinkTargetCacheExpiresLow`)
+available values:
+   any integer value
+
+For a description see the TSconfig option :ref:`tsconfigLinkTargetCacheExpiresLow`.
+
+.. _extensionConfiguation_brofix_linkTargetCacheExpiresHigh:
+
+EXT:brofix | linkTargetCacheExpiresHigh
+--------------------------------------
+
+*External link target cache (in seconds) for checking*
+
+:guilabel:`Checking` tab
+
+default:
+   0 (means use TSconfig value :ref:`tsconfigLinkTargetCacheExpiresHigh`)
+available values:
+   any integer value
+
+This should be a slightly higher value than :ref:`extensionConfiguation_brofix_linkTargetCacheExpiresLow`
+or 0.
+
+For a description see the TSconfig option :ref:`tsconfigLinkTargetCacheExpiresHigh`.
 
 .. _extensionConfiguation_brofix_excludeSoftrefs:
 
