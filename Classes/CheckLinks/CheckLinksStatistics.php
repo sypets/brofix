@@ -18,58 +18,33 @@ namespace Sypets\Brofix\CheckLinks;
 
 class CheckLinksStatistics
 {
-    /**
-     * @var string
-     */
-    protected $pageTitle;
+    protected string $pageTitle = '';
 
-    /** @var int */
-    protected $countExcludedLinks;
+    protected int $countExcludedLinks = 0;
 
-    /**
-     * @var int
-     */
-    protected $countBrokenLinks;
+    protected int $countBrokenLinks = 0;
 
-    /**
-     * @var int
-     */
-    protected $checkStartTime;
+    protected int $checkStartTime = 0;
+    protected int $checkEndTime = 0;
 
-    /**
-     * @var int
-     */
-    protected $checkEndTime;
+    protected int $countPages = 0;
 
-    /**
-     * @var int
-     */
-    protected $countPages;
+    protected int $countLinksChecked = 0;
 
-    /**
-     * @var int
-     */
-    protected $countLinks;
+    protected float $percentExcludedLinks = 0.0;
 
-    /**
-     * @var int
-     */
-    protected $countLinksChecked;
+    protected float $percentBrokenLinks = 0.0;
 
-    /**
-     * @var float
-     */
-    protected $percentExcludedLinks;
+    /** @var array<int,int> */
+    protected array $countLinksByStatus = [];
 
-    /**
-     * @var float
-     */
-    protected $percentBrokenLinks;
+    protected int $countLinksTotal = 0;
 
     protected int $countNewBrokenLinks = 0;
 
     public function __construct()
     {
+        $this->initialize();
     }
 
     public function initialize(): void
@@ -78,7 +53,7 @@ class CheckLinksStatistics
         $this->countExcludedLinks = 0;
         $this->countBrokenLinks = 0;
         $this->countPages = 0;
-        $this->countLinks = 0;
+        $this->countLinksTotal = 0;
         $this->percentBrokenLinks = 0;
         $this->percentExcludedLinks = 0;
         $this->countNewBrokenLinks = 0;
@@ -89,11 +64,11 @@ class CheckLinksStatistics
     {
         $this->checkEndTime = \time();
         // number of links actually checked
-        $this->countLinksChecked = $this->countLinks - $this->countExcludedLinks;
+        $this->countLinksChecked = $this->countLinksTotal - $this->countExcludedLinks;
         if ($this->countExcludedLinks > 0
-            && $this->countLinks > 0
+            && $this->countLinksTotal > 0
         ) {
-            $this->percentExcludedLinks = $this->countExcludedLinks / $this->countLinks * 100;
+            $this->percentExcludedLinks = $this->countExcludedLinks / $this->countLinksTotal * 100;
         } else {
             $this->percentExcludedLinks = 0;
         }
@@ -129,7 +104,7 @@ class CheckLinksStatistics
 
     public function addCountLinks(int $count): void
     {
-        $this->countLinks += $count;
+        $this->countLinksTotal += $count;
     }
 
     public function setCountPages(int $count): void
@@ -157,17 +132,26 @@ class CheckLinksStatistics
 
     public function getCountLinks(): int
     {
-        return $this->countLinks;
+        return $this->countLinksTotal;
+    }
+
+    public function getCountLinksByStatus(int $status): int
+    {
+        return (int)($this->countLinksByStatus[$status] ?? 0);
     }
 
     public function getCountBrokenLinks(): int
     {
         return $this->countBrokenLinks;
+        // todo use
+        //return (int)($this->countLinksByStatus[LinkTargetResponse::RESULT_BROKEN] ?? 0);
     }
 
     public function getCountExcludedLinks(): int
     {
         return $this->countExcludedLinks;
+        // todo: use
+        //return (int)($this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED] ?? 0);
     }
 
     /**
@@ -192,6 +176,25 @@ class CheckLinksStatistics
     public function getCountLinksChecked(): int
     {
         return $this->countLinksChecked;
+        // todo
+        /*
+        return $this->countLinksTotal - ($this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED] ?? 0)
+            - ($this->countLinksByStatus[LinkTargetResponse::RESULT_CANNOT_CHECK] ?? 0);
+        */
+    }
+
+    public function getPercentLinksByStatus(int $status): float
+    {
+        if (!isset($this->countLinksByStatus[$status])) {
+            return 0;
+        }
+
+        if ($this->countLinksByStatus[$status] > 0
+            && $this->getCountLinksChecked() > 0
+        ) {
+            return $this->countLinksByStatus[$status] / $this->getCountLinksChecked() * 100;
+        }
+        return 0;
     }
 
     /**
