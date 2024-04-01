@@ -18,6 +18,13 @@
 						<core:icon identifier="{tableHeader.type.icon}"/>
 					</f:if>
 				</th>
+
+				<f:comment>=== Last checked (record) ===</f:comment>
+				<th class="mobile-optional">
+					<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check">Last checked</f:translate>
+					<br/>
+					<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check.record">(record)</f:translate>
+				</th>
 				<th>
 					<f:format.raw>{tableHeader.linktext.header}</f:format.raw>
 				</th>
@@ -33,12 +40,29 @@
 						<core:icon identifier="{tableHeader.error.icon}"/>
 					</f:if>
 				</th>
+
+				<f:comment>===Last checked URL ===</f:comment>
 				<th class="mobile-optional">
-					<f:format.raw> {tableHeader.last_check.header}</f:format.raw>
-					<f:if condition="{tableHeader.last_check.icon}">
-						<core:icon identifier="{tableHeader.last_check.icon}"/>
+					<f:comment>
+						<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check">Last checked</f:translate>
+						<br/>
+						<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check.url">(URL)</f:translate>
+					</f:comment>
+					<f:format.raw> {tableHeader.last_check_url.header}</f:format.raw>
+					<f:if condition="{tableHeader.last_check_url.icon}">
+						<core:icon identifier="{tableHeader.last_check_url.icon}"/>
 					</f:if>
 					<br/>
+				</th>
+				<f:comment>
+					<th class="mobile-optional">
+						<f:format.raw> {tableHeader.last_check_url.header}</f:format.raw>
+						<f:if condition="{tableHeader.last_check.icon}">
+							<core:icon identifier="{tableHeader.last_check.icon}"/>
+						</f:if>
+						<br/>
+					</th>
+				</f:comment>
 				<th>
 					{tableHeader.action.header}
 				</th>
@@ -80,9 +104,21 @@
 						</f:if>
 					</div>
 				</td>
+
+				<f:comment>==== Type ====</f:comment>
 				<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
 					title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
 				</td>
+
+				<f:comment>==== last_check (record) ====</f:comment>
+				<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
+					<span class="freshness_{item.freshness}">{item.last_check}</span>
+					<f:if condition="{item.freshness} == 'stale'>">
+						<core:icon identifier="actions-document-synchronize"/>
+					</f:if>
+				</td>
+
+				<f:comment>==== Anchor Text ====</f:comment>
 				<td>
 					<span>{item.link_title}</span>
 				</td>
@@ -112,11 +148,10 @@
 					<f:if condition="{item.status} === 3"><core:icon identifier="actions-question-circle"/></f:if>
 					<f:if condition="{item.status} === 4"><core:icon identifier="actions-ban"/></f:if>
 					{item.linkmessage -> f:format.raw()}</td>
-				<td class="mobile-optional" title="{f:translate(key: 'list.info.freshness.{item.freshness}', extensionName: 'Brofix')}">
-					<span class="freshness_{item.freshness}">{item.lastcheck}</span>
-					<f:if condition="{item.freshness} == 'stale'>">
-						<core:icon identifier="actions-document-synchronize"/>
-					</f:if>
+
+				<f:comment>==== last_check_url ====</f:comment>
+				<td class="mobile-optional" title="">
+					<span>{item.last_check_url}</span>
 				</td>
 				<td>
 					<a class="btn btn-primary" href="{item.editUrl}"
