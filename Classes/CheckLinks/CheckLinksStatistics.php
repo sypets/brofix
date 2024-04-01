@@ -20,33 +20,17 @@ use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 
 class CheckLinksStatistics
 {
-    /**
-     * @var string
-     */
-    protected $pageTitle;
+    protected string $pageTitle = '';
+    protected int $checkStartTime = 0;
 
-    /**
-     * @var int
-     */
-    protected $checkStartTime;
+    protected int $checkEndTime = 0;
 
-    /**
-     * @var int
-     */
-    protected $checkEndTime;
-
-    /**
-     * @var int
-     */
-    protected $countPages;
+    protected int $countPages = 0;
 
     /** @var array<int,int> */
-    protected array $countLinksByStatus;
+    protected array $countLinksByStatus = [];
 
-    /**
-     * @var int
-     */
-    protected $countLinksTotal = 0;
+    protected int $countLinksTotal = 0;
 
     protected int $countNewBrokenLinks = 0;
 
@@ -139,17 +123,17 @@ class CheckLinksStatistics
 
     public function getCountLinksByStatus(int $status): int
     {
-        return $this->countLinksByStatus[$status];
+        return (int)($this->countLinksByStatus[$status] ?? 0);
     }
 
     public function getCountBrokenLinks(): int
     {
-        return $this->countLinksByStatus[LinkTargetResponse::RESULT_BROKEN];
+        return (int)($this->countLinksByStatus[LinkTargetResponse::RESULT_BROKEN] ?? 0);
     }
 
     public function getCountExcludedLinks(): int
     {
-        return $this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED];
+        return (int)($this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED] ?? 0);
     }
 
     /**
@@ -176,12 +160,16 @@ class CheckLinksStatistics
      */
     public function getCountLinksChecked(): int
     {
-        return $this->countLinksTotal - $this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED]
-            - $this->countLinksByStatus[LinkTargetResponse::RESULT_CANNOT_CHECK];
+        return $this->countLinksTotal - ($this->countLinksByStatus[LinkTargetResponse::RESULT_EXCLUDED] ?? 0)
+            - ($this->countLinksByStatus[LinkTargetResponse::RESULT_CANNOT_CHECK] ?? 0);
     }
 
     public function getPercentLinksByStatus(int $status): float
     {
+        if (!isset($this->countLinksByStatus[$status])) {
+            return 0;
+        }
+
         if ($this->countLinksByStatus[$status] > 0
             && $this->getCountLinksChecked() > 0
         ) {
