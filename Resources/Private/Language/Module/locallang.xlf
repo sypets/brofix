@@ -35,15 +35,24 @@
 			<trans-unit id="list.tableHead.type" resname="list.tableHead.type">
 				<source>Type</source>
 			</trans-unit>
+
+			<!-- no longer used, only used as fallback -->
 			<trans-unit id="list.tableHead.last_check" resname="list.tableHead.last_check">
+				<source>Checked</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.last_check_url" resname="list.tableHead.last_check_url">
+				<source>Checked</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.last_check.part1" resname="list.tableHead.last_check.part1">
 				<source>Last checked</source>
 			</trans-unit>
-			<trans-unit id="list.tableHead.last_check.url" resname="list.tableHead.last_check_url">
+			<trans-unit id="list.tableHead.last_check.part2.url" resname="list.tableHead.last_check.part2.url">
 				<source>(URL)</source>
 			</trans-unit>
-			<trans-unit id="list.tableHead.last_check.record" resname="list.tableHead.last_check_url">
+			<trans-unit id="list.tableHead.last_check.part2.record" resname="list.tableHead.last_check.part2.record">
 				<source>(record)</source>
 			</trans-unit>
+
 			<trans-unit id="list.tableHead.url" resname="list.tableHead.url">
 				<source>Link target</source>
 			</trans-unit>
@@ -53,6 +62,7 @@
 			<trans-unit id="list.tableHead.error" resname="list.tableHead.error">
 				<source>Error</source>
 			</trans-unit>
+
 			<trans-unit id="list.tableHead.action" resname="list.tableHead.action">
 				<source>Action</source>
 			</trans-unit>
