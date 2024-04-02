@@ -683,13 +683,30 @@ class BrokenLinkListController extends AbstractBrofixController
                 'icon'  => '',
             ];
             if ($key === 'last_check_record') {
-                $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.last_check')
-                . '<br/>'
-                . $languageService->getLL('list.tableHead.last_check.record');
+                $part1 = $languageService->getLL('list.tableHead.last_check.part1');
+                $part2 = $languageService->getLL('list.tableHead.last_check.part2.record');
+                if ($part1 && $part2) {
+                    $tableHeadData[$key]['label'] = $part1
+                        . '<br/>'
+                        . $part2;
+                } else {
+                    // fallback: use older language label
+                    $tableHeadData[$key]['label'] =
+                        $languageService->getLL('list.tableHead.last_check');
+                }
             } elseif ($key === 'last_check_url') {
-                $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.last_check')
-                . '<br/>'
-                    . $languageService->getLL('list.tableHead.last_check.url');
+                $part1 = $languageService->getLL('list.tableHead.last_check.part1');
+                $part2 = $languageService->getLL('list.tableHead.last_check.part2.url');
+                if ($part1 && $part2) {
+                    $tableHeadData[$key]['label'] = $part1
+                        . '<br/>'
+                        . $part2;
+                } else {
+                    // fallback: use older language label
+                    $tableHeadData[$key]['label'] =
+                        $languageService->getLL('list.tableHead.last_check_url')
+                        ?: $languageService->getLL('list.tableHead.last_check');
+                }
             } else {
                 $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
             }
