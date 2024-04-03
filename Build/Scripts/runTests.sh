@@ -7,6 +7,14 @@
 # TYPO3 core test runner based on docker and docker-compose.
 #
 
+
+# config
+SUPPORTED_PHP_VERSIONS="7.4|8.0|8.1|8.2|8.3"
+DEFAULT_PHP_VERSION="7.4"
+PHP_VERSION="${DEFAULT_PHP_VERSION}"
+DEFAULT_PHP_PLATFORM_VERSION="7.4.33"
+
+
 # Function to write a .env file in Build/testing-docker/local
 # This is read by docker-compose and vars defined here are
 # used in Build/testing-docker/local/docker-compose.yml
@@ -35,10 +43,18 @@ setUpDockerComposeDotEnv() {
         echo "PHP_XDEBUG_ON=${PHP_XDEBUG_ON}"
         echo "PHP_XDEBUG_PORT=${PHP_XDEBUG_PORT}"
         echo "PHP_VERSION=${PHP_VERSION}"
+        echo "DEFAULT_PHP_VERSION"=${DEFAULT_PHP_VERSION}
+        echo "DEFAULT_PHP_PLATFORM_VERSION"=${DEFAULT_PHP_PLATFORM_VERSION}
+        echo "PHP_PLATFORM_VERSION"=${PHP_PLATFORM_VERSION}
+        echo "MARIADB_VERSION=${MARIADB_VERSION}"
+        echo "MYSQL_VERSION=${MYSQL_VERSION}"
+        echo "POSTGRES_VERSION=${POSTGRES_VERSION}"
         echo "DOCKER_PHP_IMAGE=${DOCKER_PHP_IMAGE}"
         echo "EXTRA_TEST_OPTIONS=${EXTRA_TEST_OPTIONS}"
         echo "SCRIPT_VERBOSE=${SCRIPT_VERBOSE}"
         echo "PASSWD_PATH=${PASSWD_PATH}"
+        echo "IMAGE_PREFIX=${IMAGE_PREFIX}"
+        echo "DOCKER_COMPOSE_COMMAND=${DOCKER_COMPOSE_COMMAND}"
     } > .env
 }
 
@@ -49,12 +65,9 @@ a docker based test environment. Handles execution of single test files, sending
 xdebug information to a local IDE and more.
 Also used by github actions for test execution.
 
-Recommended docker version is >=20.10 for xdebug break pointing to work reliably, and
-a recent docker-compose (tested >=1.21.2) is needed.
-
 Usage: $0 [options] [file]
 
-No arguments: Run all unit tests with PHP 7.2
+No arguments: Run all unit tests with default PHP version
 
 Options:
     -s <...>
@@ -141,9 +154,9 @@ Examples:
     ./Build/Scripts/runTests.sh -s functional -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
 
-# Test if docker-compose exists, else exit out with error
-if ! type "docker-compose" > /dev/null; then
-  echo "This script relies on docker and docker-compose. Please install" >&2
+# Test if docker exists, else exit out with error
+if ! type "docker" > /dev/null; then
+  echo "This script relies on docker. Please install" >&2
   exit 1
 fi
 
@@ -172,6 +185,12 @@ EXTRA_TEST_OPTIONS=""
 SCRIPT_VERBOSE=0
 CGLCHECK_DRY_RUN=""
 PASSWD_PATH=/etc/passwd
+IMAGE_PREFIX="ghcr.io/typo3/"
+DOCKER_COMPOSE_COMMAND="docker-compose"
+which docker-compose 2>/dev/null >/dev/null
+if [ $? -ne 0 ];then
+     DOCKER_COMPOSE_COMMAND="docker compose"
+fi
 
 # Option parsing
 # Reset in case getopts has been used previously in the shell
@@ -192,7 +211,7 @@ while getopts ":s:t:d:p:e:xy:huvn" OPT; do
             ;;
         p)
             PHP_VERSION=${OPTARG}
-            if ! [[ ${PHP_VERSION} =~ ^(7.2|7.3|7.4|8.0|8.1)$ ]]; then
+            if ! [[ ${PHP_VERSION} =~ ^(${SUPPORTED_PHP_VERSIONS})$ ]]; then
                 INVALID_OPTIONS+=("${OPT} ${OPTARG} : unsupported php version")
             fi
             ;;
@@ -264,32 +283,32 @@ fi
 case ${TEST_SUITE} in
     composerCoreVersion)
         setUpDockerComposeDotEnv
-        docker-compose run composer_coreversion_require
+        ${DOCKER_COMPOSE_COMMAND} run composer_coreversion_require
         SUITE_EXIT_CODE=$?
         ;;
     composerInstall)
         setUpDockerComposeDotEnv
-        docker-compose run composer_install
+        ${DOCKER_COMPOSE_COMMAND} run composer_install
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     composerInstallMax)
         setUpDockerComposeDotEnv
-        docker-compose run composer_install_max
+        ${DOCKER_COMPOSE_COMMAND} run composer_install_max
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     composerInstallMin)
         setUpDockerComposeDotEnv
-        docker-compose run composer_install_min
+        ${DOCKER_COMPOSE_COMMAND} run composer_install_min
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     composerValidate)
         setUpDockerComposeDotEnv
-        docker-compose run composer_validate
+        ${DOCKER_COMPOSE_COMMAND} run composer_validate
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     cgl)
         # Active dry-run for cglAll needs not "-n" but specific options
@@ -297,30 +316,30 @@ case ${TEST_SUITE} in
             CGLCHECK_DRY_RUN="--dry-run --diff"
         fi
         setUpDockerComposeDotEnv
-        docker-compose run cgl_all
+        ${DOCKER_COMPOSE_COMMAND} run cgl_all
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     cglGit)
         # Active dry-run for cglAll needs not "-n" but specific options
         setUpDockerComposeDotEnv
-        docker-compose run cgl_git
+        ${DOCKER_COMPOSE_COMMAND} run cgl_git
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     functional)
         setUpDockerComposeDotEnv
         case ${DBMS} in
             mariadb)
-                docker-compose run functional_mariadb10
+                ${DOCKER_COMPOSE_COMMAND} run functional_mariadb10
                 SUITE_EXIT_CODE=$?
                 ;;
-            mssql)
-                docker-compose run functional_mssql2019latest
+            mysql)
+                ${DOCKER_COMPOSE_COMMAND} run functional_mssql2019latest
                 SUITE_EXIT_CODE=$?
                 ;;
             postgres)
-                docker-compose run functional_postgres10
+                ${DOCKER_COMPOSE_COMMAND} run functional_postgres10
                 SUITE_EXIT_CODE=$?
                 ;;
             sqlite)
@@ -329,7 +348,7 @@ case ${TEST_SUITE} in
                 # root if docker creates it. Thank you, docker. We create the path beforehand
                 # to avoid permission issues on host filesystem after execution.
                 mkdir -p "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
-                docker-compose run functional_sqlite
+                ${DOCKER_COMPOSE_COMMAND} run functional_sqlite
                 SUITE_EXIT_CODE=$?
                 ;;
             *)
@@ -338,31 +357,31 @@ case ${TEST_SUITE} in
                 echo "${HELP}" >&2
                 exit 1
         esac
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     lint)
         setUpDockerComposeDotEnv
-        docker-compose run lint
+        ${DOCKER_COMPOSE_COMMAND} run lint
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     phpstan)
         setUpDockerComposeDotEnv
-        docker-compose run phpstan
+        ${DOCKER_COMPOSE_COMMAND} run phpstan
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     phpstanGenerateBaseline)
         setUpDockerComposeDotEnv
-        docker-compose run phpstan_generate_baseline
+        ${DOCKER_COMPOSE_COMMAND} run phpstan_generate_baseline
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     unit)
         setUpDockerComposeDotEnv
-        docker-compose run unit
+        ${DOCKER_COMPOSE_COMMAND} run unit
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     update)
         # pull typo3gmbh/phpXY:latest versions of those ones that exist locally
