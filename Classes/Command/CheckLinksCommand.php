@@ -472,12 +472,12 @@ class CheckLinksCommand extends Command
             /** @var LinkAnalyzer $linkAnalyzer */
             $linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
             $linkAnalyzer->init($pageIds, $this->configuration);
-            if (isset($GLOBALS['REQUEST'])) {
-                $request = $GLOBALS['REQUEST'];
+            if (isset($GLOBALS['TYPO3_REQUEST'])) {
+                $request = $GLOBALS['TYPO3_REQUEST'];
             } else {
                 $request = CommandUtility::createFakeWebRequest($this->backendUri);
                 // set global variable here because it might be used by FormEngine processing (e.g. FormDataProvider, hooks etc.)
-                $GLOBALS['REQUEST'] = $request;
+                $GLOBALS['TYPO3_REQUEST'] = $request;
             }
             $linkAnalyzer->generateBrokenLinkRecords(
                 $request,
