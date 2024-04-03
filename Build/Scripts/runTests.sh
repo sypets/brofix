@@ -331,15 +331,15 @@ case ${TEST_SUITE} in
         setUpDockerComposeDotEnv
         case ${DBMS} in
             mariadb)
-                ${DOCKER_COMPOSE_COMMAND} run functional_mariadb
+                ${DOCKER_COMPOSE_COMMAND} run functional_mariadb10
                 SUITE_EXIT_CODE=$?
                 ;;
             mysql)
-                ${DOCKER_COMPOSE_COMMAND} run functional_mysql
+                ${DOCKER_COMPOSE_COMMAND} run functional_mssql2019latest
                 SUITE_EXIT_CODE=$?
                 ;;
             postgres)
-                ${DOCKER_COMPOSE_COMMAND} run functional_postgres
+                ${DOCKER_COMPOSE_COMMAND} run functional_postgres10
                 SUITE_EXIT_CODE=$?
                 ;;
             sqlite)
