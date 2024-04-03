@@ -251,8 +251,7 @@ services:
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
           set -x
         fi
-        php -dxdebug.mode=off .Build/bin/php-cs-fixer fix -v ${CGLCHECK_DRY_RUN} --path-mode intersection \
-          --config=Build/.php-cs-fixer.php .
+        php -dxdebug.mode=off .Build/bin/php-cs-fixer fix -v ${CGLCHECK_DRY_RUN} --path-mode intersection --config=Build/.php-cs-fixer.php .
       "
   lint:
     image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
