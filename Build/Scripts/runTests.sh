@@ -154,7 +154,7 @@ Examples:
     ./Build/Scripts/runTests.sh -s functional -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
 
-# Test if docker exists, else exit out with error
+# Test if docker-compose exists, else exit out with error
 if ! type "docker" > /dev/null; then
   echo "This script relies on docker. Please install" >&2
   exit 1
