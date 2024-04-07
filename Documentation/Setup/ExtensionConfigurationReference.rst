@@ -229,7 +229,7 @@ EXT:brofix | showEditButtons
 
 *Show button to edit entire record, only the field with a broken link or both.*
 
-:guilabel:`Backend` tab
+:guilabel:`Report` tab
 
 default:
    "Both" (both buttons are displayed)
@@ -245,7 +245,7 @@ EXT:brofix | showalllinks
 
 *Show all links, not just broken links.*
 
-:guilabel:`Backend` tab
+:guilabel:`Report` tab
 
 default:
    1 (on)
@@ -263,7 +263,7 @@ EXT:brofix | traverseMaxNumberOfPagesInBackend
 
 *Maximum number of pages to traverse in Backend ...*
 
-:guilabel:`Backend` tab
+:guilabel:`Report` tab
 
 default:
    1000
