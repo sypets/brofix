@@ -14,7 +14,7 @@ tcaProcessing = default
 # cat=checking; type=string; label= Override FormDataGroup for processing TCA: The default is empty which means use the FormDataGroup based on tcaProcessing setting.
 overrideFormDataGroup =
 
-# cat=backend; type=int; label= Maximum number of pages to traverse in Backend: Limit is disabled if =0. The default is 1000. This should be set to a hard limit for performance reasons.
+# cat=report; type=int; label= Maximum number of pages to traverse in Backend: Limit is disabled if =0. The default is 1000. This should be set to a hard limit for performance reasons.
 traverseMaxNumberOfPagesInBackend = 1000
 
 # cat=checking; type=int; label= External link target cache (in seconds) for checking: Default value is 0, which means use TSconfig value linkTargetCache.expiresLow
@@ -23,7 +23,7 @@ linkTargetCacheExpiresLow = 0
 # cat=checking; type=int; label= External link target cache (in seconds) for rechecking in Backend: Default value is 0, which means use TSconfig value linkTargetCache.expiresHigh
 linkTargetCacheExpiresHigh = 0
 
-# cat=backend; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
+# cat=report; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
 showEditButtons = both
 
 ### since TYPO3 v12
@@ -31,5 +31,5 @@ showEditButtons = both
 # cat=checking; type=bool; label=If an error code / type / exception matches this, the URL is non-checkable: This can be a regex if it starts with regex (separated by colon), otherwise it matches by start of string.
 combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/
 
-# cat=backend; type=bool; label=Show all links, not just broken links: The default is 1 (true).
+# cat=report; type=bool; label=Show all links, not just broken links: The default is 1 (true).
 showalllinks = 1
