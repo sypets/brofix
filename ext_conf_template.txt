@@ -23,6 +23,9 @@ linkTargetCacheExpiresLow = 0
 # cat=checking; type=int; label= External link target cache (in seconds) for rechecking in Backend: Default value is 0, which means use TSconfig value linkTargetCache.expiresHigh
 linkTargetCacheExpiresHigh = 0
 
+# cat=backend; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
+showEditButtons = both
+
 ### since TYPO3 v12
 
 # cat=checking; type=bool; label=If an error code / type / exception matches this, the URL is non-checkable: This can be a regex if it starts with regex (separated by colon), otherwise it matches by start of string.

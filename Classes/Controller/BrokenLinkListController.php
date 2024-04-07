@@ -778,15 +778,24 @@ class BrokenLinkListController extends AbstractBrofixController
          * @var UriBuilder $uriBuilder
          */
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $variables['editUrl'] = (string)$uriBuilder->buildUriFromRoute('record_edit', [
+        $showEditButtons = $this->configuration->getShowEditButtons();
+        $editUrlParameters = [
             'edit' => [
                 $table => [
-                    $row['record_uid'] => 'edit'
-                ]
+                    $row['record_uid'] => 'edit',
+                ],
             ],
-            'columnsOnly' => $row['field'],
-            'returnUrl' => $backUriEditField
-        ]);
+            'returnUrl' => $backUriEditField,
+        ];
+        if ($showEditButtons === 'both' || $showEditButtons === 'full') {
+            // Construct link to edit the full record
+            $variables['editUrlFull'] = (string)$uriBuilder->buildUriFromRoute('record_edit', $editUrlParameters);
+        }
+        if ($showEditButtons === 'both' || $showEditButtons === 'field') {
+            // Construct link to edit the field
+            $editUrlParameters['columnsOnly'] = $row['field'];
+            $variables['editUrlField'] = (string)$uriBuilder->buildUriFromRoute('record_edit', $editUrlParameters);
+        }
 
         // construct URL to recheck the URL
         $variables['recheckUrl'] = $this->constructBackendUri(
