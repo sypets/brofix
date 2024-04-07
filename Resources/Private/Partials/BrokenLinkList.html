@@ -140,10 +140,18 @@
 					<span>{item.last_check_url}</span>
 				</td>
 				<td>
-					<a class="btn btn-primary" href="{item.editUrl}"
-					   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
-						<core:icon identifier="actions-open" size="small"/>
-					</a>
+					<f:if condition="{item.editUrlField}">
+						<a class="btn btn-primary" href="{item.editUrlField}"
+						   title="{f:translate(key: 'list.edit.field', extensionName: 'Brofix')}">
+							<core:icon identifier="actions-open" size="small"/>
+						</a>
+					</f:if>
+					<f:if condition="{item.editUrlFull}">
+						<a class="btn btn-primary" href="{item.editUrlFull}"
+						   title="{f:translate(key: 'list.edit.record', extensionName: 'Brofix')}">
+							<core:icon identifier="form-content-element" size="small"/><core:icon identifier="actions-open" size="small"/>
+						</a>
+					</f:if>
 					<f:if condition="{item.recheckUrl}">
 						<a title="{f:translate(key: 'list.action.recheckUrl', extensionName='Brofix')}"
 						   class="btn btn-default" href="{item.recheckUrl}">

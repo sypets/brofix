@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/locallang_extconf.xlf" date="2024-04-07T10:22:34Z" product-name="brofix">
+		<header/>
+		<body>
+			<trans-unit id="showEditButtons" resname="showEditButtons">
+				<source>Show button to edit entire record, only the field with a broken link or both.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
