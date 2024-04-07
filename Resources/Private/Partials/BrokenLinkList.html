@@ -21,10 +21,9 @@
 
 				<f:comment>=== Last checked (record) ===</f:comment>
 				<th class="mobile-optional">
-					<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check">Last checked</f:translate>
-					<br/>
-					<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check.record">(record)</f:translate>
+					<f:format.raw>{tableHeader.last_check_record.header}</f:format.raw>
 				</th>
+
 				<th>
 					<f:format.raw>{tableHeader.linktext.header}</f:format.raw>
 				</th>
@@ -43,26 +42,13 @@
 
 				<f:comment>===Last checked URL ===</f:comment>
 				<th class="mobile-optional">
-					<f:comment>
-						<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check">Last checked</f:translate>
-						<br/>
-						<f:translate extensionName="brofix" key="LLL:EXT:brofix/Resource/Private/Language/Module/locallang.xlf:list.tableHead.last_check.url">(URL)</f:translate>
-					</f:comment>
-					<f:format.raw> {tableHeader.last_check_url.header}</f:format.raw>
+					<f:format.raw>{tableHeader.last_check_url.header}</f:format.raw>
 					<f:if condition="{tableHeader.last_check_url.icon}">
 						<core:icon identifier="{tableHeader.last_check_url.icon}"/>
 					</f:if>
 					<br/>
 				</th>
-				<f:comment>
-					<th class="mobile-optional">
-						<f:format.raw> {tableHeader.last_check_url.header}</f:format.raw>
-						<f:if condition="{tableHeader.last_check.icon}">
-							<core:icon identifier="{tableHeader.last_check.icon}"/>
-						</f:if>
-						<br/>
-					</th>
-				</f:comment>
+
 				<th>
 					{tableHeader.action.header}
 				</th>
