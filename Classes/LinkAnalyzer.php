@@ -54,9 +54,9 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * List of page uids (rootline downwards)
      *
-     * @var array<string|int>
+     * @var array<string|int>|null
      */
-    protected array $pids = [];
+    protected ?array $pids = [];
 
     protected ?Configuration $configuration = null;
     protected BrokenLinkRepository $brokenLinkRepository;
@@ -82,10 +82,10 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
-     * @param array<string|int> $pidList
+     * @param array<string|int>|null $pidList (List of pids or null to not use pids)
      * @param Configuration $configuration
      */
-    public function init(array $pidList, Configuration $configuration): void
+    public function init(?array $pidList, Configuration $configuration): void
     {
         $this->configuration = $configuration;
 

@@ -62,138 +62,178 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * @see LinkTargetResponse
      */
-    public function getBrokenLinks(
+    public function getBrokenLinksByChunks(
         array $pageList,
         array $linkTypes,
         array $searchFields,
         BrokenLinkListFilter $filter,
         array $orderBy = []
-    ): array {
+    ): array
+    {
         $results = [];
-        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        if ($pageList === []) {
+            return [];
+        }
+        $max = (int)($this->getMaxBindParameters() / 2 - 4);
         foreach (array_chunk($pageList, $max)
                  as $pageIdsChunk) {
-            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
-            if (!$GLOBALS['BE_USER']->isAdmin()) {
-                /**
-                 * @var EditableRestriction $editableRestriction
-                 */
-                $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
-                $queryBuilder->getRestrictions()
-                    ->add($editableRestriction);
-            }
+            $results = array_merge($results, $this->getBrokenLinks($pageIdsChunk, $linkTypes,
+                $searchFields, $filter, $orderBy));
 
-            $queryBuilder
-                ->select(self::TABLE . '.*')
-                ->from(self::TABLE)
-                ->join(
-                    self::TABLE,
-                    'pages',
-                    'pages',
-                    // @todo record_pid is not always page id
-                    $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
-                )
-                ->where(
-                    $queryBuilder->expr()->or(
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                self::TABLE . '.record_uid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                        ),
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                self::TABLE . '.record_pid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
-                        )
-                    )
-                );
-
-            if ($filter->getUidFilter() != '') {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
-                );
-            }
-            $urlFilter = $filter->getUrlFilter();
-            if ($urlFilter != '') {
-                switch ($filter->getUrlFilterMatch()) {
-                    case 'partial':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->like(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
-                            )
-                        );
-                        break;
-                    case 'exact':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->eq(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter($urlFilter)
-                            )
-                        );
-                        break;
-                    case 'partialnot':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->notLike(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
-                            )
-                        );
-                        break;
-                    case 'exactnot':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->neq(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
-                            )
-                        );
-                        break;
-                }
-            }
-            $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
-            if ($linktypeFilter != 'all') {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.link_type', $queryBuilder->createNamedParameter($linktypeFilter))
-                );
-            }
-
-            $checkStatus = $filter->getCheckStatusFilter();
-            if ($checkStatus !== LinkTargetResponse::RESULT_ALL) {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.check_status', $queryBuilder->createNamedParameter($checkStatus, Connection::PARAM_INT))
-                );
-            }
-
-            if ($orderBy !== []) {
-                $values = array_shift($orderBy);
-                if ($values && is_array($values) && count($values) === 2) {
-                    $queryBuilder->orderBy($values[0], $values[1]);
-                    foreach ($orderBy as $values) {
-                        if (!is_array($values) || count($values) != 2) {
-                            break;
-                        }
-                        $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
-                    }
-                }
-            }
-
-            if (!empty($linkTypes)) {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->in(
-                        self::TABLE . '.link_type',
-                        $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
-                    )
-                );
-            }
-
-            $results = array_merge($results, $queryBuilder->executeQuery()->fetchAllAssociative());
         }
         return $results;
+    }
+
+    public function getBrokenLinks(
+        ?array $pageIdsChunk,
+        array $linkTypes,
+        array $searchFields,
+        BrokenLinkListFilter $filter,
+        array $orderBy = []
+    ): array {
+
+        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+
+        if (!$GLOBALS['BE_USER']->isAdmin()) {
+            /**
+             * @var EditableRestriction $editableRestriction
+             */
+            $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
+            $queryBuilder->getRestrictions()
+                ->add($editableRestriction);
+        }
+
+        $queryBuilder
+            ->select(self::TABLE . '.*')
+            ->from(self::TABLE)
+            ->join(
+                self::TABLE,
+                'pages',
+                'pages',
+                // @todo record_pid is not always page id
+                $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
+            );
+        if ($pageIdsChunk != null) {
+            $queryBuilder->where(
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->in(
+                            self::TABLE . '.record_uid',
+                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                        ),
+                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                    ),
+                    $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->in(
+                            self::TABLE . '.record_pid',
+                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                        ),
+                        $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                    )
+                )
+            );
+        } else {
+            // pid != 0
+            $queryBuilder->where(
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->neq(
+                            self::TABLE . '.record_uid',
+                            $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
+                        ),
+                        $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                    ),
+                    $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->neq(
+                            self::TABLE . '.record_pid',
+                            $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
+                        ),
+                        $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                    )
+                )
+            );
+        }
+
+        if ($filter->getUidFilter() != '') {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+            );
+        }
+        $urlFilter = $filter->getUrlFilter();
+        if ($urlFilter != '') {
+            switch ($filter->getUrlFilterMatch()) {
+                case 'partial':
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->like(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                        )
+                    );
+                    break;
+                case 'exact':
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->eq(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter($urlFilter)
+                        )
+                    );
+                    break;
+                case 'partialnot':
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->notLike(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
+                        )
+                    );
+                    break;
+                case 'exactnot':
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->neq(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
+                        )
+                    );
+                    break;
+            }
+        }
+        $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
+        if ($linktypeFilter != 'all') {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::TABLE . '.link_type', $queryBuilder->createNamedParameter($linktypeFilter))
+            );
+        }
+
+        $checkStatus = $filter->getCheckStatusFilter();
+        if ($checkStatus !== LinkTargetResponse::RESULT_ALL) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::TABLE . '.check_status', $queryBuilder->createNamedParameter($checkStatus, Connection::PARAM_INT))
+            );
+        }
+
+        if ($orderBy !== []) {
+            $values = array_shift($orderBy);
+            if ($values && is_array($values) && count($values) === 2) {
+                $queryBuilder->orderBy($values[0], $values[1]);
+                foreach ($orderBy as $values) {
+                    if (!is_array($values) || count($values) != 2) {
+                        break;
+                    }
+                    $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
+                }
+            }
+        }
+
+        if (!empty($linkTypes)) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->in(
+                    self::TABLE . '.link_type',
+                    $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+                )
+            );
+        }
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
 
     /**

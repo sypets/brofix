@@ -31,6 +31,11 @@
 				<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
 				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
 				</option>
+				<f:if condition="{isAdmin}">
+					<option value="-1" {f:if(condition:'{depth} == -1', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:labels.depth_all"/>
+					</option>
+				</f:if>
 			</select>
 		</div>
 		<div class="col">
@@ -119,7 +124,7 @@
 		<button type="button" class="btn btn-default" id="brofix-reset-filter">
 			<f:translate extensionName="Brofix" key="button-remove-all-filter">Remove all filter</f:translate>
 		</button>
-		<f:if condition="{showRecheckButton}">
+		<f:if condition="{showRecheckButton} && {depth} != -1">
 			<button type="submit" class="btn btn-default t3js-update-button" name="action" id="updateLinkList"
 				   value="checklinks"
 				   data-notification-message="{f:translate(key: 'list.action.checkLinks', extensionName: 'Brofix')}">

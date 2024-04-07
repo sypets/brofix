@@ -51,6 +51,10 @@ class BrokenLinkListController extends AbstractBrofixController
 
     protected const DEFAULT_ORDER_BY = 'page';
     protected const DEFAULT_DEPTH = 0;
+
+    /** @var int show all, independent of selected page (use only if isAdmin) */
+    protected const DEPTH_ALL = -1;
+
     public const VIEW_MODE_VALUE_MIN = 'view_table_min';
     public const VIEW_MODE_VALUE_COMPLEX = 'view_table_complex';
     public const DEFAULT_VIEW_MODE_VALUE = self::VIEW_MODE_VALUE_COMPLEX;
@@ -330,7 +334,11 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->moduleTemplate->assign('docsurl', $this->configuration->getDocsUrl());
         $this->moduleTemplate->assign(
             'showRecheckButton',
-            $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
+            $this->getBackendUser()->isAdmin() || ($this->depth <= $this->configuration->getRecheckButton() && $this->depth >= 0)
+        );
+        $this->moduleTemplate->assign(
+            'isAdmin',
+            $this->getBackendUser()->isAdmin()
         );
     }
 
@@ -488,7 +496,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $considerHidden = $this->configuration->isCheckHidden();
         $depth = $this->depth;
         $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
-        if ($this->id !== 0) {
+        if ($this->id !== 0 && $this->depth !== -1) {
             $this->pageList = [];
             $this->pagesRepository->getPageList(
                 $this->pageList,
@@ -502,6 +510,8 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->configuration->getTraverseMaxNumberOfPagesInBackend()
             );
             {}
+        } else if ($this->depth === -1) {
+            $this->pageList = null;
         } else {
             $this->pageList = [];
         }
@@ -521,29 +531,14 @@ class BrokenLinkListController extends AbstractBrofixController
         // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
         // @extensionScannerIgnoreLine problem with getRootLineIsHidden
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageinfo);
-        if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
-            $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
+        if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden()) && $this->depth >= 0) {
+            $brokenLinks = $this->brokenLinkRepository->getBrokenLinksByChunks(
                 $this->pageList,
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
                 $this->filter,
                 self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
-            if ($brokenLinks) {
-                $totalCount = count($brokenLinks);
-
-                $itemsPerPage = 100;
-                if (($this->paginationCurrentPage - 1) * $itemsPerPage >= $totalCount) {
-                    $this->resetPagination();
-                }
-                $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
-                $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
-                // move end
-                foreach ($paginator->getPaginatedItems() as $row) {
-                    $items[] = $this->renderTableRow($row['table_name'], $row);
-                }
-                $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
-            }
             if ($this->configuration->getTraverseMaxNumberOfPagesInBackend()
                 && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
                 $this->createFlashMessage(
@@ -556,6 +551,29 @@ class BrokenLinkListController extends AbstractBrofixController
                     AbstractMessage::WARNING
                 );
             }
+        } else if ($this->depth === self::DEPTH_ALL) {
+            $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
+                null,
+                $this->linkTypes,
+                $this->configuration->getSearchFields(),
+                $this->filter,
+                self::ORDER_BY_VALUES[$this->orderBy] ?? []
+            );
+        }
+        if ($brokenLinks) {
+            $totalCount = count($brokenLinks);
+
+            $itemsPerPage = 100;
+            if (($this->paginationCurrentPage - 1) * $itemsPerPage >= $totalCount) {
+                $this->resetPagination();
+            }
+            $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
+            $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
+            // move end
+            foreach ($paginator->getPaginatedItems() as $row) {
+                $items[] = $this->renderTableRow($row['table_name'], $row);
+            }
+            $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
         } else {
             $this->pagination = null;
         }
