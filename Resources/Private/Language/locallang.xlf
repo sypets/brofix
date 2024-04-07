@@ -95,6 +95,9 @@
 			<trans-unit id="list.edit.field" resname="list.edit.field">
 				<source>Edit field containing this broken link</source>
 			</trans-unit>
+			<trans-unit id="list.edit.record" resname="list.edit.record">
+				<source>Edit entire element containing this broken link</source>
+			</trans-unit>
 			<trans-unit id="list.action.recheckUrl" resname="list.action.recheckUrl">
 				<source>Check link again</source>
 			</trans-unit>

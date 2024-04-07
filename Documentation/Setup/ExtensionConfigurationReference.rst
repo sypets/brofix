@@ -157,6 +157,42 @@ available values:
 
 Changes how the TCA processing is done.
 
+.. _extensionConfiguation_brofix_showEditButtons:
+
+EXT:brofix | showEditButtons
+----------------------------
+
+(since TYPO3 v12)
+
+*Show button to edit entire record, only the field with a broken link or both.*
+
+:guilabel:`Backend` tab
+
+default:
+   "Both" (both buttons are displayed)
+available values:
+   "Both", "Edit field", "Edit full"
+
+.. _extensionConfiguation_brofix_showalllinks:
+
+EXT:brofix | showalllinks
+----------------------------------------------
+
+(since TYPO3 v12)
+
+*Show all links, not just broken links.*
+
+:guilabel:`Backend` tab
+
+default:
+   1 (on)
+available values:
+   1 (on) | 0 (off)
+
+If this is on, all links can be displayed, not just the broken links. This
+requires a full recheck if the setting was previously off or the feature not
+yet available.
+
 .. _extensionConfiguation_brofix_traverseMaxNumberOfPagesInBackend:
 
 EXT:brofix | traverseMaxNumberOfPagesInBackend
