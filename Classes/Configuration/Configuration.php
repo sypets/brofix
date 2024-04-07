@@ -58,6 +58,13 @@ class Configuration
     public const SEND_EMAIL_AVAILABLE_VALUES = [self::SEND_EMAIL_NEVER, self::SEND_EMAIL_ALWAYS, self::SEND_EMAIL_ANY,
         self::SEND_EMAIL_NEW, self::SEND_EMAIL_AUTO];
 
+    public const SHOW_EDIT_BUTTONS_EDIT_FIELD = 'field';
+    public const SHOW_EDIT_BUTTONS_EDIT_FULL = 'full';
+
+    public const SHOW_EDIT_BUTTONS_BOTH = 'both';
+
+    public const SHOW_EDIT_BUTTONS_DEFAULT_VALUE = self::SHOW_EDIT_BUTTONS_BOTH;
+
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
 
     public const DEFAULT_TSCONFIG = [
@@ -158,6 +165,13 @@ class Configuration
 
     protected string $overrideFormDataGroup = '';
 
+    protected string $showEditButtons = self::SEND_EMAIL_DEFAULT_VALUE;
+
+    /** Show all links, not just the broken links */
+    protected bool $showAllLinks = true;
+
+    protected string $combinedErrorNonCheckableMatch = 'regex:/^httpStatusCode:(401|403):/';
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray
@@ -165,6 +179,9 @@ class Configuration
     public function __construct(array $extConfArray)
     {
         // initialize from extension configuration
+        $this->showAllLinks = (bool)($extConfArray['showalllinks'] ?? true);
+        $this->showEditButtons = ($extConfArray['showEditButtons'] ?? self::SHOW_EDIT_BUTTONS_DEFAULT_VALUE);
+        $this->combinedErrorNonCheckableMatch = $extConfArray['combinedErrorNonCheckableMatch'] ?? '';
         $this->excludeSoftrefs = explode(',', $extConfArray['excludeSoftrefs'] ?? '');
         $this->excludeSoftrefsInFields = explode(',', $extConfArray['excludeSoftrefsInFields'] ?? '');
         $this->setTraverseMaxNumberOfPagesInBackend(
@@ -690,6 +707,31 @@ class Configuration
     public function getExcludeSoftrefsInFields(): array
     {
         return $this->excludeSoftrefsInFields;
+    }
+
+    public function getShowEditButtons(): string
+    {
+        return $this->showEditButtons;
+    }
+
+    public function setShowEditButtons(string $showEditButtons): void
+    {
+        $this->showEditButtons = $showEditButtons;
+    }
+
+    public function isShowAllLinks(): bool
+    {
+        return $this->showAllLinks;
+    }
+
+    public function setShowAllLinks(bool $showAllLinks): void
+    {
+        $this->showAllLinks = $showAllLinks;
+    }
+
+    public function getCombinedErrorNonCheckableMatch(): string
+    {
+        return $this->combinedErrorNonCheckableMatch;
     }
 
     public function getTcaProcessing(): string
