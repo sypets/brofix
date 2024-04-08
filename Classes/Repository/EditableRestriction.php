@@ -101,7 +101,10 @@ class EditableRestriction implements QueryRestrictionInterface
     protected function getExplicitAllowFieldsForCurrentUser(string $table, string $field): array
     {
         $allowDenyOptions = [];
-        $fieldConfig = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
+        $fieldConfig = $GLOBALS['TCA'][$table]['columns'][$field]['config'] ?? [];
+        if (!$fieldConfig) {
+            return [];
+        }
         // Check for items
         if ($fieldConfig['type'] === 'select' && is_array($fieldConfig['items'] ?? false)) {
             foreach ($fieldConfig['items'] as $iVal) {
