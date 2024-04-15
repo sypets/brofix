@@ -576,6 +576,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->moduleTemplate->assign('pagination', $this->pagination);
         $this->moduleTemplate->assign('orderBy', $this->orderBy);
         $this->moduleTemplate->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->moduleTemplate->assign('showPageLayoutButton', $this->configuration->isShowPageLayoutButton());
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {

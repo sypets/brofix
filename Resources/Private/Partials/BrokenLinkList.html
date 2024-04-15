@@ -1,4 +1,5 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	  xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
 	  data-namespace-typo3-fluid="true">
 <f:if condition="{brokenLinks -> f:count()}">
 	<f:then>
@@ -152,6 +153,14 @@
 							<core:icon identifier="form-content-element" size="small"/><core:icon identifier="actions-open" size="small"/>
 						</a>
 					</f:if>
+
+					<f:if condition="{showPageLayoutButton}">
+						<f:variable name="link"><be:moduleLink route="web_layout" arguments="{id: item.pageId, returnUrl: listUri}">layout</be:moduleLink></f:variable>
+						<a href="{link}" class="btn btn-default" title="page layout">
+							<core:icon identifier="actions-document" size="small"/>
+						</a>
+					</f:if>
+
 					<f:if condition="{item.recheckUrl}">
 						<a title="{f:translate(key: 'list.action.recheckUrl', extensionName='Brofix')}"
 						   class="btn btn-default" href="{item.recheckUrl}">

@@ -26,6 +26,7 @@ use Sypets\Brofix\Linktype\LinktypeInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MailUtility;
 
@@ -172,6 +173,8 @@ class Configuration
 
     protected string $showEditButtons = self::SEND_EMAIL_DEFAULT_VALUE;
 
+    protected bool $showPageLayoutButton = true;
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -181,6 +184,7 @@ class Configuration
         // initialize from extension configuration
         $this->showAllLinks = (bool)($extConfArray['showalllinks'] ?? true);
         $this->showEditButtons = ($extConfArray['showEditButtons'] ?? self::SHOW_EDIT_BUTTONS_DEFAULT_VALUE);
+        $this->showPageLayoutButton = (bool)($extConfArray['showPageLayoutButton'] ?? true);
         $this->combinedErrorNonCheckableMatch = $extConfArray['combinedErrorNonCheckableMatch'] ?? '';
         $this->excludeSoftrefs = explode(',', $extConfArray['excludeSoftrefs'] ?? '');
         $this->excludeSoftrefsInFields = explode(',', $extConfArray['excludeSoftrefsInFields'] ?? '');
@@ -717,6 +721,21 @@ class Configuration
     public function setShowEditButtons(string $showEditButtons): void
     {
         $this->showEditButtons = $showEditButtons;
+    }
+
+    public function isShowPageLayoutButton(): bool
+    {
+        // check if page_layouts is loaded
+        if (ExtensionManagementUtility::isLoaded('page_callouts')) {
+            return false;
+        }
+
+        return $this->showPageLayoutButton;
+    }
+
+    public function setShowPageLayoutButton(bool $showPageLayoutButton): void
+    {
+        $this->showPageLayoutButton = $showPageLayoutButton;
     }
 
     public function isShowAllLinks(): bool
