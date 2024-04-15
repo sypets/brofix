@@ -643,6 +643,8 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->view->assign('pagination', $this->pagination);
         $this->view->assign('orderBy', $this->orderBy);
         $this->view->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->view->assign('showPageLayoutButton', $this->configuration->isShowPageLayoutButton());
+
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {

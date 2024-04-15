@@ -21,7 +21,7 @@ Changelog
    :glob:
    :titlesonly:
 
-   Entries/6.x/*
+   Entries/4.x/*
 
 3.2.0
 =====
