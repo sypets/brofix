@@ -1,6 +1,6 @@
 ### separate label and description with ":"
 ### Things added in later versions, add at the bottom
-### Use category "checking" and "backend"
+### Use category "checking" and "report"
 
 # cat=checking; type=string; label=Do not use these softreference parsers (comma separated list) when parsing content: This is a workaround for a TYPO3 core bug. The default is "url".
 excludeSoftrefs = url
@@ -25,6 +25,9 @@ linkTargetCacheExpiresHigh = 0
 
 # cat=report; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
 showEditButtons = both
+
+# cat=report; type=options[Off=0,On=1]; label=Show button to jump to page layout view
+showPageLayoutButton = 1
 
 ### since TYPO3 v12
 
