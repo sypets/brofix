@@ -30,6 +30,7 @@ use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -184,11 +185,13 @@ class CheckLinksCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // link checking (in particular FormEngine processing with FormDataCompiler) requires an initialized session
-        // due to AbstractUserAuthentication::getModuleData called from Clipboard::initializeClipboard called from TcaGroup::addData
-        // see https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/DataHandler/UsingDataHandler/Index.html#dataHandler-cli-command
-        \TYPO3\CMS\Core\Core\Bootstrap::initializeBackendAuthentication();
-        $GLOBALS['BE_USER']->initializeUserSessionManager();
+        if (Environment::isCli()) {
+            // link checking (in particular FormEngine processing with FormDataCompiler) requires an initialized session
+            // due to AbstractUserAuthentication::getModuleData called from Clipboard::initializeClipboard called from TcaGroup::addData
+            // see https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/DataHandler/UsingDataHandler/Index.html#dataHandler-cli-command
+            \TYPO3\CMS\Core\Core\Bootstrap::initializeBackendAuthentication();
+            $GLOBALS['BE_USER']->initializeUserSessionManager();
+        }
 
         $this->io = new SymfonyStyle($input, $output);
 
