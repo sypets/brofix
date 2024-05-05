@@ -726,7 +726,7 @@ class Configuration
     public function isShowPageLayoutButton(): bool
     {
         // check if page_layouts is loaded
-        if (ExtensionManagementUtility::isLoaded('page_callouts')) {
+        if (!ExtensionManagementUtility::isLoaded('page_callouts')) {
             return false;
         }
 
