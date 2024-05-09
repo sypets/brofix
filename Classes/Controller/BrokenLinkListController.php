@@ -864,8 +864,12 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['elementIcon'] = $this->iconFactory->getIconForRecord($table, $row, Icon::SIZE_SMALL)->render();
 
         // langIcon
-        if (isset($row['language']) && $row['language'] != -1 && isset($this->siteLanguages[(int)($row['language'])])) {
-            $variables['langIcon'] = $this->siteLanguages[(int)($row['language'])]->getFlagIdentifier();
+        if (isset($row['language'])) {
+            $lang = (int)$row['language'];
+            if ($lang != -1 && isset($this->siteLanguages[$lang])) {
+                $variables['langIcon'] = $this->siteLanguages[$lang]->getFlagIdentifier();
+            }
+            $variables['lang'] = $lang;
         }
 
         // Element Type + Field
