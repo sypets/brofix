@@ -155,7 +155,7 @@
 					</f:if>
 
 					<f:if condition="{showPageLayoutButton}">
-						<f:variable name="link"><be:moduleLink route="web_layout" arguments="{id: item.pageId, returnUrl: listUri}">layout</be:moduleLink></f:variable>
+						<f:variable name="link"><be:moduleLink route="web_layout" arguments="{id: item.pageId, returnUrl: listUri, language: item.lang}"></be:moduleLink></f:variable>
 						<a href="{link}" class="btn btn-default" title="page layout">
 							<core:icon identifier="actions-document" size="small"/>
 						</a>
