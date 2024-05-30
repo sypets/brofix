@@ -348,7 +348,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $record['flexform_field'] = $entryValue['flexformField'] ?? '';
                 $record['flexform_field_label'] = $entryValue['flexformFieldLabel'] ?? '';
                 $typeField = $GLOBALS['TCA'][$table]['ctrl']['type'] ?? false;
-                if ($entryValue['row'][$typeField] ?? false) {
+                // type might be '0', e.g. for tx_news_domain_model_news, so use isset instead of if with ??
+                if (isset($entryValue['row'][$typeField])) {
                     $record['element_type'] = $entryValue['row'][$typeField];
                 }
                 $record['exclude_link_targets_pid'] = $this->configuration->getExcludeLinkTargetStoragePid();
