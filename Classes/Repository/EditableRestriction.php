@@ -44,11 +44,22 @@ class EditableRestriction implements QueryRestrictionInterface
     protected $allowedLanguages = [];
 
     /**
-     * Explicit allow fields
+     * Explicitly allow these types based on authMode (and explicitADmode for tt_content)
+     *
+     * Example:
+     *
+     * [
+     *     'tt_content' => [
+     *          'CType' => [
+     *              'textmedia',
+     *              ...
+     *          ]
+     *      ]
+     * ]
      *
      * @var array<string,array<string,array<string>>>
      */
-    protected $explicitAllowFields = [];
+    protected $allowByFieldBasedOnAuthMode = [];
 
     /**
      * @var QueryBuilder
@@ -65,9 +76,24 @@ class EditableRestriction implements QueryRestrictionInterface
         $this->allowedFields = $this->getAllowedFieldsForCurrentUser($searchFields);
         $this->allowedLanguages = $this->getAllowedLanguagesForCurrentUser();
         foreach ($searchFields as $table => $fields) {
+            /** @todo We should look at behaviour of other tables besides tt_content. For tt_content.CType, if the
+             *  value has not been activated for the BE group (or was explicitly denied), it is not possible to edit
+             *  the record at all. However, if we try this with a non-tt_content record, the behaviour is different.
+             *  Needs further research.
+             */
             if ($table !== 'pages' && ($GLOBALS['TCA'][$table]['ctrl']['type'] ?? false)) {
                 $type = $GLOBALS['TCA'][$table]['ctrl']['type'];
-                $this->explicitAllowFields[$table][$type] = $this->getExplicitAllowFieldsForCurrentUser($table, $type);
+
+                // the value in the type field can depend on the value of a related record. We do not handle this
+                // at the moment, we only ignore these kind of fields.
+                if (strpos($type, ':') !== false) {
+                    continue;
+                }
+
+                $values = $this->getAllowByFieldBasedOnAuthModeForCurrentUser($table, $type);
+                if ($values !== null) {
+                    $this->allowByFieldBasedOnAuthMode[$table][$type] = $values;
+                }
             }
         }
         $this->queryBuilder = $queryBuilder;
@@ -94,17 +120,30 @@ class EditableRestriction implements QueryRestrictionInterface
     }
 
     /**
+     * Based on authMode / explicitADmode.
+     *
+     * If a table contains a 'type' field, it is possible to explicitly allow or deny certain types. The behaviour
+     * depends on the value of $GLOBALS['TCA'][$table]['columns'][$field]['config']['authMode'] (e.g. explicitAllow).
+     * For tt_content tables, the behaviour depends on the value of $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'].
+     *
+     *
      * @param string $table
      * @param string $field
-     * @return array<string>
+     * @return array<string>|null If null is passed, no auth checking for this $table / $field
      */
-    protected function getExplicitAllowFieldsForCurrentUser(string $table, string $field): array
+    protected function getAllowByFieldBasedOnAuthModeForCurrentUser(string $table, string $field): ?array
     {
         $allowDenyOptions = [];
         $fieldConfig = $GLOBALS['TCA'][$table]['columns'][$field]['config'] ?? [];
         if (!$fieldConfig) {
-            return [];
+            return null;
         }
+
+        $authMode = $this->getAuthMode($table, $field);
+        if (!$authMode) {
+            return null;
+        }
+
         // Check for items
         if ($fieldConfig['type'] === 'select' && is_array($fieldConfig['items'] ?? false)) {
             foreach ($fieldConfig['items'] as $iVal) {
@@ -118,6 +157,35 @@ class EditableRestriction implements QueryRestrictionInterface
             }
         }
         return $allowDenyOptions;
+    }
+
+    /**
+     * @todo in v12, this changes
+     * @return string Return empty string, if no authMode
+     */
+    protected function getAuthMode(string $table, string $type): string
+    {
+        if ($type === 'CType') {
+            /**
+             * from documentation about explicitADmode:
+             * "since v12: The handling of $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'] has been changed and is
+             * now set using explicitAllow. Extensions should not assume this global array key is set anymore as of
+             * TYPO3 Core v12. Extensions that need to stay compatible with v11 and v12 should instead use:
+             * $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'] ?? 'explicitAllow'."
+             */
+            return $GLOBALS['TYPO3_CONF_VARS']['BE']['explicitADmode'] ?? 'explicitAllow';
+        }
+
+        $authMode = $GLOBALS['TCA'][$table]['columns'][$type]['config']['authMode'] ?? '';
+        if ($authMode && $authMode != 'explicitAllow') {
+            /** since TYPO3 v12, only explicitAllow is supported
+             * from documentation:
+             * "The only valid value for TCA config option authMode is now explicitAllow. The values explicitDeny and
+             * individual are obsolete and no longer evaluated."
+             */
+            $authMode = '';
+        }
+        return $authMode;
     }
 
     /**
@@ -209,7 +277,7 @@ class EditableRestriction implements QueryRestrictionInterface
             $constraints[] = $expressionBuilder->isNull(self::TABLE . '.table_name');
         }
 
-        foreach ($this->explicitAllowFields as $table => $field) {
+        foreach ($this->allowByFieldBasedOnAuthMode as $table => $field) {
             $additionalWhere = [];
             $additionalWhere[] = $expressionBuilder->and(
                 $expressionBuilder->eq(
@@ -223,6 +291,10 @@ class EditableRestriction implements QueryRestrictionInterface
                         Connection::PARAM_STR_ARRAY
                     )
                 )
+            );
+            $additionalWhere[] = $expressionBuilder->eq(
+                self::TABLE . '.element_type',
+                $this->queryBuilder->createNamedParameter('')
             );
             $additionalWhere[] = $expressionBuilder->neq(
                 self::TABLE . '.table_name',
