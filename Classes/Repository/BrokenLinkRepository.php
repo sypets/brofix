@@ -119,7 +119,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
             $urlFilter = $filter->getUrlFilter();
-            if ($urlFilter != '') {
+            if ($urlFilter != '' && $urlFilter !== 'all') {
                 switch ($filter->getUrlFilterMatch()) {
                     case 'partial':
                         $queryBuilder->andWhere(
