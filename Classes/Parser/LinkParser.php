@@ -309,24 +309,24 @@ class LinkParser
         string $flexformFieldLabel = ''
     ): void {
         foreach ($parserResult->getMatchedElements() as $element) {
-            $r = $element['subst'];
+            $reference = $element['subst'] ?? [];
             $type = '';
             $idRecord = $record['uid'];
-            if (empty($r) || !is_array($r)) {
+            if (empty($reference) || !is_array($reference)) {
                 continue;
             }
 
             /** @var AbstractLinktype $linktypeObject */
             foreach ($this->configuration->getLinktypeObjects() as $key => $linktypeObject) {
-                $type = $linktypeObject->fetchType($r, $type, $key);
+                $type = $linktypeObject->fetchType($reference, $type, $key);
                 // Store the type that was found
                 // This prevents overriding by internal validator
                 if (!empty($type)) {
-                    $r['type'] = $type;
+                    $reference['type'] = $type;
                 }
             }
-            $key = $table . ':' . $field . ':' . $flexformField . ':' . $idRecord . ':' . $r['tokenID'];
-            $results[$type][$key]['substr'] = $r;
+            $key = $table . ':' . $field . ':' . $flexformField . ':' . $idRecord . ':' . $reference['tokenID'];
+            $results[$type][$key]['substr'] = $reference;
             $results[$type][$key]['row'] = $record;
             $results[$type][$key]['table'] = $table;
             $results[$type][$key]['field'] = $field;
@@ -368,23 +368,23 @@ class LinkParser
             $referencedRecordType = '';
             foreach ($parserResult->getMatchedElements() as $element) {
                 $type = '';
-                $r = $element['subst'];
-                if (empty($r['tokenID']) || substr_count($linkTags[$i], $r['tokenID']) === 0) {
+                $reference = $element['subst'] ?? [];
+                if (empty($reference['tokenID']) || substr_count($linkTags[$i], $reference['tokenID']) === 0) {
                     continue;
                 }
 
                 // Type of referenced record
-                if (isset($r['recordRef']) && strpos($r['recordRef'], 'pages') !== false) {
-                    $currentR = $r;
+                if (isset($reference['recordRef']) && strpos($reference['recordRef'], 'pages') !== false) {
+                    $currentR = $reference;
                     // Contains number of the page
-                    $referencedRecordType = $r['tokenValue'];
+                    $referencedRecordType = $reference['tokenValue'];
                     $wasPage = true;
-                } elseif (isset($r['recordRef']) && strpos($r['recordRef'], 'tt_content') !== false
+                } elseif (isset($reference['recordRef']) && strpos($reference['recordRef'], 'tt_content') !== false
                     && (isset($wasPage) && $wasPage === true)) {
-                    $referencedRecordType = $referencedRecordType . '#c' . $r['tokenValue'];
+                    $referencedRecordType = $referencedRecordType . '#c' . $reference['tokenValue'];
                     $wasPage = false;
                 } else {
-                    $currentR = $r;
+                    $currentR = $reference;
                 }
                 $title = strip_tags($linkTags[$i]);
             }
