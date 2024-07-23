@@ -75,6 +75,10 @@
 				<source>Simplified view</source>
 			</trans-unit>
 
+			<trans-unit id="labels.depth_all" resname="labels.depth_all">
+				<source>All</source>
+			</trans-unit>
+
 			<!-- filter -->
 			<trans-unit id="list.filter.uid" resname="list.filter.uid">
 				<source>UID</source>
