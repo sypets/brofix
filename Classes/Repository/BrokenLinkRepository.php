@@ -517,7 +517,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->from(static::TABLE)
                 ->where(
                     $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
-                    $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType))
+                    $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
+                    $queryBuilder->expr()->eq('check_status', $queryBuilder->createNamedParameter(LinkTargetResponse::RESULT_BROKEN, \PDO::PARAM_INT))
                 );
             return (bool)$queryBuilder
                 ->executeQuery()
