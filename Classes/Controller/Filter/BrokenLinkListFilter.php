@@ -143,14 +143,25 @@ class BrokenLinkListFilter implements Arrayable
         $this->linktype_filter = $linktype_filter;
     }
 
+    protected function normalizeUrlFilter(string $urlFilter): string
+    {
+        // bugfix: previously, "all" was written to this filter as default
+        if ($urlFilter === 'all') {
+            $urlFilter = '';
+        }
+        return trim($urlFilter);
+    }
+
     public function getUrlFilter(): string
     {
+        // bugfix: previously, "all" was written to this filter as default
+        $this->url_filtre = $this->normalizeUrlFilter($this->url_filtre);
         return $this->url_filtre;
     }
 
     public function setUrlFilter(string $url_filter): void
     {
-        $this->url_filtre = trim($url_filter);
+        $this->url_filtre = $this->normalizeUrlFilter($url_filter);
     }
 
     /**
