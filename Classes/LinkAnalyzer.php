@@ -414,8 +414,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             }
 
             $max = (int)($this->brokenLinkRepository->getMaxBindParameters() /2 - 4);
-            foreach (array_chunk($this->pids, $max)
-                     as $pageIdsChunk) {
+            foreach (array_chunk($this->pids, $max) as $pageIdsChunk) {
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                     ->getQueryBuilderForTable($table);
 

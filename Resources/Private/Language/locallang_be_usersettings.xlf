@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+	<file source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/locallang_be_usersettings.xlf" date="2024-09-10T10:22:34Z" product-name="brofix">
+		<header/>
+		<body>
+			<trans-unit id="usersettings.pagemodule.tab" resname="usersettings.pagemodule.tab">
+				<source>Page module</source>
+			</trans-unit>
+			<trans-unit id="usersettings.pagemodule.showPageCalloutBrokenLinksExist" resname="usersettings.pagemodule.showPageCalloutBrokenLinksExist">
+				<source>Show message in page module if broken links exist on page</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

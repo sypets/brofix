@@ -17,3 +17,4 @@ Setup
    Reference
    ExtensionConfigurationReference
    TsconfigReference
+   UserSettings

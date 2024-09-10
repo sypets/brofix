@@ -1,6 +1,6 @@
 ### separate label and description with ":"
 ### Things added in later versions, add at the bottom
-### Use category "checking" and "report"
+### Use category "checking" and "report" and "page module"
 
 # cat=checking; type=string; label=Do not use these softreference parsers (comma separated list) when parsing content: This is a workaround for a TYPO3 core bug. The default is "url".
 excludeSoftrefs = url
@@ -36,3 +36,6 @@ combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno
 
 # cat=report; type=bool; label=Show all links, not just broken links: The default is 1 (true).
 showalllinks = 1
+
+# cat=page module; type=bool; label=Show message in page module if broken links exist on page: Has small performance impact, requires the extension page_callouts, can be further configured in BE user settings
+showPageCalloutBrokenLinksExist = 1

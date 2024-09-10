@@ -71,8 +71,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     ): array {
         $results = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
-        foreach (array_chunk($pageList, $max)
-                 as $pageIdsChunk) {
+        foreach (array_chunk($pageList, $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
             if (!$GLOBALS['BE_USER']->isAdmin()) {
@@ -267,8 +266,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     {
         $markerArray = [];
         $max = (int)($this->getMaxBindParameters() /2 - 4);
-        foreach (array_chunk($pageIds, $max)
-                 as $pageIdsChunk) {
+        foreach (array_chunk($pageIds, $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
             $queryBuilder->getRestrictions()->removeAll();
 
@@ -466,8 +464,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     public function removeAllBrokenLinksForPagesBeforeTime(array $pageIds, array $linkTypes, int $time): void
     {
         $max = (int)($this->getMaxBindParameters() /2 - 4);
-        foreach (array_chunk($pageIds, $max)
-                 as $pageIdsChunk) {
+        foreach (array_chunk($pageIds, $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
             $queryBuilder->delete(self::TABLE)
