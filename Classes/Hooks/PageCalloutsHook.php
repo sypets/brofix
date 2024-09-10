@@ -19,20 +19,19 @@ namespace Sypets\Brofix\Hooks;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
-final class PageCalloutsHook
+final class PageCalloutsHook implements SingletonInterface
 {
-    /**
-     * @var BrokenLinkRepository
-     */
-    private $brokenLinkRepository;
+    private bool $showPageCalloutBrokenLinksExist = false;
 
-    public function __construct()
+    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration)
     {
-        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
+        $this->showPageCalloutBrokenLinksExist = (bool)$extensionConfiguration->get('brofix', 'showPageCalloutBrokenLinksExist');
     }
 
     /**
@@ -43,6 +42,11 @@ final class PageCalloutsHook
      */
     public function addMessages(array $pageInfo): array
     {
+        // check extension configuration
+        if (!$this->showPageCalloutBrokenLinksExist) {
+            return [];
+        }
+
         if (!$pageInfo || !is_array($pageInfo)) {
             return [];
         }
@@ -53,8 +57,12 @@ final class PageCalloutsHook
 
         /** @var BackendUserAuthentication $beUser */
         $beUser = $GLOBALS['BE_USER'];
-        if (!$beUser->check('modules', 'web_brofix')) {
+        if (!$beUser->isAdmin() && !$beUser->check('modules', 'web_brofix')) {
             // no output in case the user does not have access to the "brofix" module
+            return [];
+        }
+        // check user settings (default is 1)
+        if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? true)) === false) {
             return [];
         }
 
