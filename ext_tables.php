@@ -4,12 +4,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 defined('TYPO3') or die();
 
-// Initialize Context Sensitive Help (CSH)
-ExtensionManagementUtility::addLLrefForTCAdescr(
-    'brofix',
-    'EXT:brofix/Resources/Private/Language/Module/locallang_csh.xlf'
-);
-
 // BE user settings
 // ----------------
 
