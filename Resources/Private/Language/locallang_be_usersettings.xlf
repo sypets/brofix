@@ -3,8 +3,8 @@
 	<file source-language="en" datatype="plaintext" original="EXT:brofix/Resources/Private/Language/locallang_be_usersettings.xlf" date="2024-09-10T10:22:34Z" product-name="brofix">
 		<header/>
 		<body>
-			<trans-unit id="usersettings.pagemodule.tab" resname="usersettings.pagemodule.tab">
-				<source>Page module</source>
+			<trans-unit id="usersettings.brofix.tab" resname="usersettings.pagemodule.tab">
+				<source>Broken links</source>
 			</trans-unit>
 			<trans-unit id="usersettings.pagemodule.showPageCalloutBrokenLinksExist" resname="usersettings.pagemodule.showPageCalloutBrokenLinksExist">
 				<source>Show message in page module if broken links exist on page</source>

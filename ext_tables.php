@@ -18,8 +18,8 @@ $lll = 'LLL:EXT:brofix/Resources/Private/Language/locallang_be_usersettings.xlf'
 $GLOBALS['TYPO3_USER_SETTINGS']['columns']['tx_brofix_showPageCalloutBrokenLinksExist'] = [
     'label' => $lll . ':usersettings.pagemodule.showPageCalloutBrokenLinksExist',
     'type' => 'check',
-    'default' => '1',
+    'default' => '0',
 ];
 ExtensionManagementUtility::addFieldsToUserSettings(
-    '--div--;' . $lll . ':usersettings.pagemodule.tab,tx_brofix_showPageCalloutBrokenLinksExist',
+    '--div--;' . $lll . ':usersettings.brofix.tab,tx_brofix_showPageCalloutBrokenLinksExist',
 );
