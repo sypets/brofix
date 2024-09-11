@@ -62,7 +62,7 @@ final class PageCalloutsHook implements SingletonInterface
             return [];
         }
         // check user settings (default is 1)
-        if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? true)) === false) {
+        if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? false)) === false) {
             return [];
         }
 

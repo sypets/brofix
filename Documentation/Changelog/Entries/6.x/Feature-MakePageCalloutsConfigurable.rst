@@ -14,7 +14,7 @@ links are fixed regularly etc., this is now configurable via:
 
 *  extension configuration: "Show message in page module if broken links exist on page" *[showPageCalloutBrokenLinksExist]* (default: on)
 *  user settings: "Show message in page module if broken links exist on page"
-   *[tx_brofix_showPageCalloutBrokenLinksExist]* in tab "Page module" (default: on)
+   *[tx_brofix_showPageCalloutBrokenLinksExist]* in tab "Broken links" (default: on)
 
 The information is **only** displayed if extension configuration is set to true,
 the user settings is active and page_callouts is installed (and of course, if
