@@ -211,22 +211,4 @@ defined('TYPO3') or die();
             \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
             ['source' => 'EXT:brofix/Resources/Public/Icons/mimetypes-x-exclude-link-target.svg']
         );
-
-    // -----
-    // icons
-    // -----
-
-    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-        \TYPO3\CMS\Core\Imaging\IconRegistry::class
-    );
-    $iconRegistry->registerIcon(
-        'view-table-min',
-        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        ['source' => 'EXT:brofix/Resources/Public/Icons/view-table-min.svg']
-    );
-    $iconRegistry->registerIcon(
-        'view-table-complex',
-        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        ['source' => 'EXT:brofix/Resources/Public/Icons/view-table-complex.svg']
-    );
 })();
