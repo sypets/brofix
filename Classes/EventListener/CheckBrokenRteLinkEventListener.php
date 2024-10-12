@@ -33,6 +33,11 @@ final class CheckBrokenRteLinkEventListener
      */
     private $brokenLinkRepository;
 
+    /**
+     * @var array<string,array<string,bool>>
+     */
+    private array $resultsCache = [];
+
     public function __construct(BrokenLinkRepository $brokenLinkRepository)
     {
         $this->brokenLinkRepository = $brokenLinkRepository;
@@ -44,9 +49,16 @@ final class CheckBrokenRteLinkEventListener
             return;
         }
         $url = (string)($event->getLinkData()['url'] ?? '');
-        if (!empty($url)
-            && $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'external')) {
-            $event->markAsBrokenLink('Broken link');
+        if ($url) {
+            if (isset($this->resultsCache['external'][$url])) {
+                $isBroken = $this->resultsCache['external'][$url];
+            } else {
+                $isBroken = $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'external');
+                $this->resultsCache['external'][$url] = $isBroken;
+            }
+            if ($isBroken) {
+                $event->markAsBrokenLink('Broken link');
+            }
         }
         $event->markAsCheckedLink();
     }
@@ -57,13 +69,21 @@ final class CheckBrokenRteLinkEventListener
             return;
         }
         $hrefInformation = $event->getLinkData();
-        $url = $hrefInformation['pageuid'] ?? '';
+        $url = (string)($hrefInformation['pageuid'] ?? '');
         if ($url != '' && $url !== 'current') {
             $fragment = $hrefInformation['fragment'] ?? '';
             if ($fragment !== '') {
                 $url .= '#c' . $fragment;
             }
-            if ($this->brokenLinkRepository->isLinkTargetBrokenLink((string)$url, 'db')) {
+
+            if (isset($this->resultsCache['db'][$url])) {
+                $isBroken = $this->resultsCache['db'][$url];
+            } else {
+                $isBroken = $this->brokenLinkRepository->isLinkTargetBrokenLink((string)$url, 'db');
+                $this->resultsCache['db'][$url] = $isBroken;
+            }
+
+            if ($isBroken) {
                 $event->markAsBrokenLink('Broken link');
             }
         }

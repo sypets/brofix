@@ -3,7 +3,7 @@
 CREATE TABLE tx_brofix_broken_links (
 	uid int(11) NOT NULL auto_increment,
 	tstamp int(11) DEFAULT '0' NOT NULL,
-    crdate int(11) DEFAULT '0' NOT NULL,
+  crdate int(11) DEFAULT '0' NOT NULL,
 	record_uid int(11) DEFAULT '0' NOT NULL,
 	record_pid int(11) DEFAULT '0' NOT NULL,
 	language int(11) DEFAULT '-1' NOT NULL,
@@ -14,8 +14,8 @@ CREATE TABLE tx_brofix_broken_links (
 	table_name varchar(255) DEFAULT '' NOT NULL,
 	element_type varchar(255) DEFAULT '' NOT NULL,
 	link_title text,
-
 	url text,
+	url_hash varchar(40) DEFAULT '' NOT NULL,
 	url_response text,
 	check_status int(5) DEFAULT '4' NOT NULL,
 	last_check int(11) DEFAULT '0' NOT NULL,
@@ -23,6 +23,7 @@ CREATE TABLE tx_brofix_broken_links (
 	link_type varchar(50) DEFAULT '' NOT NULL,
 	exclude_link_targets_pid int(11) DEFAULT '0' NOT NULL,
 
+	KEY url_combined (url_hash,link_type,check_status),
 	PRIMARY KEY (uid)
 );
 

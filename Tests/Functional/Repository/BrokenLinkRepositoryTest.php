@@ -711,7 +711,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
      *
      * @param array<int,array<string,mixed>> $results
      */
-    protected function normalizeBrokenLinksResults(array &$results): void
+    protected function normalizeBrokenLinksResults(array &$results): array
     {
         foreach ($results as &$result) {
             unset($result['url_response']);
@@ -721,8 +721,14 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
             unset($result['tstamp']);
             unset($result['crdate']);
             unset($result['exclude_link_targets_pid']);
+            unset($result['url_hash']);
         }
 
+        return $this->sortBrokenLinksResults($results);
+    }
+
+    protected function sortBrokenLinksResults(array &$results): array
+    {
         usort($results, function ($a, $b) {
             $result = strcmp($a['table_name'], $b['table_name']);
             if ($result !== 0) {
@@ -733,5 +739,6 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
             }
             return ($a['record_uid'] < $b['record_uid']) ? -1 : 1;
         });
+        return $results;
     }
 }
