@@ -501,6 +501,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
     /**
      * Check if linkTarget is in list of broken links.
      *
+     * For performance reasons we use the url_hash, not the URL
+     *
      * @param string $linkTarget Url to check for. Can be a URL (for external links)
      *   a page uid (for db links), a file reference (for file links), etc.
      * @return bool is the link target a broken link
@@ -513,7 +515,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->count('uid')
                 ->from(static::TABLE)
                 ->where(
-                    $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
+                    $queryBuilder->expr()->eq('url_hash', $queryBuilder->createNamedParameter(sha1($linkTarget))),
                     $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
                     $queryBuilder->expr()->eq('check_status', $queryBuilder->createNamedParameter(LinkTargetResponse::RESULT_BROKEN, \PDO::PARAM_INT))
                 );
@@ -637,6 +639,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     {
         $count = 0;
         $record['tstamp'] = \time();
+        $record['url_hash'] = sha1($record['url']);
         try {
             $count = (int)GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getConnectionForTable(static::TABLE)
@@ -663,6 +666,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     {
         $record['tstamp'] = \time();
         $record['crdate'] = \time();
+        $record['url_hash'] = sha1($record['url']);
         try {
             GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getConnectionForTable(static::TABLE)
