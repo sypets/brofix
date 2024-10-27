@@ -36,7 +36,7 @@ abstract class AbstractFunctional extends FunctionalTestCase
     protected array $coreExtensionsToLoad = [
         'backend',
         'fluid',
-        'info',
+        //'info',
         'install'
     ];
     protected array $testExtensionsToLoad = [

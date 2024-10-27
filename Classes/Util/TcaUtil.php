@@ -23,8 +23,8 @@ class TcaUtil
         $results = [];
 
         $flexFormTools = GeneralUtility::makeInstance(FlexFormTools::class);
-        $flexFormTools->cleanFlexFormXML($table, $field, $row);
-        $flexformArray = $flexFormTools->cleanFlexFormXML;
+        $cleanedFlexformString = $flexFormTools->cleanFlexFormXML($table, $field, $row);
+        $flexformArray = GeneralUtility::xml2array($cleanedFlexformString);
 
         if (!($flexformArray['data'] ?? false)) {
             return [];
