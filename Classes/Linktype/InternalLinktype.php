@@ -390,9 +390,10 @@ class InternalLinktype extends AbstractLinktype
      * Text to be displayed with the Link as anchor text
      * (not the real anchor text of the Link.
      * @param mixed[] $row
+     * @param array<mixed>|null $additionalConfig
      * @return string
      */
-    public function getBrokenLinkText(array $row, array $additionalConfig = null): string
+    public function getBrokenLinkText(array $row, ?array $additionalConfig = null): string
     {
         $pageTitle = $additionalConfig['page']['title'] ?? '';
         $contentTitle = $additionalConfig['content']['title'] ?? '';

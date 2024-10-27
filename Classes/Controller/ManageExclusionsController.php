@@ -91,27 +91,26 @@ class ManageExclusionsController extends AbstractBrofixController
     protected bool $backendUserHasPermissions = false;
 
     public function __construct(
-        ExcludeLinkTargetRepository $excludeLinkTargetRepository = null,
-        ManageExclusionsFilter $filter = null,
-        ExtensionConfiguration $extensionConfiguration = null,
+        ExcludeLinkTargetRepository $excludeLinkTargetRepository,
+        ManageExclusionsFilter $filter,
+        ExtensionConfiguration $extensionConfiguration,
         ModuleTemplateFactory $moduleTemplateFactory,
-        IconFactory $iconFactory = null,
-        ExcludeLinkTarget $excludeLinkTarget = null,
-        CharsetConverter $charsetConverter = null,
-        LocalizationUtility $localizationUtility = null,
-        PageRenderer $pageRenderer = null
+        IconFactory $iconFactory,
+        ExcludeLinkTarget $excludeLinkTarget,
+        CharsetConverter $charsetConverter,
+        LocalizationUtility $localizationUtility,
+        PageRenderer $pageRenderer
     ) {
-        $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
-        $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
+        $this->pageRenderer = $pageRenderer;
+        $iconFactory = $iconFactory;
         $moduleTemplateFactory = $moduleTemplateFactory;
-        $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
-        $this->excludeLinkTargetRepository = $excludeLinkTargetRepository ?: GeneralUtility::makeInstance(ExcludeLinkTargetRepository::class);
-        $this->filter = $filter ?: GeneralUtility::makeInstance(ManageExclusionsFilter::class);
-        $this->charsetConverter = $charsetConverter ?? GeneralUtility::makeInstance(CharsetConverter::class);
-        $this->localizationUtility = $localizationUtility ?? GeneralUtility::makeInstance(LocalizationUtility::class);
-        $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
+        $excludeLinkTarget = $excludeLinkTarget;
+        $this->excludeLinkTargetRepository = $excludeLinkTargetRepository;
+        $this->filter = $filter;
+        $this->charsetConverter = $charsetConverter;
+        $this->localizationUtility = $localizationUtility;
 
-        $extensionConfiguration = $extensionConfiguration ?: GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        $this->orderBy = ManageExclusionsController::ORDER_BY_DEFAULT;
         $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
         $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
 

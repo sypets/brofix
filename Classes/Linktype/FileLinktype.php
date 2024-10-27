@@ -95,10 +95,10 @@ class FileLinktype extends AbstractLinktype
      * Text to be displayed with the Link as anchor text
      * (not the real anchor text of the Link.
      * @param mixed[] $row
-     * @param mixed[] $additionalConfig
+     * @param array<mixed>|null $additionalConfig
      * @return string
      */
-    public function getBrokenLinkText(array $row, array $additionalConfig = null): string
+    public function getBrokenLinkText(array $row, ?array $additionalConfig = null): string
     {
         return $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.file');
     }
