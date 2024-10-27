@@ -407,8 +407,7 @@ class BrokenLinkListController extends AbstractBrofixController
     protected function initializePageRenderer(): void
     {
         $this->pageRenderer->addCssFile('EXT:brofix/Resources/Public/Css/brofix.css', 'stylesheet', 'screen');
-        // todo: use loadJavaScriptModule
-        $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Brofix/Brofix');
+        $this->pageRenderer->loadJavaScriptModule('@sypets/brofix/Brofix.js');
         $this->pageRenderer->addInlineLanguageLabelFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
     }
 
