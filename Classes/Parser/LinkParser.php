@@ -11,6 +11,7 @@ use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
 use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
+use TYPO3\CMS\Backend\Form\FormDataGroupInterface;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserFactory;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserInterface;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
@@ -50,6 +51,7 @@ class LinkParser
 
     protected ?ServerRequestInterface $request;
     protected ?FormDataCompiler $formDataCompiler;
+    protected ?FormDataGroupInterface $formDataGroup;
     protected Configuration $configuration;
     protected SoftReferenceParserFactory $softReferenceParserFactory;
     protected ContentRepository $contentRepository;
@@ -102,10 +104,10 @@ class LinkParser
         $this->configuration = $configuration;
 
         /** @phpstan-ignore-next-line */
-        $formDataGroup = GeneralUtility::makeInstance($this->configuration->getFormDataGroup());
+        $this->formDataGroup = GeneralUtility::makeInstance($this->configuration->getFormDataGroup());
         /** @phpstan-ignore-next-line */
-        if ($formDataGroup) {
-            $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
+        if ($this->formDataGroup) {
+            $this->formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class);
         }
     }
 
@@ -463,7 +465,7 @@ class LinkParser
      */
     public function getProcessedFormData(int $uid, string $tablename, ServerRequestInterface $request): array
     {
-        if (!$this->formDataCompiler) {
+        if (!$this->formDataCompiler || !$this->formDataGroup) {
             return [];
         }
 
@@ -485,7 +487,7 @@ class LinkParser
             'request' => $request,
         ];
 
-        $this->processedFormData = $this->formDataCompiler->compile($formDataCompilerInput);
+        $this->processedFormData = $this->formDataCompiler->compile($formDataCompilerInput, $this->formDataGroup);
 
         // undo hack
         if ($isAdmin === false) {
