@@ -136,7 +136,7 @@ class ExcludeLinkTarget
     {
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable(static::TABLE);
-        if ($connection->getSchemaManager()->tablesExist(static::TABLE)) {
+        if ($connection->createSchemaManager()->tablesExist(static::TABLE)) {
             return true;
         }
         return false;
