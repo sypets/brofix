@@ -1,12 +1,22 @@
 /**
  * Module: TYPO3/CMS/Brofix/ManageExclusions
  *
- * Uses requirejs, is deprecated
+ * Is included via Configuration/JavaScriptModules.php
  */
-define(['jquery'], function($) {
-  'use strict';
 
-  $(document).ready(function () {
+import $ from 'jquery';
+import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
+
+class ManageExclusions
+{
+
+  constructor()
+  {
+    this.addEvemtListeners();
+  }
+
+  addEvemtListeners()
+  {
 
     $('#excludeUrlButton').on('click', function (){
       $('#excludeUrl_filter').val('')
@@ -24,7 +34,6 @@ define(['jquery'], function($) {
         selecteditems.push($(ob).val());
       });
       if (selecteditems.length > 0) {
-        require(['TYPO3/CMS/Core/Ajax/AjaxRequest'], function (AjaxRequest) {
           new AjaxRequest(TYPO3.settings.ajaxUrls.delete_excluded_links)
             .withQueryArguments({input: selecteditems})
             .get()
@@ -34,16 +43,13 @@ define(['jquery'], function($) {
               // todo: show flash message, return number of affected froms from ExcludeLinkTargetRepository
               //top.TYPO3.Notification.info('', '');
             });
-        });
       } else {
         // todo: show flash message (with localized message)
       }
 
     })
-  })
-  var ManageExclusions = {};
+  }
+}
 
-
-  return ManageExclusions;
-});
+export default new ManageExclusions;
 

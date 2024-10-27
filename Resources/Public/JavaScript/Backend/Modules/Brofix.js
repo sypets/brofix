@@ -1,12 +1,20 @@
 /**
  * Module: TYPO3/CMS/Brofix/Brofix
  *
- * Uses requirejs, is deprecated
+ * Is included via Configuration/JavaScriptModules.php
  */
 
-define(['jquery'], function($) {
-  'use strict';
-  $(document).ready(function () {
+import $ from 'jquery';
+
+class Brofix {
+
+  constructor()
+  {
+    this.addEvemtListeners();
+  }
+
+  addEvemtListeners()
+  {
 
     // reload list on changing these values
     $('#linktype_searchFilter').on('change', function () {
@@ -35,32 +43,6 @@ define(['jquery'], function($) {
       $('#refreshLinkList').click();
     });
 
-  })
-  var Brofix = {};
-
-  /**
-   *
-   * @param {String} prefix
-   */
-  Brofix.toggleActionButton = function(prefix) {
-    var buttonDisable = true;
-    $('.' + prefix).each(function() {
-      if ($(this).prop('checked')) {
-        buttonDisable = false;
-      }
-    });
-
-    if (prefix === 'check') {
-      $('#updateLinkList').prop('disabled', buttonDisable);
-    } else {
-      $('#refreshLinkList').prop('disabled', buttonDisable);
-    }
-  };
-
-  /**
-   * Registers listeners
-   */
-  Brofix.initializeEvents = function() {
     $('.refresh').on('click', function() {
       Brofix.toggleActionButton('refresh');
     });
@@ -82,11 +64,28 @@ define(['jquery'], function($) {
       }
       top.TYPO3.Notification.success(message);
     });
-  };
 
-  $(Brofix.initializeEvents);
+  }
 
+  /**
+   *
+   * @param {String} prefix
+   */
+  toggleActionButton(prefix)
+  {
+    var buttonDisable = true;
+    $('.' + prefix).each(function() {
+      if ($(this).prop('checked')) {
+        buttonDisable = false;
+      }
+    });
 
-  return Brofix;
-});
+    if (prefix === 'check') {
+      $('#updateLinkList').prop('disabled', buttonDisable);
+    } else {
+      $('#refreshLinkList').prop('disabled', buttonDisable);
+    }
+  }
+}
 
+export default new Brofix;
