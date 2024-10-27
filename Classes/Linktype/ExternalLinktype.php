@@ -3,19 +3,6 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Linktype;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -352,11 +339,11 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
         switch ($errorType) {
             case self::ERROR_TYPE_HTTP_STATUS_CODE:
-                $message = $lang->getLL('list.report.error.httpstatus.' . $errno);
+                $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.httpstatus.' . $errno);
                 if (!$message) {
                     if ($errno !== 0) {
                         // fall back to generic error message
-                        $message = sprintf($lang->getLL('list.report.error.httpstatus.general'), (string)$errno);
+                        $message = sprintf($lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.httpstatus.general'), (string)$errno);
                     } else {
                         $message = $exception;
                     }
@@ -367,11 +354,11 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 $message = '';
                 if ($errno > 0) {
                     // get localized error message
-                    $message = $lang->getLL('list.report.error.libcurl.' . $errno);
+                    $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.libcurl.' . $errno);
                 }
                 if (!$message) {
                     // fallback to  generic error message and show exception
-                    $message = $lang->getLL('list.report.error.networkexception');
+                    $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.networkexception');
                     if ($exception !== '') {
                         $message .= ' ('
                             . $exception
@@ -382,14 +369,14 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
             case 'loop':
                 $message = sprintf(
-                    $lang->getLL('list.report.error.redirectloop'),
+                    $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.redirectloop'),
                     $exception,
                     ''
                 );
                 break;
 
             case 'tooManyRedirects':
-                $message = $lang->getLL('list.report.error.tooManyRedirects');
+                $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.tooManyRedirects');
                 break;
 
             default:

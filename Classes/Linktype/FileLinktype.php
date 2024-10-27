@@ -3,19 +3,6 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Linktype;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
@@ -89,7 +76,7 @@ class FileLinktype extends AbstractLinktype
      */
     public function getErrorMessage(?LinkTargetResponse $linkTargetResponse): string
     {
-        return $this->getLanguageService()->getLL('list.report.error.file.notexisting');
+        return $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.file.notexisting');
     }
 
     /**
@@ -113,6 +100,6 @@ class FileLinktype extends AbstractLinktype
      */
     public function getBrokenLinkText(array $row, array $additionalConfig = null): string
     {
-        return $this->getLanguageService()->getLL('list.report.url.file');
+        return $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.file');
     }
 }

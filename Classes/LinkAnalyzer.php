@@ -112,7 +112,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     -1
                 );
                 $message = sprintf(
-                    $this->getLanguageService()->getLL('list.recheck.url.ok.removed'),
+                    $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url.ok.removed'),
                     $url,
                     $count
                 );
@@ -160,7 +160,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $linkType
                     );
                     $message = sprintf(
-                        $this->getLanguageService()->getLL('list.recheck.url.notok.removed'),
+                        $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url.notok.removed'),
                         $url,
                         $count
                     );
@@ -182,7 +182,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             $count = $this->brokenLinkRepository->updateBrokenLink($brokenLinkRecord, $identifier);
             if ($linkTargetResponse->isError()) {
                 $message = sprintf(
-                    $this->getLanguageService()->getLL('list.recheck.url.notok.updated'),
+                    $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url.notok.updated'),
                     $url,
                     $count
                 );
@@ -191,7 +191,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         if ($message === '') {
             $message = sprintf(
-                $this->getLanguageService()->getLL('list.recheck.url'),
+                $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url'),
                 $url
             );
         }
@@ -236,7 +236,7 @@ class LinkAnalyzer implements LoggerAwareInterface
 
         if (!$row) {
             // missing record: remove existing links
-            $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.removed'), $recordUid);
+            $message = sprintf($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.removed'), $recordUid);
             // remove existing broken links from table
             $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
             return true;
@@ -252,7 +252,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         if ($beforeEditedTimestamp && $timestampValue && $beforeEditedTimestamp >= $timestampValue) {
             // if timestamp of record is not after $beforeEditedTimestamp: no need to recheck
-            $message = $this->getLanguageService()->getLL('list.recheck.message.notchanged');
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.notchanged');
             if ($message) {
                 $message = sprintf($message, $header);
             }
@@ -275,7 +275,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         // remove existing broken links from table
         $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
-        $message = sprintf($this->getLanguageService()->getLL('list.recheck.message.checked'), $header);
+        $message = sprintf($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.checked'), $header);
         return true;
     }
 
