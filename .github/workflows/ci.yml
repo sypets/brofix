@@ -9,20 +9,20 @@ on:
   push:
   pull_request:
   schedule:
-    - cron:  '42 5 * * *'
+    - cron:  '42 5 * * 1'
 
 jobs:
-  all_core_12:
+  static:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
-    name: "all core-12"
+    name: "static"
     runs-on: ubuntu-20.04
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
       # rest matrix jobs be be executed anyway.
-      fail-fast: false
+      fail-fast: true
       matrix:
-        php: [ '8.1', '8.2' ]
+        php: [ '8.4' ]
         minMax: [ 'composerInstallMax' ]
     steps:
       - name: "Checkout"
@@ -50,6 +50,32 @@ jobs:
         if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
+
+  all_core_latest:
+    # only run jobs via scheduled workflow in main repo, not in forks
+    if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
+    name: "all core-latest"
+    runs-on: ubuntu-20.04
+    strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: true
+      matrix:
+        php: [ '8.2', '8.4' ]
+        minMax: [ 'composerInstallMax' ]
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "show php version"
+        run: php --version
+
+      #- name: "Set Typo3 core version"
+      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^11.5" -s composerCoreVersion
+
+      - name: "Composer"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
       - name: "Lint PHP"
         if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
@@ -73,3 +99,41 @@ jobs:
       - name: "Functional tests with postgres (nightly or pull_request)"
         if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
+
+  # v12
+  all_core_v12:
+    # only run jobs via scheduled workflow in main repo, not in forks
+    if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
+    name: "all core-v12"
+    runs-on: ubuntu-20.04
+    strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: true
+      matrix:
+        php: [ '8.1', '8.4' ]
+        minMax: [ 'composerInstallMax' ]
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "show php version"
+        run: php --version
+
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
+
+      - name: "Composer"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
+      - name: "phpstan"
+        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
+
+      - name: "Unit tests"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+
+      - name: "Functional tests with mariadb"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
