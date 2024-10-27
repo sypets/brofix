@@ -288,7 +288,7 @@ class ManageExclusionsController extends AbstractBrofixController
                 'url'   => '',
                 'icon'  => '',
             ];
-            $tableHeadData[$key]['label'] = $languageService->getLL('columnHeader.' . $key);
+            $tableHeadData[$key]['label'] = $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:columnHeader.' . $key);
             if (isset($sortActions[$key])) {
                 // sorting available, add url
                 if ($this->orderBy === $key) {

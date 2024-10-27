@@ -317,21 +317,21 @@ class InternalLinktype extends AbstractLinktype
         if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_PAGE) {
             switch ($linkTargetResponse->getErrno()) {
                 case self::ERROR_ERRNO_DELETED:
-                    $errorPage = $lang->getLL('list.report.error.page.deleted');
+                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.deleted');
                     break;
                 case self::ERROR_ERRNO_HIDDEN:
-                    $errorPage = $lang->getLL('list.report.error.page.notvisible');
+                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.notvisible');
                     break;
                 default:
-                    $errorPage = $lang->getLL('list.report.error.page.notexisting');
+                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.notexisting');
             }
         } elseif ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_CONTENT) {
             switch ($linkTargetResponse->getErrno()) {
                 case self::ERROR_ERRNO_DELETED:
-                    $errorContent = $lang->getLL('list.report.error.content.deleted');
+                    $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.deleted');
                     break;
                 case self::ERROR_ERRNO_HIDDEN:
-                    $errorContent = $lang->getLL('list.report.error.content.notvisible');
+                    $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.notvisible');
                     break;
                 case self::ERROR_ERRNO_MOVED:
                     $errorContent = str_replace(
@@ -347,11 +347,11 @@ class InternalLinktype extends AbstractLinktype
                             $custom['content']['wrongPage'] ?? '',
                             $custom['content']['rightPage'] ?? ''
                         ],
-                        $lang->getLL('list.report.error.contentmoved')
+                        $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.contentmoved')
                     );
                     break;
                 default:
-                    $errorContent = $lang->getLL('list.report.error.content.notexisting');
+                    $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.notexisting');
             }
         }
         if (isset($errorPage) && isset($errorContent)) {
@@ -362,7 +362,7 @@ class InternalLinktype extends AbstractLinktype
             $response = $errorContent;
         } else {
             // This should not happen
-            $response = $lang->getLL('list.report.noinformation');
+            $response = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.noinformation');
         }
         return $response;
     }
@@ -401,13 +401,13 @@ class InternalLinktype extends AbstractLinktype
         $pageuid = (int)($elements[0] ?? 0);
         $contentUid = (int)($elements[1] ?? 0);
 
-        $message = $this->getLanguageService()->getLL('list.report.url.page') . ':';
+        $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.page') . ':';
         if ($pageTitle) {
             $message .= (' "' . $pageTitle . '"');
         }
         $message .= (' [' . $pageuid . ']');
         if ($contentUid != 0) {
-            $message .=  ', ' . $this->getLanguageService()->getLL('list.report.url.element') . ':';
+            $message .=  ', ' . $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.element') . ':';
             if ($contentTitle) {
                 $message .= ' "' . $contentTitle . '"';
             }
