@@ -81,7 +81,7 @@ class ContentRepository
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
                 )
             )
             ->executeQuery()
@@ -102,7 +102,7 @@ class ContentRepository
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter($parentId, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($parentId, Connection::PARAM_INT)
                 )
             )
             ->executeQuery()
