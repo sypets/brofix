@@ -265,7 +265,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $considerHidden
             );
             $this->createFlashMessage(
-                $this->getLanguageService()->getLL('list.status.check.done'),
+                $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.status.check.done'),
                 '',
                 ContextualFeedbackSeverity::OK
             );
@@ -279,13 +279,13 @@ class BrokenLinkListController extends AbstractBrofixController
             if ($count > 0) {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
-                    $this->getLanguageService()->getLL('list.recheck.url.title'),
+                    $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url.title'),
                     ContextualFeedbackSeverity::OK
                 );
             } else {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
-                    $this->getLanguageService()->getLL('list.recheck.url.title'),
+                    $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url.title'),
                     ContextualFeedbackSeverity::OK
                 );
             }
@@ -309,7 +309,7 @@ class BrokenLinkListController extends AbstractBrofixController
             if ($message) {
                 $this->moduleTemplate->addFlashMessage(
                     $message,
-                    $this->getLanguageService()->getLL('list.recheck.links.title'),
+                    $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.links.title'),
                     ContextualFeedbackSeverity::OK
                 );
             }
@@ -341,8 +341,8 @@ class BrokenLinkListController extends AbstractBrofixController
         if (!$this->backendUserHasPermissionsForBrokenLinklist) {
             // If no access or if ID == zero
             $this->moduleTemplate->addFlashMessage(
-                $this->getLanguageService()->getLL('no.access'),
-                $this->getLanguageService()->getLL('no.access.title'),
+                $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:no.access'),
+                $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:no.access.title'),
                 ContextualFeedbackSeverity::ERROR
             );
             return;
@@ -546,11 +546,11 @@ class BrokenLinkListController extends AbstractBrofixController
                 && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
                 $this->createFlashMessage(
                     sprintf(
-                        $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached')
+                        $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.warning.max_limit_pages_reached')
                             ?: 'The limit of %s number of pages was reached. Some broken links may not be displayed. To see more broken links for further subpages, go to a subpage of this page.',
                         $this->configuration->getTraverseMaxNumberOfPagesInBackend()
                     ),
-                    $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
+                    $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
                     ContextualFeedbackSeverity::WARNING
                 );
             }
@@ -594,22 +594,22 @@ class BrokenLinkListController extends AbstractBrofixController
         $status = ContextualFeedbackSeverity::OK;
         if ($this->filter->hasConstraintsForNumberOfResults()) {
             $status = ContextualFeedbackSeverity::WARNING;
-            $message = $this->getLanguageService()->getLL('list.no.broken.links.filter')
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.no.broken.links.filter')
                 ?: 'No broken links found if current filter is applied!';
         } elseif ($this->depth === 0) {
-            $message = $this->getLanguageService()->getLL('list.no.broken.links.this.page')
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.no.broken.links.this.page')
                 ?: 'No broken links on this page!';
-            $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
+            $message .= ' ' . $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:message.choose.higher.level');
             $status = ContextualFeedbackSeverity::INFO;
         } elseif ($this->depth > 0 && $this->depth < BrokenLinkListFilter::PAGE_DEPTH_INFINITE) {
-            $message = $this->getLanguageService()->getLL('list.no.broken.links.current.level')
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.no.broken.links.current.level')
                 ?: 'No broken links for current level';
             $message .= ' (' . $this->depth . ').';
-            $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
+            $message .= ' ' . $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:message.choose.higher.level');
             $status = ContextualFeedbackSeverity::INFO;
         } else {
-            $message = $this->getLanguageService()->getLL('list.no.broken.links.level.infinite')
-                ?: $this->getLanguageService()->getLL('list.no.broken.links')
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.no.broken.links.level.infinite')
+                ?: $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.no.broken.links')
                 ?: 'No broken links on this page and its subpages!';
         }
         $this->createFlashMessage(
@@ -621,7 +621,7 @@ class BrokenLinkListController extends AbstractBrofixController
 
     protected function createFlashMessagesForRootPage(): void
     {
-        $this->createFlashMessage($this->getLanguageService()->getLL('list.rootpage'));
+        $this->createFlashMessage($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.rootpage'));
     }
 
     /**
@@ -682,8 +682,8 @@ class BrokenLinkListController extends AbstractBrofixController
                 'icon'  => '',
             ];
             if ($key === 'last_check_record') {
-                $part1 = $languageService->getLL('list.tableHead.last_check.part1');
-                $part2 = $languageService->getLL('list.tableHead.last_check.part2.record');
+                $part1 = $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check.part1');
+                $part2 = $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check.part2.record');
                 if ($part1 && $part2) {
                     $tableHeadData[$key]['label'] = $part1
                         . '<br/>'
@@ -691,11 +691,11 @@ class BrokenLinkListController extends AbstractBrofixController
                 } else {
                     // fallback: use older language label
                     $tableHeadData[$key]['label'] =
-                        $languageService->getLL('list.tableHead.last_check');
+                        $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check');
                 }
             } elseif ($key === 'last_check_url') {
-                $part1 = $languageService->getLL('list.tableHead.last_check.part1');
-                $part2 = $languageService->getLL('list.tableHead.last_check.part2.url');
+                $part1 = $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check.part1');
+                $part2 = $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check.part2.url');
                 if ($part1 && $part2) {
                     $tableHeadData[$key]['label'] = $part1
                         . '<br/>'
@@ -703,11 +703,11 @@ class BrokenLinkListController extends AbstractBrofixController
                 } else {
                     // fallback: use older language label
                     $tableHeadData[$key]['label'] =
-                        $languageService->getLL('list.tableHead.last_check_url')
-                        ?: $languageService->getLL('list.tableHead.last_check');
+                        $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check_url')
+                        ?: $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.last_check');
                 }
             } else {
-                $tableHeadData[$key]['label'] = $languageService->getLL('list.tableHead.' . $key);
+                $tableHeadData[$key]['label'] = $languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.' . $key);
             }
             if (isset($sortActions[$key])) {
                 // sorting available, add url
@@ -926,14 +926,14 @@ class BrokenLinkListController extends AbstractBrofixController
                 );
                 break;
             case LinkTargetResponse::RESULT_OK:
-                $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->getLL('list.msg.ok')) . '</span>';
+                $linkMessage = '<span class="valid">' . htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.ok')) . '</span>';
                 break;
 
             case LinkTargetResponse::RESULT_CANNOT_CHECK:
                 // todo add language label
                 $linkMessage = sprintf(
                     '<span class="status-cannot-check">%s</span>',
-                    htmlspecialchars($languageService->getLL('list.msg.status.cannot_check')) ?: 'Cannot check URL'
+                    htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.status.cannot_check')) ?: 'Cannot check URL'
                 );
                 if ($linkTargetResponse->getReasonCannotCheck()) {
                     $linkMessage .= ':' . $linkTargetResponse->getReasonCannotCheck();
@@ -964,14 +964,14 @@ class BrokenLinkListController extends AbstractBrofixController
                 // todo add language label
                 $linkMessage = sprintf(
                     '<span class="status-excluded">%s</span>',
-                    htmlspecialchars($languageService->getLL('list.msg.status.excluded')) ?: 'URL is excluded, will not be checked'
+                    htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.status.excluded')) ?: 'URL is excluded, will not be checked'
                 );
                 break;
             default:
                 // todo add language label
                 $linkMessage = sprintf(
                     '<span class="status-unknown">%s</span>',
-                    htmlspecialchars($languageService->getLL('list.msg.status.unknown')) ?: 'Unknown status'
+                    htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.status.unknown')) ?: 'Unknown status'
                 );
                 break;
         }
