@@ -77,10 +77,10 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     protected $crawlDelay;
 
     public function __construct(
-        RequestFactory $requestFactory = null,
-        ExcludeLinkTarget $excludeLinkTarget = null,
-        LinkTargetCacheInterface $linkTargetCache = null,
-        CrawlDelay $crawlDelay = null
+        ?RequestFactory $requestFactory = null,
+        ?ExcludeLinkTarget $excludeLinkTarget = null,
+        ?LinkTargetCacheInterface $linkTargetCache = null,
+        ?CrawlDelay $crawlDelay = null
     ) {
         $this->requestFactory = $requestFactory ?: GeneralUtility::makeInstance(RequestFactory::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);

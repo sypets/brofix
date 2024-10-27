@@ -205,29 +205,25 @@ class BrokenLinkListController extends AbstractBrofixController
     protected bool $backendUserHasPermissionsForExcludes = false;
 
     public function __construct(
-        PagesRepository $pagesRepository = null,
-        BrokenLinkRepository $brokenLinkRepository = null,
-        ExcludeLinkTarget $excludeLinkTarget = null,
-        FlashMessageService $flashMessageService = null,
+        PagesRepository $pagesRepository,
+        BrokenLinkRepository $brokenLinkRepository,
+        ExcludeLinkTarget $excludeLinkTarget,
+        FlashMessageService $flashMessageService,
         ModuleTemplateFactory $moduleTemplateFactory,
-        IconFactory $iconFactory = null,
-        ExtensionConfiguration $extensionConfiguration = null,
-        PageRenderer $pageRenderer = null
+        IconFactory $iconFactory,
+        ExtensionConfiguration $extensionConfiguration,
+        PageRenderer $pageRenderer
     ) {
-        $this->pageRenderer = $pageRenderer ?: GeneralUtility::makeInstance(PageRenderer::class);
-        $iconFactory = $iconFactory ?: GeneralUtility::makeInstance(IconFactory::class);
-        $excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+        $this->pageRenderer = $pageRenderer;
+        $iconFactory = $iconFactory;
+        $excludeLinkTarget = $excludeLinkTarget;
         $moduleTemplateFactory = $moduleTemplateFactory;
-        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $this->pagesRepository = $pagesRepository ?: GeneralUtility::makeInstance(PagesRepository::class);
-        $flashMessageService = $flashMessageService ?: GeneralUtility::makeInstance(FlashMessageService::class);
+        $this->brokenLinkRepository = $brokenLinkRepository;
+        $this->pagesRepository = $pagesRepository;
+
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $this->orderBy = BrokenLinkListController::DEFAULT_ORDER_BY;
 
-        // configuration / extension configuration
-        if (!$extensionConfiguration) {
-            $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-        }
         $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
         $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
 
