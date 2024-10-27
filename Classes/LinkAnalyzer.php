@@ -4,19 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -451,7 +438,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     foreach ($this->configuration->getDoNotCheckContentOnPagesDoktypes() as $doktype) {
                         $constraints[] = $queryBuilder->expr()->neq(
                             'p.doktype',
-                            $queryBuilder->createNamedParameter($doktype, \PDO::PARAM_INT)
+                            $queryBuilder->createNamedParameter($doktype, Connection::PARAM_INT)
                         );
                     }
 

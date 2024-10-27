@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Repository;
 
 use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -52,12 +53,12 @@ class ExcludeLinkTargetRepository
         $storagePid = $filter->getExcludeStoragePid();
         if ($storagePid !== -1) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->eq(self::TABLE . '.pid', $queryBuilder->createNamedParameter($storagePid, \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq(self::TABLE . '.pid', $queryBuilder->createNamedParameter($storagePid, Connection::PARAM_INT))
             );
         }
         if ($filter->getExcludeReasonFilter() != '') {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->eq(self::TABLE . '.reason', $queryBuilder->createNamedParameter($filter->getExcludeReasonFilter(), \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq(self::TABLE . '.reason', $queryBuilder->createNamedParameter($filter->getExcludeReasonFilter(), Connection::PARAM_INT))
             );
         }
 
@@ -91,7 +92,7 @@ class ExcludeLinkTargetRepository
             $affectedRows += $queryBuilder
                 ->delete(self::TABLE)
                 ->where(
-                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT))
                 )
                 ->executeStatement();
         }

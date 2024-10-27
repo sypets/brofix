@@ -114,7 +114,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
             if ($filter->getUidFilter() != '') {
                 $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), \PDO::PARAM_INT))
+                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), Connection::PARAM_INT))
                 );
             }
             $urlFilter = $filter->getUrlFilter();
@@ -231,14 +231,14 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         self::TABLE . '.record_uid',
-                        $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
                 ),
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         self::TABLE . '.record_pid',
-                        $queryBuilder->createNamedParameter($pageId, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
                 )
@@ -345,7 +345,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_uid',
-                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->eq(
                         'table_name',
@@ -355,7 +355,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_pid',
-                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->neq(
                         'table_name',
@@ -366,7 +366,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         } else {
             $constraints[] = $queryBuilder->expr()->eq(
                 'record_uid',
-                $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
             );
             $constraints[] = $queryBuilder->expr()->eq(
                 'table_name',
@@ -390,7 +390,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_uid',
-                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->eq(
                         'table_name',
@@ -400,7 +400,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'record_pid',
-                        $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->neq(
                         'table_name',
@@ -411,7 +411,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         } else {
             $constraints[] = $queryBuilder->expr()->eq(
                 'record_uid',
-                $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
             );
             $constraints[] = $queryBuilder->expr()->eq(
                 'table_name',
@@ -442,13 +442,13 @@ class BrokenLinkRepository implements LoggerAwareInterface
             ->where(
                 $queryBuilder->expr()->eq(
                     'record_uid',
-                    $queryBuilder->createNamedParameter($recordUid, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'table_name',
                     $queryBuilder->createNamedParameter($tableName)
                 ),
-                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
+                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, Connection::PARAM_INT))
             )
             ->executeStatement();
     }
@@ -492,7 +492,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                         'link_type',
                         $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
                     ),
-                    $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, \PDO::PARAM_INT))
+                    $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($time, Connection::PARAM_INT))
                 )
                 ->executeStatement();
         }
@@ -517,7 +517,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 ->where(
                     $queryBuilder->expr()->eq('url_hash', $queryBuilder->createNamedParameter(sha1($linkTarget))),
                     $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
-                    $queryBuilder->expr()->eq('check_status', $queryBuilder->createNamedParameter(LinkTargetResponse::RESULT_BROKEN, \PDO::PARAM_INT))
+                    $queryBuilder->expr()->eq('check_status', $queryBuilder->createNamedParameter(LinkTargetResponse::RESULT_BROKEN, Connection::PARAM_INT))
                 );
             return (bool)$queryBuilder
                 ->executeQuery()
@@ -574,7 +574,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         if ($excludeLinkTargetPid !== -1) {
             $constraints[] = $queryBuilder->expr()->eq(
                 'exclude_link_targets_pid',
-                $queryBuilder->createNamedParameter($excludeLinkTargetPid, \PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($excludeLinkTargetPid, Connection::PARAM_INT)
             );
         }
 
@@ -597,7 +597,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
             ->where(
                 $queryBuilder->expr()->eq(
                     'record_uid',
-                    $queryBuilder->createNamedParameter($record['record_uid'], \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($record['record_uid'], Connection::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'table_name',

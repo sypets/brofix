@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Sypets\Brofix\CheckLinks\LinkTargetCache;
 
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -37,11 +38,11 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             $expire = $expire ?: $this->expire;
             $constraints[] = $queryBuilder->expr()->neq(
                 'last_check',
-                $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
             );
             $constraints[] = $queryBuilder->expr()->gt(
                 'last_check',
-                $queryBuilder->createNamedParameter(\time()-$expire, \PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter(\time()-$expire, Connection::PARAM_INT)
             );
         }
 
@@ -71,8 +72,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             ->where(
                 $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($linkTarget)),
                 $queryBuilder->expr()->eq('link_type', $queryBuilder->createNamedParameter($linkType)),
-                $queryBuilder->expr()->neq('last_check', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->gt('last_check', $queryBuilder->createNamedParameter(\time()-$expire, \PDO::PARAM_INT))
+                $queryBuilder->expr()->neq('last_check', $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)),
+                $queryBuilder->expr()->gt('last_check', $queryBuilder->createNamedParameter(\time()-$expire, Connection::PARAM_INT))
             );
         $row = $queryBuilder
             ->executeQuery()
