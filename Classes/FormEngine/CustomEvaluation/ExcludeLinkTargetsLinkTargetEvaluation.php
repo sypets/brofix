@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\FormEngine\CustomEvaluation;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 /**
  * Validation of input field
  * tx_brofix_exclude_link_target.linktarget
@@ -56,12 +54,15 @@ class ExcludeLinkTargetsLinkTargetEvaluation
      * Normalize linktype for domains, this should contain only
      * the domain, not the scheme.
      *
-     * @param string $value
+     * @param string $linkTarget
      * @return string
      */
-    protected function normalizeLinkTarget(string $value): string
+    protected function normalizeLinkTarget(string $linkTarget): string
     {
-        $formData = GeneralUtility::_GP('data');
+        $formData = $_POST['data'] ?? [];
+        if (!$formData) {
+            return $linkTarget;
+        }
         $id = key($formData['tx_brofix_exclude_link_target']);
         $data = $formData['tx_brofix_exclude_link_target'][$id];
 
@@ -70,8 +71,11 @@ class ExcludeLinkTargetsLinkTargetEvaluation
 
         if ($match === 'domain' && $linkType === 'external') {
             // extract domain
-            $value = preg_replace('#(?:https?://)?([^/]*).*#', '$1', $value);
+            $linkTarget = preg_replace('#(?:https?://)?([^/]*).*#', '$1', $linkTarget);
         }
-        return $value;
+        if ($match === 'exact' && $linkType === 'external' && preg_match('#^https?://#', $linkTarget) !== 1) {
+            $linkTarget = 'https://' . $linkTarget;
+        }
+        return $linkTarget;
     }
 }
