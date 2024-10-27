@@ -25,7 +25,6 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -268,7 +267,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->createFlashMessage(
                 $this->getLanguageService()->getLL('list.status.check.done'),
                 '',
-                AbstractMessage::OK
+                ContextualFeedbackSeverity::OK
             );
             $this->resetModuleData();
             return $this->mainAction($this->moduleTemplate);
@@ -552,7 +551,7 @@ class BrokenLinkListController extends AbstractBrofixController
                         $this->configuration->getTraverseMaxNumberOfPagesInBackend()
                     ),
                     $this->getLanguageService()->getLL('list.report.warning.max_limit_pages_reached.title') ?: 'Limit for maximum number of pages reached',
-                    AbstractMessage::WARNING
+                    ContextualFeedbackSeverity::WARNING
                 );
             }
         } else {
@@ -592,22 +591,22 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function createFlashMessagesForNoBrokenLinks(): void
     {
-        $status = AbstractMessage::OK;
+        $status = ContextualFeedbackSeverity::OK;
         if ($this->filter->hasConstraintsForNumberOfResults()) {
-            $status = AbstractMessage::WARNING;
+            $status = ContextualFeedbackSeverity::WARNING;
             $message = $this->getLanguageService()->getLL('list.no.broken.links.filter')
                 ?: 'No broken links found if current filter is applied!';
         } elseif ($this->depth === 0) {
             $message = $this->getLanguageService()->getLL('list.no.broken.links.this.page')
                 ?: 'No broken links on this page!';
             $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
-            $status = AbstractMessage::INFO;
+            $status = ContextualFeedbackSeverity::INFO;
         } elseif ($this->depth > 0 && $this->depth < BrokenLinkListFilter::PAGE_DEPTH_INFINITE) {
             $message = $this->getLanguageService()->getLL('list.no.broken.links.current.level')
                 ?: 'No broken links for current level';
             $message .= ' (' . $this->depth . ').';
             $message .= ' ' . $this->getLanguageService()->getLL('message.choose.higher.level');
-            $status = AbstractMessage::INFO;
+            $status = ContextualFeedbackSeverity::INFO;
         } else {
             $message = $this->getLanguageService()->getLL('list.no.broken.links.level.infinite')
                 ?: $this->getLanguageService()->getLL('list.no.broken.links')
@@ -630,10 +629,10 @@ class BrokenLinkListController extends AbstractBrofixController
      *
      * @param string $message
      * @param string $title
-     * @param int $type
+     * @param int|value-of<ContextualFeedbackSeverity>|ContextualFeedbackSeverity $severity
      * @throws Exception
      */
-    protected function createFlashMessage(string $message, string $title = '', int $type = AbstractMessage::INFO): void
+    protected function createFlashMessage(string $message, string $title = '', $severity = ContextualFeedbackSeverity::INFO): void
     {
         /**
          * @var FlashMessage $flashMessage
@@ -642,7 +641,7 @@ class BrokenLinkListController extends AbstractBrofixController
             FlashMessage::class,
             $message,
             $title,
-            $type,
+            $severity,
             false
         );
         /**
