@@ -61,7 +61,7 @@ jobs:
       # rest matrix jobs be be executed anyway.
       fail-fast: true
       matrix:
-        php: [ '8.2', '8.3' ]
+        php: [ '8.2', '8.4' ]
         minMax: [ 'composerInstallMax' ]
     steps:
       - name: "Checkout"
@@ -126,7 +126,7 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
 
       - name: "Add prophecy for unit / functional tests"
-        run: composer require --dev jangregor/phpstan-prophecy phpspec/prophecy phpspec/prophecy-phpunit
+        run: composer require --dev jangregor/phpstan-prophecy phpspec/prophecy phpspec/prophecy-phpunit typo3/testing-framework:^7
 
       - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
