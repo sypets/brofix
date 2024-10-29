@@ -194,6 +194,12 @@ class LinkParser
                         if (!$parserResult->hasMatched()) {
                             continue;
                         }
+                        $parserKey = $softReferenceParser->getParserKey();
+                        // ignore found references for this parser
+                        // todo: make configurable
+                        if ($parserKey === 'rtehtmlarea_images') {
+                            continue;
+                        }
                         if ($softReferenceParser->getParserKey() === 'typolink_tag') {
                             $this->analyzeTypoLinks($parserResult, $results, $htmlParser, $record, $field, $table);
                         } else {
