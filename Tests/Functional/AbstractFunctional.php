@@ -4,19 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\Command\CommandUtility;
 use Sypets\Brofix\Configuration\Configuration;
@@ -73,6 +60,19 @@ abstract class AbstractFunctional extends FunctionalTestCase
             'tt_content' => ['bodytext', 'header_link', 'records']
         ];
         $linkTypes = ['db', 'file', 'external'];
+        $tsconfig = [
+            'mod' => [
+                'brofix' => [
+                    'linktypesConfig' => [
+                        'external' => [
+                            'headers' => [
+                                'User-Agent' => 'Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)',
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
 
         $tsConfigPath = GeneralUtility::getFileAbsFileName('EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig');
         $this->configuration = GeneralUtility::makeInstance(Configuration::class, self::EXTENSION_CONFIGURATION_ARRAY);
@@ -80,7 +80,6 @@ abstract class AbstractFunctional extends FunctionalTestCase
         // load default values
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
-        $this->configuration->overrideTsConfigByString(file_get_contents($tsConfigPath));
-        $this->configuration->overrideTsConfigByString('mod.brofix.linktypesConfig.external.headers.User-Agent = Mozilla/5.0 (compatible; Broken Link Checker; +https://example.org/imprint.html)');
+        $this->configuration->overrideTsConfigByArray($tsconfig);
     }
 }

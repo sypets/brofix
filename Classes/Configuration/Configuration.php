@@ -2,19 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 namespace Sypets\Brofix\Configuration;
 
 use Symfony\Component\Mime\Address;
@@ -24,7 +11,6 @@ use Sypets\Brofix\FormEngine\FieldShouldBeCheckedWithFlexform;
 use Sypets\Brofix\Linktype\AbstractLinktype;
 use Sypets\Brofix\Linktype\LinktypeInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -224,38 +210,6 @@ class Configuration
     public function loadPageTsConfig(int $page): void
     {
         $this->setTsConfig(BackendUtility::getPagesTSconfig($page)['mod.']['brofix.'] ?? []);
-    }
-
-    /**
-     * Reads page TSconfig from string and overrides existing tsconfig in
-     * $this->tsconfig with the values.
-     *
-     * @param string $tsConfigString
-     * @throws \Exception
-     *
-     * @deprecated use overrideTsConfigByArray
-     */
-    public function overrideTsConfigByString(string $tsConfigString): void
-    {
-        /**
-         * @var TypoScriptParser $parseObj
-         */
-        $parseObj = GeneralUtility::makeInstance(TypoScriptParser::class);
-        $parseObj->parse($tsConfigString);
-        if (!empty($parseObj->errors)) {
-            $parseErrorMessage = 'Invalid TSconfig'
-                . '<br />';
-            foreach ($parseObj->errors as $errorInfo) {
-                $parseErrorMessage .= $errorInfo[0] . '<br />';
-            }
-            throw new \Exception($parseErrorMessage);
-        }
-        $tsConfig = $parseObj->setup;
-        $overrideTs = $tsConfig['mod.']['brofix.'];
-
-        if (is_array($overrideTs)) {
-            ArrayUtility::mergeRecursiveWithOverrule($this->tsConfig, $overrideTs);
-        }
     }
 
     /**
