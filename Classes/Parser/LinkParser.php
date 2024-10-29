@@ -310,31 +310,61 @@ class LinkParser
         string $flexformField = '',
         string $flexformFieldLabel = ''
     ): void {
+        $foundLinks = [];
+        $key = 0;
         foreach ($parserResult->getMatchedElements() as $element) {
             $reference = $element['subst'] ?? [];
             $type = '';
             $idRecord = $record['uid'];
-            if (empty($reference) || !is_array($reference)) {
+
+            // Type of referenced record
+
+            if (isset($reference['recordRef']) && strpos($reference['recordRef'], 'pages') !== false) {
+                $currentR = $reference;
+                // Contains number of the page
+                $referencedRecordType = $reference['tokenValue'];
+                $wasPage = true;
+                $pageKey = $key;
+            } elseif (isset($reference['recordRef']) && strpos($reference['recordRef'], 'tt_content') !== false
+                && (isset($wasPage) && $wasPage === true)) {
+                // if type is ce and previous was page, we extend the page link and disregard the content link
+                //$referencedRecordType = $referencedRecordType . '#c' . $reference['tokenValue'];
+                $foundLinks[$pageKey]['pageAndAnchor'] .= '#c' . $reference['tokenValue'];
+                $wasPage = false;
                 continue;
+            } else {
+                $currentR = $reference;
             }
 
+            if (empty($currentR) || !is_array($currentR)) {
+                continue;
+            }
+            $foundLinks[$key] = [
+                'substr' => $currentR,
+                'pageAndAnchor' => $referencedRecordType,
+            ];
+        }
+
+        foreach ($foundLinks as $foundLink) {
+            $currentR = $foundLink['substr'];
             /** @var AbstractLinktype $linktypeObject */
             foreach ($this->configuration->getLinktypeObjects() as $key => $linktypeObject) {
-                $type = $linktypeObject->fetchType($reference, $type, $key);
+                $type = $linktypeObject->fetchType($currentR, $type, $key);
                 // Store the type that was found
                 // This prevents overriding by internal validator
                 if (!empty($type)) {
-                    $reference['type'] = $type;
+                    $currentR['type'] = $type;
                 }
             }
-            $key = $table . ':' . $field . ':' . $flexformField . ':' . $idRecord . ':' . $reference['tokenID'];
-            $results[$type][$key]['substr'] = $reference;
+            $key = $table . ':' . $field . ':' . $flexformField . ':' . $idRecord . ':' . $currentR['tokenID'];
+            $results[$type][$key]['substr'] = $currentR;
             $results[$type][$key]['row'] = $record;
             $results[$type][$key]['table'] = $table;
             $results[$type][$key]['field'] = $field;
             $results[$type][$key]['flexformField'] = $flexformField;
             $results[$type][$key]['flexformFieldLabel'] = $flexformFieldLabel;
             $results[$type][$key]['uid'] = $idRecord;
+            $results[$type][$key]['pageAndAnchor'] = $foundLink['pageAndAnchor'] ?? '';
         }
     }
 
