@@ -319,6 +319,7 @@ class LinkParser
 
             // Type of referenced record
 
+            $referencedRecordType = '';
             if (isset($reference['recordRef']) && strpos($reference['recordRef'], 'pages') !== false) {
                 $currentR = $reference;
                 // Contains number of the page
@@ -328,7 +329,6 @@ class LinkParser
             } elseif (isset($reference['recordRef']) && strpos($reference['recordRef'], 'tt_content') !== false
                 && (isset($wasPage) && $wasPage === true)) {
                 // if type is ce and previous was page, we extend the page link and disregard the content link
-                //$referencedRecordType = $referencedRecordType . '#c' . $reference['tokenValue'];
                 $foundLinks[$pageKey]['pageAndAnchor'] .= '#c' . $reference['tokenValue'];
                 $wasPage = false;
                 continue;
