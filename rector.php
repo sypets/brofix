@@ -1,4 +1,5 @@
 <?php
+
 /**
  * copied from cp .Build/vendor/ssch/typo3-rector/templates/rector.php.dist for v11
  * Documentation: https://github.com/sabbelasichon/typo3-rector/blob/main/docs/configuration_and_processing.md

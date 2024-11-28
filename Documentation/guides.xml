@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd" links-are-relative="true">
+  <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension" project-home="https://extensions.typo3.org/extension/brofix" project-contact="sypets@gmx.de" project-repository="https://github.com/sypets/brofix" project-issues="https://github.com/sypets/brofix/issues" edit-on-github-branch="main" edit-on-github="sypets/brofix" typo3-core-preferred="stable"/>
+  <project title="Broken Link Fixer" release="latest" version="latest" copyright="since 2000"/>
+  <inventory id="t3tca" url="https://docs.typo3.org/m/typo3/reference-tca/11.5/en-us/"/>
+  <inventory id="ext_scheduler" url="https://docs.typo3.org/c/typo3/cms-scheduler/main/en-us/"/>
+</guides>
