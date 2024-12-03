@@ -18,7 +18,7 @@ Usage quickstart
 
    You will now see the list of broken links.
 
-   Alternatively, select "Check Linnks" in the left column.
+   Alternatively, select "Check Links" in the left column.
 
 #. Start editing
 
