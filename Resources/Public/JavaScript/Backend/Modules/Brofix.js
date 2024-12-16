@@ -57,11 +57,7 @@ class Brofix {
 
     $('.t3js-update-button').on('click', function() {
       var $element = $(this);
-      var name = $element.attr('name');
-      var message = 'Event triggered';
-      if (name === 'refreshLinkList' || name === 'updateLinkList') {
-        message = $element.data('notification-message');
-      }
+      var message = $element.data('notification-message');
       top.TYPO3.Notification.success(message);
     });
 
