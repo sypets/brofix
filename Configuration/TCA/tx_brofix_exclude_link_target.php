@@ -126,6 +126,28 @@ return [
                 ],
             ]
         ],
+        'check_status' => [
+            'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.check_status',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'default' => 5,
+                'items' => [
+                    [
+                        'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.1',
+                        1
+                    ],
+                    [
+                        'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.2',
+                        2
+                    ],
+                    [
+                        'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.5',
+                        5
+                    ],
+                ]
+            ]
+        ],
         'notes' => [
             'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.notes',
             'config' => [
@@ -141,7 +163,7 @@ return [
     'types' => [
         // default
         '0' => [
-            'showitem' => 'link_type,linktarget,match,reason,notes,hidden,editlock'
+            'showitem' => 'link_type,linktarget,match,reason,check_status,notes,hidden,editlock'
         ],
     ],
     'palettes' => []

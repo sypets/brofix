@@ -55,5 +55,7 @@ CREATE TABLE tx_brofix_exclude_link_target (
     reason int(4) DEFAULT '0' NOT NULL,
     notes varchar(80) DEFAULT '' NOT NULL,
 
+		check_status int(11) unsigned DEFAULT '5' NOT NULL,
+
     PRIMARY KEY (uid)
 );
