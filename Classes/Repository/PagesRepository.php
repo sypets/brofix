@@ -29,7 +29,7 @@ class PagesRepository
      * This is a helper function for getPageList in this class.
      *
      * @param array <int,int> $pageList
-     * @param int $id Start page id
+     * @param array<int,int> $startPages Start page id
      * @param bool $useStartPage Check and add the page id itself
      * @param int $depth Depth to traverse down the page tree.
      * @param string $permsClause Perms clause
@@ -44,7 +44,7 @@ class PagesRepository
      */
     protected function getAllSubpagesForPage(
         array &$pageList,
-        int $id,
+        array $startPages,
         bool $useStartPage,
         int $depth,
         string $permsClause,
@@ -83,35 +83,45 @@ class PagesRepository
             );
         if ($useStartPage) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->eq(
+                $queryBuilder->expr()->in(
                     'uid',
-                    $queryBuilder->createNamedParameter($id, Connection::PARAM_INT)
+                    $queryBuilder->createNamedParameter($startPages, Connection::PARAM_INT_ARRAY)
                 )
             );
         } else {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->eq(
+                $queryBuilder->expr()->in(
                     'pid',
-                    $queryBuilder->createNamedParameter($id, Connection::PARAM_INT)
+                    $queryBuilder->createNamedParameter($startPages, Connection::PARAM_INT_ARRAY)
                 )
             );
         }
         $result = $queryBuilder->executeQuery();
+        $subpages = [];
         while ($row = $result->fetchAssociative()) {
             $id = (int)$row['uid'];
             $isHidden = (bool)$row['hidden'];
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
             $doktype = (int)($row['doktype'] ?? 1);
 
-            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages) && !in_array($doktype, $doNotCheckPageTypes)) {
+            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages) && !in_array($doktype,
+                    $doNotCheckPageTypes)) {
                 $pageList[$id] = $id;
             }
             if ($depth > 0 && (!($isHidden && $extendToSubpages) || $considerHidden) && !in_array($id, $excludedPages)
                 && !in_array($doktype, $doNotTraversePageTypes)
             ) {
-                $this->getAllSubpagesForPage(
+                $subpages[] = $id;
+            }
+            // we abort when limit + 1 is reached so we can determine that limit was reached and surpassed
+            if ($traverseMaxNumberOfPages && count($pageList) > $traverseMaxNumberOfPages) {
+                return $pageList;
+            }
+        }
+
+        $this->getAllSubpagesForPage(
                     $pageList,
-                    $id,
+                    $subpages,
                     false,
                     $depth,
                     $permsClause,
@@ -121,12 +131,7 @@ class PagesRepository
                     $doNotTraversePageTypes,
                     $traverseMaxNumberOfPages
                 );
-            }
-            // we abort when limit + 1 is reached so we can determine that limit was reached and surpassed
-            if ($traverseMaxNumberOfPages && count($pageList) > $traverseMaxNumberOfPages) {
-                return $pageList;
-            }
-        }
+
         return $pageList;
     }
 
@@ -170,7 +175,7 @@ class PagesRepository
         }
         $pageList = $this->getAllSubpagesForPage(
             $pageList,
-            $id,
+            [$id],
             true,
             $depth,
             $permsClause,
