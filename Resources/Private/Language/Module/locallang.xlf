@@ -447,6 +447,10 @@
 					</trans-unit>
 			 <!-- End Modification -->
 
+			<trans-unit id="list.filter.useCache.label" resname="list.filter.useCache.label">
+				<source>Use pagetree cache</source>
+			</trans-unit>
+
 		</body>
 	</file>
 </xliff>

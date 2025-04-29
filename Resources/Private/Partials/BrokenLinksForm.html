@@ -113,14 +113,13 @@
 				<label for="brofix-list-useCache">
 					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.useCache.label" extensionName="Brofix">Use pagetree cache</f:translate>:
 				</label>
-				<f:comment>checkboxes only pass with the form if they are checked.</f:comment>
-				<f:comment><input type="checkbox" id="brofix-list-useCache" name="useCache" checked="{filter.useCache}" value="{filter.useCache}" /></f:comment>
+				<f:comment>checkboxes only pass with the form if they are checked, so we use select here.</f:comment>
 				<select id="brofix-list-useCache" name="useCache" class="form-control tceforms-select">
 					<option value="0" {f:if(condition:'{filter.useCache} == 0', then: 'selected')}>
-						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.useCache.off">off</f:translate>
+						<f:translate extensionName="Core" key="LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:disable">off</f:translate>
 					</option>
 					<option value="1" {f:if(condition:'{filter.useCache} == 1', then: 'selected')}>
-						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.useCache.on">on</f:translate>
+						<f:translate extensionName="Core" key="LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:enable">on</f:translate>
 					</option>
 				</select>
 			</div>
