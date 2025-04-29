@@ -138,6 +138,7 @@ class BrokenLinkListController extends AbstractBrofixController
 
     protected string $viewMode = self::DEFAULT_VIEW_MODE_VALUE;
 
+
     /**
      * @var array<string,mixed>
      */
@@ -493,7 +494,8 @@ class BrokenLinkListController extends AbstractBrofixController
                 [],
                 $this->configuration->getDoNotCheckPagesDoktypes(),
                 $this->configuration->getDoNotTraversePagesDoktypes(),
-                $this->configuration->getTraverseMaxNumberOfPagesInBackend()
+                $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
+                $this->filter->isUseCache()
             );
             {}
         } else {

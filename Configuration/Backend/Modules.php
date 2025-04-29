@@ -65,6 +65,7 @@ return [
              'current_record_currentTime' => '',
              'current_record_url' => '',
              'current_record_linkType' => '',
+            'useCache' => '1',
          ],
 
     ],

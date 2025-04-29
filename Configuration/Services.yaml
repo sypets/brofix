@@ -47,3 +47,13 @@ services:
         description: 'Check for broken links'
         hidden: false
 
+  # Cache
+  # -----
+  cache.brofix:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory: [ '@TYPO3\CMS\Core\Cache\CacheManager', 'getCache' ]
+    arguments: [ 'brofix' ]
+
+  Sypets\Brofix\Cache\CacheManager:
+    arguments:
+      $cache: '@cache.brofix'

@@ -7,6 +7,8 @@ namespace Sypets\Brofix\Controller\Filter;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Util\Arrayable;
 use TYPO3\CMS\Backend\Module\ModuleData;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BrokenLinkListFilter implements Arrayable
 {
@@ -20,6 +22,8 @@ class BrokenLinkListFilter implements Arrayable
     protected const KEY_URL_MATCH = 'urlMatch';
 
     protected const KEY_CHECK_STATUS = 'checkStatus';
+
+    protected const KEY_USE_CACHE = 'useCache';
 
     /** @var string */
     protected const LINK_TYPE_FILTER_DEFAULT = 'all';
@@ -51,6 +55,10 @@ class BrokenLinkListFilter implements Arrayable
 
     protected int $checkStatusFilter = self::CHECK_STATUS_DEFAULT;
 
+    protected bool $useCache = true;
+
+    protected bool $showUseCache = true;
+
     /**
      * @var string
      * @deprecated
@@ -62,13 +70,21 @@ class BrokenLinkListFilter implements Arrayable
         string $linkType = self::LINK_TYPE_DEFAULT,
         string $url = '',
         string $urlMatch = self::URL_MATCH_DEFAULT,
-        int $checkStatus = self::CHECK_STATUS_DEFAULT
+        int $checkStatus = self::CHECK_STATUS_DEFAULT,
+        bool $useCache = true
     ) {
         $this->uid_filtre = $uid;
         $this->linktype_filter = $linkType;
         $this->url_filtre = $url;
         $this->urlFilterMatch = $urlMatch;
         $this->checkStatusFilter = $checkStatus;
+        $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        $this->showUseCache = (bool)($extensionConfiguration->get('brofix')['useCacheForPageList'] ?? true);
+        if ($this->showUseCache) {
+            $this->useCache = $useCache;
+        } else {
+            $this->useCache = false;
+        }
     }
 
     public static function getInstanceFromModuleData(ModuleData $moduleData): BrokenLinkListFilter
@@ -78,7 +94,8 @@ class BrokenLinkListFilter implements Arrayable
             $moduleData->get('linktype_searchFilter', 'all'),
             $moduleData->get('url_searchFilter', ''),
             $moduleData->get('url_match_searchFilter', 'partial'),
-            (int)$moduleData->get('check_status', (string)self::CHECK_STATUS_DEFAULT)
+            (int)$moduleData->get('check_status', (string)self::CHECK_STATUS_DEFAULT),
+            (bool)$moduleData->get('useCache', 1),
         );
     }
 
@@ -90,6 +107,7 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_URL] ?? '',
             $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
             $values[self::KEY_CHECK_STATUS] ?? self::CHECK_STATUS_DEFAULT,
+            $values[self::KEY_USE_CACHE] ?? 1,
         );
     }
 
@@ -101,6 +119,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
             self::KEY_CHECK_STATUS => $this->getCheckStatusFilter(),
+            self::KEY_USE_CACHE => $this->getUseCache(),
         ];
     }
 
@@ -201,4 +220,34 @@ class BrokenLinkListFilter implements Arrayable
     {
         $this->title_filter = $title_filter;
     }
+
+    public function isUseCache(): bool
+    {
+        if (!$this->showUseCache) {
+            $this->useCache = false;
+            return false;
+        }
+        return $this->useCache;
+    }
+
+    public function setUseCache(bool $useCache): void
+    {
+        if (!$this->showUseCache) {
+            $this->useCache = false;
+        } else {
+            $this->useCache = $useCache;
+        }
+    }
+
+    public function isShowUseCache(): bool
+    {
+        return $this->showUseCache;
+    }
+
+    public function setShowUseCache(bool $showUseCache): void
+    {
+        $this->showUseCache = $showUseCache;
+    }
+
+
 }

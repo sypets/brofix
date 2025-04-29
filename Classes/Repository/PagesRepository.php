@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Repository;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -12,6 +14,7 @@ use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Sypets\Brofix\Cache\CacheManager;
 
 /**
  * Handle database queries for table of broken links
@@ -21,6 +24,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class PagesRepository
 {
     protected const TABLE = 'pages';
+
+    public function __construct(
+        protected CacheManager $cacheManager
+    ) {
+
+    }
 
     /**
      * Generates a list of page uids. The start page is $id and this function
@@ -167,12 +176,36 @@ class PagesRepository
         array $excludedPages = [],
         array $doNotCheckPageTypes = [],
         array $doNotTraversePageTypes = [],
-        int $traverseMaxNumberOfPages = 0
+        int $traverseMaxNumberOfPages = 0,
+        bool $useCache = true
     ): array {
         if (in_array($id, $excludedPages)) {
             // do not add page, if in list of excluded pages
             return $pageList;
         }
+
+        $hash = null;
+        if ($useCache && $depth > 3) {
+            if ($this->getBackendUser()->isAdmin()) {
+                $username = 'admin';
+            } else {
+                $username = $this->backendUserService->getBackendUsername();
+            }
+            $hash = md5(sprintf(
+                '%d_%d_%s_%d_%s',
+                $id,
+                $depth,
+                $permsClause,
+                (int)$considerHidden,
+                $username
+            ));
+            $pids = $this->cacheManager->getObject($hash);
+            if ($pids !== null) {
+                $pageList = array_merge($pageList, $pids);
+                return $pageList;
+            }
+        }
+
         $pageList = $this->getAllSubpagesForPage(
             $pageList,
             [$id],
@@ -191,6 +224,11 @@ class PagesRepository
             $permsClause,
             $considerHidden
         );
+
+        if ($hash) {
+            $this->cacheManager->setObject($hash, $pageList, 7200);
+        }
+
         return $pageList;
     }
 
@@ -326,5 +364,18 @@ class PagesRepository
          */
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         return $connectionPool->getQueryBuilderForTable($table);
+    }
+
+    protected function isAdmin(): bool
+    {
+        return $this->getBackendUser()->isAdmin();
+    }
+
+    /**
+     * @return BackendUserAuthentication
+     */
+    protected function getBackendUser(): BackendUserAuthentication
+    {
+        return $GLOBALS['BE_USER'];
     }
 }

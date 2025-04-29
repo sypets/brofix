@@ -211,4 +211,10 @@ defined('TYPO3') or die();
             \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
             ['source' => 'EXT:brofix/Resources/Public/Icons/mimetypes-x-exclude-link-target.svg']
         );
+
+    // cache
+    // -----
+
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['brofix'] ??= [];
+
 })();
