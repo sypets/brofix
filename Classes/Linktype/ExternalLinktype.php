@@ -168,7 +168,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             if ($linkTargetResponse->isError()) {
                 // HEAD was not allowed or threw an error, now trying GET
                 $options['headers']['Range'] = 'bytes=0-4048';
-                $linkTargetRespone = $this->requestUrl($url, 'GET', $options);
+                $linkTargetResponse = $this->requestUrl($url, 'GET', $options);
             }
             $this->crawlDelay->setLastCheckedTime($this->domain);
         }
@@ -227,6 +227,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             } else {
                 $linkTargetResponse = LinkTargetResponse::createInstanceByError(self::ERROR_TYPE_UNKNOWN);
             }
+
             $linkTargetResponse->setExceptionMessage($e->getMessage());
         } catch (ConnectException | RequestException $e) {
             // RequestException - In the event of a networking error (connection timeout, DNS errors, etc.), a GuzzleHttp\Exception\RequestException is thrown.
