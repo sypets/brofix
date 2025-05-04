@@ -148,9 +148,16 @@
 
 	</div>
 	<div class="form-group">
+		<f:comment>
 		<input type="submit" class="btn btn-default t3js-update-button" name="refreshLinkList" id="refreshLinkList"
 			   value="{f:translate(key: 'label_refresh', extensionName: 'Brofix')}"
 			   data-notification-message="{f:translate(key: 'label_refresh-link-list', extensionName: 'Brofix')}"/>
+		</f:comment>
+		<button type="submit" class="btn btn-default t3js-update-button" name="action" id="refreshLinkList"
+			   value="report">
+			<f:translate key="label_refresh" extensionName="Brofix"></f:translate>
+		</button>
+
 		<button type="button" class="btn btn-default" id="brofix-reset-filter">
 			<f:translate extensionName="Brofix" key="button-remove-all-filter">Remove all filter</f:translate>
 		</button>

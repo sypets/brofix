@@ -310,7 +310,7 @@ class BrokenLinkListController extends AbstractBrofixController
                     ContextualFeedbackSeverity::OK
                 );
             }
-            $this->resetModuleData();
+            $this->resetModuleData(false);
             return $this->mainAction($this->moduleTemplate);
         }
         return $this->mainAction($this->moduleTemplate);
@@ -817,7 +817,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $variables['lastChecked'] = 0;
         // check if current record was recently checked
         if (isset($this->currentRecord['uid']) && isset($this->currentRecord['table']) && isset($this->currentRecord['field'])
-            && $this->action === 'editField'
+            //&& $this->action === 'editField'
             && $row['record_uid'] == $this->currentRecord['uid']
             && $row['table_name'] === $this->currentRecord['table']
             && $row['field'] === $this->currentRecord['field']
@@ -1032,7 +1032,7 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->paginationCurrentPage = $pageNr;
     }
 
-    protected function resetModuleData(): void
+    protected function resetModuleData(bool $resetCurrentRecord = true): void
     {
         $persist = false;
         if ($this->moduleData->get('current_record_uid')) {
@@ -1042,14 +1042,16 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->moduleData->set('current_record_currentTime', '');
             $this->moduleData->set('current_record_url', '');
             $this->moduleData->set('current_record_linkType', '');
-            $this->currentRecord = [
-                'uid' => 0,
-                'table' => '',
-                'field' => '',
-                'currentTime' => 0,
-                'url' => '',
-                'linkType' => ''
-            ];
+            if ($resetCurrentRecord) {
+                $this->currentRecord = [
+                    'uid' => 0,
+                    'table' => '',
+                    'field' => '',
+                    'currentTime' => 0,
+                    'url' => '',
+                    'linkType' => ''
+                ];
+            }
             $persist = true;
         }
         if ($this->moduleData->get('action', 'report') !== 'report') {
