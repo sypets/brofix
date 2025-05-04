@@ -183,7 +183,7 @@ class BrokenLinkListController extends AbstractBrofixController
     protected $iconFactory;
 
     /**
-     * @var array<string|int>
+     * @var array<string|int>|null
      */
     protected $pageList;
 
@@ -328,6 +328,7 @@ class BrokenLinkListController extends AbstractBrofixController
             'showRecheckButton',
             $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
         );
+        $this->moduleTemplate->assign('isAdmin', $this->getBackendUser()->isAdmin());
     }
 
     /**
@@ -480,26 +481,30 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function initializeLinkAnalyzer(): void
     {
-        $considerHidden = $this->configuration->isCheckHidden();
-        $depth = $this->depth;
-        $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
-        if ($this->id !== 0) {
-            $this->pageList = [];
-            $this->pagesRepository->getPageList(
-                $this->pageList,
-                $this->id,
-                $depth,
-                $permsClause,
-                $considerHidden,
-                [],
-                $this->configuration->getDoNotCheckPagesDoktypes(),
-                $this->configuration->getDoNotTraversePagesDoktypes(),
-                $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
-                $this->filter->isUseCache()
-            );
-            {}
+        if ($this->filter->getHowtotraverse() === 'pages' ) {
+            $considerHidden = $this->configuration->isCheckHidden();
+            $depth = $this->depth;
+            $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
+            if ($this->id !== 0) {
+                $this->pageList = [];
+                $this->pagesRepository->getPageList(
+                    $this->pageList,
+                    $this->id,
+                    $depth,
+                    $permsClause,
+                    $considerHidden,
+                    [],
+                    $this->configuration->getDoNotCheckPagesDoktypes(),
+                    $this->configuration->getDoNotTraversePagesDoktypes(),
+                    $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
+                    $this->filter->isUseCache()
+                );
+                {}
+            } else {
+                $this->pageList = [];
+            }
         } else {
-            $this->pageList = [];
+            $this->pageList = null;
         }
         $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
         $this->linkAnalyzer->init($this->pageList, $this->configuration);

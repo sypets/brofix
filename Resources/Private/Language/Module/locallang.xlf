@@ -450,6 +450,10 @@
 			<trans-unit id="list.filter.useCache.label" resname="list.filter.useCache.label">
 				<source>Use pagetree cache</source>
 			</trans-unit>
+			<trans-unit id="report.form.howtotraverse" resname="report.form.howtotraverse">
+				<source>Pages</source>
+			</trans-unit>
+
 
 		</body>
 	</file>

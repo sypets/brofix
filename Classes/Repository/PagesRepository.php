@@ -189,7 +189,7 @@ class PagesRepository
             if ($this->getBackendUser()->isAdmin()) {
                 $username = 'admin';
             } else {
-                $username = $this->backendUserService->getBackendUsername();
+                $username = $this->getBackendUsername();
             }
             $hash = md5(sprintf(
                 '%d_%d_%s_%d_%s',
@@ -377,5 +377,14 @@ class PagesRepository
     protected function getBackendUser(): BackendUserAuthentication
     {
         return $GLOBALS['BE_USER'];
+    }
+
+    public function getBackendUsername(): string
+    {
+        $beUser = $this->getBackendUser();
+        if ($beUser) {
+            return $beUser->user['username'] ?? '';
+        }
+        return '';
     }
 }

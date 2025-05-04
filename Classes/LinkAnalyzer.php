@@ -41,9 +41,9 @@ class LinkAnalyzer implements LoggerAwareInterface
     /**
      * List of page uids (rootline downwards)
      *
-     * @var array<string|int>
+     * @var array<string|int>|null
      */
-    protected array $pids = [];
+    protected ?array $pids = [];
 
     protected ?Configuration $configuration = null;
     protected BrokenLinkRepository $brokenLinkRepository;
@@ -72,7 +72,7 @@ class LinkAnalyzer implements LoggerAwareInterface
      * @param array<string|int> $pidList
      * @param Configuration $configuration
      */
-    public function init(array $pidList, Configuration $configuration): void
+    public function init(?array $pidList, Configuration $configuration): void
     {
         $this->configuration = $configuration;
 
@@ -384,13 +384,15 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     public function generateBrokenLinkRecords(ServerRequestInterface $request, array $linkTypes = [], bool $considerHidden = false): void
     {
-        if (empty($linkTypes) || empty($this->pids)) {
+        if (empty($linkTypes) || $this->pids === []) {
             return;
         }
 
         $checkStart = \time();
         $this->statistics->initialize();
-        $this->statistics->setCountPages((int)count($this->pids));
+        if ($this->pids ) {
+            $this->statistics->setCountPages((int)count($this->pids));
+        }
 
         // Traverse all configured tables
         foreach ($this->searchFields as $table => $fields) {
@@ -401,7 +403,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             }
 
             $max = (int)($this->brokenLinkRepository->getMaxBindParameters() /2 - 4);
-            foreach (array_chunk($this->pids, $max) as $pageIdsChunk) {
+            foreach (array_chunk($this->pids ?? [], $max) as $pageIdsChunk) {
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                     ->getQueryBuilderForTable($table);
 
@@ -414,21 +416,25 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $selectFields = $this->getSelectFields($table, $fields);
 
                 if ($table === 'pages') {
-                    $constraints = [
-                        $queryBuilder->expr()->in(
-                            'uid',
-                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                        )
-                    ];
+                    if ($this->pids ) {
+                        $constraints = [
+                            $queryBuilder->expr()->in(
+                                'uid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            )
+                        ];
+                    }
                 } else {
-                    // if table is not 'pages', we join with 'pages' table to exclude content elements on pages with
-                    // some doktype (e.g. 3 or 4), see Configuration::getDoNotCheckContentOnPagesDoktypes
-                    $constraints = [
-                        $queryBuilder->expr()->in(
-                            $table . '.pid',
-                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                        )
-                    ];
+                    if ($this->pids ) {
+                        // if table is not 'pages', we join with 'pages' table to exclude content elements on pages with
+                        // some doktype (e.g. 3 or 4), see Configuration::getDoNotCheckContentOnPagesDoktypes
+                        $constraints = [
+                            $queryBuilder->expr()->in(
+                                $table . '.pid',
+                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                            )
+                        ];
+                    }
                     $queryBuilder->join(
                         $table,
                         'pages',
@@ -479,15 +485,16 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $request,
                         LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
                     );
-                    //$this->statistics->addCountLinks($this->countLinks($results));
+
                     $this->checkLinks($results, $linkTypes);
                 }
             }
         }
 
         // remove all broken links for pages / linktypes before this check
-        $this->brokenLinkRepository->removeAllBrokenLinksForPagesBeforeTime($this->pids, $linkTypes, $checkStart);
-
+        if ($this->pids ) {
+            $this->brokenLinkRepository->removeAllBrokenLinksForPagesBeforeTime($this->pids, $linkTypes, $checkStart);
+        }
         $this->statistics->calculateStats();
     }
 

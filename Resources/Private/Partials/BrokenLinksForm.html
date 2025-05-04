@@ -8,31 +8,50 @@
 		<input type="hidden" name="id" value="{currentPage}"/>
 		<input type="hidden" name="orderBy" value="{orderBy}"/>
 		<input type="hidden" name="paginationPage" value="{paginationPage}"/>
-		<div class="col">
-			<label for="brofix-list-select-pagedepth">
-				<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.func.title" extensionName="Brofix"/>:
-			</label>
-			<select id="brofix-list-select-pagedepth" name="depth" class="form-control tceforms-select">
-				<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0"/>
-				</option>
-				<option value="1" {f:if(condition:'{depth} == 1', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_1"/>
-				</option>
-				<option value="2" {f:if(condition:'{depth} == 2', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_2"/>
-				</option>
-				<option value="3" {f:if(condition:'{depth} == 3', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_3"/>
-				</option>
-				<option value="4" {f:if(condition:'{depth} == 4', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4"/>
-				</option>
-				<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
-				</option>
-			</select>
-		</div>
+
+		<f:if condition="{isAdmin}">
+			<div class="col">
+				<label for="brofix-list-select-howtotraverse">
+					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.form.howtotraverse" extensionName="Brofix">Pages</f:translate>:
+				</label>
+				<select id="brofix-list-select-howtotraverse" name="howtotraverse" class="form-control tceforms-select">
+					<option value="all" {f:if(condition:'{filter.howtotraverse} == all', then: 'selected')}>
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.all">All</f:translate>
+					</option>
+					<option value="pages" {f:if(condition:'{filter.howtotraverse} == pages', then: 'selected')}>
+						<f:translate key="LLL:EXT:backend/Resources/Private/Language/locallang_db_new_content_el.xlf:menu_subpages.title">Subpages</f:translate>
+					</option>
+				</select>
+			</div>
+		</f:if>
+
+		<f:if condition="{filter.howtotraverse} == 'pages'">
+			<div class="col">
+				<label for="brofix-list-select-pagedepth">
+					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.func.title" extensionName="Brofix"/>:
+				</label>
+				<select id="brofix-list-select-pagedepth" name="depth" class="form-control tceforms-select">
+					<option value="0" {f:if(condition:'{depth} == 0', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_0"/>
+					</option>
+					<option value="1" {f:if(condition:'{depth} == 1', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_1"/>
+					</option>
+					<option value="2" {f:if(condition:'{depth} == 2', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_2"/>
+					</option>
+					<option value="3" {f:if(condition:'{depth} == 3', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_3"/>
+					</option>
+					<option value="4" {f:if(condition:'{depth} == 4', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_4"/>
+					</option>
+					<option value="999" {f:if(condition:'{depth} == 999', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.depth_infi"/>
+					</option>
+				</select>
+			</div>
+		</f:if>
 		<div class="col">
 			<label for="viewMode"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.view"/>:</label>
 			<select id="viewMode" name="viewMode" class="form-control tceforms-select view_mode">

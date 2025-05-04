@@ -66,6 +66,7 @@ return [
              'current_record_url' => '',
              'current_record_linkType' => '',
             'useCache' => '1',
+            'howtotraverse' => 'pages'
          ],
 
     ],

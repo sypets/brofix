@@ -25,6 +25,8 @@ class BrokenLinkListFilter implements Arrayable
 
     protected const KEY_USE_CACHE = 'useCache';
 
+    protected const KEY_HOWTOTRAVERSE = 'howtotraverse';
+
     /** @var string */
     protected const LINK_TYPE_FILTER_DEFAULT = 'all';
 
@@ -59,6 +61,8 @@ class BrokenLinkListFilter implements Arrayable
 
     protected bool $showUseCache = true;
 
+    protected string $howtotraverse = 'pages';
+
     /**
      * @var string
      * @deprecated
@@ -71,7 +75,8 @@ class BrokenLinkListFilter implements Arrayable
         string $url = '',
         string $urlMatch = self::URL_MATCH_DEFAULT,
         int $checkStatus = self::CHECK_STATUS_DEFAULT,
-        bool $useCache = true
+        bool $useCache = true,
+        string $howtotraverse = 'pages'
     ) {
         $this->uid_filtre = $uid;
         $this->linktype_filter = $linkType;
@@ -85,6 +90,7 @@ class BrokenLinkListFilter implements Arrayable
         } else {
             $this->useCache = false;
         }
+        $this->howtotraverse = $howtotraverse;
     }
 
     public static function getInstanceFromModuleData(ModuleData $moduleData): BrokenLinkListFilter
@@ -96,6 +102,7 @@ class BrokenLinkListFilter implements Arrayable
             $moduleData->get('url_match_searchFilter', 'partial'),
             (int)$moduleData->get('check_status', (string)self::CHECK_STATUS_DEFAULT),
             (bool)$moduleData->get('useCache', 1),
+            $moduleData->get('howtotraverse', 'pages'),
         );
     }
 
@@ -108,6 +115,7 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
             $values[self::KEY_CHECK_STATUS] ?? self::CHECK_STATUS_DEFAULT,
             $values[self::KEY_USE_CACHE] ?? 1,
+                $values[self::KEY_HOWTOTRAVERSE] ?? 'pages',
         );
     }
 
@@ -120,6 +128,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
             self::KEY_CHECK_STATUS => $this->getCheckStatusFilter(),
             self::KEY_USE_CACHE => $this->getUseCache(),
+            self::KEY_HOWTOTRAVERSE => $this->getHowtotraverse(),
         ];
     }
 
@@ -247,6 +256,16 @@ class BrokenLinkListFilter implements Arrayable
     public function setShowUseCache(bool $showUseCache): void
     {
         $this->showUseCache = $showUseCache;
+    }
+
+    public function getHowtotraverse(): string
+    {
+        return $this->howtotraverse;
+    }
+
+    public function setHowtotraverse(string $howtotraverse): void
+    {
+        $this->howtotraverse = $howtotraverse;
     }
 
 

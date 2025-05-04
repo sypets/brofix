@@ -52,7 +52,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      *
      * Will only return broken links which the current user has edit access to.
      *
-     * @param int[] $pageList Pages to check for broken links
+     * @param int[] $pageList Pages to check for broken links. If null, do not constrain
      * @param string[] $linkTypes Link types to validate
      * @param array<string,array<string>> $searchFields
      * @param array<array<string>> $orderBy
@@ -63,15 +63,20 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @see LinkTargetResponse
      */
     public function getBrokenLinks(
-        array $pageList,
+        ?array $pageList,
         array $linkTypes,
         array $searchFields,
         BrokenLinkListFilter $filter,
         array $orderBy = []
     ): array {
         $results = [];
+
+        if ($pageList === []) {
+            return [];
+        }
+
         $max = (int)($this->getMaxBindParameters() /2 - 4);
-        foreach (array_chunk($pageList, $max) as $pageIdsChunk) {
+        foreach (array_chunk($pageList ?? [1], $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
             if (!$GLOBALS['BE_USER']->isAdmin()) {
@@ -92,25 +97,28 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     'pages',
                     // @todo record_pid is not always page id
                     $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
-                )
-                ->where(
-                    $queryBuilder->expr()->or(
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                self::TABLE . '.record_uid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                        ),
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                self::TABLE . '.record_pid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
-                        )
-                    )
                 );
+            if ($pageList) {
+                $queryBuilder
+                    ->where(
+                        $queryBuilder->expr()->or(
+                            $queryBuilder->expr()->and(
+                                $queryBuilder->expr()->in(
+                                    self::TABLE . '.record_uid',
+                                    $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                                ),
+                                $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
+                            ),
+                            $queryBuilder->expr()->and(
+                                $queryBuilder->expr()->in(
+                                    self::TABLE . '.record_pid',
+                                    $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
+                                ),
+                                $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+                            )
+                        )
+                    );
+            }
 
             if ($filter->getUidFilter() != '') {
                 $queryBuilder->andWhere(
