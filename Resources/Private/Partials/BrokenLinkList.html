@@ -66,9 +66,6 @@
 					</f:else>
 				</f:if>
 				<td>
-					<f:if condition="{item.lastChecked}">
-						lastchecked
-					</f:if>
 					<span title="{item.path -> f:format.raw()}">{item.pagetitle -> f:format.raw()} [{item.pageId}]</span>
 				</td>
 				<td>
