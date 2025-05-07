@@ -7,6 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Linktype\AbstractLinktype;
+use Sypets\Brofix\Parser\SoftReference\TypolinkRecordTagSoftReferenceParser;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Util\TcaUtil;
 use TYPO3\CMS\Backend\Form\Exception\DatabaseDefaultLanguageException;
@@ -293,6 +294,11 @@ class LinkParser
         }
 
         $softRefParams = ['subst'];
+        if (in_array('typolink_tag', $softrefParserKeys)) {
+            $softrefParserKeys[] = 'typolink_tag_record';
+            $this->softReferenceParserFactory->addParser(GeneralUtility::makeInstance(TypolinkRecordTagSoftReferenceParser::class),
+                'typolink_tag_record');
+        }
         return $this->softReferenceParserFactory->getParsersBySoftRefParserList(implode(',', $softrefParserKeys), $softRefParams);
     }
 

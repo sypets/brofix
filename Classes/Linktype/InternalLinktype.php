@@ -21,6 +21,8 @@ class InternalLinktype extends AbstractLinktype
      */
     protected const ERROR_TYPE_PAGE = 'page';
 
+    protected const ERROR_TYPE_RECORD = 'record';
+
     /**
      * @var string
      */
@@ -66,9 +68,11 @@ class InternalLinktype extends AbstractLinktype
         } else {
             $table = 'pages';
         }
+        /*
         if (!in_array($table, ['pages', 'tt_content'], true)) {
             return LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
         }
+        */
         // Defines the linked page and contentUid (if any).
         if (strpos($url, '#c') !== false) {
             $parts = explode('#c', $url);
@@ -90,7 +94,7 @@ class InternalLinktype extends AbstractLinktype
             $pageUid = (int)($url);
         }
         // Check if the linked page is OK
-        $linkTargetResponse = $this->checkPage($pageUid);
+        $linkTargetResponse = $this->checkRecord($pageUid, $table);
         if ($linkTargetResponse && !$linkTargetResponse->isOk()) {
             return $linkTargetResponse;
         }
@@ -114,16 +118,42 @@ class InternalLinktype extends AbstractLinktype
      * @param int $pageUid Page uid to check
      * @return LinkTargetResponse return null if ok
      */
-    protected function checkPage(int $pageUid): ?LinkTargetResponse
+    protected function checkRecord(int $pageUid, string $table): ?LinkTargetResponse
     {
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
         // Get page ID on which the content element in fact is located
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+
+
+        $fields = [
+            'uid'
+        ];
+        $labelField = $GLOBALS['TCA'][$table]['ctrl']['label'] ?? '';
+        if ($labelField) {
+            $fields[] = $labelField;
+        }
+        $deletedField = $GLOBALS['TCA'][$table]['ctrl']['delete'] ?? '';
+        if ($deletedField) {
+            $fields[] = $deletedField;
+        }
+        $hiddenField = $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['disabled'] ?? '';
+        if ($hiddenField) {
+            $fields[] = $hiddenField;
+        }
+        $starttimeField = $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['starttime'] ?? '';
+        if ($starttimeField) {
+            $fields[] = $starttimeField;
+        }
+        $endtimeField = $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['endtime'] ?? '';
+        if ($endtimeField) {
+            $fields[] = $endtimeField;
+        }
+
         $queryBuilder->getRestrictions()->removeAll();
         $row = $queryBuilder
-            ->select('uid', 'title', 'deleted', 'hidden', 'starttime', 'endtime')
-            ->from('pages')
+            ->select(...$fields)
+            ->from($table)
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
@@ -146,15 +176,16 @@ class InternalLinktype extends AbstractLinktype
         $errno = 0;
 
         if ($row) {
-            if ($row['deleted'] == '1') {
+            if (($row[$deletedField] ?? 0) == '1') {
                 $customParams = [
+                    'table' => $table,
                     'page' => [
-                        'title' => $row['title'],
+                        'title' => $row[$labelField] ?? '',
                         'uid'   => $row['uid']
                     ]
                 ];
                 return LinkTargetResponse::createInstanceByError(
-                    self::ERROR_TYPE_PAGE,
+                    $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
                     self::ERROR_ERRNO_DELETED,
                     '',
                     '',
@@ -162,32 +193,36 @@ class InternalLinktype extends AbstractLinktype
                 );
             }
             if ($reportHiddenRecords
-                && ($row['hidden'] == '1'
-                || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
-                || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
+                && (($row[$hiddenField] ?? 0) == '1'
+                || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)($row[$starttimeField] ?? 0)
+                || (($row[$endtimeField] ?? false) && (int)$row[$endtimeField] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
+
                 $customParams = [
+                    'table' => $table,
                     'page' => [
-                        'title' => $row['title'],
+                        'title' => $row[$labelField] ?? '',
                         'uid'   => $row['uid']
                     ]
                 ];
                 return LinkTargetResponse::createInstanceByError(
-                    self::ERROR_TYPE_PAGE,
+                    $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
                     self::ERROR_ERRNO_HIDDEN,
                     '',
                     '',
                     $customParams
                 );
+
             }
         } else {
             $customParams = [
+                'table' => $table,
                 'page' => [
                     'uid' => $pageUid
                 ]
             ];
             return LinkTargetResponse::createInstanceByError(
-                self::ERROR_TYPE_PAGE,
+                $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
                 self::ERROR_ERRNO_NOTEXISTING,
                 '',
                 '',
@@ -314,7 +349,18 @@ class InternalLinktype extends AbstractLinktype
         $lang = $this->getLanguageService();
         $custom = $linkTargetResponse->getCustom();
 
-        if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_PAGE) {
+        if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_RECORD) {
+            switch ($linkTargetResponse->getErrno()) {
+                case self::ERROR_ERRNO_DELETED:
+                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.deleted');
+                    break;
+                case self::ERROR_ERRNO_HIDDEN:
+                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.notvisible');
+                    break;
+                default:
+                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.notexisting');
+            }
+        } else if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_PAGE) {
             switch ($linkTargetResponse->getErrno()) {
                 case self::ERROR_ERRNO_DELETED:
                     $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.deleted');
@@ -402,7 +448,12 @@ class InternalLinktype extends AbstractLinktype
         $pageuid = (int)($elements[0] ?? 0);
         $contentUid = (int)($elements[1] ?? 0);
 
-        $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.page') . ':';
+        if (($additionalConfig['table'] ?? 'pages') === 'pages') {
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.page') . ':';
+        } else {
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.record') . ':';
+        }
+
         if ($pageTitle) {
             $message .= (' "' . $pageTitle . '"');
         }

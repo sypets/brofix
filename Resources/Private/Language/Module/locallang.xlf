@@ -193,6 +193,17 @@
 			<trans-unit id="list.report.error.page.notvisible" resname="list.report.error.page.notvisible">
 				<source>Page is hidden.</source>
 			</trans-unit>
+
+			<trans-unit id="list.report.error.record.notexisting" resname="list.report.error.record.notexisting">
+				<source>Record does not exist.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.record.deleted" resname="list.report.error.record.deleted">
+				<source>Record is deleted.</source>
+			</trans-unit>
+			<trans-unit id="list.report.error.record.notvisible" resname="list.report.error.record.notvisible">
+				<source>Record is hidden.</source>
+			</trans-unit>
+
 			<trans-unit id="list.report.error.page.notexisting" resname="list.report.error.page.notexisting">
 				<source>Page does not exist.</source>
 			</trans-unit>
@@ -228,6 +239,9 @@
 			</trans-unit>
 			<trans-unit id="list.report.url.page" resname="list.report.url.page">
 				<source>Link to page</source>
+			</trans-unit>
+			<trans-unit id="list.report.url.record" resname="list.report.url.record">
+				<source>Link to record</source>
 			</trans-unit>
 			<trans-unit id="list.report.url.element" resname="list.report.url.element">
 				<source>Element</source>
