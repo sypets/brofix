@@ -23,6 +23,8 @@ class InternalLinktype extends AbstractLinktype
 
     protected const ERROR_TYPE_RECORD = 'record';
 
+    protected const ERROR_TYPE_PARSE = 'parse';
+
     /**
      * @var string
      */
@@ -48,53 +50,72 @@ class InternalLinktype extends AbstractLinktype
      */
     protected const ERROR_ERRNO_NOTEXISTING = 4;
 
+    protected const ERROR_ERRNO_CONFIGURATION = 5;
+
+    protected const ERROR_ERRNO_TABLE_MISSING = 6;
+
     /**
      * Checks a given URL + /path/filename.ext for validity
      *
-     * @param string $url Url to check as page-id or page-id#anchor (if anchor is present)
+     * @param string $url Url to check. Containers "<table>:<id>". If page id, can also contain anchor, e.g. "<table>:<id#c<anchor>>", legacy: only id means "pages:<id>"
      * @param mixed[] $softRefEntry: The soft reference entry which builds the context of that url
      * @param int $flags see LinktypeInterface::checkLink(), not used here
      * @return LinkTargetResponse
+     *
+     * @todo change method signature to also return null or make LinkTargetResponce status
      */
     public function checkLink(string $url, array $softRefEntry, int $flags = 0): LinkTargetResponse
     {
         $contentUid = 0;
-        $pageUid = 0;
+        $recordUid = 0;
 
-        // Only check pages records. Content elements will also be checked
-        // as we extract the contentUid in the next step.
-        if ($softRefEntry) {
-            [$table, $uid] = explode(':', $softRefEntry['substr']['recordRef']);
-        } else {
-            $table = 'pages';
+        if (strpos($url, ":") === false) {
+            $url = 'pages:' . $url;
         }
-        /*
-        if (!in_array($table, ['pages', 'tt_content'], true)) {
-            return LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
+        $matches = [];
+        $customParams = [];
+        if (preg_match('/([^:]*):([0-9]*)(?:#c([0-9]*))?/', $url, $matches) !== 1) {
+            return LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_PARSE,
+                self::ERROR_ERRNO_TABLE_MISSING,
+                '',
+                '',
+                []
+            );
         }
-        */
-        // Defines the linked page and contentUid (if any).
-        if (strpos($url, '#c') !== false) {
-            $parts = explode('#c', $url);
-            $pageUid = (int)($parts[0]);
-            $contentUid = (int)($parts[1]);
-        } elseif (
-            $table === 'tt_content'
-            && strpos($softRefEntry['row'][$softRefEntry['field']], 't3://') === 0
-        ) {
-            $parsedTypoLinkUrl = @parse_url($softRefEntry['row'][$softRefEntry['field']]);
-            if ($parsedTypoLinkUrl['host'] === 'page') {
-                parse_str($parsedTypoLinkUrl['query'], $query);
-                if (isset($query['uid'])) {
-                    $pageUid = (int)$query['uid'];
-                    $contentUid = (int)$url;
-                }
+        $table = $matches[1];
+        $recordUid = (int)($matches[2] ?? 0);
+        $contentUid = (int)($matches[3] ?? 0);
+        if ($table !== 'pages') {
+            $identifier = $table;
+            $table = $softRefEntry['substr']['table'] ?? '';
+            if (!$table) {
+                $customParams = [
+                    'table' => $table,
+                    'identifier' => $identifier,
+                    'page' => [
+                        'uid'   => $recordUid
+                    ]
+                ];
+                return LinkTargetResponse::createInstanceByError(
+                    self::ERROR_TYPE_RECORD,
+                    self::ERROR_ERRNO_CONFIGURATION,
+                    '',
+                    '',
+                    $customParams
+                );
             }
-        } else {
-            $pageUid = (int)($url);
         }
+        $customParams = [
+            'table' => $table,
+            'identifier' => $identifier,
+            'page' => [
+                'uid'   => $recordUid
+            ]
+        ];
+
         // Check if the linked page is OK
-        $linkTargetResponse = $this->checkRecord($pageUid, $table);
+        $linkTargetResponse = $this->checkRecord($recordUid, $table, $customParams);
         if ($linkTargetResponse && !$linkTargetResponse->isOk()) {
             return $linkTargetResponse;
         }
@@ -103,7 +124,7 @@ class InternalLinktype extends AbstractLinktype
         // Check if the linked content element is OK
         if ($contentUid) {
             // Check if the content element is OK
-            $linkTargetResponse = $this->checkContent($pageUid, $contentUid);
+            $linkTargetResponse = $this->checkContent($recordUid, $contentUid);
             if ($linkTargetResponse && !$linkTargetResponse->isOk()) {
                 return $linkTargetResponse;
             }
@@ -116,14 +137,28 @@ class InternalLinktype extends AbstractLinktype
      * Checks a given page uid for validity
      *
      * @param int $pageUid Page uid to check
+     * @param array $customParams
      * @return LinkTargetResponse return null if ok
      */
-    protected function checkRecord(int $pageUid, string $table): ?LinkTargetResponse
+    protected function checkRecord(int $pageUid, string $table, array &$customParams): ?LinkTargetResponse
     {
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
+        // check if table exists
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connection = $connectionPool->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME);
+        if (!in_array($table, $connection->createSchemaManager()->listTableNames())) {
+            return LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_RECORD,
+                self::ERROR_ERRNO_TABLE_MISSING,
+                '',
+                '',
+                $customParams
+            );
+        }
+
         // Get page ID on which the content element in fact is located
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $connectionPool->getQueryBuilderForTable($table);
 
 
         $fields = [
@@ -349,56 +384,71 @@ class InternalLinktype extends AbstractLinktype
         $lang = $this->getLanguageService();
         $custom = $linkTargetResponse->getCustom();
 
-        if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_RECORD) {
-            switch ($linkTargetResponse->getErrno()) {
-                case self::ERROR_ERRNO_DELETED:
-                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.deleted');
-                    break;
-                case self::ERROR_ERRNO_HIDDEN:
-                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.notvisible');
-                    break;
-                default:
-                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.notexisting');
-            }
-        } else if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_PAGE) {
-            switch ($linkTargetResponse->getErrno()) {
-                case self::ERROR_ERRNO_DELETED:
-                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.deleted');
-                    break;
-                case self::ERROR_ERRNO_HIDDEN:
-                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.notvisible');
-                    break;
-                default:
-                    $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.notexisting');
-            }
-        } elseif ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_CONTENT) {
-            switch ($linkTargetResponse->getErrno()) {
-                case self::ERROR_ERRNO_DELETED:
-                    $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.deleted');
-                    break;
-                case self::ERROR_ERRNO_HIDDEN:
-                    $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.notvisible');
-                    break;
-                case self::ERROR_ERRNO_MOVED:
-                    $errorContent = str_replace(
-                        [
-                            '###title###',
-                            '###uid###',
-                            '###wrongpage###',
-                            '###rightpage###'
-                        ],
-                        [
-                            $custom['content']['title'] ?? '',
-                            $custom['content']['uid'] ?? '',
-                            $custom['content']['wrongPage'] ?? '',
-                            $custom['content']['rightPage'] ?? ''
-                        ],
-                        $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.contentmoved')
-                    );
-                    break;
-                default:
-                    $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.notexisting');
-            }
+        switch ($linkTargetResponse->getErrorType()) {
+            case self::ERROR_TYPE_PARSE:
+                $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.other.parse');
+                break;
+            case self::ERROR_TYPE_RECORD:
+                switch ($linkTargetResponse->getErrno()) {
+                    case self::ERROR_ERRNO_DELETED:
+                        $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.deleted');
+                        break;
+                    case self::ERROR_ERRNO_HIDDEN:
+                        $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.notvisible');
+                        break;
+                    case self::ERROR_ERRNO_CONFIGURATION:
+                    case self::ERROR_ERRNO_TABLE_MISSING:
+                        $identifier = $custom['identifier'] ?? '';
+                        if ($identifier) {
+                            $identifier = $identifier . ' ';
+                        }
+                        $errorPage = $identifier . $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.notconfigured');
+                        break;
+                    default:
+                        $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.record.notexisting');
+                }
+                break;
+            case self::ERROR_TYPE_PAGE:
+                switch ($linkTargetResponse->getErrno()) {
+                    case self::ERROR_ERRNO_DELETED:
+                        $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.deleted');
+                        break;
+                    case self::ERROR_ERRNO_HIDDEN:
+                        $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.notvisible');
+                        break;
+                    default:
+                        $errorPage = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.page.notexisting');
+                }
+                break;
+            case self::ERROR_TYPE_CONTENT:
+                switch ($linkTargetResponse->getErrno()) {
+                    case self::ERROR_ERRNO_DELETED:
+                        $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.deleted');
+                        break;
+                    case self::ERROR_ERRNO_HIDDEN:
+                        $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.notvisible');
+                        break;
+                    case self::ERROR_ERRNO_MOVED:
+                        $errorContent = str_replace(
+                            [
+                                '###title###',
+                                '###uid###',
+                                '###wrongpage###',
+                                '###rightpage###'
+                            ],
+                            [
+                                $custom['content']['title'] ?? '',
+                                $custom['content']['uid'] ?? '',
+                                $custom['content']['wrongPage'] ?? '',
+                                $custom['content']['rightPage'] ?? ''
+                            ],
+                            $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.contentmoved')
+                        );
+                        break;
+                    default:
+                        $errorContent = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.content.notexisting');
+                }
+                break;
         }
         if (isset($errorPage) && isset($errorContent)) {
             $response = $errorPage . ',' . $errorContent;
@@ -421,6 +471,23 @@ class InternalLinktype extends AbstractLinktype
      */
     public function getBrokenUrl(array $row): string
     {
+        $url = $row['url'];
+        if (strpos($url, ":") === false) {
+            $url = 'pages:' . $url;
+        }
+
+        if (preg_match('/([^:]*):([0-9]*)(?:#c([0-9]*))?/', $url, $matches) !== 1) {
+            /** @todo  return null and change method signature if we cannot handle this URL */
+            return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+        }
+        $table = $matches[1];
+        $recordUid = (int)($matches[2] ?? 0);
+        $contentUid = (int)($matches[3] ?? 0);
+
+        if ($table !== 'pages' || $recordUid === 0) {
+            return '';
+        }
+
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $pageId = (int)($row['table_name'] === 'pages' ? $row['record_uid'] : $row['record_pid']);
 
@@ -429,7 +496,7 @@ class InternalLinktype extends AbstractLinktype
          */
         $site = $siteFinder->getSiteByPageId($pageId);
 
-        return (string)($site->getBase() . '/index.php?id=' . $row['url']);
+        return (string)($site->getBase() . '/index.php?id=' . $recordUid);
     }
 
     /**
@@ -443,12 +510,21 @@ class InternalLinktype extends AbstractLinktype
     {
         $pageTitle = $additionalConfig['page']['title'] ?? '';
         $contentTitle = $additionalConfig['content']['title'] ?? '';
-        // can be pageid and optionally "#..."
-        $elements = explode('#c', $row['url']);
-        $pageuid = (int)($elements[0] ?? 0);
-        $contentUid = (int)($elements[1] ?? 0);
 
-        if (($additionalConfig['table'] ?? 'pages') === 'pages') {
+        $url = $row['url'];
+        if (strpos($url, ":") === false) {
+            $url = 'pages:' . $url;
+        }
+
+        if (preg_match('/([^:]*):([0-9]*)(?:#c([0-9]*))?/', $url, $matches) !== 1) {
+            /** @todo  return null and change method signature if we cannot handle this URL */
+            return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+        }
+        $table = $matches[1];
+        $recordUid = (int)($matches[2] ?? 0);
+        $contentUid = (int)($matches[3] ?? 0);
+
+        if ($table === 'pages') {
             $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.page') . ':';
         } else {
             $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.record') . ':';
@@ -457,13 +533,13 @@ class InternalLinktype extends AbstractLinktype
         if ($pageTitle) {
             $message .= (' "' . $pageTitle . '"');
         }
-        $message .= (' [' . $pageuid . ']');
+        $message .= (' [' . $recordUid . ']');
         if ($contentUid != 0) {
             $message .=  ', ' . $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.element') . ':';
             if ($contentTitle) {
                 $message .= ' "' . $contentTitle . '"';
             }
-            $message .= (' [' . $elements[1] . ']');
+            $message .= (' [' . $contentUid . ']');
         }
         return $message;
     }

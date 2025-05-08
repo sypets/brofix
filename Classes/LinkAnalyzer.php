@@ -336,13 +336,15 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
                 $record['exclude_link_targets_pid'] = $this->configuration->getExcludeLinkTargetStoragePid();
                 $pageWithAnchor = $entryValue['pageAndAnchor'] ?? '';
+                // new: we now write the table to the url to also handle record links
                 if (!empty($pageWithAnchor)) {
                     // Page with anchor, e.g. 18#1580
-                    $url = $pageWithAnchor;
+                    $url = 'pages:' . $pageWithAnchor;
                 } else {
-                    $url = $entryValue['substr']['tokenValue'] ?? '';
+                    //$url = $entryValue['substr']['tokenValue'] ?? '';
+                    $url = (string)($entryValue['substr']['recordRef'] ?? ($entryValue['substr']['tokenValue'] ?? ''));
                 }
-                $record['url'] = (string)$url;
+                $record['url'] = $url;
 
                 $this->debug("checkLinks: before checking $url");
                 /** @var LinkTargetResponse $linkTargetResponse */

@@ -18,9 +18,11 @@ declare(strict_types=1);
 namespace Sypets\Brofix\EventListener;
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Event listeners to identify if a link is broken. For external URLs, the database is queried), for pages
@@ -63,6 +65,33 @@ final class CheckBrokenRteLinkEventListener
         $event->markAsCheckedLink();
     }
 
+    public function checkRecordLink(BrokenLinkAnalysisEvent $event): void
+    {
+        if ($event->getLinkType() !== LinkService::TYPE_RECORD) {
+            return;
+        }
+
+        $hrefInformation = $event->getLinkData();
+        $identifier = (string)($hrefInformation['identifier'] ?? '');
+        if ($identifier !== '') {
+            $uid = (int)($hrefInformation['uid'] ?? 0);
+            $url = $identifier . ':' . $uid;
+
+            if (isset($this->resultsCache['db'][$url])) {
+                $isBroken = $this->resultsCache['db'][$url];
+            } else {
+                $isBroken = $this->brokenLinkRepository->isLinkTargetBrokenLink($url, 'db');
+                $this->resultsCache['db'][$url] = $isBroken;
+            }
+
+            if ($isBroken) {
+                $event->markAsBrokenLink('Broken link');
+            }
+        }
+
+        $event->markAsCheckedLink();
+    }
+
     public function checkPageLink(BrokenLinkAnalysisEvent $event): void
     {
         if ($event->getLinkType() !== LinkService::TYPE_PAGE) {
@@ -79,7 +108,7 @@ final class CheckBrokenRteLinkEventListener
             if (isset($this->resultsCache['db'][$url])) {
                 $isBroken = $this->resultsCache['db'][$url];
             } else {
-                $isBroken = $this->brokenLinkRepository->isLinkTargetBrokenLink((string)$url, 'db');
+                $isBroken = $this->brokenLinkRepository->isLinkTargetBrokenLink((string)('pages:' . $url), 'db');
                 $this->resultsCache['db'][$url] = $isBroken;
             }
 

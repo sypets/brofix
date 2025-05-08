@@ -59,7 +59,12 @@ class TypolinkRecordTagSoftReferenceParser extends AbstractSoftReferenceParser
                         $elements[$key]['subst'] = [
                             'type' => 'db',
                             'tokenID' => $token,
-                            'recordRef' => $targetTable . ':' . $linkDetails['uid'],
+                            'identifier' => $linkDetails['identifier'],
+                            'table' => $targetTable,
+                            /** !!! instead of adding the table, we use the identifier here, this way it is possible to query links in RTE without loading page TSconfig
+                              * this is different from core functionality and may need additional changes once this class is made obsolete
+                             */
+                            'recordRef' => $linkDetails['identifier'] . ':' . $linkDetails['uid'],
                             'tokenValue' => (string)($linkDetails['uid'] ?? ''),
                         ];
                     }
