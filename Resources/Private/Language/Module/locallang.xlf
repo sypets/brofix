@@ -379,6 +379,9 @@
 			<trans-unit id="list.report.error.libcurl.63" resname="list.report.error.libcurl.63">
 				<source>Maximum file size exceeded</source>
 			</trans-unit>
+			<trans-unit id="list.report.error.notconfigured" resname="list.report.error.notconfigured">
+				<source>not configured</source>
+			</trans-unit>
 
 			<trans-unit id="list.msg.ok" resname="list.msg.ok">
 				<source>Ok</source>

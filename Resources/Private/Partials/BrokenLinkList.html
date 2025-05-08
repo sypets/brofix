@@ -110,22 +110,26 @@
 					<f:if condition="{item.linktarget}">
 						<f:then>
 							<a href="{item.linktarget}" target="_blank" rel="noreferrer">{item.linktext}</a>
+							<div class="inline-action">
+								<f:if condition="{item.encoded_linktarget}">
+									<f:then>
+										<a href="{listUri}&url_searchFilter={item.encoded_linktarget}&url_match_searchFilter=exact" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
+											<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+										</a>
+									</f:then>
+									<f:else>
+										<a href="{listUri}&url_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+											<core:icon identifier="actions-close"/>
+										</a>
+									</f:else>
+								</f:if>
+							</div>
 						</f:then>
+						<f:else>
+							{item.linktext}
+						</f:else>
 					</f:if>
-					<div class="inline-action">
-						<f:if condition="{item.encoded_linktarget}">
-							<f:then>
-								<a href="{listUri}&url_searchFilter={item.encoded_linktarget}&url_match_searchFilter=exact" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktarget.tooltip', extensionName: 'Brofix')}">
-									<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
-								</a>
-							</f:then>
-							<f:else>
-								<a href="{listUri}&url_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
-									<core:icon identifier="actions-close"/>
-								</a>
-							</f:else>
-						</f:if>
-					</div>
+
 				</td>
 				<td><f:if condition="{item.status} === 1"><core:icon identifier="actions-exclamation-triangle"/></f:if>
 					<f:if condition="{item.status} === 2"><core:icon identifier="actions-check-circle"/></f:if>

@@ -38,6 +38,10 @@ services:
         identifier: 'rte-check-link-to-file'
         event: TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent
         method: 'checkFileLink'
+      - name: event.listener
+        identifier: 'rte-check-link-to-record'
+        event: TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent
+        method: 'checkRecordLink'
 
   # Commands
   Sypets\Brofix\Command\CheckLinksCommand:
