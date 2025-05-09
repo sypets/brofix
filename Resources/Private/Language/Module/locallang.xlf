@@ -142,6 +142,9 @@
 			<trans-unit id="list.filter.check_status.4" resname="list.filter.check_status.4">
 				<source>excluded</source>
 			</trans-unit>
+			<trans-unit id="list.filter.check_status.5" resname="list.filter.check_status.4">
+				<source>unknown</source>
+			</trans-unit>
 
 			<trans-unit id="list.recheck.links.title" resname="list.recheck.links.title">
 				<source>Recheck links</source>
