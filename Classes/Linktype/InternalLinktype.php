@@ -199,8 +199,6 @@ class InternalLinktype extends AbstractLinktype
             ->executeQuery()
             ->fetchAssociative();
 
-        $customParams = [];
-
         /**
          * @var string
          */
@@ -212,12 +210,9 @@ class InternalLinktype extends AbstractLinktype
         $errno = 0;
 
         if ($row) {
-            $customParams = [
-                'table' => $table,
-                'page' => [
-                    'title' => $row[$labelField] ?? '',
-                    'uid'   => $row['uid']
-                ]
+            $customParams['page'] = [
+                'title' => $row[$labelField] ?? '',
+                'uid'   => $row['uid']
             ];
             if (($row[$deletedField] ?? 0) == '1') {
                 return LinkTargetResponse::createInstanceByError(
@@ -243,11 +238,8 @@ class InternalLinktype extends AbstractLinktype
 
             }
         } else {
-            $customParams = [
-                'table' => $table,
-                'page' => [
-                    'uid' => $pageUid
-                ]
+            $customParams['page'] = [
+               'uid' => $pageUid
             ];
             return LinkTargetResponse::createInstanceByError(
                 $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
@@ -265,9 +257,10 @@ class InternalLinktype extends AbstractLinktype
      *
      * @param int $pageUid Uid of the page to which the link is pointing
      * @param int $contentUid Uid of the content element to check
+     * @param array<mixed> $customParams
      * @return LinkTargetResponse|null null on success
      */
-    protected function checkContent(int $pageUid, int $contentUid): ?LinkTargetResponse
+    protected function checkContent(int $pageUid, int $contentUid, array &$customParams): ?LinkTargetResponse
     {
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
@@ -293,12 +286,10 @@ class InternalLinktype extends AbstractLinktype
             // Check if the element is on the linked page
             // (The element might have been moved to another page)
             if ($correctPageID !== $pageUid) {
-                $customParams = [
-                    'content' => [
-                        'uid' => $contentUid,
-                        'wrongPage' => $pageUid,
-                        'rightPage' => $correctPageID
-                    ]
+                $customParams['content'] = [
+                    'uid' => $contentUid,
+                    'wrongPage' => $pageUid,
+                    'rightPage' => $correctPageID
                 ];
                 return LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_CONTENT,
@@ -310,11 +301,9 @@ class InternalLinktype extends AbstractLinktype
             }
             if ($row['deleted'] == '1') {
                 // The element is located on the page to which the link is pointing
-                $customParams = [
-                    'content' => [
-                        'title' => $row['header'],
-                        'uid'   => $row['uid']
-                    ]
+                $customParams['content'] = [
+                    'title' => $row['header'],
+                    'uid'   => $row['uid']
                 ];
                 return LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_CONTENT,
@@ -329,11 +318,9 @@ class InternalLinktype extends AbstractLinktype
                 || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
                 || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
-                $customParams = [
-                    'content' => [
-                        'title' => $row['header'],
-                        'uid'   => $row['uid']
-                    ]
+                $customParams['content'] = [
+                    'title' => $row['header'],
+                    'uid'   => $row['uid']
                 ];
                 return LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_CONTENT,
@@ -345,10 +332,8 @@ class InternalLinktype extends AbstractLinktype
             }
         } else {
             // The content element does not exist
-            $customParams = [
-                'content' => [
-                    'uid' => $contentUid
-                ]
+            $customParams['content'] = [
+                'uid' => $contentUid
             ];
             return LinkTargetResponse::createInstanceByError(
                 self::ERROR_TYPE_CONTENT,
@@ -520,7 +505,15 @@ class InternalLinktype extends AbstractLinktype
         if ($table === 'pages') {
             $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.page') . ':';
         } else {
-            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.record') . ':';
+            if (isset($additionalConfig['table'])) {
+                $table = $additionalConfig['table'];
+            }
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.record');
+            if ($table && ($GLOBALS['TCA'][$table]['ctrl']['title'] ?? false)) {
+                $message .= sprintf(' "%s"', $this->getLanguageService()->sL($GLOBALS['TCA'][$table]['ctrl']['title']));
+
+            }
+            $message .= ':';
         }
 
         if ($pageTitle) {
