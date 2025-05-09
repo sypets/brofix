@@ -29,10 +29,10 @@ parameters:
   level: 6
 
   paths:
-    - ../../Classes/Util
+    - ../../Classes
     #- ../../Tests
-  #scanDirectories:
-  #  - ../../.Build/vendor
+  scanDirectories:
+    - ../../.Build/vendor
 
   excludePaths:
     - ../../Classes/Hooks/DataHandlerHook.php

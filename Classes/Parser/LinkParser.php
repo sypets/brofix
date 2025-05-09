@@ -324,6 +324,9 @@ class LinkParser
     ): void {
         $foundLinks = [];
         $key = 0;
+        $pageKey = 0;
+        $type = '';
+        $idRecord = 0;
         foreach ($parserResult->getMatchedElements() as $element) {
             $reference = $element['subst'] ?? [];
             $type = '';

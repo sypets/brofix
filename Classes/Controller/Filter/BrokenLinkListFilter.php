@@ -127,7 +127,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
             self::KEY_CHECK_STATUS => $this->getCheckStatusFilter(),
-            self::KEY_USE_CACHE => $this->getUseCache(),
+            self::KEY_USE_CACHE => $this->isUseCache(),
             self::KEY_HOWTOTRAVERSE => $this->getHowtotraverse(),
         ];
     }
