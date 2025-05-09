@@ -142,7 +142,6 @@ class BrokenLinkListFilter implements Arrayable
         if ($this->getUidFilter()
             || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER_DEFAULT
             || $this->getUrlFilter()
-            || $this->getUrlFilterMatch() !== self::URL_MATCH_DEFAULT
         ) {
             return true;
         }
