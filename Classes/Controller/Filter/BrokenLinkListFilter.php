@@ -135,16 +135,14 @@ class BrokenLinkListFilter implements Arrayable
     /**
      * Check if any filter is active
      *
-     * - we do not include the View mode in this check since this will
-     *   no affect the number of results
-     *
      * @return bool
      */
-    public function hasConstraintsForNumberOfResults(): bool
+    public function isFilter(): bool
     {
         if ($this->getUidFilter()
             || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER_DEFAULT
             || $this->getUrlFilter()
+            || $this->getUrlFilterMatch() !== self::URL_MATCH_DEFAULT
         ) {
             return true;
         }
