@@ -86,6 +86,7 @@ class InternalLinktype extends AbstractLinktype
         $table = $matches[1];
         $recordUid = (int)($matches[2] ?? 0);
         $contentUid = (int)($matches[3] ?? 0);
+        $identifier = '';
         if ($table !== 'pages') {
             $identifier = $table;
             $table = $softRefEntry['substr']['table'] ?? '';
@@ -130,7 +131,7 @@ class InternalLinktype extends AbstractLinktype
             }
         }
 
-        return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
+        return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK, 0, $customParams);
     }
 
     /**
@@ -211,14 +212,14 @@ class InternalLinktype extends AbstractLinktype
         $errno = 0;
 
         if ($row) {
+            $customParams = [
+                'table' => $table,
+                'page' => [
+                    'title' => $row[$labelField] ?? '',
+                    'uid'   => $row['uid']
+                ]
+            ];
             if (($row[$deletedField] ?? 0) == '1') {
-                $customParams = [
-                    'table' => $table,
-                    'page' => [
-                        'title' => $row[$labelField] ?? '',
-                        'uid'   => $row['uid']
-                    ]
-                ];
                 return LinkTargetResponse::createInstanceByError(
                     $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
                     self::ERROR_ERRNO_DELETED,
@@ -232,14 +233,6 @@ class InternalLinktype extends AbstractLinktype
                 || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)($row[$starttimeField] ?? 0)
                 || (($row[$endtimeField] ?? false) && (int)$row[$endtimeField] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
             ) {
-
-                $customParams = [
-                    'table' => $table,
-                    'page' => [
-                        'title' => $row[$labelField] ?? '',
-                        'uid'   => $row['uid']
-                    ]
-                ];
                 return LinkTargetResponse::createInstanceByError(
                     $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
                     self::ERROR_ERRNO_HIDDEN,
