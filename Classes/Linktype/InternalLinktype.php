@@ -84,7 +84,7 @@ class InternalLinktype extends AbstractLinktype
             );
         }
         $table = $matches[1];
-        $recordUid = (int)($matches[2] ?? 0);
+        $recordUid = (int)($matches[2]);
         $contentUid = (int)($matches[3] ?? 0);
         $identifier = '';
         if ($table !== 'pages') {
@@ -125,7 +125,7 @@ class InternalLinktype extends AbstractLinktype
         // Check if the linked content element is OK
         if ($contentUid) {
             // Check if the content element is OK
-            $linkTargetResponse = $this->checkContent($recordUid, $contentUid);
+            $linkTargetResponse = $this->checkContent($recordUid, $contentUid, $customParams);
             if ($linkTargetResponse && !$linkTargetResponse->isOk()) {
                 return $linkTargetResponse;
             }
@@ -138,7 +138,7 @@ class InternalLinktype extends AbstractLinktype
      * Checks a given page uid for validity
      *
      * @param int $pageUid Page uid to check
-     * @param array $customParams
+     * @param array<mixed> $customParams
      * @return LinkTargetResponse return null if ok
      */
     protected function checkRecord(int $pageUid, string $table, array &$customParams): ?LinkTargetResponse
@@ -455,11 +455,10 @@ class InternalLinktype extends AbstractLinktype
         }
 
         if (preg_match('/([^:]*):([0-9]*)(?:#c([0-9]*))?/', $url, $matches) !== 1) {
-            /** @todo  return null and change method signature if we cannot handle this URL */
-            return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+            return  '';
         }
         $table = $matches[1];
-        $recordUid = (int)($matches[2] ?? 0);
+        $recordUid = (int)($matches[2]);
         $contentUid = (int)($matches[3] ?? 0);
 
         if ($table !== 'pages' || $recordUid === 0) {
@@ -495,11 +494,10 @@ class InternalLinktype extends AbstractLinktype
         }
 
         if (preg_match('/([^:]*):([0-9]*)(?:#c([0-9]*))?/', $url, $matches) !== 1) {
-            /** @todo  return null and change method signature if we cannot handle this URL */
-            return  LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+            return  '';
         }
         $table = $matches[1];
-        $recordUid = (int)($matches[2] ?? 0);
+        $recordUid = (int)($matches[2]);
         $contentUid = (int)($matches[3] ?? 0);
 
         if ($table === 'pages') {

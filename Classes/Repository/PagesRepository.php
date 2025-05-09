@@ -372,11 +372,11 @@ class PagesRepository
     }
 
     /**
-     * @return BackendUserAuthentication
+     * @return BackendUserAuthentication|null
      */
-    protected function getBackendUser(): BackendUserAuthentication
+    protected function getBackendUser(): ?BackendUserAuthentication
     {
-        return $GLOBALS['BE_USER'];
+        return $GLOBALS['BE_USER'] ?? null;
     }
 
     public function getBackendUsername(): string

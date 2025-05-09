@@ -53,7 +53,7 @@ class TypolinkRecordTagSoftReferenceParser extends AbstractSoftReferenceParser
                             $targetTable = $pageTsConfig['TCEMAIN.']['linkHandler.'][$linkDetails['identifier'] . '.']['configuration.']['table'] ?? $linkDetails['identifier'];
                         } else {
                             // Backwards compatibility for the old behaviour, where the identifier was saved as the table.
-                            $targetTable = $linkData['identifier'];
+                            $targetTable = $linkDetails['identifier'] ?? '';
                         }
 
                         $elements[$key]['subst'] = [
