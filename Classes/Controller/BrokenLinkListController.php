@@ -604,7 +604,7 @@ class BrokenLinkListController extends AbstractBrofixController
     protected function createFlashMessagesForNoBrokenLinks(): void
     {
         $status = ContextualFeedbackSeverity::OK;
-        if ($this->filter->hasConstraintsForNumberOfResults()) {
+        if ($this->filter->isFilter()) {
             $status = ContextualFeedbackSeverity::WARNING;
             $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.no.broken.links.filter')
                 ?: 'No broken links found if current filter is applied!';
