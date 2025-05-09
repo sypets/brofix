@@ -523,6 +523,15 @@ class BrokenLinkListController extends AbstractBrofixController
         // @extensionScannerIgnoreLine problem with getRootLineIsHidden
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
+
+            /**
+             * @todo Currently, we fetch all and then paginate. We would like to optimize this to fetch only the broken
+             *       links for one page. However, this would make it necessary to first fetch the total amount, which
+             *       is similarly complicated to getBrokenLinks because of the array_chunking the pids. Possibly, set
+             *       a hard limit to the number of pages and do away with array_chunking.
+             *       There is already traverseMaxNumberOfPagesInBackend extension configuration which would have to
+             *       effectively be set to a hard limit corresponding to (int)(BrokenLinkRepository::getMaxBindParameters() /2 - 4);
+            */
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
                 $this->pageList,
                 $this->linkTypes,

@@ -61,6 +61,8 @@ class BrokenLinkRepository implements LoggerAwareInterface
      * @return mixed[]
      *
      * @see LinkTargetResponse
+     * @todo Instead of array_chunking the pids, set a hard limit. $max is usually something around 30000. It does not make sense to use more for performance reasons. This
+     *       way, it is possible to simplify the function slightly and we do not need to iterate.
      */
     public function getBrokenLinks(
         ?array $pageList,
@@ -75,6 +77,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
             return [];
         }
 
+        /**
+         * array_chunk the pids here because otherwise we might get exceptions such as "Too many params in prepared statement". If not using prepared statements, we run
+         * into other limit.
+         */
         $max = (int)($this->getMaxBindParameters() /2 - 4);
         foreach (array_chunk($pageList ?? [1], $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
