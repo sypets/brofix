@@ -481,30 +481,52 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function initializeLinkAnalyzer(): void
     {
-        if ($this->filter->getHowtotraverse() === 'pages' ) {
-            $considerHidden = $this->configuration->isCheckHidden();
-            $depth = $this->depth;
-            $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
-            if ($this->id !== 0) {
-                $this->pageList = [];
-                $this->pagesRepository->getPageList(
-                    $this->pageList,
-                    $this->id,
-                    $depth,
-                    $permsClause,
-                    $considerHidden,
-                    [],
-                    $this->configuration->getDoNotCheckPagesDoktypes(),
-                    $this->configuration->getDoNotTraversePagesDoktypes(),
-                    $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
-                    $this->filter->isUseCache()
-                );
-                {}
-            } else {
-                $this->pageList = [];
-            }
-        } else {
-            $this->pageList = null;
+        switch ($this->filter->getHowtotraverse()) {
+            case BrokenLinkListFilter::HOW_TO_TRAVERSE_PAGES:
+                $considerHidden = $this->configuration->isCheckHidden();
+                $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
+                if ($this->id !== 0) {
+                    $this->pageList = [];
+                    $this->pagesRepository->getPageList(
+                        $this->pageList,
+                        [$this->id],
+                        $this->depth,
+                        $permsClause,
+                        $considerHidden,
+                        [],
+                        $this->configuration->getDoNotCheckPagesDoktypes(),
+                        $this->configuration->getDoNotTraversePagesDoktypes(),
+                        $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
+                        $this->filter->isUseCache()
+                    );
+                } else {
+                    $this->pageList = [];
+                }
+                break;
+            case BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL:
+                if ($this->isAdmin()) {
+                    $this->pageList = null;
+                }
+            case BrokenLinkListFilter::HOW_TO_TRAVERSE_ALLMOUNTPOINTS:
+                // get mountpoints
+                $startPids = $this->getAllowedDbMounts();
+                if ($startPids) {
+                    $considerHidden = $this->configuration->isCheckHidden();
+                    $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
+                    $this->pageList = [];
+                    $this->pagesRepository->getPageList(
+                        $this->pageList,
+                        $startPids,
+                        $this->depth,
+                        $permsClause,
+                        $considerHidden,
+                        [],
+                        $this->configuration->getDoNotCheckPagesDoktypes(),
+                        $this->configuration->getDoNotTraversePagesDoktypes(),
+                        $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
+                        $this->filter->isUseCache()
+                    );
+                }
         }
         $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
         $this->linkAnalyzer->init($this->pageList, $this->configuration);
@@ -1072,5 +1094,22 @@ class BrokenLinkListController extends AbstractBrofixController
         if ($persist) {
             $this->getBackendUser()->pushModuleData(self::MODULE_NAME, $this->moduleData->toArray());
         }
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getAllowedDbMounts(): array
+    {
+        $dbMounts = (int)($this->getBackendUser()->uc['pageTree_temporaryMountPoint'] ?? 0);
+        if (!$dbMounts) {
+            $dbMounts = array_map(intval(...), $this->getBackendUser()->returnWebmounts());
+
+            $dbMounts = array_unique($dbMounts);
+        } else {
+            $dbMounts = [$dbMounts];
+        }
+
+        return $dbMounts;
     }
 }

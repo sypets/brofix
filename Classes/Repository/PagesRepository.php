@@ -155,7 +155,7 @@ class PagesRepository
      * Important: Not all checks are performed on the start page.
      *
      * @param array <int,int> $pageList
-     * @param int $id
+     * @param array <int,int> $startPages
      * @param int $depth
      * @param string $permsClause
      * @param array<int,int> $excludedPages
@@ -169,7 +169,7 @@ class PagesRepository
      */
     public function getPageList(
         array &$pageList,
-        int $id,
+        array $startPages,
         int $depth,
         string $permsClause,
         bool $considerHidden = false,
@@ -179,8 +179,13 @@ class PagesRepository
         int $traverseMaxNumberOfPages = 0,
         bool $useCache = true
     ): array {
-        if (in_array($id, $excludedPages)) {
-            // do not add page, if in list of excluded pages
+        foreach ($startPages as $key => $startPage) {
+            if (in_array($startPage, $excludedPages)) {
+                // do not add page, if in list of excluded pages
+                uset($startPages[$key]);
+            }
+        }
+        if (!$startPages) {
             return $pageList;
         }
 
@@ -193,7 +198,7 @@ class PagesRepository
             }
             $hash = md5(sprintf(
                 '%d_%d_%s_%d_%s',
-                $id,
+                implode(',', $startPages),
                 $depth,
                 $permsClause,
                 (int)$considerHidden,
@@ -208,7 +213,7 @@ class PagesRepository
 
         $pageList = $this->getAllSubpagesForPage(
             $pageList,
-            [$id],
+            $startPages,
             true,
             $depth,
             $permsClause,
@@ -220,7 +225,7 @@ class PagesRepository
         );
         $this->getTranslationForPage(
             $pageList,
-            $id,
+            $startPages,
             $permsClause,
             $considerHidden
         );
@@ -273,7 +278,7 @@ class PagesRepository
      * Add page translations to list of pages
      *
      * @param array <int,int> $pageList
-     * @param int $currentPage
+     * @param array <int,int> $startPages
      * @param string $permsClause
      * @param bool $considerHiddenPages
      * @param int[] $limitToLanguageIds
@@ -281,7 +286,7 @@ class PagesRepository
      */
     public function getTranslationForPage(
         array $pageList,
-        int $currentPage,
+        array $startPages,
         string $permsClause,
         bool $considerHiddenPages,
         array $limitToLanguageIds = []
@@ -298,9 +303,9 @@ class PagesRepository
             $queryBuilder->getRestrictions()->add($hiddenRestriction);
         }
         $constraints = [
-            $queryBuilder->expr()->eq(
+            $queryBuilder->expr()->in(
                 'l10n_parent',
-                $queryBuilder->createNamedParameter($currentPage, Connection::PARAM_INT)
+                $queryBuilder->createNamedParameter($startPages, Connection::PARAM_INT_ARRAY)
             )
         ];
         if (!empty($limitToLanguageIds)) {
