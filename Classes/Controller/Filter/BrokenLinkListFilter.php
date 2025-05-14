@@ -7,6 +7,7 @@ namespace Sypets\Brofix\Controller\Filter;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Util\Arrayable;
 use TYPO3\CMS\Backend\Module\ModuleData;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -38,6 +39,12 @@ class BrokenLinkListFilter implements Arrayable
 
     /** @var int */
     public const PAGE_DEPTH_INFINITE = 999;
+
+    public const HOW_TO_TRAVERSE_PAGES = 'pages';
+    public const HOW_TO_TRAVERSE_ALL = 'all';
+    public const HOW_TO_TRAVERSE_ALLMOUNTPOINTS = 'allmountpoints';
+    public const HOW_TO_TRAVERSE_DEFAULT = self::HOW_TO_TRAVERSE_PAGES;
+
 
     /**
      * @var string
@@ -76,7 +83,7 @@ class BrokenLinkListFilter implements Arrayable
         string $urlMatch = self::URL_MATCH_DEFAULT,
         int $checkStatus = self::CHECK_STATUS_DEFAULT,
         bool $useCache = true,
-        string $howtotraverse = 'pages'
+        string $howtotraverse = self::HOW_TO_TRAVERSE_DEFAULT
     ) {
         $this->uid_filtre = $uid;
         $this->linktype_filter = $linkType;
@@ -102,7 +109,7 @@ class BrokenLinkListFilter implements Arrayable
             $moduleData->get('url_match_searchFilter', 'partial'),
             (int)$moduleData->get('check_status', (string)self::CHECK_STATUS_DEFAULT),
             (bool)$moduleData->get('useCache', 1),
-            $moduleData->get('howtotraverse', 'pages'),
+            $moduleData->get('howtotraverse', self::HOW_TO_TRAVERSE_DEFAULT),
         );
     }
 
@@ -115,7 +122,7 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
             $values[self::KEY_CHECK_STATUS] ?? self::CHECK_STATUS_DEFAULT,
             $values[self::KEY_USE_CACHE] ?? 1,
-                $values[self::KEY_HOWTOTRAVERSE] ?? 'pages',
+                $values[self::KEY_HOWTOTRAVERSE] ?? self::HOW_TO_TRAVERSE_DEFAULT,
         );
     }
 
@@ -257,13 +264,32 @@ class BrokenLinkListFilter implements Arrayable
 
     public function getHowtotraverse(): string
     {
+        if (!$this->isAdmin() && $this->howtotraverse === self::HOW_TO_TRAVERSE_ALL) {
+            return self::HOW_TO_TRAVERSE_ALLMOUNTPOINTS;
+        }
+        if ($this->isAdmin() && $this->howtotraverse === self::HOW_TO_TRAVERSE_ALLMOUNTPOINTS) {
+            return self::HOW_TO_TRAVERSE_ALL;
+        }
         return $this->howtotraverse;
     }
 
     public function setHowtotraverse(string $howtotraverse): void
     {
+
         $this->howtotraverse = $howtotraverse;
     }
 
+    protected function isAdmin(): bool
+    {
+        return $this->getBackendUser()->isAdmin();
+    }
+
+    /**
+     * @return BackendUserAuthentication
+     */
+    protected function getBackendUser(): BackendUserAuthentication
+    {
+        return $GLOBALS['BE_USER'];
+    }
 
 }

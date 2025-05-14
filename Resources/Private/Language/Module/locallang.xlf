@@ -103,6 +103,9 @@
 			<trans-unit id="list.filter.linktype.all" resname="list.filter.linktype.all">
 				<source>All</source>
 			</trans-unit>
+			<trans-unit id="list.filter.linktype.allmountpoints" resname="list.filter.linktype.allmountpoints">
+				<source>All mountpoints</source>
+			</trans-unit>
 			<trans-unit id="list.filter.linktype.external" resname="list.filter.linktype.external">
 				<source>External</source>
 			</trans-unit>
