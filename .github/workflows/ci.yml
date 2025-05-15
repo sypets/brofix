@@ -16,7 +16,7 @@ jobs:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
     name: "static"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
       # rest matrix jobs be be executed anyway.
@@ -55,7 +55,7 @@ jobs:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
     name: "all core-latest"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
       # rest matrix jobs be be executed anyway.
@@ -107,7 +107,7 @@ jobs:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
     name: "all core-v12"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
       # rest matrix jobs be be executed anyway.
