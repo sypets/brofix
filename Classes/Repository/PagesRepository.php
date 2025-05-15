@@ -196,14 +196,15 @@ class PagesRepository
             } else {
                 $username = $this->getBackendUsername();
             }
-            $hash = md5(sprintf(
-                '%d_%d_%s_%d_%s',
+            $code = sprintf(
+                'brofix_pages_%s_%d_%d_%s',
                 implode(',', $startPages),
                 $depth,
-                $permsClause,
+                //$permsClause,
                 (int)$considerHidden,
                 $username
-            ));
+            );
+            $hash = md5($code);
             $pids = $this->cacheManager->getObject($hash);
             if ($pids !== null) {
                 $pageList = array_merge($pageList, $pids);
