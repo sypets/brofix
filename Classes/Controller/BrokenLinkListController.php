@@ -506,6 +506,7 @@ class BrokenLinkListController extends AbstractBrofixController
             case BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL:
                 if ($this->isAdmin()) {
                     $this->pageList = null;
+                    break;
                 }
             case BrokenLinkListFilter::HOW_TO_TRAVERSE_ALLMOUNTPOINTS:
                 // get mountpoints
