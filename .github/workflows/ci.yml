@@ -90,17 +90,17 @@ jobs:
       #  if: always()
       #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
 
-      #- name: "Functional tests with mariadb"
-      #  if: always()
-      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
+      - name: "Functional tests with mariadb"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
 
-      #- name: "Functional tests with sqlite (nightly or pull_request)"
-      #  if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
-      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d sqlite -s functional
+      - name: "Functional tests with sqlite (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d sqlite -s functional
 
-      #- name: "Functional tests with postgres (nightly or pull_request)"
-      #  if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
-      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
+      - name: "Functional tests with postgres (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
 
   # v12
   all_core_v12:
