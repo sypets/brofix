@@ -69,7 +69,7 @@ class InternalLinktype extends AbstractLinktype
         $contentUid = 0;
         $recordUid = 0;
 
-        if (strpos($url, ":") === false) {
+        if (strpos($url, ':') === false) {
             $url = 'pages:' . $url;
         }
         $matches = [];
@@ -161,7 +161,6 @@ class InternalLinktype extends AbstractLinktype
         // Get page ID on which the content element in fact is located
         $queryBuilder = $connectionPool->getQueryBuilderForTable($table);
 
-
         $fields = [
             'uid'
         ];
@@ -235,7 +234,6 @@ class InternalLinktype extends AbstractLinktype
                     '',
                     $customParams
                 );
-
             }
         } else {
             $customParams['page'] = [
@@ -450,7 +448,7 @@ class InternalLinktype extends AbstractLinktype
     public function getBrokenUrl(array $row): string
     {
         $url = $row['url'];
-        if (strpos($url, ":") === false) {
+        if (strpos($url, ':') === false) {
             $url = 'pages:' . $url;
         }
 
@@ -489,7 +487,7 @@ class InternalLinktype extends AbstractLinktype
         $contentTitle = $additionalConfig['content']['title'] ?? '';
 
         $url = $row['url'];
-        if (strpos($url, ":") === false) {
+        if (strpos($url, ':') === false) {
             $url = 'pages:' . $url;
         }
 
@@ -509,7 +507,6 @@ class InternalLinktype extends AbstractLinktype
             $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.url.record');
             if ($table && ($GLOBALS['TCA'][$table]['ctrl']['title'] ?? false)) {
                 $message .= sprintf(' "%s"', $this->getLanguageService()->sL($GLOBALS['TCA'][$table]['ctrl']['title']));
-
             }
             $message .= ':';
         }

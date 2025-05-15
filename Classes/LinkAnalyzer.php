@@ -392,7 +392,7 @@ class LinkAnalyzer implements LoggerAwareInterface
 
         $checkStart = \time();
         $this->statistics->initialize();
-        if ($this->pids ) {
+        if ($this->pids) {
             $this->statistics->setCountPages((int)count($this->pids));
         }
 
@@ -419,7 +419,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $selectFields = $this->getSelectFields($table, $fields);
 
                 if ($table === 'pages') {
-                    if ($this->pids ) {
+                    if ($this->pids) {
                         $constraints = [
                             $queryBuilder->expr()->in(
                                 'uid',
@@ -428,7 +428,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                         ];
                     }
                 } else {
-                    if ($this->pids ) {
+                    if ($this->pids) {
                         // if table is not 'pages', we join with 'pages' table to exclude content elements on pages with
                         // some doktype (e.g. 3 or 4), see Configuration::getDoNotCheckContentOnPagesDoktypes
                         $constraints = [
@@ -495,7 +495,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
 
         // remove all broken links for pages / linktypes before this check
-        if ($this->pids ) {
+        if ($this->pids) {
             $this->brokenLinkRepository->removeAllBrokenLinksForPagesBeforeTime($this->pids, $linkTypes, $checkStart);
         }
         $this->statistics->calculateStats();

@@ -138,7 +138,6 @@ class BrokenLinkListController extends AbstractBrofixController
 
     protected string $viewMode = self::DEFAULT_VIEW_MODE_VALUE;
 
-
     /**
      * @var array<string,mixed>
      */
@@ -508,6 +507,7 @@ class BrokenLinkListController extends AbstractBrofixController
                     $this->pageList = null;
                     break;
                 }
+                // no break
             case BrokenLinkListFilter::HOW_TO_TRAVERSE_ALLMOUNTPOINTS:
                 // get mountpoints
                 $startPids = $this->getAllowedDbMounts();
@@ -546,7 +546,6 @@ class BrokenLinkListController extends AbstractBrofixController
         // @extensionScannerIgnoreLine problem with getRootLineIsHidden
         $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageinfo);
         if ($this->id > 0 && (!$rootLineHidden || $this->configuration->isCheckHidden())) {
-
             /**
              * @todo Currently, we fetch all and then paginate. We would like to optimize this to fetch only the broken
              *       links for one page. However, this would make it necessary to first fetch the total amount, which

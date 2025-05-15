@@ -9,9 +9,7 @@ use TYPO3\CMS\Core\DataHandling\SoftReference\AbstractSoftReferenceParser;
 use TYPO3\CMS\Core\DataHandling\SoftReference\SoftReferenceParserResult;
 use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
-use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
  * TypoLink tag processing for type LinkServer::TYPE_RECORD. Handles only links of this type!

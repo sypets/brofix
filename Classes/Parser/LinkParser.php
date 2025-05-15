@@ -296,8 +296,10 @@ class LinkParser
         $softRefParams = ['subst'];
         if (in_array('typolink_tag', $softrefParserKeys)) {
             $softrefParserKeys[] = 'typolink_tag_record';
-            $this->softReferenceParserFactory->addParser(GeneralUtility::makeInstance(TypolinkRecordTagSoftReferenceParser::class),
-                'typolink_tag_record');
+            $this->softReferenceParserFactory->addParser(
+                GeneralUtility::makeInstance(TypolinkRecordTagSoftReferenceParser::class),
+                'typolink_tag_record'
+            );
         }
         return $this->softReferenceParserFactory->getParsersBySoftRefParserList(implode(',', $softrefParserKeys), $softRefParams);
     }
