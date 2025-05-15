@@ -182,7 +182,7 @@ class PagesRepository
         foreach ($startPages as $key => $startPage) {
             if (in_array($startPage, $excludedPages)) {
                 // do not add page, if in list of excluded pages
-                uset($startPages[$key]);
+                unset($startPages[$key]);
             }
         }
         if (!$startPages) {

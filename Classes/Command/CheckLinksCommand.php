@@ -453,7 +453,7 @@ class CheckLinksCommand extends Command
         if (!$rootLineHidden || $checkHidden) {
             $this->pagesRepository->getPageList(
                 $pageIds,
-                $pageUid,
+                [$pageUid],
                 $depth,
                 '1=1',
                 $checkHidden,
