@@ -50,6 +50,11 @@ class FileLinktype extends AbstractLinktype
      */
     public function checkLink(string $url, array $softRefEntry, int $flags = 0): LinkTargetResponse
     {
+        if (strpos($url, 'sys_file:') === 0) {
+            $parts = explode(':', $url);
+            $url = (string)($parts[1] ?? 0);
+        }
+
         /**
          * @var ResourceFactory $resourceFactory
          */
@@ -84,6 +89,8 @@ class FileLinktype extends AbstractLinktype
      *
      * @param mixed[] $row Broken link record
      * @return string Parsed broken url
+     *
+     * @todo We also show links to non-broken files, here the link could be created
      */
     public function getBrokenUrl(array $row): string
     {
@@ -97,6 +104,8 @@ class FileLinktype extends AbstractLinktype
      * @param mixed[] $row
      * @param array<mixed>|null $additionalConfig
      * @return string
+     *
+     * @todo Show filename if possible
      */
     public function getBrokenLinkText(array $row, ?array $additionalConfig = null): string
     {
