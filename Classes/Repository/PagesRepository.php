@@ -24,9 +24,12 @@ class PagesRepository
 {
     protected const TABLE = 'pages';
 
+    protected ?CacheManager $cacheManager;
+
     public function __construct(
-        protected CacheManager $cacheManager
+        ?CacheManager $cacheManager=null
     ) {
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -128,18 +131,20 @@ class PagesRepository
             }
         }
 
-        $this->getAllSubpagesForPage(
-            $pageList,
-            $subpages,
-            false,
-            $depth,
-            $permsClause,
-            $considerHidden,
-            $excludedPages,
-            $doNotCheckPageTypes,
-            $doNotTraversePageTypes,
-            $traverseMaxNumberOfPages
-        );
+        if ($subpages) {
+            $this->getAllSubpagesForPage(
+                $pageList,
+                $subpages,
+                false,
+                $depth,
+                $permsClause,
+                $considerHidden,
+                $excludedPages,
+                $doNotCheckPageTypes,
+                $doNotTraversePageTypes,
+                $traverseMaxNumberOfPages
+            );
+        }
 
         return $pageList;
     }
@@ -190,7 +195,7 @@ class PagesRepository
         }
 
         $hash = null;
-        if ($useCache && $depth > 3) {
+        if ($this->cacheManager && $useCache && $depth > 3) {
             if ($this->getBackendUser()->isAdmin()) {
                 $username = 'admin';
             } else {
@@ -231,7 +236,7 @@ class PagesRepository
             $considerHidden
         );
 
-        if ($hash) {
+        if ($this->cacheManager && $hash) {
             $this->cacheManager->setObject($hash, $pageList, 7200);
         }
 

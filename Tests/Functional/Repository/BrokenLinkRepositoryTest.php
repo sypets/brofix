@@ -2,19 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
@@ -414,7 +401,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'field' => 'bodytext',
                     'table_name' => 'tt_content',
                     'link_title' => 'broken link',
-                    'url' => '85',
+                    'url' => 'pages:85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
@@ -429,7 +416,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'field' => 'bodytext',
                     'table_name' => 'tt_content',
                     'link_title' => 'broken link',
-                    'url' => 'file:88',
+                    'url' => 'sys_file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
@@ -494,7 +481,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'field' => 'bodytext',
                     'table_name' => 'tt_content',
                     'link_title' => 'broken link',
-                    'url' => '85',
+                    'url' => 'pages:85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
@@ -509,7 +496,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'field' => 'bodytext',
                     'table_name' => 'tt_content',
                     'link_title' => 'broken link',
-                    'url' => 'file:88',
+                    'url' => 'sys_file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
@@ -566,7 +553,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'field' => 'bodytext',
                     'table_name' => 'tt_content',
                     'link_title' => 'broken link',
-                    'url' => '85',
+                    'url' => 'pages:85',
                     'link_type' => 'db',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
@@ -581,7 +568,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'field' => 'bodytext',
                     'table_name' => 'tt_content',
                     'link_title' => 'broken link',
-                    'url' => 'file:88',
+                    'url' => 'sys_file:88',
                     'link_type' => 'file',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
