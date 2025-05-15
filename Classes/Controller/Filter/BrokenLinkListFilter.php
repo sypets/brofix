@@ -45,7 +45,6 @@ class BrokenLinkListFilter implements Arrayable
     public const HOW_TO_TRAVERSE_ALLMOUNTPOINTS = 'allmountpoints';
     public const HOW_TO_TRAVERSE_DEFAULT = self::HOW_TO_TRAVERSE_PAGES;
 
-
     /**
      * @var string
      */
@@ -122,7 +121,7 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
             $values[self::KEY_CHECK_STATUS] ?? self::CHECK_STATUS_DEFAULT,
             $values[self::KEY_USE_CACHE] ?? 1,
-                $values[self::KEY_HOWTOTRAVERSE] ?? self::HOW_TO_TRAVERSE_DEFAULT,
+            $values[self::KEY_HOWTOTRAVERSE] ?? self::HOW_TO_TRAVERSE_DEFAULT,
         );
     }
 
@@ -275,7 +274,6 @@ class BrokenLinkListFilter implements Arrayable
 
     public function setHowtotraverse(string $howtotraverse): void
     {
-
         $this->howtotraverse = $howtotraverse;
     }
 
@@ -291,5 +289,4 @@ class BrokenLinkListFilter implements Arrayable
     {
         return $GLOBALS['BE_USER'];
     }
-
 }

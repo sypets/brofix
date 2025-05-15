@@ -18,11 +18,9 @@ declare(strict_types=1);
 namespace Sypets\Brofix\EventListener;
 
 use Sypets\Brofix\Repository\BrokenLinkRepository;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Html\Event\BrokenLinkAnalysisEvent;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Event listeners to identify if a link is broken. For external URLs, the database is queried), for pages

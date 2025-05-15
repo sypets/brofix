@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Repository;
 
+use Sypets\Brofix\Cache\CacheManager;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -14,7 +14,6 @@ use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Sypets\Brofix\Cache\CacheManager;
 
 /**
  * Handle database queries for table of broken links
@@ -28,7 +27,6 @@ class PagesRepository
     public function __construct(
         protected CacheManager $cacheManager
     ) {
-
     }
 
     /**
@@ -113,8 +111,10 @@ class PagesRepository
             $extendToSubpages = (bool)($row['extendToSubpages'] ?? 0);
             $doktype = (int)($row['doktype'] ?? 1);
 
-            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages) && !in_array($doktype,
-                    $doNotCheckPageTypes)) {
+            if ((!$isHidden || $considerHidden) && !in_array($id, $excludedPages) && !in_array(
+                $doktype,
+                $doNotCheckPageTypes
+            )) {
                 $pageList[$id] = $id;
             }
             if ($depth > 0 && (!($isHidden && $extendToSubpages) || $considerHidden) && !in_array($id, $excludedPages)
@@ -129,17 +129,17 @@ class PagesRepository
         }
 
         $this->getAllSubpagesForPage(
-                    $pageList,
-                    $subpages,
-                    false,
-                    $depth,
-                    $permsClause,
-                    $considerHidden,
-                    $excludedPages,
-                    $doNotCheckPageTypes,
-                    $doNotTraversePageTypes,
-                    $traverseMaxNumberOfPages
-                );
+            $pageList,
+            $subpages,
+            false,
+            $depth,
+            $permsClause,
+            $considerHidden,
+            $excludedPages,
+            $doNotCheckPageTypes,
+            $doNotTraversePageTypes,
+            $traverseMaxNumberOfPages
+        );
 
         return $pageList;
     }
