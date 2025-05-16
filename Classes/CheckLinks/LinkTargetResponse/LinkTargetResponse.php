@@ -25,6 +25,9 @@ class LinkTargetResponse
 
     public const REASON_CANNOT_CHECK_CLOUDFLARE = 'cloudflare';
 
+    public const REASON_CANNOT_CHECK_429 = '429:too many requests';
+    public const REASON_CANNOT_CHECK_503 = '503:service unavailable';
+
     protected int $status;
     protected int $lastChecked = 0;
 

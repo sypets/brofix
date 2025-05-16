@@ -41,12 +41,21 @@ class CrawlDelayTest extends AbstractUnit
     /**
      * @test
      */
-    public function crawlDelayDoesNotDelayForNewDomain(): void
+    public function crawlDelayReturnsTrueForNewDomain(): void
     {
         $subject = $this->initializeCrawlDelay();
         $subject->setConfiguration($this->configuration);
         $result = $subject->crawlDelay('example.org');
-        self::assertEquals(0, $result, 'Result should be 0 (no crawl delay)');
+        self::assertTrue($result, 'Result should be true');
+    }
+
+    public function crawlDelayNoWaitTimeForNewDomain(): void
+    {
+        $subject = $this->initializeCrawlDelay();
+        $subject->setConfiguration($this->configuration);
+        $subject->crawlDelay('example.org');
+        $result = $subject->getLastWaitSeconds();
+        self::assertEquals(0, $result, 'Result should be 0');
     }
 
     /**
@@ -60,7 +69,8 @@ class CrawlDelayTest extends AbstractUnit
         $subject = $this->initializeCrawlDelay();
         $subject->setConfiguration($this->configuration);
         $subject->crawlDelay('example.org');
-        $result = $subject->crawlDelay('example.com');
+        $subject->crawlDelay('example.com');
+        $result = $subject->getLastWaitSeconds();
         self::assertEquals(0, $result, 'Result should be 0 (no crawl delay)');
     }
 
@@ -78,7 +88,8 @@ class CrawlDelayTest extends AbstractUnit
         $expected = $this->configuration->getCrawlDelaySeconds();
 
         $subject->crawlDelay($domain);
-        $result = $subject->crawlDelay($domain);
+        $subject->crawlDelay($domain);
+        $result = $subject->getLastWaitSeconds();
         self::assertEquals(
             $expected,
             $result,

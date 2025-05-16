@@ -32,11 +32,13 @@ class CrawlDelay
     /**
      * Timestamps when an URL from the domain was last accessed.
      *
-     * @var array<string,int>
+     * @var array<string,array{lastChecked: int, stopChecking: bool, retryAfter: int, reasonCannotCheck: string}>
      */
-    protected $lastCheckedDomainTimestamps = [];
+    protected $domainInfo = [];
 
     protected Configuration $configuration;
+
+    protected int $lastWaitSeconds = 0;
 
     public function setConfiguration(Configuration $config): void
     {
@@ -48,30 +50,51 @@ class CrawlDelay
      *
      * @param string $domain
      *
-     * @return int returns number of microseconds waited
+     * @return bool continue checking
      */
-    public function crawlDelay(string $domain): int
+    public function crawlDelay(string $domain): bool
     {
+        $this->lastWaitSeconds = 0;
+
+        $current = \time();
+
+        // stopChecking is set, check if current time is past retryAfter
+        if ($this->domainInfo[$domain]['stopChecking'] ?? false) {
+            if (($this->domainInfo[$domain]['retryAfter'] ?? false) && $current > $this->domainInfo[$domain]['retryAfter']) {
+                $this->domainInfo[$domain]['stopChecking'] = false;
+                $this->domainInfo[$domain]['retryAfter'] = 0;
+                // check again
+            } else {
+                // still stop checking
+                return false;
+            }
+        }
+
         $delaySeconds = $this->getCrawlDelayByDomain($domain);
         if ($delaySeconds === 0) {
-            return 0;
+            return true;
         }
         /**
          * @var int
          */
-        $lastTimestamp = $this->lastCheckedDomainTimestamps[$domain] ?? 0;
-        $current = \time();
+        $lastTimestamp = (int)($this->domainInfo[$domain]['lastChecked'] ?? 0);
 
         // check if delay necessary
-        $wait = $delaySeconds - ($current-$lastTimestamp);
-        if ($wait > 0) {
+        $this->lastWaitSeconds = $delaySeconds - ($current-$lastTimestamp);
+        if ($this->lastWaitSeconds > 0) {
             // wait now
-            sleep($wait);
-            return $wait;
+            sleep($this->lastWaitSeconds);
+        } else {
+            $this->lastWaitSeconds = 0;
         }
-        // no delay necessary
-        $this->lastCheckedDomainTimestamps[$domain] = $current;
-        return 0;
+        // set last checked
+        $this->domainInfo[$domain]['lastChecked'] = $current;
+        return true;
+    }
+
+    public function getLastWaitSeconds(): int
+    {
+        return $this->lastWaitSeconds;
     }
 
     /**
@@ -86,7 +109,7 @@ class CrawlDelay
             return false;
         }
         $current = \time();
-        $this->lastCheckedDomainTimestamps[$domain] = $current;
+        $this->domainInfo[$domain]['lastChecked'] = $current;
         return true;
     }
 
@@ -106,5 +129,16 @@ class CrawlDelay
             return 0;
         }
         return $this->configuration->getCrawlDelaySeconds();
+    }
+
+    public function stopChecking(string $domain, int $retryAfter = 0, string $reasonCannotCheck = ''): void
+    {
+        $this->domainInfo[$domain]['stopChecking'] = true;
+        if ($retryAfter) {
+            $this->domainInfo[$domain]['retryAfter'] = $retryAfter;
+        }
+        if ($reasonCannotCheck) {
+            $this->domainInfo[$domain]['reasonCannotCheck'] = $reasonCannotCheck;
+        }
     }
 }
