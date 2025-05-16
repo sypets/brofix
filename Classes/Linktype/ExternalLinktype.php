@@ -160,8 +160,13 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         $url = $this->preprocessUrl($origUrl);
         if (!empty($url)) {
             if (($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY) === 0) {
-                $delayed = $this->crawlDelay->crawlDelay($this->domain);
-                $this->logger->debug('crawl delay=' . $delayed . ' for URL=' . $url);
+                $continueChecking = $this->crawlDelay->crawlDelay($this->domain);
+                if (!$continueChecking) {
+                    $this->logger->debug('crawl delay: stop checking for URL=' . $url);
+                    $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+                    $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_429);
+                    return $linkTargetResponse;
+                }
             }
 
             $linkTargetResponse = $this->requestUrl($url, 'HEAD', $options);
@@ -287,6 +292,42 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                     $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_CLOUDFLARE);
                 }
             }
+        }
+
+        /**
+         * check for 429 - too many requests
+         * or 503 - Service unavailable
+         * A Retry-After header may be included to this response to indicate how long a client should wait before making the request again.
+         * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429
+         * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/503
+         * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After
+         *
+         * If we get a "too many requests" or Service unavailable, we stop checking for this domain
+         */
+        if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_HTTP_STATUS_CODE
+            && ($linkTargetResponse->getErrno() === 429 || $linkTargetResponse->getErrno() === 503)) {
+            $retryAfter = 0;
+            // array of values
+            foreach ($responseHeaders as $headerName => $headerValues) {
+                if (mb_strtolower($headerName) === 'retry-after') {
+                    foreach ($headerValues as $headerValue) {
+                        $retryAfter = $headerValue;
+                        if (is_numeric($retryAfter)) {
+                            $retryAfter = ((int)($retryAfter)) + \time();
+                            break 2;
+                        }
+                        try {
+                            $retryAfter = strtotime((string)$retryAfter);
+                            break 2;
+                        } catch (\Throwable $e) {
+                        }
+                    }
+                }
+            }
+            $this->crawlDelay->stopChecking($this->domain, $retryAfter, LinkTargetResponse::REASON_CANNOT_CHECK_429);
+            $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
+            $linkTargetResponse->setReasonCannotCheck($linkTargetResponse->getErrno() === 429 ? LinkTargetResponse::REASON_CANNOT_CHECK_429
+                : LinkTargetResponse::REASON_CANNOT_CHECK_503);
         }
 
         return $linkTargetResponse;
