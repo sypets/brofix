@@ -135,35 +135,63 @@ class BrokenLinkRepository implements LoggerAwareInterface
             if ($urlFilter != '') {
                 switch ($filter->getUrlFilterMatch()) {
                     case 'partial':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->like(
+                        $urlFilters = explode('|', $filter->getUrlFilter());
+                        $urlFilterConstraints =  [];
+                        foreach ($urlFilters as $urlFilter) {
+                            $urlFilterConstraints[] = $queryBuilder->expr()->like(
                                 self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
-                            )
+                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
+                            );
+                        }
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->or(...$urlFilterConstraints)
                         );
                         break;
                     case 'exact':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->eq(
+                        $urlFilters = explode('|', $filter->getUrlFilter());
+                        $urlFilterConstraints =  [];
+                        foreach ($urlFilters as $urlFilter) {
+                            $urlFilterConstraints[] = $queryBuilder->expr()->eq(
                                 self::TABLE . '.url',
                                 $queryBuilder->createNamedParameter($urlFilter)
-                            )
+                            );
+                        }
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->or(...$urlFilterConstraints)
                         );
                         break;
                     case 'partialnot':
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->notLike(
+                        $urlFilters = explode('|', $filter->getUrlFilter());
+                        $urlFilterConstraints =  [];
+                        foreach ($urlFilters as $urlFilter) {
+                            $urlFilterConstraints[] = $queryBuilder->expr()->notLike(
                                 self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($filter->getUrlFilter()) . '%')
-                            )
+                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
+                            );
+                        }
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->and(...$urlFilterConstraints)
                         );
                         break;
                     case 'exactnot':
+                        /*
                         $queryBuilder->andWhere(
                             $queryBuilder->expr()->neq(
                                 self::TABLE . '.url',
                                 $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
                             )
+                        );
+                        */
+                        $urlFilters = explode('|', $filter->getUrlFilter());
+                        $urlFilterConstraints =  [];
+                        foreach ($urlFilters as $urlFilter) {
+                            $urlFilterConstraints[] = $queryBuilder->expr()->neq(
+                                self::TABLE . '.url',
+                                $queryBuilder->createNamedParameter($urlFilter)
+                            );
+                        }
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->and(...$urlFilterConstraints)
                         );
                         break;
                 }
