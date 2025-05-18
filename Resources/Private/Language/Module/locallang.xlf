@@ -83,7 +83,7 @@
 				<source>URL</source>
 			</trans-unit>
 			<trans-unit id="list.filter.url.placeholder" resname="list.filter.url.placeholder">
-				<source>URL</source>
+				<source>URL|URL2</source>
 			</trans-unit>
 			<trans-unit id="list.filter.url.match.partial" resname="list.filter.url.match.partial">
 				<source>partial match</source>
