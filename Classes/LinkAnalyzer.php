@@ -132,14 +132,16 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $row = $this->contentRepository->getRowForUid($uid, $table, $selectFields);
                 }
 
-                $this->linkParser->findLinksForRecord(
-                    $results,
-                    $table,
-                    [$record['field']],
-                    $row,
-                    $request,
-                    LinkParser::MASK_CONTENT_CHECK_ALL
-                );
+                if ($row) {
+                    $this->linkParser->findLinksForRecord(
+                        $results,
+                        $table,
+                        [$record['field']],
+                        $row,
+                        $request,
+                        LinkParser::MASK_CONTENT_CHECK_ALL
+                    );
+                }
                 $urls = [];
                 foreach ($results[$linkType] ?? [] as $entryValue) {
                     $pageWithAnchor = $entryValue['pageAndAnchor'] ?? '';
