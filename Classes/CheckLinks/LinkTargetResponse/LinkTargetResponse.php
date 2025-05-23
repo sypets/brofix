@@ -40,6 +40,8 @@ class LinkTargetResponse
 
     protected string $reasonCannotCheck = '';
 
+    protected array $redirects = [];
+
     /**
      * @param int $status
      * @param int $lastChecked
@@ -108,7 +110,7 @@ class LinkTargetResponse
      */
     public static function createInstanceFromArray(array $values): LinkTargetResponse
     {
-        return new LinkTargetResponse(
+        $linkTargetResponse = new LinkTargetResponse(
             $values['status'],
             $values['lastChecked'] ?? \time(),
             $values['custom'] ?? [],
@@ -118,6 +120,10 @@ class LinkTargetResponse
             $values['message'] ?? '',
             $values['reasonCannotCheck'] ?? ''
         );
+        if ($values['redirects'] ?? false) {
+            $linkTargetResponse->setRedirects($values['redirects'] ?? []);
+        }
+        return $linkTargetResponse;
     }
 
     /**
@@ -273,4 +279,30 @@ class LinkTargetResponse
         }
         return $result;
     }
+
+    public function getEffectiveUrl(): string
+    {
+        if ($this->redirects) {
+            return(string)( end($this->redirects)['to'] ?? '');
+        }
+        return '';
+
+    }
+
+    public function setRedirects(array $redirects): void
+    {
+        $this->redirects = $redirects;
+
+    }
+
+    public function getRedirects(): array
+    {
+        return $this->redirects;
+    }
+
+    public function getRedirectCount(): int
+    {
+        return count($this->redirects);
+    }
+
 }

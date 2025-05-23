@@ -1014,6 +1014,8 @@ class BrokenLinkListController extends AbstractBrofixController
 
         // link / URL
         $variables['linktarget'] = $hookObj->getBrokenUrl($row);
+        $variables['effectiveUrl'] = $linkTargetResponse->getEffectiveUrl();
+        $variables['redirectCount'] = $linkTargetResponse->getRedirectCount();
         $variables['orig_linktarget'] = $row['url'];
         if ($this->filter->getUrlFilter() == $variables['orig_linktarget']
             && $this->filter->getUrlFilterMatch() === 'exact'
