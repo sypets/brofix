@@ -352,9 +352,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                 if (!$linkTargetResponse) {
                     $this->debug("checkLinks: after checking $url: returned null, no checking for this URL");
                     continue;
-                } else {
-                    $this->debug("checkLinks: after checking $url");
                 }
+                $this->debug("checkLinks: after checking $url");
 
                 $this->statistics->incrementCountLinksByStatus($linkTargetResponse->getStatus());
 
