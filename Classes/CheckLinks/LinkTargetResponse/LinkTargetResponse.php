@@ -40,6 +40,9 @@ class LinkTargetResponse
 
     protected string $reasonCannotCheck = '';
 
+    /**
+     * @var array<int,array{from:string, to:string}>
+     */
     protected array $redirects = [];
 
     /**
@@ -283,18 +286,22 @@ class LinkTargetResponse
     public function getEffectiveUrl(): string
     {
         if ($this->redirects) {
-            return(string)( end($this->redirects)['to'] ?? '');
+            return(string)(end($this->redirects)['to'] ?? '');
         }
         return '';
-
     }
 
+    /**
+     * @param array<int,array{from:string, to:string}> $redirects
+     */
     public function setRedirects(array $redirects): void
     {
         $this->redirects = $redirects;
-
     }
 
+    /**
+     * @return array<int,array{from:string, to:string}>
+     */
     public function getRedirects(): array
     {
         return $this->redirects;
@@ -304,5 +311,4 @@ class LinkTargetResponse
     {
         return count($this->redirects);
     }
-
 }

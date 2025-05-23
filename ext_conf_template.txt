@@ -31,7 +31,7 @@ showPageLayoutButton = 1
 
 ### since TYPO3 v12
 
-# cat=checking; type=boolean;label=If an error code / type / exception matches this, the URL is non-checkable: This can be a regex if it starts with regex (separated by colon), otherwise it matches by start of string.
+# cat=checking; type=string;label=If an error code / type / exception matches this, the URL is non-checkable: This can be a regex if it starts with regex (separated by colon), otherwise it matches by start of string.
 combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/
 
 # cat=report; type=boolean;label=Show all links, not just broken links: The default is 1 (true).

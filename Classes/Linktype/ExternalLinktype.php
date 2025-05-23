@@ -79,6 +79,9 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected $crawlDelay;
 
+    /**
+     * @var array<int,array{from:string, to:string}>
+     */
     protected array $redirects = [];
 
     public function __construct(
@@ -153,7 +156,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
         $this->redirects = [];
 
-        $onRedirect = function(
+        $onRedirect = function (
             RequestInterface $request,
             ResponseInterface $response,
             UriInterface $uri
@@ -190,7 +193,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             ],
             'headers'         => $this->configuration->getLinktypesConfigExternalHeaders(),
             'timeout' => $this->configuration->getLinktypesConfigExternalTimeout(),
-
 
         ];
 
@@ -237,7 +239,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         try {
             $this->redirects = [];
             $response = $this->requestFactory->request($url, $method, $options);
-
 
             if ($response->getStatusCode() >= 300) {
                 $linkTargetResponse = LinkTargetResponse::createInstanceByError(
@@ -330,7 +331,9 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             );
         }
 
-        if ($this->redirects && $linkTargetResponse) {
+        // phpstan doesn't realize, $this->redirects can be set in on_redirect callback
+        // @phpstan-ignore-next-line
+        if ($this->redirects) {
             $linkTargetResponse->setRedirects($this->redirects);
         }
 
@@ -376,9 +379,15 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
             $effectiveUrl = $linkTargetResponse->getEffectiveUrl() ?: $url;
             $effectiveDomain = $this->getDomainForUrl($effectiveUrl);
-            $this->logger->info(sprinf('ExternalLinktype detected HTTP status code: %d for url %s (domain=%s)'
-                . '=> effective url <%s> stop checking this domain in this cycle',
-                $linkTargetResponse->getErrno(), $url, $this->domain, $effectiveUrl, $effectiveDomain));
+            $this->logger->info(sprintf(
+                'ExternalLinktype detected HTTP status code: %d for url=<%s> (domain=<%s>)'
+                . '=> effective url=<%s> (domain=<%s>) stop checking this domain in this cycle',
+                $linkTargetResponse->getErrno(),
+                $url,
+                $this->domain,
+                $effectiveUrl,
+                $effectiveDomain
+            ));
 
             $this->crawlDelay->stopChecking($effectiveDomain, $retryAfter, LinkTargetResponse::REASON_CANNOT_CHECK_429);
             $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
