@@ -9,6 +9,9 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\CrawlDelay;
@@ -76,6 +79,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected $crawlDelay;
 
+    protected array $redirects = [];
+
     public function __construct(
         ?RequestFactory $requestFactory = null,
         ?ExcludeLinkTarget $excludeLinkTarget = null,
@@ -106,10 +111,10 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      * @param string $origUrl The URL to check
      * @param mixed[] $softRefEntry The soft reference entry which builds the context of that URL
      * @param int $flags can be a combination of flags defined in AbstractLinktype CHECK_LINK_FLAG_*
-     * @return LinkTargetResponse
+     * @return LinkTargetResponse|null
      * @throws \InvalidArgumentException
      */
-    public function checkLink(string $origUrl, array $softRefEntry, int $flags = 0): LinkTargetResponse
+    public function checkLink(string $origUrl, array $softRefEntry, int $flags = 0): ?LinkTargetResponse
     {
         $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
 
@@ -146,15 +151,47 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
         $cookieJar = GeneralUtility::makeInstance(CookieJar::class);
 
+        $this->redirects = [];
+
+        $onRedirect = function(
+            RequestInterface $request,
+            ResponseInterface $response,
+            UriInterface $uri
+        ) {
+            $this->redirects[] = [
+                'from' => (string)$request->getUri(),
+                'to' => (string)$uri,
+            ];
+        };
+
         $options = [
             'cookies' => $cookieJar,
             'allow_redirects' => [
+                /** Strict RFC compliant redirects mean that POST redirect requests are sent as
+                 *  POST requests vs. doing what most browsers do which is redirect POST requests
+                 *  with GET requests.
+                 *
+                 * We don't really do POST request, only HEAD and GET
+                 */
                 'strict' => true,
+                /** Set to false to disable adding the Referer
+                 * header when redirecting.
+                 */
                 'referer' => true,
                 'max' => $this->configuration->getLinktypesConfigExternalRedirects(),
+
+                /**  on_redirect: (callable) PHP callable that is invoked when a redirect
+                 * is encountered. The callable is invoked with the original request and the
+                 * redirect response that was received. Any return value from the on_redirect
+                 * function is ignored.
+                 * @see https://docs.guzzlephp.org/en/stable/request-options.html
+                 */
+                'on_redirect' => $onRedirect,
             ],
             'headers'         => $this->configuration->getLinktypesConfigExternalHeaders(),
             'timeout' => $this->configuration->getLinktypesConfigExternalTimeout(),
+
+
         ];
 
         $url = $this->preprocessUrl($origUrl);
@@ -162,13 +199,18 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             if (($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY) === 0) {
                 $continueChecking = $this->crawlDelay->crawlDelay($this->domain);
                 if (!$continueChecking) {
+                    /*
                     $this->logger->debug('crawl delay: stop checking for URL=' . $url);
                     $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
                     $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_429);
                     return $linkTargetResponse;
+                    */
+                    // we return null in this case, because this is a temporary error code
+                    return null;
                 }
             }
 
+            // first check HEAD and if ERROR, also check GET
             $linkTargetResponse = $this->requestUrl($url, 'HEAD', $options);
             if ($linkTargetResponse->isError()) {
                 // HEAD was not allowed or threw an error, now trying GET
@@ -193,7 +235,10 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     {
         $responseHeaders = [];
         try {
+            $this->redirects = [];
             $response = $this->requestFactory->request($url, $method, $options);
+
+
             if ($response->getStatusCode() >= 300) {
                 $linkTargetResponse = LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_HTTP_STATUS_CODE,
@@ -285,7 +330,11 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             );
         }
 
-        if ($this->isCombinedErrorNonCheckable($linkTargetResponse)) {
+        if ($this->redirects && $linkTargetResponse) {
+            $linkTargetResponse->setRedirects($this->redirects);
+        }
+
+        if ($method === 'GET' && $this->isCombinedErrorNonCheckable($linkTargetResponse)) {
             $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
             foreach ($responseHeaders as $headerName => $headerValue) {
                 if (str_starts_with(mb_strtolower($headerName), 'cf-')) {
@@ -304,7 +353,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
          *
          * If we get a "too many requests" or Service unavailable, we stop checking for this domain
          */
-        if ($linkTargetResponse->getErrorType() === self::ERROR_TYPE_HTTP_STATUS_CODE
+        if ($method === 'GET' && $linkTargetResponse->getErrorType() === self::ERROR_TYPE_HTTP_STATUS_CODE
             && ($linkTargetResponse->getErrno() === 429 || $linkTargetResponse->getErrno() === 503)) {
             $retryAfter = 0;
             // array of values
@@ -324,7 +373,14 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                     }
                 }
             }
-            $this->crawlDelay->stopChecking($this->domain, $retryAfter, LinkTargetResponse::REASON_CANNOT_CHECK_429);
+
+            $effectiveUrl = $linkTargetResponse->getEffectiveUrl() ?: $url;
+            $effectiveDomain = $this->getDomainForUrl($effectiveUrl);
+            $this->logger->info(sprinf('ExternalLinktype detected HTTP status code: %d for url %s (domain=%s)'
+                . '=> effective url <%s> stop checking this domain in this cycle',
+                $linkTargetResponse->getErrno(), $url, $this->domain, $effectiveUrl, $effectiveDomain));
+
+            $this->crawlDelay->stopChecking($effectiveDomain, $retryAfter, LinkTargetResponse::REASON_CANNOT_CHECK_429);
             $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
             $linkTargetResponse->setReasonCannotCheck($linkTargetResponse->getErrno() === 429 ? LinkTargetResponse::REASON_CANNOT_CHECK_429
                 : LinkTargetResponse::REASON_CANNOT_CHECK_503);
@@ -473,5 +529,24 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         }
         $this->domain = $parts['host'] ?? '';
         return $url;
+    }
+
+    protected function getDomainForUrl(string $url): string
+    {
+        $url = html_entity_decode($url);
+        $parts = parse_url($url);
+        $host = (string)($parts['host'] ?? '');
+        if ($host !== '') {
+            try {
+                $newDomain = (string)idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+                if (strcmp($host, $newDomain) !== 0) {
+                    $parts['host'] = $newDomain;
+                    $url = HttpUtility::buildUrl($parts);
+                }
+            } catch (\Exception | \Throwable $e) {
+                // proceed with link checking
+            }
+        }
+        return $parts['host'] ?? '';
     }
 }

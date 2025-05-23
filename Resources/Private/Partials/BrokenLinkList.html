@@ -111,6 +111,11 @@
 					<f:if condition="{item.linktarget}">
 						<f:then>
 							<a href="{item.linktarget}" target="_blank" rel="noreferrer">{item.linktext}</a>
+							<f:if condition="{item.effectiveUrl}">
+								<br/><core:icon identifier="actions-arrow-down-right-alt" size="small" />
+								 <a href="{item.effectiveUrl}" target="_blank" rel="noreferrer" title="redirect target">{item.effectiveUrl}</a>
+								<span title="redirect count">({item.redirectCount})</span>
+							</f:if>
 							<div class="inline-action">
 								<f:if condition="{item.encoded_linktarget}">
 									<f:then>

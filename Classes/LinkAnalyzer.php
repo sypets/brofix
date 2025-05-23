@@ -349,7 +349,12 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $this->debug("checkLinks: before checking $url");
                 /** @var LinkTargetResponse $linkTargetResponse */
                 $linkTargetResponse = $linktypeObject->checkLink((string)$url, $entryValue, $mode);
-                $this->debug("checkLinks: after checking $url");
+                if (!$linkTargetResponse) {
+                    $this->debug("checkLinks: after checking $url: returned null, no checking for this URL");
+                    continue;
+                } else {
+                    $this->debug("checkLinks: after checking $url");
+                }
 
                 $this->statistics->incrementCountLinksByStatus($linkTargetResponse->getStatus());
 
@@ -368,6 +373,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     }
                 } elseif ($this->configuration->isShowAllLinks()) {
                     $record['check_status'] = $linkTargetResponse->getStatus();
+                    // url_response may also contain information in case of a non-error
                     $record['url_response'] = $linkTargetResponse->toJson();
                     $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();

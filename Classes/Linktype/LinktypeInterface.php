@@ -20,9 +20,9 @@ interface LinktypeInterface
      * @param mixed[] $softRefEntry The soft reference entry which builds the context of that url
      * @param int $flags can be a combination of flags, see flags defined in AbstractLinktype, e.g.
      *   e.g. AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY
-     * @return LinkTargetResponse
+     * @return LinkTargetResponse|null
      */
-    public function checkLink(string $url, array $softRefEntry, int $flags = 0): LinkTargetResponse;
+    public function checkLink(string $url, array $softRefEntry, int $flags = 0): ?LinkTargetResponse;
 
     /**
      * Base type fetching method, based on the type that softRefParserObj returns.
