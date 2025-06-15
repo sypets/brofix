@@ -161,6 +161,8 @@ class Configuration
 
     protected bool $showPageLayoutButton = true;
 
+    protected bool $recheckLinksOnEditing = false;
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -168,6 +170,7 @@ class Configuration
     public function __construct(array $extConfArray)
     {
         // initialize from extension configuration
+        $this->recheckLinksOnEditing = (bool)($extConfArray['recheckLinksOnEditing'] ?? false);
         $this->showAllLinks = (bool)($extConfArray['showalllinks'] ?? true);
         $this->showEditButtons = ($extConfArray['showEditButtons'] ?? self::SHOW_EDIT_BUTTONS_DEFAULT_VALUE);
         $this->showPageLayoutButton = (bool)($extConfArray['showPageLayoutButton'] ?? true);
@@ -754,5 +757,10 @@ class Configuration
     public function getCustom(): array
     {
         return $this->tsConfig['custom.'] ?? [];
+    }
+
+    public function isRecheckLinksOnEditing(): bool
+    {
+        return $this->recheckLinksOnEditing;
     }
 }

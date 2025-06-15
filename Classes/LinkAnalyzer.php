@@ -201,6 +201,51 @@ class LinkAnalyzer implements LoggerAwareInterface
     }
 
     /**
+     * @param string $message
+     * @param array<string> $linkTypes
+     * @param int $recordUid
+     * @param string $table
+     * @param string $field
+     * @param int $beforeEditedTimestamp
+     * @param ServerRequestInterface $request
+     * @param bool $checkHidden
+     * @return bool
+     */
+    public function recheckRecord(
+        string &$message,
+        array $linkTypes,
+        int $recordUid,
+        string $table,
+        string $field,
+        int $beforeEditedTimestamp,
+        ServerRequestInterface $request,
+        bool $checkHidden = false
+    ): bool {
+        if ($this->configuration->isRecheckLinksOnEditing()) {
+            return $this->recheckLinks(
+                $message,
+                $linkTypes,
+                $recordUid,
+                $table,
+                $field,
+                $beforeEditedTimestamp,
+                $request,
+                $checkHidden
+            );
+        }
+        return $this->checkLinksStillExistInRecord(
+            $message,
+            $linkTypes,
+            $recordUid,
+            $table,
+            $field,
+            $beforeEditedTimestamp,
+            $request,
+            $checkHidden
+        );
+    }
+
+    /**
      * Recheck for broken links for one field in table for record.
      *
      * This will not use a crawl delay.
@@ -277,6 +322,150 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         // remove existing broken links from table
         $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
+        $message = sprintf($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.checked'), $header);
+        return true;
+    }
+
+    /**
+     * Check if links still exist in the record and if record is visible in FE.
+     * If not remove link records from tx_brofix_broken_links.
+     *
+     * DO not however check links.
+     *
+     * @todo check if record is visible in FE: check if page is visible as well
+     *
+     * @param string $message
+     * @param array<string> $linkTypes
+     * @param int $recordUid
+     * @param string $table
+     * @param string $field
+     * @param int $beforeEditedTimestamp
+     * @param ServerRequestInterface $request
+     * @param bool $checkHidden
+     * @return bool
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Throwable
+     */
+    public function checkLinksStillExistInRecord(
+        string &$message,
+        array $linkTypes,
+        int $recordUid,
+        string $table,
+        string $field,
+        int $beforeEditedTimestamp,
+        ServerRequestInterface $request,
+        bool $checkHidden = false
+    ): bool {
+        // If table is not configured, assume the extension is not installed
+        // and therefore no need to check it
+        if (!is_array($GLOBALS['TCA'][$table])) {
+            return false;
+        }
+
+        // todo: for tcaProcessing 'full', we get entire record even though it is inefficient, optimize this
+        // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
+        if ($this->configuration->getTcaProcessing() === Configuration::TCA_PROCESSING_FULL) {
+            $row = $this->contentRepository->getRowForUid($recordUid, $table, ['*'], $checkHidden);
+        } else {
+            $selectFields = $this->getSelectFields($table, [$field]);
+            $row = $this->contentRepository->getRowForUid($recordUid, $table, $selectFields, $checkHidden);
+        }
+
+        $startTime = \time();
+
+        if (!$row) {
+            // missing record: remove existing links
+            $message = sprintf($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.removed'), $recordUid);
+            // remove existing broken links from table
+            $this->brokenLinkRepository->removeBrokenLinksForRecordBeforeTime($table, $recordUid, $startTime);
+            return true;
+        }
+        $headerField = $GLOBALS['TCA'][$table]['ctrl']['label'] ?? '';
+        $header = $row[$headerField] ?? $recordUid;
+
+        $timestampField = $GLOBALS['TCA'][$table]['ctrl']['tstamp'] ?? '';
+        if ($timestampField) {
+            $timestampValue = (int)($row[$timestampField] ?? 0);
+        } else {
+            $timestampValue = 0;
+        }
+        if ($beforeEditedTimestamp && $timestampValue && $beforeEditedTimestamp >= $timestampValue) {
+            // if timestamp of record is not after $beforeEditedTimestamp: no need to recheck
+            $message = $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.notchanged');
+            if ($message) {
+                $message = sprintf($message, $header);
+            }
+            return false;
+        }
+        $resultsLinks = [];
+        $this->linkParser->findLinksForRecord(
+            $resultsLinks,
+            $table,
+            [$field],
+            $row,
+            $request,
+            LinkParser::MASK_CONTENT_CHECK_ALL-LinkParser::MASK_CONTENT_CHECK_IF_EDITABLE_FIELD
+        );
+
+        // get all broken links for $recordUid / $field / $table combination
+        $queryBuilderLinkval = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_brofix_broken_links');
+        $resultLinkval = $queryBuilderLinkval->select('uid', 'link_type', 'link_title', 'url')
+            ->from('tx_brofix_broken_links')
+            ->where(
+                $queryBuilderLinkval->expr()->eq(
+                    'record_uid',
+                    $queryBuilderLinkval->createNamedParameter($recordUid, Connection::PARAM_INT)
+                ),
+                $queryBuilderLinkval->expr()->eq(
+                    'table_name',
+                    $queryBuilderLinkval->createNamedParameter($table)
+                ),
+                $queryBuilderLinkval->expr()->eq(
+                    'field',
+                    $queryBuilderLinkval->createNamedParameter($field)
+                )
+            )
+            ->execute();
+
+        // check if broken links from tx_linkvalidator_link still exist in record / table / field
+        while ($row = $resultLinkval->fetch()) {
+            $link_type = $row['link_type'];
+            $link_title = $row['link_title'];
+            $url = $row['url'];
+            $found = false;
+            foreach ($resultsLinks[$link_type] ?? [] as $hash => $values) {
+                $link_title2 = $values['link_title'];
+
+                if ($link_type === 'db') {
+                    $url2 = $values['substr']['recordRef'];
+                } else {
+                    $url2 = $values['substr']['tokenValue'];
+                }
+
+                if ($url == $url2
+                    && $link_title == $link_title2
+                ) {
+                    // found
+                    $found = true;
+                    unset($resultsLinks[$link_type][$hash]);
+                    break;
+                }
+            }
+            if (!$found) {
+                // remove broken link from list of broken links
+                $queryBuilderLinkval
+                    ->delete('tx_brofix_broken_links')
+                    ->where(
+                        $queryBuilderLinkval->expr()->eq(
+                            'uid',
+                            $queryBuilderLinkval->createNamedParameter($row['uid'], Connection::PARAM_INT)
+                        )
+                    )
+                    ->execute();
+            }
+        }
+
         $message = sprintf($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.message.checked'), $header);
         return true;
     }

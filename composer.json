@@ -76,25 +76,25 @@
 			"TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
 		],
 		"ci:composerinstall": [
-			"Build/Scripts/runTests.sh -p 7.4 -s composerInstallMax"
+			"Build/Scripts/runTests.sh  -s composerInstallMax"
 		],
 		"ci:composervalidate": [
-			"Build/Scripts/runTests.sh -p 7.4 -s composerValidate"
+			"Build/Scripts/runTests.sh  -s composerValidate"
 		],
 		"ci:phpcgl:check": [
-			"Build/Scripts/runTests.sh -p 7.4 -s cgl -n"
+			"Build/Scripts/runTests.sh  -s cgl -n"
 		],
 		"ci:phpcgl:fix": [
-			"Build/Scripts/runTests.sh -p 7.4 -s cgl"
+			"Build/Scripts/runTests.sh  -s cgl"
 		],
 		"ci:cgl:check": [
 			"@ci:phpcgl:check"
 		],
 		"ci:phplint": [
-			"Build/Scripts/runTests.sh -p 7.4 -s phpstan -e \"-c ../Build/phpstan.neon\""
+			"Build/Scripts/runTests.sh  -s phpstan -e \"-c ../Build/phpstan.neon\""
 		],
 		"ci:phpstan": [
-			"Build/Scripts/runTests.sh -p 7.4 -s phpstan -e \"-c ../Build/phpstan.neon\""
+			"Build/Scripts/runTests.sh  -s phpstan -e \"-c ../Build/phpstan.neon\""
 		],
 		"rector:check": [
 			"@php .Build/bin/rector --dry-run"
@@ -103,10 +103,10 @@
 			"@php .Build/bin/rector"
 		],
 		"ci:phpunit": [
-			"Build/Scripts/runTests.sh -p 7.4 -s unit"
+			"Build/Scripts/runTests.sh  -s unit"
 		],
 		"ci:phpfunctional": [
-			"Build/Scripts/runTests.sh -p 7.4 -s functional"
+			"Build/Scripts/runTests.sh  -s functional"
 		],
 		"ci:check": [
 			"@ci:composerinstall",
