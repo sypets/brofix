@@ -42,3 +42,6 @@ showPageCalloutBrokenLinksExist = 1
 
 # cat=report; type=boolean; label=Use cache for page list; This is recommended for large number of pages to improve performance
 useCacheForPageList = 1
+
+# cat=checking; type=boolean; label=After editing a record, recheck links; This is NOT recommended as it may result in excessive checking and delays when editing. It is already checked if links still exist in record.
+recheckLinksOnEditing = 0

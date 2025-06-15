@@ -292,7 +292,8 @@ class BrokenLinkListController extends AbstractBrofixController
         if ($this->action === 'editField') {
             $message = '';
             // recheck broken links for last edited reccord
-            $this->linkAnalyzer->recheckLinks(
+            //$this->linkAnalyzer->recheckLinks(
+            $this->linkAnalyzer->recheckRecord(
                 $message,
                 $this->linkTypes,
                 (int)$this->currentRecord['uid'],
@@ -374,7 +375,6 @@ class BrokenLinkListController extends AbstractBrofixController
              */
             $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
         }
-
 
         $this->backendUserHasPermissionsForBrokenLinklist = false;
         if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
