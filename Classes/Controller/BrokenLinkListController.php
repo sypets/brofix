@@ -352,11 +352,16 @@ class BrokenLinkListController extends AbstractBrofixController
     {
         $backendUser = $this->getBackendUser();
         $this->id = (int)($request->getParsedBody()['id'] ?? $request->getQueryParams()['id'] ?? 0);
-        $this->resolveSiteLanguages($this->id);
 
-        $this->pageinfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW));
         if ($this->id !== 0) {
+            $this->resolveSiteLanguages($this->id);
+            $this->pageinfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW));
             $this->configuration->loadPageTsConfig($this->id);
+
+            $this->pageRecord = BackendUtility::readPageAccess(
+                $this->id,
+                $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
+            );
         }
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->getSettingsFromQueryParameters($request);
@@ -370,10 +375,7 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->hookObjectsArr[$linkType] = GeneralUtility::makeInstance($className);
         }
 
-        $this->pageRecord = BackendUtility::readPageAccess(
-            $this->id,
-            $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
-        );
+
         $this->backendUserHasPermissionsForBrokenLinklist = false;
         if (($this->id && is_array($this->pageRecord)) || (!$this->id && $this->getBackendUser()->isAdmin())) {
             $this->backendUserHasPermissionsForBrokenLinklist = true;

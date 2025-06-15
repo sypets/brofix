@@ -132,6 +132,11 @@ abstract class AbstractBrofixController
      */
     protected function resolveSiteLanguages(int $pageId): void
     {
+        if ($pageId === 0) {
+            $this->siteLanguages = [];
+            return;
+        }
+
         /**
          * @var SiteMatcher $siteMatcher
          */
