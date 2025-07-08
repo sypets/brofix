@@ -145,4 +145,30 @@ class ExternalLinktypeTest extends AbstractUnit
         }
         return array_merge_recursive($options, ['headers' => ['Range' => 'bytes=0-4048']]);
     }
+
+    /**
+     * @test
+     */
+    public function checkLinkDetectsCloudflareServer(): void
+    {
+        $url = 'https://example.com';
+        $httpMethod = 'GET';
+        $options = $this->getRequestHeaderOptions($httpMethod);
+
+        $responseProphecy = $this->prophesize(Response::class);
+        $responseProphecy->getStatusCode()->willReturn(200);
+        $responseProphecy->getHeaderLine('Content-Type')->willReturn('text/html');
+        $responseProphecy->getHeaders()->willReturn(['Server' => ['cloudflare']]);
+        $responseProphecy->getBody()->willReturn(GeneralUtility::makeInstance(\GuzzleHttp\Psr7\Stream::class, fopen('php://temp', 'r+')));
+
+        $requestFactoryProphecy = $this->prophesize(RequestFactory::class);
+        $requestFactoryProphecy->request($url, $httpMethod, $options)
+            ->willReturn($responseProphecy->reveal());
+        $subject = $this->instantiateExternalLinktype($requestFactoryProphecy);
+
+        $linkTargetResponse = $subject->checkLink($url, []);
+
+        self::assertSame(LinkTargetResponse::RESULT_UNKNOWN, $linkTargetResponse->getStatus());
+        self::assertSame(LinkTargetResponse::REASON_CANNOT_CHECK_CLOUDFLARE, $linkTargetResponse->getReasonCannotCheck());
+    }
 }

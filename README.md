@@ -27,3 +27,11 @@ whom this work would not have been possible.
 | **Repository:**  | https://github.com/sypets/brofix                   |
 | **Read online:** | https://docs.typo3.org/p/sypets/brofix/main/en-us/ |
 | **TER:**         | https://extensions.typo3.org/extension/brofix      |
+
+## Check Status Meanings
+
+- **1 (RESULT_BROKEN):** The link is broken.
+- **2 (RESULT_OK):** The link is working.
+- **3 (RESULT_CANNOT_CHECK):** The link could not be checked (e.g., due to network issues).
+- **4 (RESULT_EXCLUDED):** The link was excluded from checking.
+- **5 (RESULT_UNKNOWN):** The link status is unknown because the server is identified as Cloudflare.

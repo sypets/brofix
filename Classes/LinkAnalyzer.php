@@ -546,6 +546,23 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
                 $this->debug("checkLinks: after checking $url");
 
+                // Check for Cloudflare
+                $headers = $linkTargetResponse->getCustom()['headers'] ?? [];
+                $serverHeader = '';
+                if (is_array($headers)) {
+                    foreach ($headers as $headerLine) {
+                        if (is_string($headerLine) && stripos($headerLine, 'Server:') === 0) {
+                            $serverHeader = trim(substr($headerLine, strlen('Server:')));
+                            break;
+                        }
+                    }
+                }
+
+                if (stripos($serverHeader, 'cloudflare') !== false) {
+                    $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_UNKNOWN);
+                    $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_CLOUDFLARE);
+                }
+
                 $this->statistics->incrementCountLinksByStatus($linkTargetResponse->getStatus());
 
                 // Broken link found
