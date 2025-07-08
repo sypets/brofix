@@ -547,33 +547,15 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $this->debug("checkLinks: after checking $url");
 
                 // Check for Cloudflare
-                $headers = $linkTargetResponse->getCustom()['headers'] ?? [];
-                $serverHeader = '';
-                if (is_array($headers)) {
-                    foreach ($headers as $headerLine) {
-                        if (is_string($headerLine) && stripos($headerLine, 'Server:') === 0) {
-                            $serverHeader = trim(substr($headerLine, strlen('Server:')));
-                            break;
-                        }
-                    }
-                }
-
-                if (stripos($serverHeader, 'cloudflare') !== false) {
+                if ($linkTargetResponse->getReasonCannotCheck() == LinkTargetResponse::REASON_CANNOT_CHECK_CLOUDFLARE) {
                     $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_UNKNOWN);
                     $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_CLOUDFLARE);
                 }
 
                 $this->statistics->incrementCountLinksByStatus($linkTargetResponse->getStatus());
 
-                // If Cloudflare detected, status is RESULT_UNKNOWN (5).
-                // Otherwise, check for error or cannot_check.
-                if ($linkTargetResponse->getStatus() === LinkTargetResponse::RESULT_UNKNOWN) {
-                    $record['url_response'] = $linkTargetResponse->toJson();
-                    $record['check_status'] = LinkTargetResponse::RESULT_UNKNOWN;
-                    $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
-                    $record['last_check'] = \time();
-                    $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
-                } elseif ($linkTargetResponse->isError() || $linkTargetResponse->isCannotCheck()) {
+                // Broken link found
+                if ($linkTargetResponse->isError() || $linkTargetResponse->isCannotCheck()) {
                     $record['url_response'] = $linkTargetResponse->toJson();
                     $record['check_status'] = $linkTargetResponse->getStatus();
                     // last_check reflects time of last check (may be older if URL was in cache)
