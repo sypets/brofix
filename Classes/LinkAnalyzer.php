@@ -565,8 +565,15 @@ class LinkAnalyzer implements LoggerAwareInterface
 
                 $this->statistics->incrementCountLinksByStatus($linkTargetResponse->getStatus());
 
-                // Broken link found
-                if ($linkTargetResponse->isError() || $linkTargetResponse->isCannotCheck()) {
+                // If Cloudflare detected, status is RESULT_UNKNOWN (5).
+                // Otherwise, check for error or cannot_check.
+                if ($linkTargetResponse->getStatus() === LinkTargetResponse::RESULT_UNKNOWN) {
+                    $record['url_response'] = $linkTargetResponse->toJson();
+                    $record['check_status'] = LinkTargetResponse::RESULT_UNKNOWN;
+                    $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
+                    $record['last_check'] = \time();
+                    $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
+                } elseif ($linkTargetResponse->isError() || $linkTargetResponse->isCannotCheck()) {
                     $record['url_response'] = $linkTargetResponse->toJson();
                     $record['check_status'] = $linkTargetResponse->getStatus();
                     // last_check reflects time of last check (may be older if URL was in cache)
