@@ -465,6 +465,12 @@
 				   <trans-unit id="form.selectLinkType" resname="form.selectLinkType">
 						<source>Select Link Type</source>
 					</trans-unit>
+                    <trans-unit id="form.linkType" resname="form.linkType">
+                        <source>Link type</source>
+                    </trans-unit>
+                    <trans-unit id="form.reason" resname="form.reason">
+                        <source>Reason</source>
+                    </trans-unit>
 			 <!-- End Modification -->
 
 			<trans-unit id="list.filter.useCache.label" resname="list.filter.useCache.label">
