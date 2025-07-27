@@ -544,14 +544,13 @@ class BrokenLinkListController extends AbstractBrofixController
 
         $items = [];
         $totalCount = 0;
-        
+
         $shouldShow = true;
         $howToTraverse = $this->filter->getHowtotraverse();
         if ($howToTraverse === BrokenLinkListFilter::HOW_TO_TRAVERSE_PAGES) {
             if ($this->id <= 0) {
                 $shouldShow = false;
             } else {
-
                 // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
                 // @extensionScannerIgnoreLine problem with getRootLineIsHidden
                 $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageinfo);
@@ -560,8 +559,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 }
             }
         }
-        
-        
+
         if ($shouldShow) {
             /**
              * @todo Currently, we fetch all and then paginate. We would like to optimize this to fetch only the broken
