@@ -453,21 +453,12 @@
 				 <trans-unit id="excludeLinksTitle" resname="excludeLinksTitle">
 					  <source>Excluded link targets</source>
 				  </trans-unit>
-				  <trans-unit id="form.selectReason" resname="form.selectReason">
-					   <source>Select reason</source>
-				   </trans-unit>
 				   <trans-unit id="form.external" resname="form.external">
 						<source>External</source>
 				   </trans-unit>
 				   <trans-unit id="form.internal" resname="form.internal">
 						<source>Internal</source>
 				   </trans-unit>
-				   <trans-unit id="form.selectLinkType" resname="form.selectLinkType">
-						<source>Select Link Type</source>
-					</trans-unit>
-                    <trans-unit id="form.linkType" resname="form.linkType">
-                        <source>Link type</source>
-                    </trans-unit>
                     <trans-unit id="form.reason" resname="form.reason">
                         <source>Reason</source>
                     </trans-unit>

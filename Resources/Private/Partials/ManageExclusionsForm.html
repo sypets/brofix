@@ -22,11 +22,11 @@
 
 				<div class="col">
 					<label for="brofix-list-select-linktype">
-						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.linkType" extensionName="Brofix"/>:
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:columnHeader.link_type" extensionName="Brofix"/>:
 					</label>
 					<select id="brofix-list-select-linktype" name="excludeLinkType_filter" class="form-control input-sm">
 						<option selected="selected" value="">
-							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.selectLinkType"/>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.all"/>
 						</option>
 						<f:if condition="{excludeLinkType_filter} == 'external'">
 							<f:then>
@@ -69,7 +69,7 @@
 					</label>
 					<select id="brofix-list-select-pagedepths" name="excludeReason_filter" class="form-control input-sm">
 						<option selected="selected" value="">
-							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:form.selectReason"/>
+							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.all"/>
 						</option>
 
 						<f:if condition="{excludeReason_filter} == '0'">
