@@ -1016,11 +1016,11 @@ class BrokenLinkListController extends AbstractBrofixController
                     htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.status.excluded')) ?: 'URL is excluded, will not be checked'
                 );
                 break;
-            default:
-                // todo add language label
+            default: // This case will handle LinkTargetResponse::RESULT_UNKNOWN (which is 5)
+                // todo add language label for list.msg.status.cloudflare
                 $linkMessage = sprintf(
-                    '<span class="status-unknown">%s</span>',
-                    htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.status.unknown')) ?: 'Unknown status'
+                    '<span class="status-cloudflare">%s</span>', // Consider adding a specific CSS class if styling is needed
+                    htmlspecialchars($languageService->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.msg.status.cloudflare')) ?: 'Cloudflare link'
                 );
                 break;
         }

@@ -104,6 +104,7 @@ Currently, these are the known status:
 * 2: ok
 * 3: not possible to check ("non-checkable")
 * 4: is excluded
+* 5: Cloudflare link
 
 This should also improve handling of cloudflare protected sites as these
 typically return 403 HTTP status code. The link checking status is no longer
