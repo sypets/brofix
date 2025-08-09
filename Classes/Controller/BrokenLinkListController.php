@@ -924,13 +924,28 @@ class BrokenLinkListController extends AbstractBrofixController
             $variables['table'] = $table;
             $variables['field'] = $row['field'] ?? '';
         }
-        $variables['elementType'] = $this->getLanguageService()->sL($GLOBALS['TCA'][$table]['ctrl']['title'] ?? '');
+        if ($GLOBALS['TCA'][$table]['ctrl']['title'] ?? false) {
+            try {
+                $variables['elementType'] = $this->getLanguageService()->sL($GLOBALS['TCA'][$table]['ctrl']['title']);
+            } catch (\Throwable $e) {
+                // todo: log ERROR
+                $variables['elementType'] = '';
+            }
+        } else {
+            // todo: log warning
+            $variables['elementType'] = '';
+        }
         // Get the language label for the field from TCA
         $fieldName = '';
         if ($GLOBALS['TCA'][$table]['columns'][$row['field']]['label'] ?? false) {
-            $fieldName = $languageService->sL($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']);
+            try {
+                $fieldName = $languageService->sL($GLOBALS['TCA'][$table]['columns'][$row['field']]['label']);
+            } catch (\Throwable $e) {
+                // todo: log ERROR
+                $fieldName = '';
+            }
             // Crop colon from end if present
-            if (substr($fieldName, -1, 1) === ':') {
+            if ($fieldName && substr($fieldName, -1, 1) === ':') {
                 $fieldName = substr($fieldName, 0, strlen($fieldName) - 1);
             }
         }
