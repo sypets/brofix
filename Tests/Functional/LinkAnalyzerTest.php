@@ -4,19 +4,6 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -30,10 +17,11 @@ class LinkAnalyzerTest extends AbstractFunctional
         $GLOBALS['LANG'] = $this->getContainer()->get(LanguageServiceFactory::class)->create('default');
         $this->setupBackendUserAndGroup(
             3,
-            'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
-            'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+            __DIR__ . '/Repository/Fixtures/be_users.csv',
+            __DIR__ . '/Repository/Fixtures/be_groups.csv'
         );
-        Bootstrap::initializeLanguageObject();
+        //Bootstrap::initializeLanguageObject();
+        self::initializeLanguageObject();
     }
 
     /**
@@ -44,7 +32,7 @@ class LinkAnalyzerTest extends AbstractFunctional
     protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
     {
         if ($groupFixtureFile) {
-            $this->importDataSet($groupFixtureFile);
+            $this->importCSVDataSet($groupFixtureFile);
         }
         $this->backendUserFixture = $fixtureFile;
         $this->setUpBackendUserFromFixture($uid);
@@ -68,40 +56,40 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
-    public function findAllBrokenLinksDataProvider(): array
+    public static function findAllBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
 
         return [
             'Test with one broken external link (not existing domain)' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_external.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_link_external.csv'
                 ],
             'Test with one broken page link (not existing page)' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_page.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_link_page.csv'
                 ],
             'Test with one broken file link (not existing file)' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_file.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_link_file.csv'
                 ],
             'Test with several broken external, page and file links' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_links_several.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_links_several.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_links_several.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_links_several.csv'
                 ],
             'Test with several pages with broken external, page and file links' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_links_several_pages.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_links_several_pages.csv',
                     [1, 2],
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_links_several_pages.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_links_several_pages.csv'
                 ],
         ];
     }
@@ -119,7 +107,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $linkTypes = ['db', 'file', 'external'];
 
         // setup
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
 
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
@@ -131,7 +119,7 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
-    public function findFindOnlyFileBrokenLinksDataProvider(): array
+    public static function findFindOnlyFileBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
 
@@ -139,21 +127,21 @@ class LinkAnalyzerTest extends AbstractFunctional
             // Tests with one broken link
             'Test with one broken external link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken page link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken file link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_file.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_link_file.csv'
                 ],
         ];
     }
@@ -171,7 +159,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $linkTypes = ['file'];
 
         // setup
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
@@ -183,7 +171,7 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
-    public function findFindOnlyPageBrokenLinksDataProvider(): array
+    public static function findFindOnlyPageBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
 
@@ -191,21 +179,21 @@ class LinkAnalyzerTest extends AbstractFunctional
             // Tests with one broken link
             'Test with one broken external link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken page link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_page.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_link_page.csv'
                 ],
             'Test with one broken file link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
         ];
     }
@@ -224,7 +212,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $linkTypes = ['db'];
 
         // setup
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
@@ -236,7 +224,7 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
-    public function findFindOnlyExternalBrokenLinksDataProvider(): array
+    public static function findFindOnlyExternalBrokenLinksDataProvider(): array
     {
         $pidList1 = [1];
 
@@ -244,21 +232,21 @@ class LinkAnalyzerTest extends AbstractFunctional
             // Tests with one broken link
             'Test with one broken external link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_external.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_broken_link_external.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_broken_link_external.csv'
                 ],
             'Test with one broken page link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_page.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken file link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_file.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
         ];
     }
@@ -276,7 +264,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         $linkTypes = ['external'];
 
         // setup
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $this->configuration->getLinkTypes());
@@ -288,28 +276,28 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
-    public function getLinkStatisticsDoNotDetectCorrectLinksAsBrokenDataProvider(): array
+    public static function getLinkStatisticsDoNotDetectCorrectLinksAsBrokenDataProvider(): array
     {
         $pidList1 = [1];
 
         return [
             'Test with one not broken page link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link.xml',
+                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_not_broken_page_link.csv'
                 ],
             'Test with one not broken page link with anchor' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link_with_anchor.xml',
+                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link_with_anchor.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_not_broken_page_link.csv'
                 ],
             'Test with one not broken page link with anchor in header_link' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link_with_anchor_in_header_link.xml',
+                    __DIR__ . '/Fixtures/input_content_with_not_broken_page_link_with_anchor_in_header_link.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_content_with_not_broken_page_link.csv'
+                    __DIR__ . '/Fixtures/expected_output_content_with_not_broken_page_link.csv'
                 ],
         ];
     }
@@ -325,7 +313,7 @@ class LinkAnalyzerTest extends AbstractFunctional
     public function testGetLinkStatisticsDoNotDetectCorrectLinksAsBroken(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         // setup
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $configuration = $this->configuration;
         // make sure no DB entries are created for not broken links
         $configuration->setShowAllLinks(false);
@@ -339,28 +327,28 @@ class LinkAnalyzerTest extends AbstractFunctional
     /**
      * @return array<string,mixed[]>
      */
-    public function checkContentByTypeDataProvider(): array
+    public static function checkContentByTypeDataProvider(): array
     {
         $pidList1 = [1];
 
         return [
             'Test with one broken link in tt_content.bodytext and CType=header. Expected: no broken links' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_in_bodytext_type_header.xml',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_in_bodytext_type_header.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken link in pages.url and doktype=1. Expected: no broken links' =>
                 [
-                    __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_1.xml',
+                    __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_1.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_none.csv'
+                    __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
             'Test with one broken link in pages.url and doktype=3. Expected: 1 broken link' =>
                 [
-                    __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_3.xml',
+                    __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_3.csv',
                     $pidList1,
-                    'EXT:brofix/Tests/Functional/Fixtures/expected_output_page_with_broken_link_url.csv'
+                    __DIR__ . '/Fixtures/expected_output_page_with_broken_link_url.csv'
                 ],
         ];
     }
@@ -390,7 +378,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         ];
 
         // setup
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $this->configuration->setLinkTypes($linkTypes);
         $this->configuration->setSearchFields($searchFields);
         $linkAnalyzer = $this->initializeLinkAnalyzer($pidList);
