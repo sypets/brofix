@@ -426,10 +426,10 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $queryBuilderLinkval->createNamedParameter($field)
                 )
             )
-            ->execute();
+            ->executeQuery();
 
         // check if broken links from tx_linkvalidator_link still exist in record / table / field
-        while ($row = $resultLinkval->fetch()) {
+        while ($row = $resultLinkval->fetchAssociative()) {
             $link_type = $row['link_type'];
             $link_title = $row['link_title'];
             $url = $row['url'];
@@ -462,7 +462,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                             $queryBuilderLinkval->createNamedParameter($row['uid'], Connection::PARAM_INT)
                         )
                     )
-                    ->execute();
+                    ->executeStatement();
             }
         }
 
