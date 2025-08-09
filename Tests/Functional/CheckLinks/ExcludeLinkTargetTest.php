@@ -12,20 +12,22 @@ class ExcludeLinkTargetTest extends AbstractFunctional
     /**
      * @return array<string,array<mixed>>
      */
-    public function isExcludedDataProvider(): array
+    public static function isExcludedDataProvider(): array
     {
         return [
             'URL should be excluded' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_excluded.xml',
-                    'https://example.org',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_excluded.csv',
+                    // URL is excluded
+                    'http://localhost/isexcluded',
                     'external',
                     true
                 ],
             'URL should not be excluded' =>
                 [
-                    __DIR__ . '/Fixtures/input_content_with_broken_link_excluded.xml',
-                    'https://example.com',
+                    __DIR__ . '/Fixtures/input_content_with_broken_link_excluded.csv',
+                    // domain is not excluded
+                    'http://localhost/isnotexcluded/',
                     'external',
                     false
                 ],
@@ -42,8 +44,12 @@ class ExcludeLinkTargetTest extends AbstractFunctional
      */
     public function testIsExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult): void
     {
-        // setup
-        $this->importDataSet($inputFile);
+        /**
+         * @todo deprecated  importDataSet Will be removed with core v12 compatible testing-framework. Importing database fixtures based on XML format is discouraged. Switch to CSV format instead.
+         * Use method importCSVDataSet() to import such fixture files and assertCSVDataSet() to compare database state with fixture files.
+         */
+        // $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $excludeLinkTarget = new ExcludeLinkTarget();
         $excludeLinkTarget->setExcludeLinkTargetsPid($this->configuration->getExcludeLinkTargetStoragePid());
         $result = $excludeLinkTarget->isExcluded($url, $linkType);

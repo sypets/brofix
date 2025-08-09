@@ -8,7 +8,6 @@ use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctional;
-use TYPO3\CMS\Core\Core\Bootstrap;
 
 class BrokenLinkRepositoryTest extends AbstractFunctional
 {
@@ -17,40 +16,40 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     /**
      * @var array<string,array<mixed>>
      */
-    protected $beusers = [
+    protected static $beusers = [
         'admin' => [
-            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users_admin.xml',
+            'fixture' => __DIR__ . '/Fixtures/be_users_admin.csv',
             'uid' => 1,
             'groupFixture' => ''
         ],
         'no group' => [
-            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'fixture' => __DIR__ . '/Fixtures/be_users.csv',
             'uid' => 2,
             'groupFixture' => ''
         ],
         // write access to pages, tt_content (no non_exclude_fields)
         'group 1' => [
-            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'fixture' => __DIR__ . '/Fixtures/be_users.csv',
             'uid' => 3,
-            'groupFixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+            'groupFixture' => __DIR__ . '/Fixtures/be_groups.csv'
         ],
         // write access to pages, tt_content, exclude field pages.header_link
         'group 2' => [
-            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'fixture' => __DIR__ . '/Fixtures/be_users.csv',
             'uid' => 4,
-            'groupFixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+            'groupFixture' => __DIR__ . '/Fixtures/be_groups.csv'
         ],
         // write access to pages, tt_content (restricted to default language)
         'group 3' => [
-            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'fixture' => __DIR__ . '/Fixtures/be_users.csv',
             'uid' => 5,
-            'groupFixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+            'groupFixture' => __DIR__ . '/Fixtures/be_groups.csv'
         ],
         // group 6: access to all, but restricted via explicit allow to CType=texmedia and text
         'group 6' => [
-            'fixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_users.xml',
+            'fixture' => __DIR__ . '/Fixtures/be_users.csv',
             'uid' => 6,
-            'groupFixture' => 'EXT:brofix/Tests/Functional/Repository/Fixtures/be_groups.xml'
+            'groupFixture' => __DIR__ . '/Fixtures/be_groups.csv'
         ],
 
     ];
@@ -65,14 +64,14 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     /**
      * @return \Generator<string,array<mixed>>
      */
-    public function getLinkCountsForPagesAndLinktypesReturnsCorrectCountForUserDataProvider(): \Generator
+    public static function getLinkCountsForPagesAndLinktypesReturnsCorrectCountForUserDataProvider(): \Generator
     {
         yield 'Admin user should see all broken links' =>
         [
             // backendUser: 1=admin
-            $this->beusers['admin'],
+            self::$beusers['admin'],
             // input file for DB
-            __DIR__ . '/Fixtures/input.xml',
+            __DIR__ . '/Fixtures/input.csv',
             //pids
             [1],
             // expected result:
@@ -86,9 +85,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with no group should see none' =>
         [
             // backend user
-            $this->beusers['no group'],
+            self::$beusers['no group'],
             // input file for DB
-            __DIR__ . '/Fixtures/input.xml',
+            __DIR__ . '/Fixtures/input.csv',
             //pids
             [1],
             // expected result:
@@ -103,9 +102,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages but not to specific tables should see none' =>
         [
             // backend user
-            $this->beusers['no group'],
+            self::$beusers['no group'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_2.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_2.csv',
             //pids
             [1],
             // expected result:
@@ -119,9 +118,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages and to specific tables, but no non_exclude_fields should see 3 of 4 broken links (no links in header_link)' =>
         [
             // backend user
-            $this->beusers['group 1'],
+            self::$beusers['group 1'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_3.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_3.csv',
             //pids
             [1],
             // expected result:
@@ -135,9 +134,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages, specific tables and non_exclude_fields=header_link should see all broken links' =>
         [
             // backend user
-            $this->beusers['group 2'],
+            self::$beusers['group 2'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_4.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_4.csv',
             //pids
             [1],
             // expected result:
@@ -151,9 +150,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User has write permission only for Ctype textmedia and text, should see only broken links from textmedia records' =>
         [
             // backend user
-            $this->beusers['group 6'],
+            self::$beusers['group 6'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_6_explicit_allow.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_6_explicit_allow.csv',
             //pids
             [1],
             // expected result:
@@ -168,9 +167,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User has write permission only for default language and should see only 1 of 2 broken links' =>
         [
             // backend user
-            $this->beusers['group 3'],
+            self::$beusers['group 3'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_5.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_5.csv',
             //pids
             [1],
             // expected result:
@@ -207,7 +206,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture'] ?? '');
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
         $linkAnalyzer->init($pidList, $this->configuration);
@@ -226,14 +225,14 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     /**
      * @return \Generator<string,array<mixed>>
      */
-    public function getBrokenLinksReturnsCorrectCountForUserDataProvider(): \Generator
+    public static function getBrokenLinksReturnsCorrectCountForUserDataProvider(): \Generator
     {
         yield 'Admin user should see all broken links' =>
         [
             // backendUser: 1=admin
-            $this->beusers['admin'],
+            self::$beusers['admin'],
             // input file for DB
-            __DIR__ . '/Fixtures/input.xml',
+            __DIR__ . '/Fixtures/input.csv',
             //pids
             [1],
             // count
@@ -243,9 +242,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with no group should see none' =>
         [
             // backend user
-            $this->beusers['no group'],
+            self::$beusers['no group'],
             // input file for DB
-            __DIR__ . '/Fixtures/input.xml',
+            __DIR__ . '/Fixtures/input.csv',
             //pids
             [1],
             // count
@@ -254,9 +253,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages but not to specific tables should see none' =>
         [
             // backend user
-            $this->beusers['no group'],
+            self::$beusers['no group'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_2.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_2.csv',
             //pids
             [1],
             // count
@@ -265,9 +264,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages and to specific tables, but no exclude fields should see 3 of 4 broken links' =>
         [
             // backend user
-            $this->beusers['group 1'],
+            self::$beusers['group 1'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_3.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_3.csv',
             //pids
             [1],
             // count
@@ -276,9 +275,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages, specific tables and exclude fields should see all broken links' =>
         [
             // backend user
-            $this->beusers['group 2'],
+            self::$beusers['group 2'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_4.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_4.csv',
             //pids
             [1],
             // count
@@ -287,9 +286,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User has write permission only for Ctype textmedia and text, should see only broken links from textmedia records' =>
         [
             // backend user
-            $this->beusers['group 6'],
+            self::$beusers['group 6'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_6_explicit_allow.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_6_explicit_allow.csv',
             //pids
             [1],
             // count
@@ -299,9 +298,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User has write permission only for default language and should see only 1 of 2 broken links' =>
         [
             // backend user
-            $this->beusers['group 3'],
+            self::$beusers['group 3'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_5.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_5.csv',
             //pids
             [1],
             // count
@@ -332,7 +331,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
@@ -351,14 +350,14 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     /**
      * @return \Generator<string,array<mixed>>
      */
-    public function getBrokenLinksReturnsCorrectValuesForUserDataProvider(): \Generator
+    public static function getBrokenLinksReturnsCorrectValuesForUserDataProvider(): \Generator
     {
         yield 'Admin user should see all broken links' =>
         [
             // backendUser: 1=admin
-            $this->beusers['admin'],
+            self::$beusers['admin'],
             // input file for DB
-            __DIR__ . '/Fixtures/input.xml',
+            __DIR__ . '/Fixtures/input.csv',
             //pids
             [1],
             // expected result:
@@ -429,9 +428,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with no group should see none' =>
         [
             // backend user
-            $this->beusers['no group'],
+            self::$beusers['no group'],
             // input file for DB
-            __DIR__ . '/Fixtures/input.xml',
+            __DIR__ . '/Fixtures/input.csv',
             //pids
             [1],
             // expected result:
@@ -440,9 +439,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages but not to specific tables should see none' =>
         [
             // backend user
-            $this->beusers['no group'],
+            self::$beusers['no group'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_2.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_2.csv',
             //pids
             [1],
             // expected result:
@@ -451,9 +450,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages and to specific tables, but no exclude fields should see 3 of 4 broken links' =>
         [
             // backend user
-            $this->beusers['group 1'],
+            self::$beusers['group 1'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_3.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_3.csv',
             //pids
             [1],
             // expected result:
@@ -508,9 +507,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User with permission to pages, specific tables and exclude fields should see all broken links' =>
         [
             // backend user
-            $this->beusers['group 2'],
+            self::$beusers['group 2'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_4.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_4.csv',
             //pids
             [1],
             // expected result:
@@ -580,9 +579,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User has write permission only for Ctype textmedia and text, should see only broken links from textmedia records' =>
         [
             // backend user
-            $this->beusers['group 6'],
+            self::$beusers['group 6'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_6_explicit_allow.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_6_explicit_allow.csv',
             //pids
             [1],
             // expected result:
@@ -608,9 +607,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         yield 'User has write permission only for default language and should see only 1 of 2 broken links' =>
         [
             // backend user
-            $this->beusers['group 3'],
+            self::$beusers['group 3'],
             // input file for DB
-            __DIR__ . '/Fixtures/input_permissions_user_5.xml',
+            __DIR__ . '/Fixtures/input_permissions_user_5.csv',
             //pids
             [1],
             // expected result:
@@ -657,7 +656,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
-        $this->importDataSet($inputFile);
+        $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
         $linkAnalyzer->generateBrokenLinkRecords($this->request, $linkTypes);
@@ -684,11 +683,11 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
     {
         if ($groupFixtureFile) {
-            $this->importDataSet($groupFixtureFile);
+            $this->importCSVDataSet($groupFixtureFile);
         }
         $this->backendUserFixture = $fixtureFile;
         $this->setUpBackendUserFromFixture($uid);
-        Bootstrap::initializeLanguageObject();
+        self::initializeLanguageObject();
     }
 
     /**

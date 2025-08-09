@@ -1,0 +1,8 @@
+"pages",,,
+,"uid","pid","doktype"
+,1,0,0
+,2,1,0
+"tt_content",,,,,,
+,"uid","pid","header","header_link","CType","colPos"
+,1,1,"header with link","t3://page?uid=2#2","textmedia",0
+,2,2,"<p>hello</p>","","textmedia",0

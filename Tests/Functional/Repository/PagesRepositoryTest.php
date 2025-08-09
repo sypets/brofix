@@ -13,11 +13,11 @@ class PagesRepositoryTest extends AbstractFunctional
     /**
      * @return \Generator<string,array<mixed>>
      */
-    public function getPageListReturnsCorrectPagesDataProvider(): \Generator
+    public static function getPageListReturnsCorrectPagesDataProvider(): \Generator
     {
         yield 'normal page, depth=0' => [
                 // input pages
-                __DIR__ . '/Fixtures/input_pages.xml',
+                __DIR__ . '/Fixtures/input_pages.csv',
                 // start page
                 1,
                 // depth
@@ -34,7 +34,7 @@ class PagesRepositoryTest extends AbstractFunctional
 
         yield 'normal page, depth=1' => [
             // input pages
-            __DIR__ . '/Fixtures/input_pages.xml',
+            __DIR__ . '/Fixtures/input_pages.csv',
             // start page
             1,
             // depth
@@ -51,7 +51,7 @@ class PagesRepositoryTest extends AbstractFunctional
 
         yield 'normal page, depth=2' => [
             // input pages
-            __DIR__ . '/Fixtures/input_pages.xml',
+            __DIR__ . '/Fixtures/input_pages.csv',
             // start page
             1,
             // depth
@@ -68,7 +68,7 @@ class PagesRepositoryTest extends AbstractFunctional
 
         yield 'normal page, depth=999' => [
             // input pages
-            __DIR__ . '/Fixtures/input_pages.xml',
+            __DIR__ . '/Fixtures/input_pages.csv',
             // start page
             1,
             // depth
@@ -85,7 +85,7 @@ class PagesRepositoryTest extends AbstractFunctional
 
         yield 'subpage of hidden should be returned' => [
             // input pages
-            __DIR__ . '/Fixtures/input_pages_hidden.xml',
+            __DIR__ . '/Fixtures/input_pages_hidden.csv',
             // start page
             1,
             // depth
@@ -102,7 +102,7 @@ class PagesRepositoryTest extends AbstractFunctional
 
         yield 'subpage of hidden + extendToSubpages should NOT be returned' => [
             // input pages
-            __DIR__ . '/Fixtures/input_pages_hidden_extend_to_subpages.xml',
+            __DIR__ . '/Fixtures/input_pages_hidden_extend_to_subpages.csv',
             // start page
             1,
             // depth
@@ -119,7 +119,7 @@ class PagesRepositoryTest extends AbstractFunctional
 
         yield 'page with doktype=255 and subpages should not be returned' => [
             // input pages
-            __DIR__ . '/Fixtures/input_pages_doktypes.xml',
+            __DIR__ . '/Fixtures/input_pages_doktypes.csv',
             // start page
             1,
             // depth
@@ -167,7 +167,7 @@ class PagesRepositoryTest extends AbstractFunctional
             255 => 255,
         ];
 
-        $this->importDataSet($fixture);
+        $this->importCSVDataSet($fixture);
         $pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
         $results = [];
         $pagesRepository->getPageList(

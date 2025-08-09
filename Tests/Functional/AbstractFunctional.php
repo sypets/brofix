@@ -7,6 +7,8 @@ namespace Sypets\Brofix\Tests\Functional;
 use Psr\Http\Message\ServerRequestInterface;
 use Sypets\Brofix\Command\CommandUtility;
 use Sypets\Brofix\Configuration\Configuration;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
@@ -81,5 +83,34 @@ abstract class AbstractFunctional extends FunctionalTestCase
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->configuration->overrideTsConfigByArray($tsconfig);
+    }
+
+    /**
+     * Copied from typo3/testing-framework FunctionalTestCase::setUpBackendUserFromFixture(),
+     * has been removed since:
+     *  "deprecated This method together with property $this->backendUserFixture and the functional test
+     *  related fixture .xml files will be removed with core v12 compatible testing-framework.
+     *  Existing usages should be adapted, first call $this->importCSVDataSet() with a local .csv
+     *  based fixture file - delivered by your extension - into database. Then call
+     *  $this->setUpBackendUser() with an id that is delivered with the fixture file to set
+     *  up a backend user. See this styleguide commit for an example transition:
+     *  https://github.com/TYPO3/styleguide/commit/dce442978c552346165d1b420d86caa830f6741f"
+     *
+     * "@param int $userUid
+     * @return BackendUserAuthentication
+     * @throws \TYPO3\TestingFramework\Core\Exception
+     */
+    protected function setUpBackendUserFromFixture(int $userUid): BackendUserAuthentication
+    {
+        $this->importCSVDataSet($this->backendUserFixture);
+        return $this->setUpBackendUser($userUid);
+    }
+
+    /**
+     * copied from Bootstrap::initializeLanguageObject()
+     */
+    public static function initializeLanguageObject()
+    {
+        $GLOBALS['LANG'] = GeneralUtility::makeInstance(LanguageServiceFactory::class)->createFromUserPreferences($GLOBALS['BE_USER']);
     }
 }

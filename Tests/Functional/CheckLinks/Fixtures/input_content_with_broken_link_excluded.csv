@@ -1,0 +1,3 @@
+"tx_brofix_exclude_link_target",,,,,
+,"uid","pid","linktarget","link_type","match"
+,1,0,"http://localhost/isexcluded","external","exact"

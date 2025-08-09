@@ -1,0 +1,8 @@
+"pages"
+,"uid","pid","doktype"
+,1,0,0
+,2,1,0
+"tt_content"
+,"uid","pid","bodytext","CType","colPos"
+,1,1,"<p><a href=""t3://page?uid=2#2"">not broken link</a></p>","textmedia",0
+,2,2,"<p>hello</p>","textmedia",0
