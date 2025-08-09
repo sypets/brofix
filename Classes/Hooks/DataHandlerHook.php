@@ -39,8 +39,8 @@ final class DataHandlerHook
     private $excludeLinkTarget;
 
     public function __construct(
-        BrokenLinkRepository $brokenLinkRepository = null,
-        ExcludeLinkTarget $excludeLinkTarget = null
+        ?BrokenLinkRepository $brokenLinkRepository = null,
+        ?ExcludeLinkTarget $excludeLinkTarget = null
     ) {
         $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
