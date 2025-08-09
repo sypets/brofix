@@ -435,7 +435,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             $url = $row['url'];
             $found = false;
             foreach ($resultsLinks[$link_type] ?? [] as $hash => $values) {
-                $link_title2 = $values['link_title'];
+                $link_title2 = $values['link_title'] ?? '';
 
                 if ($link_type === 'db') {
                     $url2 = $values['substr']['recordRef'];
