@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Repository;
 
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Hoa\File\Link\Link;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
+use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -69,6 +71,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         array $linkTypes,
         array $searchFields,
         BrokenLinkListFilter $filter,
+        Configuration $configuration,
         array $orderBy = []
     ): array {
         $results = [];
@@ -203,7 +206,12 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
-            $checkStatus = $filter->getCheckStatusFilter();
+            if ($configuration->isShowAllLinks()) {
+                $checkStatus = $filter->getCheckStatusFilter();
+            } else {
+                // default is show error only
+                $checkStatus = LinkTargetResponse::RESULT_BROKEN;
+            }
             if ($checkStatus !== LinkTargetResponse::RESULT_ALL) {
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->eq(self::TABLE . '.check_status', $queryBuilder->createNamedParameter($checkStatus, Connection::PARAM_INT))

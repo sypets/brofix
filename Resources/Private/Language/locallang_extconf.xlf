@@ -4,7 +4,7 @@
 		<header/>
 		<body>
 			<trans-unit id="showEditButtons" resname="showEditButtons">
-				<source>Show button to edit entire record, only the field with a broken link or both.</source>
+				<source>Show button to edit entire record, only the field with a broken link or both (in list).</source>
 			</trans-unit>
 		</body>
 	</file>

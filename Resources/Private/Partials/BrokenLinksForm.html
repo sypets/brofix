@@ -112,42 +112,47 @@
 			</select>
 		</div>
 
-		<div class="col">
-			<label for="brofix-list-select-check_status">
-				<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.label" extensionName="Brofix"/>:
-			</label>
-			<select id="brofix-list-select-check_status" name="check_status" class="form-control tceforms-select">
-				<option value="-1" {f:if(condition:'{filter.checkStatusFilter} == -1', then: 'selected')}>
-					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.all"/>
-				</option>
-				<option value="1" {f:if(condition:'{filter.checkStatusFilter} == 1', then: 'selected')}>
-					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.1"/>
-				</option>
-				<option value="2" {f:if(condition:'{filter.checkStatusFilter} == 2', then: 'selected')}>
-					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.2"/>
-				</option>
-				<option value="3" {f:if(condition:'{filter.checkStatusFilter} == 3', then: 'selected')}>
-					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.3"/>
-				</option>
-				<option value="4" {f:if(condition:'{filter.checkStatusFilter} == 4', then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.4"/>
-				</option>
-				<f:for each="{checkStatusOptions}" as="checkStatusOption">
-					<option value="{key}">{checkStatusOption}</option>
-				</f:for>
-			</select>
-		</div>
-		<f:if condition="{filter.showUseCache}">
+
+		<f:if condition="{configuration.showalllinks}">
+			<div class="col">
+				<label for="brofix-list-select-check_status">
+					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.label" extensionName="Brofix"/>:
+				</label>
+				<select id="brofix-list-select-check_status" name="check_status" class="form-control tceforms-select">
+					<option value="-1" {f:if(condition:'{filter.checkStatusFilter} == -1', then: 'selected')}>
+						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.all"/>
+					</option>
+					<option value="1" {f:if(condition:'{filter.checkStatusFilter} == 1', then: 'selected')}>
+						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.1"/>
+					</option>
+					<option value="2" {f:if(condition:'{filter.checkStatusFilter} == 2', then: 'selected')}>
+						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.2"/>
+					</option>
+					<option value="3" {f:if(condition:'{filter.checkStatusFilter} == 3', then: 'selected')}>
+						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.3"/>
+					</option>
+					<option value="4" {f:if(condition:'{filter.checkStatusFilter} == 4', then: 'selected')}>
+					<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.check_status.4"/>
+					</option>
+					<f:for each="{checkStatusOptions}" as="checkStatusOption">
+						<option value="{key}">{checkStatusOption}</option>
+					</f:for>
+				</select>
+			</div>
+		</f:if>
+
+
+		<f:if condition="{configuration.enableCacheForPageListButton}">
 			<div class="col">
 				<label for="brofix-list-useCache">
 					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.useCache.label" extensionName="Brofix">Use pagetree cache</f:translate>:
 				</label>
 				<f:comment>checkboxes only pass with the form if they are checked, so we use select here.</f:comment>
 				<select id="brofix-list-useCache" name="useCache" class="form-control tceforms-select">
-					<option value="0" {f:if(condition:'{filter.useCache} == 0', then: 'selected')}>
+					<option value="0" {f:if(condition:'{filter.usePagetreeCache} == 0', then: 'selected')}>
 						<f:translate extensionName="Core" key="LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:disable">off</f:translate>
 					</option>
-					<option value="1" {f:if(condition:'{filter.useCache} == 1', then: 'selected')}>
+					<option value="1" {f:if(condition:'{filter.usePagetreeCache} == 1', then: 'selected')}>
 						<f:translate extensionName="Core" key="LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:enable">on</f:translate>
 					</option>
 				</select>
