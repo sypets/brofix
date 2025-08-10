@@ -435,7 +435,11 @@ class BrokenLinkListController extends AbstractBrofixController
 
         $this->depth = (int)$this->moduleData->get('depth', self::DEFAULT_DEPTH);
         $this->orderBy = $this->moduleData->get('orderBy', BrokenLinkListController::DEFAULT_ORDER_BY);
-        $this->viewMode = $this->moduleData->get('viewMode', self::DEFAULT_VIEW_MODE_VALUE);
+        if ($this->configuration->isEnableSelectViewControl()) {
+            $this->viewMode = $this->moduleData->get('viewMode', self::DEFAULT_VIEW_MODE_VALUE);
+        } else {
+            $this->viewMode = self::VIEW_MODE_VALUE_COMPLEX;
+        }
 
         $this->filter = BrokenLinkListFilter::getInstanceFromModuleData($this->moduleData);
 
@@ -482,7 +486,12 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function initializeLinkAnalyzer(): void
     {
-        switch ($this->filter->getHowtotraverse()) {
+        if ($this->configuration->isEnableHowToTraverseControl()) {
+            $howtotraverse = $this->filter->getHowtotraverse();
+        } else {
+            $howtotraverse = BrokenLinkListFilter::HOW_TO_TRAVERSE_PAGES;
+        }
+        switch ($howtotraverse) {
             case BrokenLinkListFilter::HOW_TO_TRAVERSE_PAGES:
                 $considerHidden = $this->configuration->isCheckHidden();
                 $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);

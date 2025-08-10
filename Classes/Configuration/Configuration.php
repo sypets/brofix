@@ -168,6 +168,8 @@ class Configuration
 
     protected bool $useCacheForPageList = self::USE_CACHE_FOR_PAGELIST_DEFAULT;
     protected bool $enableCacheForPageListButton = self::ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT;
+    protected bool $enableSelectViewControl = true;
+    protected bool $enableHowToTraverseControl = true;
 
     /**
      * Configuration constructor.
@@ -192,6 +194,8 @@ class Configuration
 
         $this->useCacheForPageList = (bool)($extConfArray['useCacheForPageList'] ?? self::USE_CACHE_FOR_PAGELIST_DEFAULT);
         $this->enableCacheForPageListButton = (bool)($extConfArray['form']['control']['enableCacheForPageList'] ?? self::ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT);
+        $this->enableSelectViewControl = (bool)($extConfArray['form']['control']['selectView'] ?? true);
+        $this->enableHowToTraverseControl = (bool)($extConfArray['form']['control']['howToTraverse'] ?? true);
 
         // initialize from global configuration
         // Hook to handle own checks
@@ -785,5 +789,15 @@ class Configuration
             return false;
         }
         return $this->enableCacheForPageListButton;
+    }
+
+    public function isEnableSelectViewControl(): bool
+    {
+        return $this->enableSelectViewControl;
+    }
+
+    public function isEnableHowToTraverseControl(): bool
+    {
+        return $this->enableHowToTraverseControl;
     }
 }

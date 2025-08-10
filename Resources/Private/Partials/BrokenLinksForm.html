@@ -9,31 +9,42 @@
 		<input type="hidden" name="orderBy" value="{orderBy}"/>
 		<input type="hidden" name="paginationPage" value="{paginationPage}"/>
 
-		<div class="col">
-			<label for="brofix-list-select-howtotraverse">
-				<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.form.howtotraverse" extensionName="Brofix">Pages</f:translate>:
-			</label>
-			<select id="brofix-list-select-howtotraverse" name="howtotraverse" class="form-control tceforms-select">
-				<f:if condition="{isAdmin}">
-					<f:then>
-						<option value="all" {f:if(condition:'{filter.howtotraverse} == all', then: 'selected')}>
-							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.all">All</f:translate>
+		<f:if condition="{configuration.enableHowToTraverseControl}">
+			<f:then>
+				<div class="col">
+					<label for="brofix-list-select-howtotraverse">
+						<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.form.howtotraverse" extensionName="Brofix">Pages</f:translate>:
+					</label>
+					<select id="brofix-list-select-howtotraverse" name="howtotraverse" class="form-control tceforms-select">
+						<f:if condition="{isAdmin}">
+							<f:then>
+								<option value="all" {f:if(condition:'{filter.howtotraverse} == all', then: 'selected')}>
+									<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.all">All</f:translate>
+								</option>
+							</f:then>
+							<f:else>
+								<option value="all" {f:if(condition:'{filter.howtotraverse} == allmountpoints', then: 'selected')}>
+									<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.allmountpoints">All mountpoings</f:translate>
+								</option>
+							</f:else>
+						</f:if>
+						<option value="pages" {f:if(condition:'{filter.howtotraverse} == pages', then: 'selected')}>
+							<f:translate key="LLL:EXT:backend/Resources/Private/Language/locallang_db_new_content_el.xlf:menu_subpages.title">Subpages</f:translate>
 						</option>
-					</f:then>
-					<f:else>
-						<option value="all" {f:if(condition:'{filter.howtotraverse} == allmountpoints', then: 'selected')}>
-							<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.linktype.allmountpoints">All mountpoings</f:translate>
-						</option>
-					</f:else>
-				</f:if>
-				<option value="pages" {f:if(condition:'{filter.howtotraverse} == pages', then: 'selected')}>
-					<f:translate key="LLL:EXT:backend/Resources/Private/Language/locallang_db_new_content_el.xlf:menu_subpages.title">Subpages</f:translate>
-				</option>
-			</select>
-		</div>
+					</select>
+				</div>
+			</f:then>
+			<f:else>
+				<input type="hidden" id="brofix-list-select-howtotraverse" name="howtotraverse" value="pages"/>
+			</f:else>
+		</f:if>
 
+		<f:variable name="howtotraverse">pages</f:variable>
+		<f:if condition="{configuration.enableHowToTraverseControl}">
+			<f:variable name="howtotraverse">{filter.howtotraverse}</f:variable>
+		</f:if>
 
-		<f:if condition="{filter.howtotraverse} == 'pages' || {filter.howtotraverse} == 'allmountpoints'">
+		<f:if condition="{howtotraverse} == 'pages' || {howtotraverse} == 'allmountpoints'">
 			<div class="col">
 				<label for="brofix-list-select-pagedepth">
 					<f:translate key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:report.func.title" extensionName="Brofix"/>:
@@ -60,17 +71,24 @@
 				</select>
 			</div>
 		</f:if>
-		<div class="col">
-			<label for="viewMode"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.view"/>:</label>
-			<select id="viewMode" name="viewMode" class="form-control tceforms-select view_mode">
-				<option value="view_table_complex" {f:if(condition: "{viewMode} == 'view_table_complex'", then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.extended">|||||</f:translate>
-				</option>
-				<option value="view_table_min" {f:if(condition: "{viewMode} == 'view_table_min'", then: 'selected')}>
-				<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.simple">|||</f:translate>
-				</option>
-			</select>
-		</div>
+		<f:if condition="{configuration.enableSelectViewControl}">
+			<f:then>
+				<div class="col">
+					<label for="viewMode"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.view"/>:</label>
+					<select id="viewMode" name="viewMode" class="form-control tceforms-select view_mode">
+						<option value="view_table_complex" {f:if(condition: "{viewMode} == 'view_table_complex'", then: 'selected')}>
+						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.extended">|||||</f:translate>
+						</option>
+						<option value="view_table_min" {f:if(condition: "{viewMode} == 'view_table_min'", then: 'selected')}>
+						<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.form.table.simple">|||</f:translate>
+						</option>
+					</select>
+				</div>
+			</f:then>
+			<f:else>
+				<input type="hidden" id="viewMode" name="viewMode" value="view_table_complex" />
+			</f:else>
+		</f:if>
 
 		<div class="col">
 			<label for="uid_searchFilter"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>:</label>
