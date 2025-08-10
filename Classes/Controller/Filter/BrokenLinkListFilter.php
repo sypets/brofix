@@ -63,9 +63,7 @@ class BrokenLinkListFilter implements Arrayable
 
     protected int $checkStatusFilter = self::CHECK_STATUS_DEFAULT;
 
-    protected bool $useCache = true;
-
-    protected bool $showUseCache = true;
+    protected bool $usePagetreeCache = true;
 
     protected string $howtotraverse = 'pages';
 
@@ -81,7 +79,7 @@ class BrokenLinkListFilter implements Arrayable
         string $url = '',
         string $urlMatch = self::URL_MATCH_DEFAULT,
         int $checkStatus = self::CHECK_STATUS_DEFAULT,
-        bool $useCache = true,
+        bool $usePagetreeCache = true,
         string $howtotraverse = self::HOW_TO_TRAVERSE_DEFAULT
     ) {
         $this->uid_filtre = $uid;
@@ -90,12 +88,7 @@ class BrokenLinkListFilter implements Arrayable
         $this->urlFilterMatch = $urlMatch;
         $this->checkStatusFilter = $checkStatus;
         $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-        $this->showUseCache = (bool)($extensionConfiguration->get('brofix')['useCacheForPageList'] ?? true);
-        if ($this->showUseCache) {
-            $this->useCache = $useCache;
-        } else {
-            $this->useCache = false;
-        }
+        $this->usePagetreeCache = $usePagetreeCache;
         $this->howtotraverse = $howtotraverse;
     }
 
@@ -133,7 +126,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
             self::KEY_CHECK_STATUS => $this->getCheckStatusFilter(),
-            self::KEY_USE_CACHE => $this->isUseCache(),
+            self::KEY_USE_CACHE => $this->isUsePagetreeCache(),
             self::KEY_HOWTOTRAVERSE => $this->getHowtotraverse(),
         ];
     }
@@ -233,32 +226,14 @@ class BrokenLinkListFilter implements Arrayable
         $this->title_filter = $title_filter;
     }
 
-    public function isUseCache(): bool
+    public function isUsePagetreeCache(): bool
     {
-        if (!$this->showUseCache) {
-            $this->useCache = false;
-            return false;
-        }
-        return $this->useCache;
+        return $this->usePagetreeCache;
     }
 
-    public function setUseCache(bool $useCache): void
+    public function setUsePagetreeCache(bool $usePagetreeCache): void
     {
-        if (!$this->showUseCache) {
-            $this->useCache = false;
-        } else {
-            $this->useCache = $useCache;
-        }
-    }
-
-    public function isShowUseCache(): bool
-    {
-        return $this->showUseCache;
-    }
-
-    public function setShowUseCache(bool $showUseCache): void
-    {
-        $this->showUseCache = $showUseCache;
+        $this->usePagetreeCache = $usePagetreeCache;
     }
 
     public function getHowtotraverse(): string

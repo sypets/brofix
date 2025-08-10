@@ -52,6 +52,9 @@ class Configuration
 
     public const SHOW_EDIT_BUTTONS_DEFAULT_VALUE = self::SHOW_EDIT_BUTTONS_BOTH;
 
+    public const USE_CACHE_FOR_PAGELIST_DEFAULT = true;
+    public const ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT = false;
+
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
     public const DEFAULT_TSCONFIG = [
         'searchFields.' => [
@@ -163,6 +166,9 @@ class Configuration
 
     protected bool $recheckLinksOnEditing = false;
 
+    protected bool $useCacheForPageList = self::USE_CACHE_FOR_PAGELIST_DEFAULT;
+    protected bool $enableCacheForPageListButton = self::ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT;
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -183,6 +189,9 @@ class Configuration
         );
         $this->tcaProcessing = $extConfArray['tcaProcessing'] ?? self::TCA_PROCESSING_DEFAULT_VALUE;
         $this->overrideFormDataGroup = $extConfArray['overrideFormDataGroup'] ?? '';
+
+        $this->useCacheForPageList = (bool)($extConfArray['useCacheForPageList'] ?? self::USE_CACHE_FOR_PAGELIST_DEFAULT);
+        $this->enableCacheForPageListButton = (bool)($extConfArray['form']['control']['enableCacheForPageList'] ?? self::ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT);
 
         // initialize from global configuration
         // Hook to handle own checks
@@ -762,5 +771,19 @@ class Configuration
     public function isRecheckLinksOnEditing(): bool
     {
         return $this->recheckLinksOnEditing;
+    }
+
+    public function isUseCacheForPageList(): bool
+    {
+        return $this->useCacheForPageList;
+    }
+
+    public function isEnableCacheForPageListButton(): bool
+    {
+        // do not show button in any case if cache is disabled
+        if (!$this->isUseCacheForPageList()) {
+            return false;
+        }
+        return $this->enableCacheForPageListButton;
     }
 }

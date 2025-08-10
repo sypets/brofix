@@ -341,6 +341,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
             $linkTypes,
             $searchFields,
             new BrokenLinkListFilter(),
+            $this->configuration,
             []
         );
 
@@ -667,6 +668,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
             $linkTypes,
             $searchFields,
             new BrokenLinkListFilter(),
+            $this->configuration,
             []
         );
 

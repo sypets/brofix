@@ -488,6 +488,16 @@ class BrokenLinkListController extends AbstractBrofixController
                 $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
                 if ($this->id !== 0) {
                     $this->pageList = [];
+
+                    // pagetree cache is on if pagetree cache is enabled in extension.
+                    $usePageTreeCache = $this->configuration->isUseCacheForPageList();
+                    if ($usePageTreeCache) {
+                        // If pagetree cache is enabled and pagetree cache button is enabled, must also check if on in filter
+                        if ($this->configuration->isEnableCacheForPageListButton()) {
+                            $usePageTreeCache = $this->filter->isUsePagetreeCache();
+                        }
+                    }
+
                     $this->pagesRepository->getPageList(
                         $this->pageList,
                         [$this->id],
@@ -498,7 +508,7 @@ class BrokenLinkListController extends AbstractBrofixController
                         $this->configuration->getDoNotCheckPagesDoktypes(),
                         $this->configuration->getDoNotTraversePagesDoktypes(),
                         $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
-                        $this->filter->isUseCache()
+                        $usePageTreeCache
                     );
                 } else {
                     $this->pageList = [];
@@ -517,6 +527,16 @@ class BrokenLinkListController extends AbstractBrofixController
                     $considerHidden = $this->configuration->isCheckHidden();
                     $permsClause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
                     $this->pageList = [];
+
+                    // pagetree cache is on if pagetree cache is enabled in extension.
+                    $usePageTreeCache = $this->configuration->isUseCacheForPageList();
+                    if ($usePageTreeCache) {
+                        // If pagetree cache is enabled and pagetree cache button is enabled, must also check if on in filter
+                        if ($this->configuration->isEnableCacheForPageListButton()) {
+                            $usePageTreeCache = $this->filter->isUsePagetreeCache();
+                        }
+                    }
+
                     $this->pagesRepository->getPageList(
                         $this->pageList,
                         $startPids,
@@ -527,7 +547,7 @@ class BrokenLinkListController extends AbstractBrofixController
                         $this->configuration->getDoNotCheckPagesDoktypes(),
                         $this->configuration->getDoNotTraversePagesDoktypes(),
                         $this->configuration->getTraverseMaxNumberOfPagesInBackend(),
-                        $this->filter->isUseCache()
+                        $usePageTreeCache
                     );
                 }
         }
@@ -574,6 +594,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 $this->linkTypes,
                 $this->configuration->getSearchFields(),
                 $this->filter,
+                $this->configuration,
                 self::ORDER_BY_VALUES[$this->orderBy] ?? []
             );
             if ($brokenLinks) {
@@ -623,7 +644,12 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->moduleTemplate->assign('pagination', $this->pagination);
         $this->moduleTemplate->assign('orderBy', $this->orderBy);
         $this->moduleTemplate->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+
+        // todo: only pass configuration
         $this->moduleTemplate->assign('showPageLayoutButton', $this->configuration->isShowPageLayoutButton());
+
+        $this->moduleTemplate->assign('configuration', $this->configuration);
+
         $sortActions = [];
 
         foreach (array_keys(self::ORDER_BY_VALUES) as $key) {

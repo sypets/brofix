@@ -1,6 +1,11 @@
-### separate label and description with ":"
-### Things added in later versions, add at the bottom
-### Use category "checking" and "report" and "page module"
+### - separate label and description with ":"
+### - ### Add in order which makes sense to user
+### - Use category (cat=)
+###   1. "checking"
+###   2. "report"
+###   3. "page module"
+
+### checking ###
 
 # cat=checking; type=string; label=Do not use these softreference parsers (comma separated list) when parsing content: This is a workaround for a TYPO3 core bug. The default is "url".
 excludeSoftrefs = url
@@ -14,34 +19,39 @@ tcaProcessing = default
 # cat=checking; type=string; label= Override FormDataGroup for processing TCA: The default is empty which means use the FormDataGroup based on tcaProcessing setting.
 overrideFormDataGroup =
 
-# cat=report; type=int; label= Maximum number of pages to traverse in Backend: Limit is disabled if =0. The default is 10000. This should be set to a hard limit for performance reasons.
-traverseMaxNumberOfPagesInBackend = 10000
-
 # cat=checking; type=int; label= External link target cache (in seconds) for checking: Default value is 0, which means use TSconfig value linkTargetCache.expiresLow
 linkTargetCacheExpiresLow = 0
 
 # cat=checking; type=int; label= External link target cache (in seconds) for rechecking in Backend: Default value is 0, which means use TSconfig value linkTargetCache.expiresHigh
 linkTargetCacheExpiresHigh = 0
 
-# cat=report; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
-showEditButtons = both
-
-# cat=report; type=options[Off=0,On=1]; label=Show button to jump to page layout view
-showPageLayoutButton = 1
-
-### since TYPO3 v12
-
 # cat=checking; type=string;label=If an error code / type / exception matches this, the URL is non-checkable: This can be a regex if it starts with regex (separated by colon), otherwise it matches by start of string.
 combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/
 
-# cat=report; type=boolean;label=Show all links, not just broken links: The default is 1 (true).
+# cat=checking; type=boolean; label=After editing a record, recheck links; This is NOT recommended as it may result in excessive checking and delays when editing. It is already checked if links still exist in record.
+recheckLinksOnEditing = 0
+
+### report ###
+
+# cat=report; type=int; label= Maximum number of pages to traverse in Backend: Limit is disabled if =0. The default is 10000. This should be set to a hard limit for performance reasons, esp. if pagetree cache is not used (useCacheForPageList).
+traverseMaxNumberOfPagesInBackend = 10000
+
+# cat=report; type=boolean; label=Use cache for pagetree list: This is recommended for large number of pages to improve performance, default is off (0).
+useCacheForPageList = 1
+
+# cat=report; type=boolean; label=Show control to disable / enable cache for pagetree list: Will only be shown if cache is used (useCacheForPageList=1), default is off (0).
+form.control.enableCacheForPageList = 0
+
+# cat=report; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
+showEditButtons = both
+
+# cat=report; type=options[Off=0,On=1]; label=Show button to jump to page layout view (in list)
+showPageLayoutButton = 1
+
+# cat=report; type=boolean;label=Show all links, not just broken links (in list): The default is 1 (true).
 showalllinks = 1
+
+### page module ###
 
 # cat=page module; type=boolean;label=Show message in page module if broken links exist on page: Has small performance impact, requires the extension page_callouts, can be further configured in BE user settings
 showPageCalloutBrokenLinksExist = 1
-
-# cat=report; type=boolean; label=Use cache for page list; This is recommended for large number of pages to improve performance
-useCacheForPageList = 1
-
-# cat=checking; type=boolean; label=After editing a record, recheck links; This is NOT recommended as it may result in excessive checking and delays when editing. It is already checked if links still exist in record.
-recheckLinksOnEditing = 0
