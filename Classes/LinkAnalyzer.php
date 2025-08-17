@@ -177,6 +177,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             // last_check reflects time of last check (is now because URL not fetched from cache)
             $brokenLinkRecord['last_check_url'] = \time();
             $brokenLinkRecord['last_check'] = \time();
+            $brokenLinkRecord['url_checker'] = $linkTargetResponse->getUrlChecker();
             $identifier = [
                     'url' => $url,
                     'link_type' => $linkType
@@ -555,6 +556,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     // last_check reflects time of last check (may be older if URL was in cache)
                     $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
+                    $record['url_checker'] = $linkTargetResponse->getUrlChecker();
                     if ($this->brokenLinkRepository->insertOrUpdateBrokenLink($record)
                         && $linkTargetResponse->isError()
                     ) {
@@ -567,6 +569,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['url_response'] = $linkTargetResponse->toJson();
                     $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
+                    $record['url_checker'] = $linkTargetResponse->getUrlChecker();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                 }
             }

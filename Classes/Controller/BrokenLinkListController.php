@@ -1074,6 +1074,13 @@ class BrokenLinkListController extends AbstractBrofixController
                 );
                 break;
         }
+        if (($row['url_checker'] ?? false)
+        && ($this->configuration->isShowUrlCheckerOn()
+            ||
+            ($this->configuration->isShowUrlCheckerAdminOnly() && $this->getBackendUser()->isAdmin()))
+        ) {
+            $linkMessage .= ' (' . $row['url_checker'] . ')';
+        }
         $variables['linkmessage'] = $linkMessage;
         $variables['status'] = $linkTargetResponse->getStatus();
 

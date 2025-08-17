@@ -40,6 +40,8 @@ class LinkTargetResponse
 
     protected string $reasonCannotCheck = '';
 
+    protected string $urlChecker = '';
+
     /**
      * @var array<int,array{from:string, to:string}>
      */
@@ -96,7 +98,7 @@ class LinkTargetResponse
     {
         $status = $values['valid'] ? self::RESULT_OK : self::RESULT_BROKEN;
         $errorParams = $values['errorParams'] ?? [];
-        return new LinkTargetResponse(
+        $linkTargetResponse = new LinkTargetResponse(
             $status,
             $values['lastChecked'] ?? 0,
             $errorParams['custom'] ?? [],
@@ -105,6 +107,10 @@ class LinkTargetResponse
             $errorParams['exceptionMsg'] ?? '',
             $errorParams['message'] ?? ''
         );
+        if (($values['url_checker'] ?? false)) {
+            $linkTargetResponse->setUrlChecker($values['url_checker']);
+        }
+        return $linkTargetResponse;
     }
 
     /**
@@ -125,6 +131,9 @@ class LinkTargetResponse
         );
         if ($values['redirects'] ?? false) {
             $linkTargetResponse->setRedirects($values['redirects'] ?? []);
+        }
+        if (($values['url_checker'] ?? false)) {
+            $linkTargetResponse->setUrlChecker($values['url_checker']);
         }
         return $linkTargetResponse;
     }
@@ -310,5 +319,15 @@ class LinkTargetResponse
     public function getRedirectCount(): int
     {
         return count($this->redirects);
+    }
+
+    public function getUrlChecker(): string
+    {
+        return $this->urlChecker;
+    }
+
+    public function setUrlChecker(string $urlChecker): void
+    {
+        $this->urlChecker = $urlChecker;
     }
 }

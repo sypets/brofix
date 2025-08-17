@@ -56,6 +56,13 @@ class Configuration
     public const ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT = false;
 
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
+
+    public const SHOW_URL_CHECKER_OFF = 0;
+    public const SHOW_URL_CHECKER_ADMIN_ONLY = 1;
+    public const SHOW_URL_CHECKER_ON = 2;
+
+    public const SHOW_URL_CHECKER_DEFAULT = self::SHOW_URL_CHECKER_OFF;
+
     public const DEFAULT_TSCONFIG = [
         'searchFields.' => [
             'pages' => 'media,url',
@@ -171,6 +178,8 @@ class Configuration
     protected bool $enableSelectViewControl = true;
     protected bool $enableHowToTraverseControl = true;
 
+    protected int $showUrlChecker = self::SHOW_URL_CHECKER_DEFAULT;
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -196,6 +205,7 @@ class Configuration
         $this->enableCacheForPageListButton = (bool)($extConfArray['form']['control']['enableCacheForPageList'] ?? self::ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT);
         $this->enableSelectViewControl = (bool)($extConfArray['form']['control']['selectView'] ?? true);
         $this->enableHowToTraverseControl = (bool)($extConfArray['form']['control']['howToTraverse'] ?? true);
+        $this->showUrlChecker = (int)($extConfArray['showUrlChecker'] ?? self::SHOW_URL_CHECKER_DEFAULT);
 
         // initialize from global configuration
         // Hook to handle own checks
@@ -799,5 +809,25 @@ class Configuration
     public function isEnableHowToTraverseControl(): bool
     {
         return $this->enableHowToTraverseControl;
+    }
+
+    public function getShowUrlChecker(): int
+    {
+        return $this->showUrlChecker;
+    }
+
+    public function isShowUrlCheckerOn(): bool
+    {
+        return $this->showUrlChecker === self::SHOW_URL_CHECKER_ON;
+    }
+
+    public function isShowUrlCheckerOff(): bool
+    {
+        return $this->showUrlChecker === self::SHOW_URL_CHECKER_OFF;
+    }
+
+    public function isShowUrlCheckerAdminOnly(): bool
+    {
+        return $this->showUrlChecker === self::SHOW_URL_CHECKER_ADMIN_ONLY;
     }
 }
