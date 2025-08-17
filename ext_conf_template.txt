@@ -57,6 +57,9 @@ showPageLayoutButton = 1
 # cat=report; type=boolean;label=Show all links, not just broken links (in list): The default is 1 (true).
 showalllinks = 1
 
+# cat=report; type=options[No=0, Show for admins=1, Show for all=2]; label=Show URL checker (e.g. brofix/guzzle, default is off)
+showUrlChecker = 0
+
 ### page module ###
 
 # cat=page module; type=boolean;label=Show message in page module if broken links exist on page: Has small performance impact, requires the extension page_callouts, can be further configured in BE user settings

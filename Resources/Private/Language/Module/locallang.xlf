@@ -276,6 +276,9 @@
 			<trans-unit id="list.report.error.file.notexisting" resname="list.report.error.file.notexisting">
 				<source>File doesn't exist.</source>
 			</trans-unit>
+			<trans-unit id="list.report.error.unknown" resname="list.report.error.unknown">
+				<source>Unknown error.</source>
+			</trans-unit>
 
 
 			<!-- link target error messages: HTTP Status codes -->

@@ -377,6 +377,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => 'brofix/guzzle',
                 ],
                 [
                     'record_uid' => 2,
@@ -392,6 +393,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => '',
                 ],
                 [
                     'record_uid' => 3,
@@ -407,6 +409,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => '',
                 ],
                 [
                     'record_uid' => 5,
@@ -422,6 +425,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => '',
                 ],
             ]
         ];
@@ -472,6 +476,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => 'brofix/guzzle'
                 ],
                 [
                     'record_uid' => 3,
@@ -487,6 +492,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => ''
                 ],
                 [
                     'record_uid' => 5,
@@ -502,6 +508,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => ''
                 ],
             ]
         ];
@@ -529,6 +536,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => 'brofix/guzzle'
                 ],
                 [
                     'record_uid' => 2,
@@ -537,13 +545,14 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'headline' => '',
                     'field' => 'header_link',
                     'table_name' => 'tt_content',
-                    'link_title' => null,
+                    'link_title' => '',
                     'url' => 'http://localhost/iAmInvalid',
                     'link_type' => 'external',
                     'element_type' => 'textmedia',
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => ''
                 ],
                 [
                     'record_uid' => 3,
@@ -559,6 +568,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => ''
                 ],
                 [
                     'record_uid' => 5,
@@ -574,6 +584,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => ''
                 ],
             ]
         ];
@@ -601,6 +612,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => 'brofix/guzzle'
                 ],
             ]
         ];
@@ -629,6 +641,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                     'check_status' => 1,
                     'flexform_field' => '',
                     'flexform_field_label' => '',
+                    'url_checker' => 'brofix/guzzle'
                 ],
             ]
         ];

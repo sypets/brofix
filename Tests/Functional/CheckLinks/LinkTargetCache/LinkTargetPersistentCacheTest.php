@@ -85,7 +85,8 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
             'message' => $errorMessage,
             'custom' => [],
             'reasonCannotCheck' => '',
-            'redirects' => []
+            'redirects' => [],
+            'urlChecker' => '',
 
         ];
 

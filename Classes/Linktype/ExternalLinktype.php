@@ -31,6 +31,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
+    protected const URL_CHECKER_NAME = 'brofix/guzzle';
+
     // HTTP status code was delivered (and can be found in $errorParams->errno)
     public const ERROR_TYPE_HTTP_STATUS_CODE = 'httpStatusCode';
     // An error occurred in lowlevel handler and a cURL error code can be found in $errorParams->errno
@@ -38,6 +40,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     public const ERROR_TYPE_TOO_MANY_REDIRECTS = 'tooManyRedirects';
     public const ERROR_TYPE_UNABLE_TO_PARSE = 'unableToParseUri';
     public const ERROR_TYPE_UNKNOWN = 'unknown';
+    // Generic error : todo handle
+    public const ERROR_TYPE_GENERAL = 'general';
 
     /**
      * @var RequestFactory
@@ -120,10 +124,13 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     public function checkLink(string $origUrl, array $softRefEntry, int $flags = 0): ?LinkTargetResponse
     {
         $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
+        $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
 
         // check if URL should be excluded, treat excluded URLs as valid URLs
         if ($this->excludeLinkTarget->isExcluded($origUrl, 'external')) {
-            return LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_EXCLUDED);
+            $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_EXCLUDED);
+            $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
+            return $linkTargetResponse;
         }
 
         // use URL from cache, if available
@@ -142,6 +149,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 $this->configuration->getLinkTargetCacheExpires($flags)
             );
             if ($urlResponse) {
+                $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
                 if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE_ON_ERROR) !== 0)
                     && $urlResponse->getStatus() === LinkTargetResponse::RESULT_BROKEN) {
                     // make sure result is fresh if invalid URL
@@ -221,7 +229,9 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             }
             $this->crawlDelay->setLastCheckedTime($this->domain);
         }
+        $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
         $this->insertIntoLinkTargetCache($url, $linkTargetResponse);
+
         return $linkTargetResponse;
     }
 
@@ -430,8 +440,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      *
      * @param ?LinkTargetResponse $linkTargetResponse All parameters needed for the rendering of the error message
      * @return string Validation error message
-     *
-     * @deprecated
      */
     public function getErrorMessage(?LinkTargetResponse $linkTargetResponse): string
     {
@@ -483,11 +491,20 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 break;
 
             case 'tooManyRedirects':
+            case self::ERROR_TYPE_TOO_MANY_REDIRECTS:
                 $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.tooManyRedirects');
                 break;
 
+            case self::ERROR_TYPE_UNABLE_TO_PARSE:
+                $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.other.parse');
+                break;
+
+            case self::ERROR_TYPE_UNKNOWN:
+                $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.unknown');
+                break;
+
             default:
-                $message = $exception;
+                $message = $exception ?: $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.unknown');
         }
         return $message;
     }

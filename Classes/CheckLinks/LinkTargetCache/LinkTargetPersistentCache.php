@@ -115,7 +115,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
                     'link_type' => $linkType,
                     'url_response' => $linkTargetResponse->toJson(),
                     'check_status' => $linkTargetResponse->getStatus(),
-                    'last_check' => \time()
+                    'last_check' => \time(),
+                    'url_checker' => $linkTargetResponse->getUrlChecker(),
                 ]
             )
             ->executeStatement();
@@ -133,6 +134,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
             ->set('url_response', $linkTargetResponse->toJson())
             ->set('check_status', (string)$linkTargetResponse->getStatus())
             ->set('last_check', (string)\time())
+            ->set('url_checker', $linkTargetResponse->getUrlChecker())
             ->executeStatement();
     }
 
