@@ -1,6 +1,6 @@
 <f:layout name="SystemEmail" />
 <f:section name="Title"><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.title" languageKey="{language}">Broken Links Report</f:translate></f:section>
-<f:section name="Subject"><f:if condition="{subject}"><f:then>{subject}</f:then><f:else><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header" languageKey="{language}">Broken links for page </f:translate></f:else></f:if> "{stats.pageTitle}" [{pageId}]: {stats.countBrokenLinks}</f:section>
+<f:section name="Subject"><f:if condition="{subject}"><f:then>{subject}</f:then><f:else><f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header" languageKey="{language}">Broken links for page </f:translate></f:else></f:if> "{stats.pageTitle}" [{pageId}]: {stats.countBrokenLinks} (<f:format.number decimals="2">{stats.percentBrokenLinks}</f:format.number>%)</f:section>
 <f:section name="Main">
 
 <f:translate key="LLL:EXT:brofix/Resources/Private/Language/locallang.xlf:email.brokenlinksreport.header.broken_links" languageKey="{language}">Broken links</f:translate>
