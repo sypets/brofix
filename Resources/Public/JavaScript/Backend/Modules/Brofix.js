@@ -38,6 +38,7 @@ class Brofix {
       $('#uid_searchFilter').attr('value', '');
       $('#linktype_searchFilter').val('all');
       $('#url_searchFilter').attr('value', '');
+      $('#error_searchFilter').attr('value', '');
       $('#url_match_searchFilter').val('partial');
       $('#brofix-list-select-check_status').val('1');
       $('#refreshLinkList').click();

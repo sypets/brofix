@@ -178,6 +178,8 @@ class LinkAnalyzer implements LoggerAwareInterface
             $brokenLinkRecord['last_check_url'] = \time();
             $brokenLinkRecord['last_check'] = \time();
             $brokenLinkRecord['url_checker'] = $linkTargetResponse->getUrlChecker();
+            $brokenLinkRecord['error_type'] = $linkTargetResponse->getErrorType();
+            $brokenLinkRecord['errno'] = $linkTargetResponse->getErrno();
             $identifier = [
                     'url' => $url,
                     'link_type' => $linkType
@@ -557,6 +559,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $record['url_checker'] = $linkTargetResponse->getUrlChecker();
+                    $brokenLinkRecord['error_type'] = $linkTargetResponse->getErrorType();
+                    $brokenLinkRecord['errno'] = $linkTargetResponse->getErrno();
                     if ($this->brokenLinkRepository->insertOrUpdateBrokenLink($record)
                         && $linkTargetResponse->isError()
                     ) {
@@ -570,6 +574,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                     $record['last_check_url'] = $linkTargetResponse->getLastChecked() ?: \time();
                     $record['last_check'] = \time();
                     $record['url_checker'] = $linkTargetResponse->getUrlChecker();
+                    $brokenLinkRecord['error_type'] = $linkTargetResponse->getErrorType();
+                    $brokenLinkRecord['errno'] = $linkTargetResponse->getErrno();
                     $this->brokenLinkRepository->insertOrUpdateBrokenLink($record);
                 }
             }

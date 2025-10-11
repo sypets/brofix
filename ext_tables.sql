@@ -20,6 +20,8 @@ CREATE TABLE tx_brofix_broken_links (
 	url_response text,
 	check_status int(5) DEFAULT '4' NOT NULL,
 	url_checker varchar(100) DEFAULT '' NOT NULL,
+	error_type  varchar(50) DEFAULT '' NOT NULL,
+	errno int(11) unsigned DEFAULT '0' NOT NULL,
 
 	last_check int(11) DEFAULT '0' NOT NULL,
 	last_check_url int(11) DEFAULT '0' NOT NULL,
@@ -40,6 +42,8 @@ CREATE TABLE tx_brofix_link_target_cache (
 	check_status int(11) unsigned DEFAULT '0' NOT NULL,
 	url_response text,
 	url_checker varchar(100) DEFAULT '' NOT NULL,
+	error_type varchar(50) DEFAULT '' NOT NULL,
+	errno int(11) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid)
 );

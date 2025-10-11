@@ -96,12 +96,13 @@ class BrokenLinkListController extends AbstractBrofixController
         // sort by error type
         'error' => [
             ['check_status', 'ASC'],
-            ['link_type', 'ASC'],
-            ['url_response', 'ASC']
+            ['error_type', 'ASC'],
+            ['errno', 'ASC']
         ],
         'error_reverse' => [
-            ['link_type', 'DESC'],
-            ['url_response', 'DESC']
+            ['check_status', 'DESC'],
+            ['error_type', 'DESC'],
+            ['errno', 'DESC']
         ],
     ];
 
@@ -1103,6 +1104,13 @@ class BrokenLinkListController extends AbstractBrofixController
             $variables['link_title'] = '';
         }
         $variables['linktext'] = $hookObj->getBrokenLinkText($row, $linkTargetResponse->getCustom());
+
+        // error
+        /** @phpstan-ignore-next-line  */
+        if ($row['error_type'] ?? false && $row['errno'] ?? false) {
+            $variables['error'] = $row['error_type'] . ':' . $row['errno'];
+        }
+
 
         // last check of record
         // show the oldest last_check, either for the record or for the link target
