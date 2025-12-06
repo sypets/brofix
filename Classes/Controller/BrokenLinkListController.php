@@ -1111,7 +1111,6 @@ class BrokenLinkListController extends AbstractBrofixController
             $variables['error'] = $row['error_type'] . ':' . $row['errno'];
         }
 
-
         // last check of record
         // show the oldest last_check, either for the record or for the link target
         $variables['lastcheck_combined'] = StringUtil::formatTimestampAsString($row['last_check'] < $row['last_check_url'] ? $row['last_check'] : $row['last_check_url']);

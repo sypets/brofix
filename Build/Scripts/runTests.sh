@@ -95,10 +95,8 @@ Options:
             - postgres: use postgres
             - sqlite: use sqlite
 
-    -p <8.1|8.2>
+    -p <${SUPPORTED_PHP_VERSIONS}>
         Specifies the PHP minor version to be used
-            - 8.1: use PHP 8.1
-            - 8.2 (default)
 
     -e "<phpunit|phpstan options>"
         Only with -s functional|unit|phpstan
@@ -168,10 +166,10 @@ if ! command -v realpath &> /dev/null; then
 else
   ROOT_DIR=`realpath ${PWD}/../../`
 fi
-CORE_VERSION="12.4"
+CORE_VERSION="13.4"
 TEST_SUITE="unit"
 DBMS="mariadb"
-PHP_VERSION="8.2"
+PHP_VERSION="$DEFAULT_PHP_VERSIONS"
 DATABASE_DRIVER=""
 MARIADB_VERSION="10.3"
 MYSQL_VERSION="8.0"

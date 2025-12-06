@@ -42,7 +42,6 @@ class LinkTargetResponse
 
     protected string $urlChecker = '';
 
-
     /**
      * @var array<int,array{from:string, to:string}>
      */

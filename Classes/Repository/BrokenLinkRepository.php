@@ -142,24 +142,27 @@ class BrokenLinkRepository implements LoggerAwareInterface
             $errorConstraintsOr = [];
             if ($errorFilter !== '') {
                 $errorCombinations = explode('|', $errorFilter);
-                foreach($errorCombinations as $errorCombination) {
-
+                foreach ($errorCombinations as $errorCombination) {
                     $parts = explode(':', $errorCombination);
                     if (count($parts) === 2) {
-
                         $errorType = $parts[0];
                         $errno = (int)$parts[1];
                         $errorConstraintsOr[] = $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->eq(self::TABLE . '.error_type',
-                                $queryBuilder->createNamedParameter($errorType)),
-                            $queryBuilder->expr()->eq(self::TABLE . '.errno',
-                                $queryBuilder->createNamedParameter($errno, Connection::PARAM_INT))
+                            $queryBuilder->expr()->eq(
+                                self::TABLE . '.error_type',
+                                $queryBuilder->createNamedParameter($errorType)
+                            ),
+                            $queryBuilder->expr()->eq(
+                                self::TABLE . '.errno',
+                                $queryBuilder->createNamedParameter($errno, Connection::PARAM_INT)
+                            )
                         );
-                    } else if (count($parts) === 1) {
+                    } elseif (count($parts) === 1) {
                         $errorType = $parts[0];
-                        $errorConstraintsOr[] = $queryBuilder->expr()->eq(self::TABLE . '.error_type',
-                            $queryBuilder->createNamedParameter($errorType));
-
+                        $errorConstraintsOr[] = $queryBuilder->expr()->eq(
+                            self::TABLE . '.error_type',
+                            $queryBuilder->createNamedParameter($errorType)
+                        );
                     }
                 }
             }

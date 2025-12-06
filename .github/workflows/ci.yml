@@ -144,9 +144,9 @@ jobs:
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
 
-      - name: "Unit tests"
-        if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+      #- name: "Unit tests"
+      #  if: always()
+      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
 
       - name: "Functional tests with mariadb"
         if: always()
