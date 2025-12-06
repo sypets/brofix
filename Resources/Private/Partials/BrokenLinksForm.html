@@ -130,6 +130,17 @@
 			</select>
 		</div>
 
+		<f:comment>Error code</f:comment>
+		<div class="col">
+			<label for="error_searchFilter">
+				<f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.error"/>:
+			</label>
+			<input type="search" size="20" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized"
+				   name="error_searchFilter"
+				   placeholder=""
+				   id="error_searchFilter"
+				   value="{filter.errorFilter}"/>
+		</div>
 
 		<f:if condition="{configuration.showalllinks}">
 			<div class="col">

@@ -58,6 +58,7 @@ return [
              'linktype_searchFilter' => 'all',
              'url_searchFilter' => 'all',
              'url_match_searchFilter' => 'partial',
+             'error_searchFilter' => '',
              'check_status' => '1',
              'current_record_uid' => '',
              'current_record_table' => '',

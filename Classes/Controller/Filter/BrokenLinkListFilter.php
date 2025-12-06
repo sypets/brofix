@@ -28,6 +28,8 @@ class BrokenLinkListFilter implements Arrayable
 
     protected const KEY_HOWTOTRAVERSE = 'howtotraverse';
 
+    protected const KEY_ERROR = 'error';
+
     /** @var string */
     protected const LINK_TYPE_FILTER_DEFAULT = 'all';
 
@@ -61,6 +63,8 @@ class BrokenLinkListFilter implements Arrayable
     /** @var string  */
     protected $urlFilterMatch = self::URL_MATCH_DEFAULT;
 
+    protected string $errorFilter = '';
+
     protected int $checkStatusFilter = self::CHECK_STATUS_DEFAULT;
 
     protected bool $usePagetreeCache = true;
@@ -78,6 +82,7 @@ class BrokenLinkListFilter implements Arrayable
         string $linkType = self::LINK_TYPE_DEFAULT,
         string $url = '',
         string $urlMatch = self::URL_MATCH_DEFAULT,
+        string $errorFilter = '',
         int $checkStatus = self::CHECK_STATUS_DEFAULT,
         bool $usePagetreeCache = true,
         string $howtotraverse = self::HOW_TO_TRAVERSE_DEFAULT
@@ -86,6 +91,7 @@ class BrokenLinkListFilter implements Arrayable
         $this->linktype_filter = $linkType;
         $this->url_filtre = $url;
         $this->urlFilterMatch = $urlMatch;
+        $this->errorFilter = $errorFilter;
         $this->checkStatusFilter = $checkStatus;
         $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         $this->usePagetreeCache = $usePagetreeCache;
@@ -99,6 +105,7 @@ class BrokenLinkListFilter implements Arrayable
             $moduleData->get('linktype_searchFilter', 'all'),
             $moduleData->get('url_searchFilter', ''),
             $moduleData->get('url_match_searchFilter', 'partial'),
+            $moduleData->get('error_searchFilter', ''),
             (int)$moduleData->get('check_status', (string)self::CHECK_STATUS_DEFAULT),
             (bool)$moduleData->get('useCache', 1),
             $moduleData->get('howtotraverse', self::HOW_TO_TRAVERSE_DEFAULT),
@@ -112,6 +119,7 @@ class BrokenLinkListFilter implements Arrayable
             $values[self::KEY_LINKTYPE] ?? self::LINK_TYPE_DEFAULT,
             $values[self::KEY_URL] ?? '',
             $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
+            $values[self::KEY_ERROR] ?? '',
             $values[self::KEY_CHECK_STATUS] ?? self::CHECK_STATUS_DEFAULT,
             $values[self::KEY_USE_CACHE] ?? 1,
             $values[self::KEY_HOWTOTRAVERSE] ?? self::HOW_TO_TRAVERSE_DEFAULT,
@@ -125,6 +133,7 @@ class BrokenLinkListFilter implements Arrayable
             self::KEY_LINKTYPE => $this->getLinktypeFilter(),
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
+            self::KEY_ERROR => $this->getErrorFilter(),
             self::KEY_CHECK_STATUS => $this->getCheckStatusFilter(),
             self::KEY_USE_CACHE => $this->isUsePagetreeCache(),
             self::KEY_HOWTOTRAVERSE => $this->getHowtotraverse(),
@@ -141,6 +150,7 @@ class BrokenLinkListFilter implements Arrayable
         if ($this->getUidFilter()
             || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER_DEFAULT
             || $this->getUrlFilter()
+            || $this->getErrorFilter()
         ) {
             return true;
         }
@@ -202,6 +212,19 @@ class BrokenLinkListFilter implements Arrayable
     public function setUrlFilterMatch(string $urlFilterMatch): void
     {
         $this->urlFilterMatch = $urlFilterMatch;
+    }
+
+    /**
+     * Combined eror of <errorType>:<errno> or several e.g. 'libcurlErrno:6|custom:11'
+     */
+    public function getErrorFilter(): string
+    {
+        return $this->errorFilter;
+    }
+
+    public function setErrorFilter(string $errorFilter): void
+    {
+        $this->errorFilter = $errorFilter;
     }
 
     public function getCheckStatusFilter(): int

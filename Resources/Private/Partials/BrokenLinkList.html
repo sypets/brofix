@@ -142,7 +142,25 @@
 					<f:if condition="{item.status} === 2"><core:icon identifier="actions-check-circle"/></f:if>
 					<f:if condition="{item.status} === 3"><core:icon identifier="actions-question-circle"/></f:if>
 					<f:if condition="{item.status} === 4"><core:icon identifier="actions-ban"/></f:if>
-					{item.linkmessage -> f:format.raw()}</td>
+					{item.linkmessage -> f:format.raw()}
+					<f:if condition="{item.status} == 1">
+						<div class="inline-action">
+							<f:if condition="{filter.errorFilter}">
+								<f:then>
+									<a class="btn btn-default" href="{listUri}&error_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+										<core:icon identifier="actions-close" size="medium"/>
+									</a>
+								</f:then>
+								<f:else>
+									<a class="btn btn-default" href="{listUri}&error_searchFilter={item.error}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.element.uid.tooltip', extensionName: 'Brofix')}">
+										<core:icon identifier="actions-filter" size="small"/>
+										<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+									</a>
+								</f:else>
+							</f:if>
+						</div>
+					</f:if>
+				</td>
 
 				<f:comment>==== last_check_url ====</f:comment>
 				<td class="mobile-optional" title="">

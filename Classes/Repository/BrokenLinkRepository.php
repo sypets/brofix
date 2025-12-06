@@ -134,6 +134,44 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), Connection::PARAM_INT))
                 );
             }
+
+            // errorFilter, might be 'custom:13' or 'custom:13|httpErrorCode:404' etc. Several combinations, separated
+            // by '|', each combination with <errortype>:<errno>
+
+            $errorFilter = $filter->getErrorFilter();
+            $errorConstraintsOr = [];
+            if ($errorFilter !== '') {
+                $errorCombinations = explode('|', $errorFilter);
+                foreach ($errorCombinations as $errorCombination) {
+                    $parts = explode(':', $errorCombination);
+                    if (count($parts) === 2) {
+                        $errorType = $parts[0];
+                        $errno = (int)$parts[1];
+                        $errorConstraintsOr[] = $queryBuilder->expr()->and(
+                            $queryBuilder->expr()->eq(
+                                self::TABLE . '.error_type',
+                                $queryBuilder->createNamedParameter($errorType)
+                            ),
+                            $queryBuilder->expr()->eq(
+                                self::TABLE . '.errno',
+                                $queryBuilder->createNamedParameter($errno, Connection::PARAM_INT)
+                            )
+                        );
+                    } elseif (count($parts) === 1) {
+                        $errorType = $parts[0];
+                        $errorConstraintsOr[] = $queryBuilder->expr()->eq(
+                            self::TABLE . '.error_type',
+                            $queryBuilder->createNamedParameter($errorType)
+                        );
+                    }
+                }
+            }
+            if ($errorConstraintsOr) {
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->or(...$errorConstraintsOr)
+                );
+            }
+
             $urlFilter = $filter->getUrlFilter();
             if ($urlFilter != '') {
                 switch ($filter->getUrlFilterMatch()) {
