@@ -327,7 +327,12 @@ class BrokenLinkListController extends AbstractBrofixController
         $this->moduleTemplate->assign('docsurl', $this->configuration->getDocsUrl());
         $this->moduleTemplate->assign(
             'showRecheckButton',
-            $this->getBackendUser()->isAdmin() || $this->depth <= $this->configuration->getRecheckButton()
+            // only show recheck button if limit to pages or mount points
+            $this->filter->getHowtotraverse() !== BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL
+            && (
+                $this->getBackendUser()->isAdmin()
+                || $this->depth <= $this->configuration->getRecheckButton()
+            )
         );
         $this->moduleTemplate->assign('isAdmin', $this->getBackendUser()->isAdmin());
     }
@@ -622,7 +627,9 @@ class BrokenLinkListController extends AbstractBrofixController
                 }
                 $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
             }
-            if ($this->configuration->getTraverseMaxNumberOfPagesInBackend()
+            if ($howToTraverse !== BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL
+                && $this->configuration->getTraverseMaxNumberOfPagesInBackend()
+                && is_countable($this->pageList)
                 && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
                 $this->createFlashMessage(
                     sprintf(
