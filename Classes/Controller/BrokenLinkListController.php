@@ -329,7 +329,8 @@ class BrokenLinkListController extends AbstractBrofixController
             'showRecheckButton',
             // only show recheck button if limit to pages or mount points
             $this->filter->getHowtotraverse() !== BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL
-            && ($this->getBackendUser()->isAdmin()
+            && (
+                $this->getBackendUser()->isAdmin()
                 || $this->depth <= $this->configuration->getRecheckButton()
             )
         );
