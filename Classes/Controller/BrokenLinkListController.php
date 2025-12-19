@@ -622,7 +622,9 @@ class BrokenLinkListController extends AbstractBrofixController
                 }
                 $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
             }
-            if ($this->configuration->getTraverseMaxNumberOfPagesInBackend()
+            if ($howToTraverse !== BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL
+                && $this->configuration->getTraverseMaxNumberOfPagesInBackend()
+                && is_countable($this->pageList)
                 && count($this->pageList) >= $this->configuration->getTraverseMaxNumberOfPagesInBackend()) {
                 $this->createFlashMessage(
                     sprintf(
