@@ -135,6 +135,26 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
+            if ($filter->getTypeFilter() != '') {
+                $parts = explode('.', $filter->getTypeFilter());
+                $table_name = $parts[0];
+                $field = $parts[1] ?? '';
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq(
+                        self::TABLE . '.table_name',
+                        $queryBuilder->createNamedParameter($table_name)
+                    )
+                );
+                if ($field) {
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->eq(
+                            self::TABLE . '.field',
+                            $queryBuilder->createNamedParameter($field)
+                        )
+                    );
+                }
+            }
+
             // errorFilter, might be 'custom:13' or 'custom:13|httpErrorCode:404' etc. Several combinations, separated
             // by '|', each combination with <errortype>:<errno>
 

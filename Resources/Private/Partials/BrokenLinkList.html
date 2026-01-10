@@ -91,8 +91,24 @@
 				</td>
 
 				<f:comment>==== Type ====</f:comment>
-				<td class="mobile-optional">{item.elementIcon -> f:format.raw()}<span
-					title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
+				<td class="mobile-optional">
+					{item.elementIcon -> f:format.raw()}
+					<span title="{item.table} {item.field}">{item.elementType}:<br/>{item.fieldName}</span>
+					<div class="inline-action">
+						<f:if condition="{filter.typeFilter}">
+							<f:then>
+								<a class="btn btn-default" href="{listUri}&type_searchFilter=" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.unset.tooltip', extensionName: 'Brofix')}">
+									<core:icon identifier="actions-close" size="medium"/>
+								</a>
+							</f:then>
+							<f:else>
+								<a class="btn btn-default" href="{listUri}&type_searchFilter={item.table}.{item.field}" title="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.element.uid.tooltip', extensionName: 'Brofix')}">
+									<core:icon identifier="actions-filter" size="small"/>
+									<f:translate key="filter" extensionName="Brofix">Filter</f:translate>
+								</a>
+							</f:else>
+						</f:if>
+					</div>
 				</td>
 
 				<f:comment>==== last_check (record) ====</f:comment>

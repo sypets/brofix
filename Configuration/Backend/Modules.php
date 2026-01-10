@@ -55,6 +55,7 @@ return [
              'paginationPage' => '1',
              'viewMode' => 'view_table_complex',
              'uid_searchFilter' => '',
+             'type_searchFilter' => '',
              'linktype_searchFilter' => 'all',
              'url_searchFilter' => 'all',
              'url_match_searchFilter' => 'partial',

@@ -15,6 +15,8 @@ class BrokenLinkListFilter implements Arrayable
 {
     /** @var string  */
     protected const KEY_UID = 'uid';
+
+    protected const KEY_TYPE = 'type';
     /** @var string */
     protected const KEY_URL = 'url';
     /** @var string */
@@ -52,6 +54,8 @@ class BrokenLinkListFilter implements Arrayable
      */
     protected $uid_filtre = '';
 
+    protected string $typeFilter;
+
     /** @var string */
     protected $linktype_filter = self::LINK_TYPE_DEFAULT;
 
@@ -79,6 +83,7 @@ class BrokenLinkListFilter implements Arrayable
 
     public function __construct(
         string $uid = '',
+        string $typeFilter = '',
         string $linkType = self::LINK_TYPE_DEFAULT,
         string $url = '',
         string $urlMatch = self::URL_MATCH_DEFAULT,
@@ -88,6 +93,7 @@ class BrokenLinkListFilter implements Arrayable
         string $howtotraverse = self::HOW_TO_TRAVERSE_DEFAULT
     ) {
         $this->uid_filtre = $uid;
+        $this->typeFilter = $typeFilter;
         $this->linktype_filter = $linkType;
         $this->url_filtre = $url;
         $this->urlFilterMatch = $urlMatch;
@@ -102,6 +108,7 @@ class BrokenLinkListFilter implements Arrayable
     {
         return new BrokenLinkListFilter(
             $moduleData->get('uid_searchFilter', ''),
+            $moduleData->get('type_searchFilter', ''),
             $moduleData->get('linktype_searchFilter', 'all'),
             $moduleData->get('url_searchFilter', ''),
             $moduleData->get('url_match_searchFilter', 'partial'),
@@ -116,6 +123,7 @@ class BrokenLinkListFilter implements Arrayable
     {
         return new BrokenLinkListFilter(
             $values[self::KEY_UID] ?? '',
+            $values[self::KEY_TYPE] ?? '',
             $values[self::KEY_LINKTYPE] ?? self::LINK_TYPE_DEFAULT,
             $values[self::KEY_URL] ?? '',
             $values[self::KEY_URL_MATCH] ?? self::URL_MATCH_DEFAULT,
@@ -130,6 +138,7 @@ class BrokenLinkListFilter implements Arrayable
     {
         return [
             self::KEY_UID => $this->getUidFilter(),
+            self::KEY_TYPE => $this->getTypeFilter(),
             self::KEY_LINKTYPE => $this->getLinktypeFilter(),
             self::KEY_URL => $this->getUrlFilter(),
             self::KEY_URL_MATCH => $this->getUrlFilterMatch(),
@@ -151,6 +160,7 @@ class BrokenLinkListFilter implements Arrayable
             || $this->getLinktypeFilter() !== self::LINK_TYPE_FILTER_DEFAULT
             || $this->getUrlFilter()
             || $this->getErrorFilter()
+            || $this->getTypeFilter()
         ) {
             return true;
         }
@@ -165,6 +175,16 @@ class BrokenLinkListFilter implements Arrayable
     public function setUidFilter(string $uid_filter): void
     {
         $this->uid_filtre = trim($uid_filter);
+    }
+
+    public function getTypeFilter(): string
+    {
+        return $this->typeFilter;
+    }
+
+    public function setTypeFilter(string $typeFilter): void
+    {
+        $this->typeFilter = trim($typeFilter);
     }
 
     public function getLinktypeFilter(): string

@@ -36,6 +36,7 @@ class Brofix {
     // reset filter
     $('#brofix-reset-filter').on('click', function () {
       $('#uid_searchFilter').attr('value', '');
+      $('#type_searchFilter').attr('value', '');
       $('#linktype_searchFilter').val('all');
       $('#url_searchFilter').attr('value', '');
       $('#error_searchFilter').attr('value', '');
