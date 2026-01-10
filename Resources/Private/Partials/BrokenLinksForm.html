@@ -94,6 +94,12 @@
 			<label for="uid_searchFilter"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/>:</label>
 			<input type="search" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="uid_searchFilter" placeholder="{f:translate(key: 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.filter.uid')}" id="uid_searchFilter" value="{filter.uidFilter}"/>
 		</div>
+
+		<div class="col">
+			<label for="type_searchFilter"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.tableHead.type"/>:</label>
+			<input type="search" class="form-control t3js-clearable hasDefaultValue slug-impact t3js-charcounter-initialized" name="type_searchFilter" placeholder="" id="type_searchFilter" value="{filter.typeFilter}"/>
+		</div>
+
 		<f:if condition="{linktypes}">
 			<div class="col">
 				<label for="linktype_searchFilter"><f:translate extensionName="Brofix" key="LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:columnHeader.link_type"/>:</label>
