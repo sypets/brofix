@@ -19,6 +19,7 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetCacheInterface;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
+use Sypets\Brofix\CheckLinks\RobotsTxtChecker;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -42,6 +43,8 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     public const ERROR_TYPE_UNKNOWN = 'unknown';
     // Generic error : todo handle
     public const ERROR_TYPE_GENERAL = 'general';
+    public const ERROR_TYPE_ROBOTS_TXT = 'robots.txt';
+
 
     /**
      * @var RequestFactory
@@ -88,16 +91,20 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected array $redirects = [];
 
+    protected RobotsTxtChecker $robotsTxtChecker;
+
     public function __construct(
         ?RequestFactory $requestFactory = null,
         ?ExcludeLinkTarget $excludeLinkTarget = null,
         ?LinkTargetCacheInterface $linkTargetCache = null,
-        ?CrawlDelay $crawlDelay = null
+        ?CrawlDelay $crawlDelay = null,
+        ?RobotsTxtChecker $robotsTxtChecker = null
     ) {
         $this->requestFactory = $requestFactory ?: GeneralUtility::makeInstance(RequestFactory::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
         $this->linkTargetCache = $linkTargetCache ?: GeneralUtility::makeInstance(LinkTargetPersistentCache::class);
         $this->crawlDelay = $crawlDelay ?: GeneralUtility::makeInstance(CrawlDelay::class);
+        $this->robotsTxtChecker = $robotsTxtChecker ?: GeneralUtility::makeInstance(RobotsTxtChecker::class);
     }
 
     public function setConfiguration(Configuration $configuration): void
@@ -158,6 +165,14 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                     return $urlResponse;
                 }
             }
+        }
+
+        if ($this->configuration->isCheckRobotsTxt()
+            && !$this->robotsTxtChecker->isAllowed($origUrl)) {
+            $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_CANNOT_CHECK, \time());
+            $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_ROBOTS_TXT);
+            $linkTargetResponse->setErrorType(self::ERROR_TYPE_ROBOTS_TXT);
+            return $linkTargetResponse;
         }
 
         $cookieJar = GeneralUtility::makeInstance(CookieJar::class);
@@ -447,10 +462,19 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             return '';
         }
 
+
         $lang = $this->getLanguageService();
         $errorType = $linkTargetResponse->getErrorType();
         $errno = $linkTargetResponse->getErrno();
         $exception = $linkTargetResponse->getExceptionMessage();
+        $status = $linkTargetResponse->getStatus();
+        if ($errno === 0
+            && $exception === ''
+            && $errorType === ''
+        ) {
+            return '';
+        }
+
 
         switch ($errorType) {
             case self::ERROR_TYPE_HTTP_STATUS_CODE:
@@ -497,6 +521,10 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
             case self::ERROR_TYPE_UNABLE_TO_PARSE:
                 $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.other.parse');
+                break;
+
+            case self::ERROR_TYPE_ROBOTS_TXT:
+                $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.robotxTxt.general');
                 break;
 
             case self::ERROR_TYPE_UNKNOWN:

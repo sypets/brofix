@@ -180,6 +180,8 @@ class Configuration
 
     protected int $showUrlChecker = self::SHOW_URL_CHECKER_DEFAULT;
 
+    protected bool $checkRobotsTxt = true;
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -191,6 +193,7 @@ class Configuration
         $this->showAllLinks = (bool)($extConfArray['showalllinks'] ?? true);
         $this->showEditButtons = ($extConfArray['showEditButtons'] ?? self::SHOW_EDIT_BUTTONS_DEFAULT_VALUE);
         $this->showPageLayoutButton = (bool)($extConfArray['showPageLayoutButton'] ?? true);
+        $this->checkRobotsTxt = (bool)($extConfArray['checkRobotsTxt'] ?? true);
         $this->combinedErrorNonCheckableMatch = $extConfArray['combinedErrorNonCheckableMatch'] ?? '';
         $this->excludeSoftrefs = explode(',', $extConfArray['excludeSoftrefs'] ?? '');
         $this->excludeSoftrefsInFields = explode(',', $extConfArray['excludeSoftrefsInFields'] ?? '');
@@ -829,5 +832,15 @@ class Configuration
     public function isShowUrlCheckerAdminOnly(): bool
     {
         return $this->showUrlChecker === self::SHOW_URL_CHECKER_ADMIN_ONLY;
+    }
+
+    public function isCheckRobotsTxt(): bool
+    {
+        return $this->checkRobotsTxt;
+    }
+
+    public function setCheckRobotsTxt(bool $checkRobotsTxt): void
+    {
+        $this->checkRobotsTxt = $checkRobotsTxt;
     }
 }

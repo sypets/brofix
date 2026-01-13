@@ -24,9 +24,9 @@ class LinkTargetResponse
     public const RESULT_UNKNOWN = 5;
 
     public const REASON_CANNOT_CHECK_CLOUDFLARE = 'cloudflare';
-
     public const REASON_CANNOT_CHECK_429 = '429:too many requests';
     public const REASON_CANNOT_CHECK_503 = '503:service unavailable';
+    public const REASON_CANNOT_ROBOTS_TXT = 'robots.txt';
 
     protected int $status;
     protected int $lastChecked = 0;
@@ -217,9 +217,10 @@ class LinkTargetResponse
         return $this->status;
     }
 
-    public function setStatus(int $status): void
+    public function setStatus(int $status): LinkTargetResponse
     {
         $this->status = $status;
+        return $this;
     }
 
     public function getLastChecked(): int
@@ -253,9 +254,19 @@ class LinkTargetResponse
         return $this->errorType;
     }
 
+    public function setErrorType(string $errorType): void
+    {
+        $this->errorType = $errorType;
+    }
+
     public function getErrno(): int
     {
         return $this->errno;
+    }
+
+    public function setErrno(int $errno): void
+    {
+        $this->errno = $errno;
     }
 
     public function getExceptionMessage(): string

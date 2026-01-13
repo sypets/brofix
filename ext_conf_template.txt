@@ -31,6 +31,9 @@ combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno
 # cat=checking; type=boolean; label=After editing a record, recheck links; This is NOT recommended as it may result in excessive checking and delays when editing. It is already checked if links still exist in record.
 recheckLinksOnEditing = 0
 
+# cat=checking; type=boolean; label=Perform robots.txt checking
+checkRobotsTxt = 1
+
 ### report ###
 
 # cat=report; type=int; label= Maximum number of pages to traverse in Backend: Limit is disabled if =0. The default is 10000. This should be set to a hard limit for performance reasons, esp. if pagetree cache is not used (useCacheForPageList).

@@ -35,6 +35,7 @@
 	},
 	"require": {
 		"php": "^8.1",
+		"spatie/robots-txt": "^2.5",
 		"typo3/cms-backend": "^12.4.1 || ^13.4",
 		"typo3/cms-core": "^12.4.1 || ^13.4",
 		"typo3/cms-fluid": "^12.4.1 || ^13.4",

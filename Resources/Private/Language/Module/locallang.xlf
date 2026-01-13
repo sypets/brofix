@@ -197,6 +197,10 @@
 				<source>Page is hidden.</source>
 			</trans-unit>
 
+			<trans-unit id="list.report.error.robotxTxt.general" resname="list.report.error.robotxTxt.general">
+				<source>URL is denied by robots.txt</source>
+			</trans-unit>
+
 			<trans-unit id="list.report.error.record.notexisting" resname="list.report.error.record.notexisting">
 				<source>Record does not exist.</source>
 			</trans-unit>
