@@ -9,7 +9,6 @@ return [
         'hideAtCopy' => true,
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
         'editlock' => 'editlock',
         'type' => 'link_type',
         'typeicon_classes' => [
@@ -35,8 +34,8 @@ return [
                 'default' => 0,
                 'items' => [
                     [
-                        0 => '',
-                        1 => '',
+                        'label' => '',
+                        'value' => '',
                     ]
                 ],
             ]
@@ -49,9 +48,18 @@ return [
                 'default' => 'external',
                 'renderType' => 'selectSingle',
                 'items' => [
-                    ['LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_type.external', 'external'],
-                    ['LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_type.db', 'db'],
-                    ['LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_type.file', 'file'],
+                    [
+                        'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_type.external',
+                        'value' => 'external'
+                    ],
+                    [
+                        'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_type.db',
+                        'value' => 'db'
+                    ],
+                    [
+                        'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.link_type.file',
+                        'value' => 'file'
+                    ],
                 ],
                 'fieldWizard' => [
                     'selectIcons' => [
@@ -60,7 +68,7 @@ return [
                 ],
                 'size' => 1,
                 'maxitems' => 1,
-            ]
+            ],
         ],
         'match' => [
             'exclude' => false,
@@ -70,8 +78,14 @@ return [
                 'default' => 'exact',
                 'renderType' => 'selectSingle',
                 'items' => [
-                    ['LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.match_by.exact', 'exact'],
-                    ['LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.match_by.domain', 'domain'],
+                    [
+                        'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.match_by.exact',
+                        'value' => 'exact'
+                    ],
+                    [
+                        'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.match_by.domain',
+                        'value' => 'domain'
+                    ],
                 ],
                 'fieldWizard' => [
                     'selectIcons' => [
@@ -80,7 +94,7 @@ return [
                 ],
                 'size' => 1,
                 'maxitems' => 1,
-            ]
+            ],
         ],
         'linktarget' => [
             'exclude' => false,
@@ -92,7 +106,7 @@ return [
                 'rows' => 5,
                 'eval' => 'trim,' . \Sypets\Brofix\FormEngine\CustomEvaluation\ExcludeLinkTargetsLinkTargetEvaluation::class,
                 'required' => true,
-            ]
+            ],
         ],
         'editlock' => [
             'exclude' => true,
@@ -103,11 +117,11 @@ return [
                 'default' => 0,
                 'items' => [
                     [
-                        0 => '0',
-                        1 => '1',
-                    ]
-                ]
-            ]
+                        'label' => '0',
+                        'value' => '1',
+                    ],
+                ],
+            ],
         ],
         'reason' => [
             'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.reason',
@@ -117,15 +131,15 @@ return [
                 'renderType' => 'selectSingle',
                 'items' => [
                     [
-                        'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.reason.none',
-                        0
+                        'label' =>'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.reason.none',
+                        'value' => 0
                     ],
                     [
-                        'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.reason.noBrokenLink',
-                        1
-                    ]
+                        'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.reason.noBrokenLink',
+                        'value' => 1
+                    ],
                 ],
-            ]
+            ],
         ],
         'notes' => [
             'label' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.notes',
@@ -136,7 +150,7 @@ return [
                 'cols' => 40,
                 'max' => 80,
                 'placeholder' => 'LLL:EXT:brofix/Resources/Private/Language/Module/locallang_db.xlf:tx_brofix_exclude_link_target.notes.placeholder',
-            ]
+            ],
         ],
     ],
     'types' => [
