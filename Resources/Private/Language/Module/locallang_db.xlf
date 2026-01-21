@@ -51,6 +51,9 @@
 			<trans-unit id="tx_brofix_exclude_link_target.disabled" resname="tx_brofix_exclude_link_target.disabled">
 				<source>Disable</source>
 			</trans-unit>
+			<trans-unit id="tx_brofix_exclude_link_target.check_status" resname="tx_brofix_exclude_link_target.check_status">
+				<source>Ergebnis</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
