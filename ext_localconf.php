@@ -8,14 +8,6 @@ use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsRemoveUnused;
 defined('TYPO3') or die();
 
 (function () {
-    // ------------------
-    // load page TSconfig
-    // ------------------
-
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
-        "@import 'EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig'"
-    );
-
     // -----
     // Fluid
     // -----
