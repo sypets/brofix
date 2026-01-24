@@ -197,13 +197,6 @@ defined('TYPO3') or die();
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass']['brofix'] = \Sypets\Brofix\Hooks\DataHandlerHook::class;
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass']['brofix'] = \Sypets\Brofix\Hooks\DataHandlerHook::class;
 
-    \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class)
-        ->registerIcon(
-            'mimetypes-x-exclude-link-target',
-            \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            ['source' => 'EXT:brofix/Resources/Public/Icons/mimetypes-x-exclude-link-target.svg']
-        );
-
     // cache
     // -----
 

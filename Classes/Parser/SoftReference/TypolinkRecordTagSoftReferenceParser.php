@@ -24,13 +24,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class TypolinkRecordTagSoftReferenceParser extends AbstractSoftReferenceParser
 {
+    public function __construct(private readonly \TYPO3\CMS\Core\LinkHandling\LinkService $linkService)
+    {
+    }
     public function parse(string $table, string $field, int $uid, string $content, string $structurePath = ''): SoftReferenceParserResult
     {
         $this->setTokenIdBasePrefix($table, (string)$uid, $field, $structurePath);
 
         // Parse string for special TYPO3 <link> tag:
         $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
-        $linkService = GeneralUtility::makeInstance(LinkService::class);
+        $linkService = $this->linkService;
         $linkTags = $htmlParser->splitTags('a', $content);
         // Traverse result:
         $elements = [];

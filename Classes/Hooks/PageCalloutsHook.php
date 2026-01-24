@@ -29,7 +29,7 @@ final class PageCalloutsHook implements SingletonInterface
 {
     private bool $showPageCalloutBrokenLinksExist = false;
 
-    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration)
+    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration, private readonly \TYPO3\CMS\Backend\Routing\UriBuilder $uriBuilder)
     {
         $this->showPageCalloutBrokenLinksExist = (bool)$extensionConfiguration->get('brofix', 'showPageCalloutBrokenLinksExist');
     }
@@ -93,7 +93,7 @@ final class PageCalloutsHook implements SingletonInterface
 
     protected function createBackendUri(int $pageId, string $route = 'web_brofix'): string
     {
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = $this->uriBuilder;
         return (string)$uriBuilder->buildUriFromRoute($route, ['id' => $pageId]);
     }
 

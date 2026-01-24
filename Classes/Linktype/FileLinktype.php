@@ -19,6 +19,9 @@ class FileLinktype extends AbstractLinktype
     public const ERROR_CODE_FILE_MISSING = 1;
 
     public const ERROR_CODE_FOLDER_MISSING = 2;
+    public function __construct(private readonly \TYPO3\CMS\Core\Resource\ResourceFactory $resourceFactory)
+    {
+    }
 
     /**
     * Type fetching method, based on the type that softRefParserObj returns
@@ -58,7 +61,7 @@ class FileLinktype extends AbstractLinktype
         /**
          * @var ResourceFactory $resourceFactory
          */
-        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        $resourceFactory = $this->resourceFactory;
         try {
             $file = $resourceFactory->retrieveFileOrFolderObject($url);
         } catch (FileDoesNotExistException $e) {

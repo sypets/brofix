@@ -214,7 +214,8 @@ class BrokenLinkListController extends AbstractBrofixController
         IconFactory $iconFactory,
         ExtensionConfiguration $extensionConfiguration,
         PageRenderer $pageRenderer,
-        private \TYPO3\CMS\Core\Context\Context $context
+        private \TYPO3\CMS\Core\Context\Context $context,
+        private readonly \TYPO3\CMS\Backend\Routing\UriBuilder $uriBuilder
     ) {
         $this->pageRenderer = $pageRenderer;
         $iconFactory = $iconFactory;
@@ -482,7 +483,7 @@ class BrokenLinkListController extends AbstractBrofixController
         /**
          * @var UriBuilder $uriBuilder
          */
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = $this->uriBuilder;
         $uri = (string)$uriBuilder->buildUriFromRoute($route, $parameters);
 
         return $uri;
@@ -740,7 +741,7 @@ class BrokenLinkListController extends AbstractBrofixController
         /**
          * @var FlashMessageService $flashMessageService
          */
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
+        $flashMessageService = $this->flashMessageService;
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('brofix');
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
@@ -869,7 +870,7 @@ class BrokenLinkListController extends AbstractBrofixController
         /**
          * @var UriBuilder $uriBuilder
          */
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = $this->uriBuilder;
         $showEditButtons = $this->configuration->getShowEditButtons();
         $editUrlParameters = [
             'edit' => [

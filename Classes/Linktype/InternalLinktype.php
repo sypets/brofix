@@ -53,7 +53,7 @@ class InternalLinktype extends AbstractLinktype
     protected const ERROR_ERRNO_CONFIGURATION = 5;
 
     protected const ERROR_ERRNO_TABLE_MISSING = 6;
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool, private \TYPO3\CMS\Core\Context\Context $context)
+    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool, private \TYPO3\CMS\Core\Context\Context $context, private readonly \TYPO3\CMS\Core\Site\SiteFinder $siteFinder)
     {
     }
 
@@ -466,7 +466,7 @@ class InternalLinktype extends AbstractLinktype
             return '';
         }
 
-        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $siteFinder = $this->siteFinder;
         $pageId = (int)($row['table_name'] === 'pages' ? $row['record_uid'] : $row['record_pid']);
 
         /**
