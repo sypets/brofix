@@ -429,7 +429,8 @@ class CheckLinksCommand extends Command
         $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
         if ($pageRow === null) {
             throw new \InvalidArgumentException(
-                sprintf('Invalid page uid passed as argument: %d', $pageUid), 1582332944
+                sprintf('Invalid page uid passed as argument: %d', $pageUid),
+                1582332944
             );
         }
 

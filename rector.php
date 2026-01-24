@@ -21,7 +21,6 @@ use Ssch\TYPO3Rector\Set\Typo3SetList;
  * - ssch/typo3-rector
  *
  * Currently checks for complicance with TYPO3 v12
- *
  */
 return RectorConfig::configure()
     ->withPaths([

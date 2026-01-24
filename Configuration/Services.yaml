@@ -10,7 +10,24 @@ services:
   Sypets\Brofix\LinkAnalyzer:
     public: true
 
+  # required for functional tests
+  Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache:
+    public: true
+
+  Sypets\Brofix\CheckLinks\ExcludeLinkTarget:
+    public: true
+
   Sypets\Brofix\Repository\BrokenLinkRepository:
+    public: true
+
+  # required for DI in tests
+  Sypets\Brofix\Repository\PagesRepository:
+    public: true
+
+  Sypets\Brofix\Repository\ContentRepository:
+    public: true
+
+  Sypets\Brofix\Repository\ExcludeLinkTargetRepository:
     public: true
 
   # backend module

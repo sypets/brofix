@@ -6,9 +6,18 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks;
 
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Tests\Functional\AbstractFunctional;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ExcludeLinkTargetTest extends AbstractFunctional
+final class ExcludeLinkTargetTest extends AbstractFunctional
 {
+    protected ExcludeLinkTarget $excludeLinkTarget;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->excludeLinkTarget = GeneralUtility::makeInstance(ExcludeLinkTarget::class);
+    }
+
     /**
      * @return array<string,array<mixed>>
      */
@@ -48,9 +57,8 @@ class ExcludeLinkTargetTest extends AbstractFunctional
          * @todo deprecated  importDataSet Will be removed with core v12 compatible testing-framework. Importing database fixtures based on XML format is discouraged. Switch to CSV format instead.
          * Use method importCSVDataSet() to import such fixture files and assertCSVDataSet() to compare database state with fixture files.
          */
-        // $this->importDataSet($inputFile);
         $this->importCSVDataSet($inputFile);
-        $excludeLinkTarget = new ExcludeLinkTarget();
+        $excludeLinkTarget = $this->excludeLinkTarget;
         $excludeLinkTarget->setExcludeLinkTargetsPid($this->configuration->getExcludeLinkTargetStoragePid());
         $result = $excludeLinkTarget->isExcluded($url, $linkType);
 

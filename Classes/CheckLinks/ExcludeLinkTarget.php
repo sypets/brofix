@@ -7,7 +7,6 @@ namespace Sypets\Brofix\CheckLinks;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This class takes care of checking if a link target (URL)
@@ -25,11 +24,9 @@ class ExcludeLinkTarget
     public const REASON_NONE_GIVEN = 0;
     public const REASON_NO_BROKEN_LINK = 1;
 
-    /**
-     * @var int
-     */
-    protected $excludeLinkTargetsPid = 0;
-    public function __construct(private ConnectionPool $connectionPool)
+    protected int $excludeLinkTargetsPid = 0;
+
+    public function __construct(protected ConnectionPool $connectionPool)
     {
     }
 

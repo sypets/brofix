@@ -9,15 +9,17 @@ use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
-final class PageCalloutsHook implements SingletonInterface
+class PageCalloutsHook implements SingletonInterface
 {
-    private bool $showPageCalloutBrokenLinksExist = false;
+    protected bool $showPageCalloutBrokenLinksExist = false;
 
-    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration, private readonly UriBuilder $uriBuilder)
-    {
+    public function __construct(
+        protected BrokenLinkRepository $brokenLinkRepository,
+        ExtensionConfiguration $extensionConfiguration,
+        protected readonly UriBuilder $uriBuilder
+    ) {
         $this->showPageCalloutBrokenLinksExist = (bool)$extensionConfiguration->get('brofix', 'showPageCalloutBrokenLinksExist');
     }
 

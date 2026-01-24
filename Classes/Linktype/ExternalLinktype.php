@@ -88,6 +88,9 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
      */
     protected array $redirects = [];
 
+    /**
+     * @todo always require initialized object, need changes in tests
+     */
     public function __construct(
         ?RequestFactory $requestFactory = null,
         ?ExcludeLinkTarget $excludeLinkTarget = null,

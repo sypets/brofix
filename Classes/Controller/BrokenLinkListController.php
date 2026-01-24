@@ -188,16 +188,6 @@ class BrokenLinkListController extends AbstractBrofixController
     protected $pageList;
 
     /**
-     * @var BrokenLinkRepository
-     */
-    protected $brokenLinkRepository;
-
-    /**
-     * @var PagesRepository
-     */
-    protected $pagesRepository;
-
-    /**
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
@@ -206,16 +196,17 @@ class BrokenLinkListController extends AbstractBrofixController
     protected bool $backendUserHasPermissionsForExcludes = false;
 
     public function __construct(
-        PagesRepository $pagesRepository,
-        BrokenLinkRepository $brokenLinkRepository,
+        protected PagesRepository $pagesRepository,
+        protected BrokenLinkRepository $brokenLinkRepository,
+        // has property in parent class !
         ExcludeLinkTarget $excludeLinkTarget,
         FlashMessageService $flashMessageService,
         ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory,
         ExtensionConfiguration $extensionConfiguration,
         PageRenderer $pageRenderer,
-        private Context $context,
-        private readonly UriBuilder $uriBuilder
+        protected Context $context,
+        protected readonly UriBuilder $uriBuilder
     ) {
         $this->pageRenderer = $pageRenderer;
         $iconFactory = $iconFactory;

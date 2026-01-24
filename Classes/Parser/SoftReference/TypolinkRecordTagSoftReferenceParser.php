@@ -24,8 +24,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class TypolinkRecordTagSoftReferenceParser extends AbstractSoftReferenceParser
 {
-    public function __construct(private readonly \TYPO3\CMS\Core\LinkHandling\LinkService $linkService)
+    protected readonly LinkService $linkService;
+
+    /**
+     * @todo always require initialized object, need changes in tests
+     */
+    public function __construct(?LinkService $linkService = null)
     {
+        $this->linkService = $linkService ?? GeneralUtility::makeInstance(LinkService::class);
     }
     public function parse(string $table, string $field, int $uid, string $content, string $structurePath = ''): SoftReferenceParserResult
     {

@@ -7,12 +7,12 @@ use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This class implements a persistent link target cache using
  * a database table.
  * @internal
+ * @todo Make final and change methods and properties from protected to private
  */
 class LinkTargetPersistentCache extends AbstractLinkTargetCache
 {
@@ -21,7 +21,8 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
     const CHECK_STATUS_NONE = 0;
     const CHECK_STATUS_OK = 1;
     const CHECK_STATUS_ERROR = 2;
-    public function __construct(private ConnectionPool $connectionPool)
+
+    public function __construct(protected ConnectionPool $connectionPool)
     {
     }
 

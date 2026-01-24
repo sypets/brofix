@@ -60,14 +60,16 @@ class GenerateCheckResultFluidMail implements SingletonInterface
 
         if ($recipients === []) {
             throw new MissingConfigurationException(
-                'Missing configuration for email recipient (Tsconfig: mod.brofix.mail.recipients)', 8980109579
+                'Missing configuration for email recipient (Tsconfig: mod.brofix.mail.recipients)',
+                8980109579
             );
         }
 
         $from = $config->getMailFromEmail();
         if ($from === '') {
             throw new MissingConfigurationException(
-                'Missing configuration for email sender (Tsconfig: mod.brofix.mail.from)', 7661484439
+                'Missing configuration for email sender (Tsconfig: mod.brofix.mail.from)',
+                7661484439
             );
         }
 

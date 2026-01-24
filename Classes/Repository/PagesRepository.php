@@ -19,17 +19,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Handle database queries for table of broken links
  *
  * @internal
+ * @todo make "final" and use private instaed of protected
  */
 class PagesRepository
 {
     protected const TABLE = 'pages';
 
-    protected ?CacheManager $cacheManager;
-
     public function __construct(
-        ?CacheManager $cacheManager=null, private ConnectionPool $connectionPool
+        protected CacheManager $cacheManager,
+        protected ConnectionPool $connectionPool
     ) {
-        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -196,7 +195,7 @@ class PagesRepository
 
         $hash = null;
         if ($this->cacheManager && $useCache && $depth > 3) {
-            if ($this->getBackendUser()->isAdmin()) {
+            if ($this->getBackendUser() && $this->getBackendUser()->isAdmin()) {
                 $username = 'admin';
             } else {
                 $username = $this->getBackendUsername();
@@ -379,7 +378,8 @@ class PagesRepository
 
     protected function isAdmin(): bool
     {
-        return $this->getBackendUser()->isAdmin();
+        $backendUser = $this->getBackendUser();
+        return $backendUser && $backendUser->isAdmin();
     }
 
     /**

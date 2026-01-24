@@ -26,17 +26,17 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @internal This class is a hook implementation and is for internal use inside this extension only.
  */
-final class DataHandlerHook
+class DataHandlerHook
 {
     /**
      * @var BrokenLinkRepository
      */
-    private $brokenLinkRepository;
+    protected $brokenLinkRepository;
 
     /**
      * @var ExcludeLinkTarget
      */
-    private $excludeLinkTarget;
+    protected $excludeLinkTarget;
 
     public function __construct(
         ?BrokenLinkRepository $brokenLinkRepository = null,
@@ -103,7 +103,7 @@ final class DataHandlerHook
         $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
     }
 
-    private function removeBrokenLinkRecordsForExcludedLinkTarget(array $row): bool
+    protected function removeBrokenLinkRecordsForExcludedLinkTarget(array $row): bool
     {
         if ($row === []
             || (($row['linktarget'] ?? '') === '')

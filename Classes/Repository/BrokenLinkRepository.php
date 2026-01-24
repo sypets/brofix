@@ -22,6 +22,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Handle database queries for table of broken links
  *
  * @internal
+ *
+ * @todo Make final and change protected methods and properties to private
  */
 class BrokenLinkRepository implements LoggerAwareInterface
 {
@@ -29,17 +31,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
     protected const TABLE = 'tx_brofix_broken_links';
 
-    /**
-     * @var int
-     */
-    protected $maxBindParameters;
+    protected int $maxBindParameters = 0;
 
-    public function __construct(private ConnectionPool $connectionPool)
+    public function __construct(protected ConnectionPool $connectionPool)
     {
-        /**
-         * @var ConnectionPool $connectionPool
-         */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connection = $connectionPool->getConnectionForTable(static::TABLE);
         $this->maxBindParameters = PlatformInformation::getMaxBindParameters($connection->getDatabasePlatform());
     }

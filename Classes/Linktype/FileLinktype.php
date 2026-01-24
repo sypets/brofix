@@ -19,8 +19,15 @@ class FileLinktype extends AbstractLinktype
     public const ERROR_CODE_FILE_MISSING = 1;
 
     public const ERROR_CODE_FOLDER_MISSING = 2;
-    public function __construct(private readonly ResourceFactory $resourceFactory)
+
+    protected readonly ResourceFactory $resourceFactory;
+
+    /**
+     * @todo always require initialized object, need changes in tests
+     */
+    public function __construct(?ResourceFactory $resourceFactory = null)
     {
+        $this->resourceFactory = $resourceFactory ?? GeneralUtility::makeInstance(ResourceFactory::class);
     }
 
     /**

@@ -17,7 +17,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ContentRepository
 {
     protected const TABLE = 'tt_content';
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+
+    public function __construct(protected ConnectionPool $connectionPool)
     {
     }
 

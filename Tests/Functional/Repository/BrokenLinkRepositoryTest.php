@@ -8,6 +8,7 @@ use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctional;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BrokenLinkRepositoryTest extends AbstractFunctional
 {
@@ -58,7 +59,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
     {
         parent::setUp();
 
-        $this->brokenLinkRepository = new BrokenLinkRepository();
+        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
     }
 
     /**

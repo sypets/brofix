@@ -53,9 +53,19 @@ class InternalLinktype extends AbstractLinktype
     protected const ERROR_ERRNO_CONFIGURATION = 5;
 
     protected const ERROR_ERRNO_TABLE_MISSING = 6;
-    public function __construct(private ConnectionPool $connectionPool, private Context $context,
-        private readonly SiteFinder $siteFinder)
-    {
+
+    protected ConnectionPool $connectionPool;
+    protected Context $context;
+    protected SiteFinder $siteFinder;
+
+    public function __construct(
+        ?ConnectionPool $connectionPool = null,
+        ?Context $context = null,
+        ?SiteFinder $siteFinder = null
+    ) {
+        $this->connectionPool = $connectionPool ?? GeneralUtility::makeInstance(ConnectionPool::class);
+        $this->context = $context ?? GeneralUtility::makeInstance(Context::class);
+        $this->siteFinder = $siteFinder ?? GeneralUtility::makeInstance(SiteFinder::class);
     }
 
     /**

@@ -61,7 +61,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
         PagesRepository $pagesRepository,
-        private ConnectionPool $connectionPool
+        protected ConnectionPool $connectionPool
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
