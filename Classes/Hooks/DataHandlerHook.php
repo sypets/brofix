@@ -19,7 +19,6 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Hook for changes to records in the database.
@@ -31,7 +30,8 @@ class DataHandlerHook
     public function __construct(
         protected BrokenLinkRepository $brokenLinkRepository,
         protected ExcludeLinkTarget $excludeLinkTarget
-    ) {}
+    ) {
+    }
 
     /**
      * 1. If an ExcludeLinkTarget record is changed or created
