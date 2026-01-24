@@ -90,7 +90,7 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
       - name: "rector (apply v12 rules)"
-        run: composer rector:check
+        run: Build/Scripts/runTests.sh -s rector:check -p 8.5
 
   # v13
   all_core_v13:

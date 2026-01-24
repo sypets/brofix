@@ -80,6 +80,9 @@ Options:
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - unit (default): PHP unit tests
             - functional: functional tests
+            - rector:check : check rector (dry-run)
+            - rector:fix   : apply rector
+            - rector:baseline : create baseline file
 
     -t <composer-core-version-constraint>
         Only with -s composerCoreVersion
@@ -323,7 +326,25 @@ case ${TEST_SUITE} in
         SUITE_EXIT_CODE=$?
         ${DOCKER_COMPOSE_COMMAND} down
         ;;
-    functional)
+    rector:check)
+        setUpDockerComposeDotEnv
+        ${DOCKER_COMPOSE_COMMAND} run rector_check
+        SUITE_EXIT_CODE=$?
+        ${DOCKER_COMPOSE_COMMAND} down
+        ;;
+    rector:fix)
+        setUpDockerComposeDotEnv
+        ${DOCKER_COMPOSE_COMMAND} run rector_fix
+        SUITE_EXIT_CODE=$?
+        ${DOCKER_COMPOSE_COMMAND} down
+        ;;
+    rector:baseline)
+        setUpDockerComposeDotEnv
+        ${DOCKER_COMPOSE_COMMAND} run rector_baseline
+        SUITE_EXIT_CODE=$?
+        ${DOCKER_COMPOSE_COMMAND} down
+        ;;
+functional)
         setUpDockerComposeDotEnv
         case ${DBMS} in
             mariadb)
