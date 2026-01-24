@@ -6,8 +6,15 @@
 TSconfig Reference
 ==================
 
+.. important::
+
+   Location of file changed since 6.5.4
+
 Default configuration:
-https://github.com/sypets/brofix/blob/main/Configuration/TsConfig/Page/pagetsconfig.tsconfig
+
+*  (in GitHub for latest main): https://github.com/sypets/brofix/blob/main/Configuration/page.tsconfig
+*  (in installed extension): Configuration/page.tsconfig
+
 
 .. contents::
    :local:

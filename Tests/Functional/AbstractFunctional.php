@@ -76,7 +76,8 @@ abstract class AbstractFunctional extends FunctionalTestCase
             ]
         ];
 
-        $tsConfigPath = GeneralUtility::getFileAbsFileName('EXT:brofix/Configuration/TsConfig/Page/pagetsconfig.tsconfig');
+        // not used
+        // $tsConfigPath = GeneralUtility::getFileAbsFileName('EXT:brofix/Configuration/page.tsconfig');
         $this->configuration = GeneralUtility::makeInstance(Configuration::class, self::EXTENSION_CONFIGURATION_ARRAY);
 
         // load default values
