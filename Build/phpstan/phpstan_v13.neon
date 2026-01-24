@@ -1,0 +1,38 @@
+includes:
+  # regenerate baseline with: Build/Scripts/runTests.sh -s phpstanGenerateBaseline
+  - phpstan-baseline_v13.neon
+  #- ../../.Build/vendor/jangregor/phpstan-prophecy/extension.neon
+  - ../../.Build/vendor/bnf/phpstan-psr-container/extension.neon
+  #- ../../.Build/vendor/friendsoftypo3/phpstan-typo3/extension.neon
+  - ../../.Build/vendor/phpstan/phpstan-phpunit/extension.neon
+  - ../../.Build/vendor/phpstan/phpstan-phpunit/rules.neon
+
+parameters:
+  # Use local cache dir instead of /tmp
+  tmpDir: ../../.Build/.cache/phpstan
+
+  parallel:
+    # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
+    maximumNumberOfProcesses: 5
+
+  level: 6
+
+  paths:
+    - ../../Classes
+    #- ../../Tests
+    - ../../Configuration
+    - ../../ext_localconf.php
+    - ../../ext_tables.php
+    - ../../ext_emconf.php
+
+  scanDirectories:
+    - ../../.Build/vendor
+
+  excludePaths:
+    - ../../Classes/Hooks/DataHandlerHook.php
+    - ../../Classes/Command/CheckLinksCommand.php
+
+  treatPhpDocTypesAsCertain: false
+  #featureToggles:
+  #    nodeConnectingVisitorCompatibility: false
+

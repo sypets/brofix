@@ -82,7 +82,6 @@ Options:
             - functional: functional tests
             - rector:check : check rector (dry-run)
             - rector:fix   : apply rector
-            - rector:baseline : create baseline file
 
     -t <composer-core-version-constraint>
         Only with -s composerCoreVersion
@@ -338,13 +337,7 @@ case ${TEST_SUITE} in
         SUITE_EXIT_CODE=$?
         ${DOCKER_COMPOSE_COMMAND} down
         ;;
-    rector:baseline)
-        setUpDockerComposeDotEnv
-        ${DOCKER_COMPOSE_COMMAND} run rector_baseline
-        SUITE_EXIT_CODE=$?
-        ${DOCKER_COMPOSE_COMMAND} down
-        ;;
-functional)
+    functional)
         setUpDockerComposeDotEnv
         case ${DBMS} in
             mariadb)
