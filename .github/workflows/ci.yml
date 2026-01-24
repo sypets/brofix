@@ -98,6 +98,9 @@ jobs:
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
 
+      - name: "rector (apply v12 rules)"
+        run: composer rector:check
+
       # todo: replace prophecy
 
       #- name: "Unit tests"
