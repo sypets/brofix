@@ -213,7 +213,8 @@ class BrokenLinkListController extends AbstractBrofixController
         ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory,
         ExtensionConfiguration $extensionConfiguration,
-        PageRenderer $pageRenderer
+        PageRenderer $pageRenderer,
+        private \TYPO3\CMS\Core\Context\Context $context
     ) {
         $this->pageRenderer = $pageRenderer;
         $iconFactory = $iconFactory;
@@ -861,7 +862,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 'current_record_uid' => $row['record_uid'],
                 'current_record_table' => $row['table_name'],
                 'current_record_field' => $row['field'],
-                'current_record_currentTime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
+                'current_record_currentTime' => $this->context->getPropertyFromAspect('date', 'timestamp'),
             ]
         );
 
@@ -899,7 +900,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 'current_record_uid' => $row['record_uid'],
                 'current_record_table' => $row['table_name'],
                 'current_record_field' => $row['field'],
-                'current_record_currentTime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
+                'current_record_currentTime' => $this->context->getPropertyFromAspect('date', 'timestamp'),
             ]
         );
 

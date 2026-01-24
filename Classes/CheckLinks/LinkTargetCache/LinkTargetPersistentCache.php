@@ -21,6 +21,9 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
     const CHECK_STATUS_NONE = 0;
     const CHECK_STATUS_OK = 1;
     const CHECK_STATUS_ERROR = 2;
+    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+    {
+    }
 
     /**
      * Check if url exists in link cache (and is not expired)
@@ -140,7 +143,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
 
     public function remove(string $linkTarget, string $linkType): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable(static::TABLE);
         $queryBuilder
             ->delete(static::TABLE)
@@ -159,7 +162,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 }

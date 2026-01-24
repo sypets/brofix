@@ -60,7 +60,8 @@ class LinkAnalyzer implements LoggerAwareInterface
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
-        PagesRepository $pagesRepository
+        PagesRepository $pagesRepository,
+        private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
@@ -411,7 +412,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         );
 
         // get all broken links for $recordUid / $field / $table combination
-        $queryBuilderLinkval = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilderLinkval = $this->connectionPool
             ->getQueryBuilderForTable('tx_brofix_broken_links');
         $resultLinkval = $queryBuilderLinkval->select('uid', 'link_type', 'link_title', 'url')
             ->from('tx_brofix_broken_links')
@@ -612,7 +613,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             $max = (int)($this->brokenLinkRepository->getMaxBindParameters() /2 - 4);
             foreach (array_chunk($this->pids ?? [], $max) as $pageIdsChunk) {
                 $constraints = [];
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                $queryBuilder = $this->connectionPool
                     ->getQueryBuilderForTable($table);
 
                 if ($considerHidden) {

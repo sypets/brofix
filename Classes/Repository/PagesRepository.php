@@ -27,7 +27,7 @@ class PagesRepository
     protected ?CacheManager $cacheManager;
 
     public function __construct(
-        ?CacheManager $cacheManager=null
+        ?CacheManager $cacheManager=null, private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool
     ) {
         $this->cacheManager = $cacheManager;
     }
@@ -259,7 +259,7 @@ class PagesRepository
             return true;
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()->removeAll();
 
         $row = $queryBuilder
@@ -373,7 +373,7 @@ class PagesRepository
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 

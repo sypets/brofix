@@ -245,7 +245,7 @@ class CheckLinksCommand extends Command
             }
             // should be an array now
             if (!is_array($startPages)) {
-                throw new InvalidArgumentException('--start-pages invalid values passed for this option');
+                throw new InvalidArgumentException('--start-pages invalid values passed for this option', 7986018416);
             }
             $startPagesResults = [];
             foreach ($startPages as $page) {
@@ -429,7 +429,7 @@ class CheckLinksCommand extends Command
         $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
         if ($pageRow === null) {
             throw new \InvalidArgumentException(
-                sprintf('Invalid page uid passed as argument: %d', $pageUid)
+                sprintf('Invalid page uid passed as argument: %d', $pageUid), 1582332944
             );
         }
 

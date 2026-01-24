@@ -34,7 +34,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      */
     protected $maxBindParameters;
 
-    public function __construct()
+    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
     {
         /**
          * @var ConnectionPool $connectionPool
@@ -749,7 +749,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $record['tstamp'] = \time();
         $record['url_hash'] = sha1($record['url']);
         try {
-            $count = (int)GeneralUtility::makeInstance(ConnectionPool::class)
+            $count = (int)$this->connectionPool
                 ->getConnectionForTable(static::TABLE)
                 ->update(self::TABLE, $record, $identifier);
         } catch (\Exception $e) {
@@ -776,7 +776,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $record['crdate'] = \time();
         $record['url_hash'] = sha1($record['url']);
         try {
-            GeneralUtility::makeInstance(ConnectionPool::class)
+            $this->connectionPool
                 ->getConnectionForTable(static::TABLE)
                 ->insert(self::TABLE, $record);
         } catch (\Exception $e) {
@@ -799,7 +799,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 }

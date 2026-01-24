@@ -29,6 +29,9 @@ class ExcludeLinkTarget
      * @var int
      */
     protected $excludeLinkTargetsPid = 0;
+    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+    {
+    }
 
     public function setExcludeLinkTargetsPid(int $pid): void
     {
@@ -134,7 +137,7 @@ class ExcludeLinkTarget
 
     protected function isTableExists(): bool
     {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+        $connection = $this->connectionPool
             ->getConnectionForTable(static::TABLE);
         if ($connection->createSchemaManager()->tablesExist([static::TABLE])) {
             return true;
@@ -150,7 +153,7 @@ class ExcludeLinkTarget
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 }

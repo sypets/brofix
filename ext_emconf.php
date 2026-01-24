@@ -9,13 +9,10 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'sypets@gmx.de',
     'author_company' => '',
     'state' => 'stable',
-    'uploadfolder' => 0,
-    'createDirs' => '',
-    'clearCacheOnLoad' => 0,
     'version' => '6.5.4-dev',
     'constraints' => [
         'depends' => [
-            'typo3' => '12.4.4-13.9.99',
+            'typo3' => '12.4.0-12.4.99',
         ],
         'conflicts' => [],
         'suggests' => [
