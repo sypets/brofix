@@ -3,12 +3,17 @@
 #    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
 #  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
 
-# current Support is:
+# current support is:
 # - TYPO3 v12
 # - TYPO3 v13
-# and PHP 8.1-8.4 (PHP 8.1 not supported with TYPO3 v13, should be dropped when support for v12 is dropped)
-# use PHP 8.3 as default version (update to 8.4 when possible)
+# - PHP 8.1-8.4 (for TYPO3 v12)
+# - PHP 8.2-8.5 (for TYPO3 v13)
 
+# PHP support in TYPO3:
+# - TYPO3 v12 : PHP 8.1 - 8.4
+# - TYPO3 v13 : PHP 8.2 - 8.5
+
+# always force TYPO3 version, also for latest to make sure it runs with latest version
 
 name: CI
 
@@ -29,7 +34,7 @@ jobs:
       # rest matrix jobs be be executed anyway.
       fail-fast: true
       matrix:
-        php: [ '8.3' ]
+        php: [ '8.4' ]
         minMax: [ 'composerInstallMax' ]
     steps:
       - name: "Checkout"
@@ -58,7 +63,8 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
 
-  all_core_latest:
+  # v13
+  all_core_v13:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
     name: "all core-latest"
@@ -69,7 +75,7 @@ jobs:
       fail-fast: true
       matrix:
         # only testing with highest and lowest
-        php: [ '8.2', '8.4' ]
+        php: [ '8.2', '8.5' ]
         minMax: [ 'composerInstallMax' ]
     steps:
       - name: "Checkout"
@@ -78,8 +84,8 @@ jobs:
       - name: "show php version"
         run: php --version
 
-      #- name: "Set Typo3 core version"
-      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^11.5" -s composerCoreVersion
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^13.4" -s composerCoreVersion
 
       - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
