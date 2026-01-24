@@ -214,8 +214,8 @@ class BrokenLinkListController extends AbstractBrofixController
         IconFactory $iconFactory,
         ExtensionConfiguration $extensionConfiguration,
         PageRenderer $pageRenderer,
-        private \TYPO3\CMS\Core\Context\Context $context,
-        private readonly \TYPO3\CMS\Backend\Routing\UriBuilder $uriBuilder
+        private Context $context,
+        private readonly UriBuilder $uriBuilder
     ) {
         $this->pageRenderer = $pageRenderer;
         $iconFactory = $iconFactory;
