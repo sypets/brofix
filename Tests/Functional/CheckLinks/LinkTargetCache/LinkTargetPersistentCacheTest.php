@@ -6,15 +6,24 @@ namespace Sypets\Brofix\Tests\Functional\CheckLinks\LinkTargetCache;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Tests\Functional\AbstractFunctional;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LinkTargetPersistentCacheTest extends AbstractFunctional
+final class LinkTargetPersistentCacheTest extends AbstractFunctional
 {
+    private LinkTargetPersistentCache $linkTargetPersistentCache;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->linkTargetPersistentCache = GeneralUtility::makeInstance(LinkTargetPersistentCache::class);
+    }
+
     public function testHasEntryForUrlReturnsFalse(): void
     {
         $url = 'https://example.org';
         $type = 'external';
 
-        $subject = new LinkTargetPersistentCache();
+        $subject = $this->linkTargetPersistentCache;
         $result = $subject->hasEntryForUrl($url, $type);
 
         self::assertFalse($result, 'Empty cache should not have entry for url');
@@ -25,7 +34,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
         $url = 'https://example.org';
         $type = 'external';
 
-        $subject = new LinkTargetPersistentCache();
+        $subject = $this->linkTargetPersistentCache;
         $result = $subject->getUrlResponseForUrl($url, $type);
 
         self::assertNull($result, 'Empty cache should return null');
@@ -36,7 +45,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
         $url = 'https://example.org';
         $type = 'external';
 
-        $subject = new LinkTargetPersistentCache();
+        $subject = $this->linkTargetPersistentCache;
         $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
 
         $subject->setResult($url, $type, $linkTargetResponse);
@@ -51,7 +60,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
         $url = 'https://example.org';
         $type = 'external';
 
-        $subject = new LinkTargetPersistentCache();
+        $subject = $this->linkTargetPersistentCache;
         $linkTargetResponse = LinkTargetResponse::createInstanceByStatus(LinkTargetResponse::RESULT_OK);
         $subject->setResult($url, $type, $linkTargetResponse);
         $actualLinkTargetResponse = $subject->getUrlResponseForUrl($url, $type);
@@ -90,7 +99,7 @@ class LinkTargetPersistentCacheTest extends AbstractFunctional
 
         ];
 
-        $subject = new LinkTargetPersistentCache();
+        $subject = $this->linkTargetPersistentCache;
         $linkTargetResponse = LinkTargetResponse::createInstanceByError(
             $errorType,
             $errno,

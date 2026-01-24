@@ -110,7 +110,7 @@ abstract class AbstractFunctional extends FunctionalTestCase
     /**
      * copied from Bootstrap::initializeLanguageObject()
      */
-    public static function initializeLanguageObject()
+    public static function initializeLanguageObject(): void
     {
         $GLOBALS['LANG'] = GeneralUtility::makeInstance(LanguageServiceFactory::class)->createFromUserPreferences($GLOBALS['BE_USER']);
     }

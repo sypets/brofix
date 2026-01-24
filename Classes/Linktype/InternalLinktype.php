@@ -54,6 +54,20 @@ class InternalLinktype extends AbstractLinktype
 
     protected const ERROR_ERRNO_TABLE_MISSING = 6;
 
+    protected ConnectionPool $connectionPool;
+    protected Context $context;
+    protected SiteFinder $siteFinder;
+
+    public function __construct(
+        ?ConnectionPool $connectionPool = null,
+        ?Context $context = null,
+        ?SiteFinder $siteFinder = null
+    ) {
+        $this->connectionPool = $connectionPool ?? GeneralUtility::makeInstance(ConnectionPool::class);
+        $this->context = $context ?? GeneralUtility::makeInstance(Context::class);
+        $this->siteFinder = $siteFinder ?? GeneralUtility::makeInstance(SiteFinder::class);
+    }
+
     /**
      * Checks a given URL + /path/filename.ext for validity
      *
@@ -146,7 +160,7 @@ class InternalLinktype extends AbstractLinktype
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
         // check if table exists
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         $connection = $connectionPool->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME);
         if (!in_array($table, $connection->createSchemaManager()->listTableNames())) {
             return LinkTargetResponse::createInstanceByError(
@@ -224,8 +238,8 @@ class InternalLinktype extends AbstractLinktype
             }
             if ($reportHiddenRecords
                 && (($row[$hiddenField] ?? 0) == '1'
-                || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)($row[$starttimeField] ?? 0)
-                || (($row[$endtimeField] ?? false) && (int)$row[$endtimeField] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
+                || $this->context->getPropertyFromAspect('date', 'timestamp') < (int)($row[$starttimeField] ?? 0)
+                || (($row[$endtimeField] ?? false) && (int)$row[$endtimeField] < $this->context->getPropertyFromAspect('date', 'timestamp')))
             ) {
                 return LinkTargetResponse::createInstanceByError(
                     $table === 'pages' ? self::ERROR_TYPE_PAGE : self::ERROR_TYPE_RECORD,
@@ -263,7 +277,7 @@ class InternalLinktype extends AbstractLinktype
         $reportHiddenRecords = $this->configuration->isReportHiddenRecords();
 
         // Get page ID on which the content element in fact is located
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
         $row = $queryBuilder
             ->select('uid', 'pid', 'header', 'deleted', 'hidden', 'starttime', 'endtime')
@@ -313,8 +327,8 @@ class InternalLinktype extends AbstractLinktype
             }
             if ($reportHiddenRecords
                 && ($row['hidden'] == '1'
-                || GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
-                || ($row['endtime'] && (int)$row['endtime'] < GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')))
+                || $this->context->getPropertyFromAspect('date', 'timestamp') < (int)$row['starttime']
+                || ($row['endtime'] && (int)$row['endtime'] < $this->context->getPropertyFromAspect('date', 'timestamp')))
             ) {
                 $customParams['content'] = [
                     'title' => $row['header'],
@@ -463,7 +477,7 @@ class InternalLinktype extends AbstractLinktype
             return '';
         }
 
-        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $siteFinder = $this->siteFinder;
         $pageId = (int)($row['table_name'] === 'pages' ? $row['record_uid'] : $row['record_pid']);
 
         /**

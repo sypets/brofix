@@ -18,6 +18,10 @@ class ContentRepository
 {
     protected const TABLE = 'tt_content';
 
+    public function __construct(protected ConnectionPool $connectionPool)
+    {
+    }
+
     /**
      * @param int $uid
      * @param string $table
@@ -117,7 +121,7 @@ class ContentRepository
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 }

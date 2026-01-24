@@ -22,6 +22,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Handle database queries for table of broken links
  *
  * @internal
+ *
+ * @todo Make final and change protected methods and properties to private
  */
 class BrokenLinkRepository implements LoggerAwareInterface
 {
@@ -29,17 +31,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
 
     protected const TABLE = 'tx_brofix_broken_links';
 
-    /**
-     * @var int
-     */
-    protected $maxBindParameters;
+    protected int $maxBindParameters = 0;
 
-    public function __construct()
+    public function __construct(protected ConnectionPool $connectionPool)
     {
-        /**
-         * @var ConnectionPool $connectionPool
-         */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connection = $connectionPool->getConnectionForTable(static::TABLE);
         $this->maxBindParameters = PlatformInformation::getMaxBindParameters($connection->getDatabasePlatform());
     }
@@ -749,7 +744,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $record['tstamp'] = \time();
         $record['url_hash'] = sha1($record['url']);
         try {
-            $count = (int)GeneralUtility::makeInstance(ConnectionPool::class)
+            $count = (int)$this->connectionPool
                 ->getConnectionForTable(static::TABLE)
                 ->update(self::TABLE, $record, $identifier);
         } catch (\Exception $e) {
@@ -776,7 +771,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $record['crdate'] = \time();
         $record['url_hash'] = sha1($record['url']);
         try {
-            GeneralUtility::makeInstance(ConnectionPool::class)
+            $this->connectionPool
                 ->getConnectionForTable(static::TABLE)
                 ->insert(self::TABLE, $record);
         } catch (\Exception $e) {
@@ -799,7 +794,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 }

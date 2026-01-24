@@ -62,12 +62,41 @@ jobs:
         if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
+  # v13 / run only with latest PHP version
+  all_core_v13-lastest-php:
+    # only run jobs via scheduled workflow in main repo, not in forks
+    if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
+    name: "TYPO3 v13 / only latest PHP: rector"
+    runs-on: ubuntu-latest
+    strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: true
+      matrix:
+        # only testing with highest
+        php: [ '8.5' ]
+        minMax: [ 'composerInstallMax' ]
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "show php version"
+        run: php --version
+
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^13.4" -s composerCoreVersion
+
+      - name: "Composer"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
+      - name: "rector (apply v12 rules)"
+        run: Build/Scripts/runTests.sh -s rector:check -p 8.5
 
   # v13
   all_core_v13:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
-    name: "all core-latest"
+    name: "all core v13"
     runs-on: ubuntu-latest
     strategy:
       # This prevents cancellation of matrix job runs, if one/two already failed and let the
@@ -96,7 +125,7 @@ jobs:
 
       - name: "phpstan"
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v13.neon" -v
 
       # todo: replace prophecy
 

@@ -19,17 +19,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Handle database queries for table of broken links
  *
  * @internal
+ * @todo make "final" and use private instaed of protected
  */
 class PagesRepository
 {
     protected const TABLE = 'pages';
 
-    protected ?CacheManager $cacheManager;
-
     public function __construct(
-        ?CacheManager $cacheManager=null
+        protected CacheManager $cacheManager,
+        protected ConnectionPool $connectionPool
     ) {
-        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -195,8 +194,8 @@ class PagesRepository
         }
 
         $hash = null;
-        if ($this->cacheManager && $useCache && $depth > 3) {
-            if ($this->getBackendUser()->isAdmin()) {
+        if ($useCache && $depth > 3) {
+            if ($this->getBackendUser() && $this->getBackendUser()->isAdmin()) {
                 $username = 'admin';
             } else {
                 $username = $this->getBackendUsername();
@@ -211,8 +210,12 @@ class PagesRepository
             );
             $hash = md5($code);
             $pids = $this->cacheManager->getObject($hash);
-            if ($pids !== null) {
-                $pageList = array_merge($pageList, $pids);
+            if (is_array($pids)) {
+                $newpids = [];
+                foreach ($pids as $key=>$pid) {
+                    $newpids[(int)$key] = (int)$pid;
+                }
+                $pageList = array_merge($pageList, $newpids);
                 return $pageList;
             }
         }
@@ -236,7 +239,7 @@ class PagesRepository
             $considerHidden
         );
 
-        if ($this->cacheManager && $hash) {
+        if ($hash) {
             $this->cacheManager->setObject($hash, $pageList, 7200);
         }
 
@@ -259,7 +262,7 @@ class PagesRepository
             return true;
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()->removeAll();
 
         $row = $queryBuilder
@@ -373,13 +376,14 @@ class PagesRepository
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 
     protected function isAdmin(): bool
     {
-        return $this->getBackendUser()->isAdmin();
+        $backendUser = $this->getBackendUser();
+        return $backendUser && $backendUser->isAdmin();
     }
 
     /**

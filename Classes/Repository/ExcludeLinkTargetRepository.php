@@ -8,11 +8,14 @@ use Sypets\Brofix\Controller\Filter\ManageExclusionsFilter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ExcludeLinkTargetRepository
 {
     protected const TABLE = 'tx_brofix_exclude_link_target';
+
+    public function __construct(protected ConnectionPool $connectionPool)
+    {
+    }
 
     /**
      * Get Excluded links.
@@ -107,7 +110,7 @@ class ExcludeLinkTargetRepository
         /**
          * @var ConnectionPool $connectionPool
          */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         return $connectionPool->getQueryBuilderForTable($table);
     }
 }

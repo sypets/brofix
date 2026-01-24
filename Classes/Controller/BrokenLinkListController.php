@@ -188,16 +188,6 @@ class BrokenLinkListController extends AbstractBrofixController
     protected $pageList;
 
     /**
-     * @var BrokenLinkRepository
-     */
-    protected $brokenLinkRepository;
-
-    /**
-     * @var PagesRepository
-     */
-    protected $pagesRepository;
-
-    /**
      * @var FlashMessageQueue<FlashMessage>
      */
     protected $defaultFlashMessageQueue;
@@ -206,14 +196,17 @@ class BrokenLinkListController extends AbstractBrofixController
     protected bool $backendUserHasPermissionsForExcludes = false;
 
     public function __construct(
-        PagesRepository $pagesRepository,
-        BrokenLinkRepository $brokenLinkRepository,
+        protected PagesRepository $pagesRepository,
+        protected BrokenLinkRepository $brokenLinkRepository,
+        // has property in parent class !
         ExcludeLinkTarget $excludeLinkTarget,
-        FlashMessageService $flashMessageService,
+        protected FlashMessageService $flashMessageService,
         ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory,
         ExtensionConfiguration $extensionConfiguration,
-        PageRenderer $pageRenderer
+        PageRenderer $pageRenderer,
+        protected Context $context,
+        protected readonly UriBuilder $uriBuilder
     ) {
         $this->pageRenderer = $pageRenderer;
         $iconFactory = $iconFactory;
@@ -481,7 +474,7 @@ class BrokenLinkListController extends AbstractBrofixController
         /**
          * @var UriBuilder $uriBuilder
          */
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = $this->uriBuilder;
         $uri = (string)$uriBuilder->buildUriFromRoute($route, $parameters);
 
         return $uri;
@@ -739,7 +732,7 @@ class BrokenLinkListController extends AbstractBrofixController
         /**
          * @var FlashMessageService $flashMessageService
          */
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
+        $flashMessageService = $this->flashMessageService;
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('brofix');
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
@@ -861,14 +854,14 @@ class BrokenLinkListController extends AbstractBrofixController
                 'current_record_uid' => $row['record_uid'],
                 'current_record_table' => $row['table_name'],
                 'current_record_field' => $row['field'],
-                'current_record_currentTime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
+                'current_record_currentTime' => $this->context->getPropertyFromAspect('date', 'timestamp'),
             ]
         );
 
         /**
          * @var UriBuilder $uriBuilder
          */
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = $this->uriBuilder;
         $showEditButtons = $this->configuration->getShowEditButtons();
         $editUrlParameters = [
             'edit' => [
@@ -899,7 +892,7 @@ class BrokenLinkListController extends AbstractBrofixController
                 'current_record_uid' => $row['record_uid'],
                 'current_record_table' => $row['table_name'],
                 'current_record_field' => $row['field'],
-                'current_record_currentTime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
+                'current_record_currentTime' => $this->context->getPropertyFromAspect('date', 'timestamp'),
             ]
         );
 

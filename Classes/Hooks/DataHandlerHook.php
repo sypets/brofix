@@ -19,31 +19,18 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Hook for changes to records in the database.
  *
  * @internal This class is a hook implementation and is for internal use inside this extension only.
  */
-final class DataHandlerHook
+class DataHandlerHook
 {
-    /**
-     * @var BrokenLinkRepository
-     */
-    private $brokenLinkRepository;
-
-    /**
-     * @var ExcludeLinkTarget
-     */
-    private $excludeLinkTarget;
-
     public function __construct(
-        ?BrokenLinkRepository $brokenLinkRepository = null,
-        ?ExcludeLinkTarget $excludeLinkTarget = null
+        protected BrokenLinkRepository $brokenLinkRepository,
+        protected ExcludeLinkTarget $excludeLinkTarget
     ) {
-        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
     }
 
     /**
@@ -97,13 +84,13 @@ final class DataHandlerHook
     }
 
     // If records get deleted, remove corresponding broken link records
-    public function processCmdmap_deleteAction($table, $id, $recordToDelete, $recordWasDeleted, $dataHandler)
+    public function processCmdmap_deleteAction($table, $id, $recordToDelete, $recordWasDeleted, $dataHandler): void
     {
         $id = (int)$id;
         $this->brokenLinkRepository->removeBrokenLinksForRecord($table, $id);
     }
 
-    private function removeBrokenLinkRecordsForExcludedLinkTarget(array $row): bool
+    protected function removeBrokenLinkRecordsForExcludedLinkTarget(array $row): bool
     {
         if ($row === []
             || (($row['linktarget'] ?? '') === '')

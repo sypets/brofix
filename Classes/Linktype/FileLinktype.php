@@ -20,6 +20,16 @@ class FileLinktype extends AbstractLinktype
 
     public const ERROR_CODE_FOLDER_MISSING = 2;
 
+    protected readonly ResourceFactory $resourceFactory;
+
+    /**
+     * @todo always require initialized object, need changes in tests
+     */
+    public function __construct(?ResourceFactory $resourceFactory = null)
+    {
+        $this->resourceFactory = $resourceFactory ?? GeneralUtility::makeInstance(ResourceFactory::class);
+    }
+
     /**
     * Type fetching method, based on the type that softRefParserObj returns
     *
@@ -58,7 +68,7 @@ class FileLinktype extends AbstractLinktype
         /**
          * @var ResourceFactory $resourceFactory
          */
-        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        $resourceFactory = $this->resourceFactory;
         try {
             $file = $resourceFactory->retrieveFileOrFolderObject($url);
         } catch (FileDoesNotExistException $e) {

@@ -3,34 +3,23 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Hooks;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
-final class PageCalloutsHook implements SingletonInterface
+class PageCalloutsHook implements SingletonInterface
 {
-    private bool $showPageCalloutBrokenLinksExist = false;
+    protected bool $showPageCalloutBrokenLinksExist = false;
 
-    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration)
-    {
+    public function __construct(
+        protected BrokenLinkRepository $brokenLinkRepository,
+        ExtensionConfiguration $extensionConfiguration,
+        protected readonly UriBuilder $uriBuilder
+    ) {
         $this->showPageCalloutBrokenLinksExist = (bool)$extensionConfiguration->get('brofix', 'showPageCalloutBrokenLinksExist');
     }
 
@@ -38,7 +27,7 @@ final class PageCalloutsHook implements SingletonInterface
      * Create flash message for showing information about broken links in page module
      *
      * @param mixed[] $pageInfo
-     * @return array{'title'?: string, 'message'?: string, 'state'?: int}:
+     * @return array{'title'?: string, 'message'?: string, 'state'?: int}
      */
     public function addMessages(array $pageInfo): array
     {
@@ -47,7 +36,7 @@ final class PageCalloutsHook implements SingletonInterface
             return [];
         }
 
-        if (!$pageInfo || !is_array($pageInfo)) {
+        if (!$pageInfo) {
             return [];
         }
         $pageId = (int)($pageInfo['uid']);
@@ -93,7 +82,7 @@ final class PageCalloutsHook implements SingletonInterface
 
     protected function createBackendUri(int $pageId, string $route = 'web_brofix'): string
     {
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = $this->uriBuilder;
         return (string)$uriBuilder->buildUriFromRoute($route, ['id' => $pageId]);
     }
 
