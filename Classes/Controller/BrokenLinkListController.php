@@ -200,7 +200,7 @@ class BrokenLinkListController extends AbstractBrofixController
         protected BrokenLinkRepository $brokenLinkRepository,
         // has property in parent class !
         ExcludeLinkTarget $excludeLinkTarget,
-        FlashMessageService $flashMessageService,
+        protected FlashMessageService $flashMessageService,
         ModuleTemplateFactory $moduleTemplateFactory,
         IconFactory $iconFactory,
         ExtensionConfiguration $extensionConfiguration,

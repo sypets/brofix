@@ -27,7 +27,7 @@ class PageCalloutsHook implements SingletonInterface
      * Create flash message for showing information about broken links in page module
      *
      * @param mixed[] $pageInfo
-     * @return array{'title'?: string, 'message'?: string, 'state'?: int}:
+     * @return array{'title'?: string, 'message'?: string, 'state'?: int}
      */
     public function addMessages(array $pageInfo): array
     {
@@ -36,7 +36,7 @@ class PageCalloutsHook implements SingletonInterface
             return [];
         }
 
-        if (!$pageInfo || !is_array($pageInfo)) {
+        if (!$pageInfo) {
             return [];
         }
         $pageId = (int)($pageInfo['uid']);

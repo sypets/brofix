@@ -217,7 +217,7 @@ class LinkParser
                 . ' stack trace:'
                 . $e->getTraceAsString()
             );
-        } catch (\Exception | \Throwable $e) {
+        } catch (\Throwable $e) {
             // log exception with more context and throw again so that errors are not obscured
             // @extensionScannerIgnoreLine problem with ->error()
             $this->error(

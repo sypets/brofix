@@ -194,7 +194,7 @@ class PagesRepository
         }
 
         $hash = null;
-        if ($this->cacheManager && $useCache && $depth > 3) {
+        if ($useCache && $depth > 3) {
             if ($this->getBackendUser() && $this->getBackendUser()->isAdmin()) {
                 $username = 'admin';
             } else {
@@ -210,8 +210,12 @@ class PagesRepository
             );
             $hash = md5($code);
             $pids = $this->cacheManager->getObject($hash);
-            if ($pids !== null) {
-                $pageList = array_merge($pageList, $pids);
+            if (is_array($pids)) {
+                $newpids = [];
+                foreach ($pids as $key=>$pid) {
+                    $newpids[(int)$key] = (int)$pid;
+                }
+                $pageList = array_merge($pageList, $newpids);
                 return $pageList;
             }
         }
@@ -235,7 +239,7 @@ class PagesRepository
             $considerHidden
         );
 
-        if ($this->cacheManager && $hash) {
+        if ($hash) {
             $this->cacheManager->setObject($hash, $pageList, 7200);
         }
 

@@ -28,23 +28,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class DataHandlerHook
 {
-    /**
-     * @var BrokenLinkRepository
-     */
-    protected $brokenLinkRepository;
-
-    /**
-     * @var ExcludeLinkTarget
-     */
-    protected $excludeLinkTarget;
-
     public function __construct(
-        ?BrokenLinkRepository $brokenLinkRepository = null,
-        ?ExcludeLinkTarget $excludeLinkTarget = null
-    ) {
-        $this->brokenLinkRepository = $brokenLinkRepository ?: GeneralUtility::makeInstance(BrokenLinkRepository::class);
-        $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
-    }
+        protected BrokenLinkRepository $brokenLinkRepository,
+        protected ExcludeLinkTarget $excludeLinkTarget
+    ) {}
 
     /**
      * 1. If an ExcludeLinkTarget record is changed or created

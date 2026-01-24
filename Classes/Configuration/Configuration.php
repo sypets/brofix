@@ -481,7 +481,7 @@ class Configuration
 
     /**
      * Return crawlDelay.nodelay domains.
-     * @return array<string>awlDelayNodelayDomains
+     * @return array<string>
      */
     public function getCrawlDelayNodelayDomains(): array
     {

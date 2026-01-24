@@ -17,6 +17,9 @@ services:
   Sypets\Brofix\CheckLinks\ExcludeLinkTarget:
     public: true
 
+  Sypets\Brofix\Hooks\DataHandlerHook:
+    public: true
+
   Sypets\Brofix\Repository\BrokenLinkRepository:
     public: true
 

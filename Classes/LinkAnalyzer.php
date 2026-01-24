@@ -195,6 +195,7 @@ class LinkAnalyzer implements LoggerAwareInterface
             }
             return $count;
         }
+        /** @phpstan-ignore-next-line  */
         if ($message === '') {
             $message = sprintf(
                 $this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.recheck.url'),
