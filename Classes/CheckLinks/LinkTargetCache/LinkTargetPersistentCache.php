@@ -21,7 +21,7 @@ class LinkTargetPersistentCache extends AbstractLinkTargetCache
     const CHECK_STATUS_NONE = 0;
     const CHECK_STATUS_OK = 1;
     const CHECK_STATUS_ERROR = 2;
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+    public function __construct(private ConnectionPool $connectionPool)
     {
     }
 

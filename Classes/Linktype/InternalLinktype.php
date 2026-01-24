@@ -53,7 +53,8 @@ class InternalLinktype extends AbstractLinktype
     protected const ERROR_ERRNO_CONFIGURATION = 5;
 
     protected const ERROR_ERRNO_TABLE_MISSING = 6;
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool, private \TYPO3\CMS\Core\Context\Context $context, private readonly \TYPO3\CMS\Core\Site\SiteFinder $siteFinder)
+    public function __construct(private ConnectionPool $connectionPool, private Context $context,
+        private readonly SiteFinder $siteFinder)
     {
     }
 

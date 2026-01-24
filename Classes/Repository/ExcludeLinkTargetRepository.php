@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ExcludeLinkTargetRepository
 {
     protected const TABLE = 'tx_brofix_exclude_link_target';
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+    public function __construct(private ConnectionPool $connectionPool)
     {
     }
 

@@ -19,7 +19,7 @@ class FileLinktype extends AbstractLinktype
     public const ERROR_CODE_FILE_MISSING = 1;
 
     public const ERROR_CODE_FOLDER_MISSING = 2;
-    public function __construct(private readonly \TYPO3\CMS\Core\Resource\ResourceFactory $resourceFactory)
+    public function __construct(private readonly ResourceFactory $resourceFactory)
     {
     }
 

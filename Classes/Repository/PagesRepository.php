@@ -27,7 +27,7 @@ class PagesRepository
     protected ?CacheManager $cacheManager;
 
     public function __construct(
-        ?CacheManager $cacheManager=null, private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool
+        ?CacheManager $cacheManager=null, private ConnectionPool $connectionPool
     ) {
         $this->cacheManager = $cacheManager;
     }

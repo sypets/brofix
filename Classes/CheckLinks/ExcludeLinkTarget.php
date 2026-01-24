@@ -29,7 +29,7 @@ class ExcludeLinkTarget
      * @var int
      */
     protected $excludeLinkTargetsPid = 0;
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+    public function __construct(private ConnectionPool $connectionPool)
     {
     }
 

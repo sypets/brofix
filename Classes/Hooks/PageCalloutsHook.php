@@ -3,19 +3,6 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Hooks;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Sypets\Brofix\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -29,7 +16,7 @@ final class PageCalloutsHook implements SingletonInterface
 {
     private bool $showPageCalloutBrokenLinksExist = false;
 
-    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration, private readonly \TYPO3\CMS\Backend\Routing\UriBuilder $uriBuilder)
+    public function __construct(private BrokenLinkRepository $brokenLinkRepository, ExtensionConfiguration $extensionConfiguration, private readonly UriBuilder $uriBuilder)
     {
         $this->showPageCalloutBrokenLinksExist = (bool)$extensionConfiguration->get('brofix', 'showPageCalloutBrokenLinksExist');
     }

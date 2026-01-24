@@ -34,7 +34,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
      */
     protected $maxBindParameters;
 
-    public function __construct(private \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool)
+    public function __construct(private ConnectionPool $connectionPool)
     {
         /**
          * @var ConnectionPool $connectionPool
