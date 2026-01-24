@@ -1,5 +1,6 @@
 <?php
 
+/** @phpstan-ignore-next-line */
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Broken link fixer',
     'description' => 'Check for broken links and fix them via a backend module (forked from core linkvalidator)',
