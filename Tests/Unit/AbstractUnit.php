@@ -3,31 +3,23 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
+use PHPUnit\Framework\MockObject\MockObject;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
+/**
+ * @see https://docs.typo3.org/m/typo3/reference-coreapi/13.4/en-us/Testing/UnitTesting/Index.html
+ * @see https://docs.phpunit.de/en/10.5/test-doubles.html
+ *
+ * createMock()
+ *  is the standard, best-practice method to create a test double where all methods are replaced by default, honoring the visibility of methods (private/protected methods cannot be called).
+ * getAccessibleMock()
+ * is a specialized tool (often used in TYPO3 testing) designed to mock a class while allowing the test to access and invoke its protected or private methods for testing purposes.
+ */
 abstract class AbstractUnit extends UnitTestCase
 {
-    use ProphecyTrait;
-
     protected const EXTENSION_CONFIGURATION_ARRAY = [
         'excludeSoftrefs' => 'url',
         'excludeSoftrefsInFields' => 'tt_content.bodytext',
@@ -57,18 +49,20 @@ abstract class AbstractUnit extends UnitTestCase
         );
     }
 
-    protected function inializeLanguageServiceProphecy(): void
+    protected function inializeLanguageServiceMock(): void
     {
-        $GLOBALS['LANG'] = $this->buildLanguageServiceProphecy()->reveal();
+        $GLOBALS['LANG'] = $this->buildLanguageServiceMock();
     }
 
-    /**
-     * @return ObjectProphecy<LanguageService>
-     */
-    protected function buildLanguageServiceProphecy(): ObjectProphecy
+    protected function buildLanguageServiceMock(): MockObject
     {
-        $languageServiceProphecy = $this->prophesize(LanguageService::class);
-        $languageServiceProphecy->getLL(Argument::any())->willReturn('translation string');
-        return $languageServiceProphecy;
+        $languageServiceMockObject =
+            $this->createMock(LanguageService::class);
+        /**
+         * returnValue is deprecated:
+         * Use <code>$double->willReturn()</code> instead of <code>$double->will($this->returnValue())</code>
+         */
+        $languageServiceMockObject->method('sL')->willReturn('translation string');
+        return $languageServiceMockObject;
     }
 }

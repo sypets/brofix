@@ -3,19 +3,6 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit\Configuration;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use Symfony\Component\Mime\Address;
 use Sypets\Brofix\Tests\Unit\AbstractUnit;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -36,6 +23,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function overrideSearchFieldsSetsCorrectValues(): void
     {
         $tsconfig = [
@@ -69,6 +57,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function setSearchFieldsSetsCorrectValues(): void
     {
         $expectedSearchFields = [
@@ -94,6 +83,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getExcludedCtypesIsCorrectDefault(): void
     {
         $expected = [
@@ -108,6 +98,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getMailFromEmailIsCorrectDefault(): void
     {
         $email = $this->configuration->getMailFromEmail();
@@ -122,6 +113,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getMailFromEmailUsesSystemDefault(): void
     {
         $email = 'system@example.org';
@@ -135,11 +127,17 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
+    /**
+     * @test
+     */
+    #[Test]
     public function getMailFromEmailReturnsCorrectTsconfig(): void
     {
         $emailExpected = 'system@example.org';
         $tsconfig = [
-            'mail.fromemail' => $emailExpected,
+            'mail.' => [
+                'fromemail' => $emailExpected,
+            ]
         ];
 
         $this->configuration->overrideTsConfigByArray($tsconfig);
@@ -155,6 +153,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getMailFromNameIsCorrectDefault(): void
     {
         self::assertEquals(
@@ -165,9 +164,10 @@ class ConfigurationTest extends AbstractUnit
     }
 
     /**
-     * @test
      * @throws \Exception
+     * @test
      */
+    #[Test]
     public function getMailFromNameReturnsCorrectTsconfig(): void
     {
         $nameExpected = 'Webmaster';
@@ -190,6 +190,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getMailRecipientsIsCorrectDefault(): void
     {
         // expected, actual, message
@@ -203,6 +204,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getMailRecipientsReturnsCorrectValue(): void
     {
         $email = 'system@example.org';
@@ -226,6 +228,7 @@ class ConfigurationTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function getMailRecipientsReturnsCorrectValuesMultiple(): void
     {
         $email = 'system@example.org,system2@example.org';

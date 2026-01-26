@@ -3,24 +3,10 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit\Linktype;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
+use PHPUnit\Framework\MockObject\MockObject;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
@@ -31,37 +17,34 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ExternalLinktypeTest extends AbstractUnit
 {
-    use ProphecyTrait;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->inializeLanguageServiceProphecy();
+        $this->inializeLanguageServiceMock();
     }
 
     /**
      * @test
      */
+    #[Test]
     public function checkLinkWithExternalUrlNotFoundReturnsCorrectStatus(): void
     {
         $httpMethod = 'GET';
         $options = $this->getRequestHeaderOptions($httpMethod);
         $url = 'https://localhost/~not-existing-url';
 
-        $responseProphecy = $this->prophesize(Response::class);
-        $responseProphecy->getStatusCode()->willReturn(404);
-        $responseProphecy->getHeaders()->willReturn([]);
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->method('getStatusCode')->willReturn(404);
+        $responseMock->method('getHeaders')->willReturn([]);
 
-        $exceptionProphecy = $this->prophesize(ClientException::class);
-        $exceptionProphecy->hasResponse()
-            ->willReturn(true);
-        $exceptionProphecy->getResponse()
-            ->willReturn($responseProphecy->reveal());
+        $exceptionMock = $this->createMock(ClientException::class);
+        $exceptionMock->method('hasResponse')->willReturn(true);
+        $exceptionMock->method('getResponse')->willReturn($responseMock);
 
-        $requestFactoryProphecy = $this->prophesize(RequestFactory::class);
-        $requestFactoryProphecy->request($url, $httpMethod, $options)
-            ->willThrow($exceptionProphecy->reveal());
-        $subject = $this->instantiateExternalLinktype($requestFactoryProphecy);
+        $requestFactoryMock = $this->createMock(RequestFactory::class);
+        $requestFactoryMock->method('request', $url, $httpMethod, $options)
+            ->willThrowException($exceptionMock);
+        $subject = $this->instantiateExternalLinktype($requestFactoryMock);
 
         $method = new \ReflectionMethod($subject, 'requestUrl');
         $method->setAccessible(true);
@@ -74,26 +57,27 @@ class ExternalLinktypeTest extends AbstractUnit
     /**
      * @test
      */
+    #[Test]
     public function checkLinkWithExternalUrlNotFoundResultsNotFoundErrorType(): void
     {
         $httpMethod = 'GET';
         $options = $this->getRequestHeaderOptions($httpMethod);
         $url = 'http://localhost/~not-existing-url';
 
-        $responseProphecy = $this->prophesize(Response::class);
-        $responseProphecy->getStatusCode()->willReturn(404);
-        $responseProphecy->getHeaders()->willReturn([]);
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->method('getStatusCode')->willReturn(404);
+        $responseMock->method('getHeaders')->willReturn([]);
 
-        $exceptionProphecy = $this->prophesize(ClientException::class);
-        $exceptionProphecy->hasResponse()
+        $exceptionMock = $this->createMock(ClientException::class);
+        $exceptionMock->method('hasResponse')
             ->willReturn(true);
-        $exceptionProphecy->getResponse()
-            ->willReturn($responseProphecy->reveal());
+        $exceptionMock->method('getResponse')
+            ->willReturn($responseMock);
 
-        $requestFactoryProphecy = $this->prophesize(RequestFactory::class);
-        $requestFactoryProphecy->request($url, $httpMethod, $options)
-            ->willThrow($exceptionProphecy->reveal());
-        $subject = $this->instantiateExternalLinktype($requestFactoryProphecy);
+        $requestFactoryMock = $this->createMock(RequestFactory::class);
+        $requestFactoryMock->method('request', $url, $httpMethod, $options)
+            ->willThrowException($exceptionMock);
+        $subject = $this->instantiateExternalLinktype($requestFactoryMock);
 
         $method = new \ReflectionMethod($subject, 'requestUrl');
         $method->setAccessible(true);
@@ -104,22 +88,16 @@ class ExternalLinktypeTest extends AbstractUnit
         self::assertTrue($linkTargetResponse->getErrorType() !== '');
     }
 
-    /**
-     * @param ObjectProphecy<RequestFactory>|null $requestFactoryProphecy
-     * @return ExternalLinktype
-     */
-    private function instantiateExternalLinktype(ObjectProphecy $requestFactoryProphecy = null): ExternalLinktype
+    private function instantiateExternalLinktype(MockObject $requestFactoryMock): ExternalLinktype
     {
-        $requestFactoryProphecy = $requestFactoryProphecy ?: $this->prophesize(RequestFactory::class);
+        $excludeLinkTargetMock = $this->createMock(ExcludeLinkTarget::class);
 
-        $excludeLinkTargetProphecy = $this->prophesize(ExcludeLinkTarget::class);
-
-        $linkTargetCacheProphycy = $this->prophesize(LinkTargetPersistentCache::class);
+        $linkTargetCacheMock = $this->createMock(LinkTargetPersistentCache::class);
 
         return new ExternalLinktype(
-            $requestFactoryProphecy->reveal(),
-            $excludeLinkTargetProphecy->reveal(),
-            $linkTargetCacheProphycy->reveal()
+            $requestFactoryMock,
+            $excludeLinkTargetMock,
+            $linkTargetCacheMock
         );
     }
 

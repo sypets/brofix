@@ -127,11 +127,9 @@ jobs:
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v13.neon" -v
 
-      # todo: replace prophecy
-
-      #- name: "Unit tests"
-      #  if: always()
-      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+      - name: "Unit tests"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
 
       - name: "Functional tests with mariadb"
         if: always()
@@ -169,9 +167,6 @@ jobs:
       - name: "Set Typo3 core version"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
 
-      #- name: "Add prophecy for unit / functional tests"
-      #  run: composer require --dev jangregor/phpstan-prophecy phpspec/prophecy phpspec/prophecy-phpunit typo3/testing-framework:^7
-
       - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
@@ -179,9 +174,9 @@ jobs:
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
 
-      #- name: "Unit tests"
-      #  if: always()
-      #  run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+      - name: "Unit tests"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
 
       - name: "Functional tests with mariadb"
         if: always()
