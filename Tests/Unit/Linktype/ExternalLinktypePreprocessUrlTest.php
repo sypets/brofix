@@ -3,20 +3,6 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit\Linktype;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
-use Prophecy\PhpUnit\ProphecyTrait;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
 use Sypets\Brofix\Linktype\ExternalLinktype;
@@ -25,12 +11,10 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class ExternalLinktypePreprocessUrlTest extends UnitTestCase
 {
-    use ProphecyTrait;
-
     /**
      * @return \Generator<string,string[]>
      */
-    public function preprocessUrlsDataProvider(): \Generator
+    public static function preprocessUrlsDataProvider(): \Generator
     {
         // regression test for issue #92230: handle incomplete or faulty URLs gracefully
         yield 'faulty URL with mailto' => [
@@ -94,7 +78,9 @@ class ExternalLinktypePreprocessUrlTest extends UnitTestCase
     /**
      * @test
      * @dataProvider preprocessUrlsDataProvider
-     */
+    */
+    #[DataProvider('preprocessUrlsDataProvider')]
+    #[Test]
     public function preprocessUrlReturnsCorrectString(string $inputUrl, string $expectedResult): void
     {
         $subject = $this->instantiateExternalLinktype();
@@ -106,14 +92,14 @@ class ExternalLinktypePreprocessUrlTest extends UnitTestCase
 
     private function instantiateExternalLinktype(): ExternalLinktype
     {
-        $requestFactoryProphecy = $this->prophesize(RequestFactory::class);
-        $excludeLinkTargetProphecy = $this->prophesize(ExcludeLinkTarget::class);
-        $linkTargetCacheProphecy = $this->prophesize(LinkTargetPersistentCache::class);
+        $requestFactoryMock = $this->createMock(RequestFactory::class);
+        $excludeLinkTargetMock = $this->createMock(ExcludeLinkTarget::class);
+        $linkTargetCacheMock = $this->createMock(LinkTargetPersistentCache::class);
 
         return new ExternalLinktype(
-            $requestFactoryProphecy->reveal(),
-            $excludeLinkTargetProphecy->reveal(),
-            $linkTargetCacheProphecy->reveal()
+            $requestFactoryMock,
+            $excludeLinkTargetMock,
+            $linkTargetCacheMock
         );
     }
 }
