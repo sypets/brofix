@@ -198,28 +198,26 @@ class BrokenLinkListController extends AbstractBrofixController
     public function __construct(
         protected PagesRepository $pagesRepository,
         protected BrokenLinkRepository $brokenLinkRepository,
-        // has property in parent class !
+        // has property in parent class, is passed to parent object via constructor!
         ExcludeLinkTarget $excludeLinkTarget,
         protected FlashMessageService $flashMessageService,
+        // has property in parent class, is passed to parent object via constructor!
         ModuleTemplateFactory $moduleTemplateFactory,
+        // has property in parent class, is passed to parent object via constructor!
         IconFactory $iconFactory,
+        // only needed in constructur
         ExtensionConfiguration $extensionConfiguration,
+        // has property in parent class
         PageRenderer $pageRenderer,
         protected Context $context,
         protected readonly UriBuilder $uriBuilder
     ) {
-        $this->pageRenderer = $pageRenderer;
-        $iconFactory = $iconFactory;
-        $excludeLinkTarget = $excludeLinkTarget;
-        $moduleTemplateFactory = $moduleTemplateFactory;
-        $this->brokenLinkRepository = $brokenLinkRepository;
-        $this->pagesRepository = $pagesRepository;
-
         $this->defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $this->orderBy = BrokenLinkListController::DEFAULT_ORDER_BY;
 
         $extConfArray  = $extensionConfiguration->get('brofix') ?: [];
         $configuration = GeneralUtility::makeInstance(Configuration::class, $extConfArray);
+        $this->pageRenderer = $pageRenderer;
 
         parent::__construct(
             $configuration,
