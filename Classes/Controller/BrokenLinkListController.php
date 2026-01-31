@@ -10,6 +10,7 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
+use Sypets\Brofix\Controller\Pagination\PaginateInfo;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Linktype\LinktypeInterface;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
@@ -46,6 +47,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class BrokenLinkListController extends AbstractBrofixController
 {
+    protected const PAGINATE_ITEMS_PER_PAGE = 100;
+
     protected const MODULE_NAME = 'web_brofix_broken_links';
 
     protected const DEFAULT_ORDER_BY = 'page';
@@ -185,6 +188,8 @@ class BrokenLinkListController extends AbstractBrofixController
 
     protected bool $backendUserHasPermissionsForBrokenLinklist = false;
     protected bool $backendUserHasPermissionsForExcludes = false;
+
+    protected ?PaginateInfo $paginateInfo = null;
 
     public function __construct(
         protected PagesRepository $pagesRepository,
@@ -440,10 +445,10 @@ class BrokenLinkListController extends AbstractBrofixController
         if ($paginationPage !== null) {
             $this->paginationCurrentPage = (int)$paginationPage;
         } else {
-            $this->paginationCurrentPage = 1;
+            $this->paginationCurrentPage = PaginateInfo::PAGE_NUMBER_START;
         }
-        if ($this->paginationCurrentPage < 1) {
-            $this->paginationCurrentPage = 1;
+        if ($this->paginationCurrentPage < PaginateInfo::PAGE_NUMBER_START) {
+            $this->paginationCurrentPage = PaginateInfo::PAGE_NUMBER_START;
         }
     }
 
@@ -562,11 +567,9 @@ class BrokenLinkListController extends AbstractBrofixController
      */
     protected function initializeViewForBrokenLinks(): void
     {
-        $this->moduleTemplate->assign('depth', $this->depth);
-
-        $items = [];
-        $totalCount = 0;
-
+        /** Determines whether link list should be displayed, if no page selected and traverse by subpages:
+         * no
+         */
         $shouldShow = true;
         $howToTraverse = $this->filter->getHowtotraverse();
         if ($howToTraverse === BrokenLinkListFilter::HOW_TO_TRAVERSE_PAGES) {
@@ -583,37 +586,16 @@ class BrokenLinkListController extends AbstractBrofixController
         }
 
         if ($shouldShow) {
-            /**
-             * @todo Currently, we fetch all and then paginate. We would like to optimize this to fetch only the broken
-             *       links for one page. However, this would make it necessary to first fetch the total amount, which
-             *       is similarly complicated to getBrokenLinks because of the array_chunking the pids. Possibly, set
-             *       a hard limit to the number of pages and do away with array_chunking.
-             *       There is already traverseMaxNumberOfPagesInBackend extension configuration which would have to
-             *       effectively be set to a hard limit corresponding to (int)(BrokenLinkRepository::getMaxBindParameters() /2 - 4);
-            */
-            $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
-                $this->pageList,
-                $this->linkTypes,
-                $this->configuration->getSearchFields(),
-                $this->filter,
-                $this->configuration,
-                self::ORDER_BY_VALUES[$this->orderBy] ?? []
-            );
-            if ($brokenLinks) {
-                $totalCount = count($brokenLinks);
+            // todo: do this in fetchPaginatedLinkList
+            //$totalCount = $this->fetchTotalCountOfBrokenLinks();
 
-                $itemsPerPage = 100;
-                if (($this->paginationCurrentPage - 1) * $itemsPerPage >= $totalCount) {
-                    $this->resetPagination();
-                }
-                $paginator = GeneralUtility::makeInstance(ArrayPaginator::class, $brokenLinks, $this->paginationCurrentPage, $itemsPerPage);
-                $this->pagination = GeneralUtility::makeInstance(SimplePagination::class, $paginator);
-                // move end
-                foreach ($paginator->getPaginatedItems() as $row) {
-                    $items[] = $this->renderTableRow($row['table_name'], $row);
-                }
-                $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
-            }
+            // todo: do this in fetchPaginatedLinkList
+            //$paginateInfo = new PaginateInfo($totalCount, $this->paginationCurrentPage);
+
+            $items = $this->fetchPaginatedLinkList();
+
+            $howToTraverse = $this->filter->getHowtotraverse();
+            // check if limit was reached
             if ($howToTraverse !== BrokenLinkListFilter::HOW_TO_TRAVERSE_ALL
                 && $this->configuration->getTraverseMaxNumberOfPagesInBackend()
                 && is_countable($this->pageList)
@@ -629,13 +611,18 @@ class BrokenLinkListController extends AbstractBrofixController
                 );
             }
         } else {
-            $this->pagination = null;
+            // todo : show message to select page
+            $totalCount = 0;
+            $items = [];
+            $paginateInfo = null;
         }
-        $this->moduleTemplate->assign('totalCount', $totalCount);
+
+        $this->moduleTemplate->assign('depth', $this->depth);
+        $this->moduleTemplate->assign('totalCount', $this->paginateInfo ? $this->paginateInfo->getNumberOfItems() : 0);
         $this->moduleTemplate->assign('filter', $this->filter);
         $this->moduleTemplate->assign('viewMode', $this->viewMode);
-        if ($this->id === 0) {
-            $this->createFlashMessagesForRootPage();
+        if (!$shouldShow) {
+            $this->createFlashMessageToSelectPageInPagetree();
         } elseif (empty($items)) {
             $this->createFlashMessagesForNoBrokenLinks();
         }
@@ -645,9 +632,10 @@ class BrokenLinkListController extends AbstractBrofixController
             $this->moduleTemplate->assign('linktypes', $linktypes);
         }
 
-        $this->moduleTemplate->assign('pagination', $this->pagination);
+        // todo replace with pageinateInfo
+        //$this->moduleTemplate->assign('pagination', $this->pagination);
         $this->moduleTemplate->assign('orderBy', $this->orderBy);
-        $this->moduleTemplate->assign('paginationPage', $this->paginationCurrentPage ?: 1);
+        $this->moduleTemplate->assign('paginationPage', $this->paginationCurrentPage ?: PaginateInfo::PAGE_NUMBER_START);
 
         // todo: only pass configuration
         $this->moduleTemplate->assign('showPageLayoutButton', $this->configuration->isShowPageLayoutButton());
@@ -663,6 +651,40 @@ class BrokenLinkListController extends AbstractBrofixController
 
         // Table header
         $this->moduleTemplate->assign('tableHeader', $this->getVariablesForTableHeader($sortActions));
+    }
+
+    protected function fetchPaginatedLinkList(): array
+    {
+        $brokenLinks = [];
+
+        // fetch total count
+        $totalCount = $this->brokenLinkRepository->getBrokenLinksCount($this->pageList,
+            $this->linkTypes,
+            $this->configuration->getSearchFields(),
+            $this->filter,
+            $this->configuration,  'tx_brofix_tmp_page_ids');
+
+        if ($this->paginateInfo === null) {
+            $this->paginateInfo = new PaginateInfo($totalCount, $this->paginationCurrentPage);
+        }
+
+        $dbalResult = $this->brokenLinkRepository->getBrokenLinks(
+            $this->pageList,
+            $this->linkTypes,
+            $this->configuration->getSearchFields(),
+            $this->filter,
+            $this->configuration,
+            self::ORDER_BY_VALUES[$this->orderBy] ?? [],
+            $this->paginateInfo,'tx_brofix_tmp_page_ids'
+        );
+
+        while ($row = $dbalResult->fetchAssociative()) {
+            // enrich content
+            $brokenLinks[] = $this->renderTableRow($row['table_name'], $row);
+        }
+        $this->moduleTemplate->assign('listUri', $this->constructBackendUri());
+
+        return $brokenLinks;
     }
 
     /**
@@ -698,7 +720,10 @@ class BrokenLinkListController extends AbstractBrofixController
         );
     }
 
-    protected function createFlashMessagesForRootPage(): void
+    /**
+     * "Select a page in the page tree!"
+     */
+    protected function createFlashMessageToSelectPageInPagetree(): void
     {
         $this->createFlashMessage($this->getLanguageService()->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.rootpage'));
     }
@@ -1143,7 +1168,7 @@ class BrokenLinkListController extends AbstractBrofixController
         return true;
     }
 
-    protected function resetPagination(int $pageNr = 1): void
+    protected function resetPagination(int $pageNr = PaginateInfo::PAGE_NUMBER_START): void
     {
         $this->paginationCurrentPage = $pageNr;
     }
