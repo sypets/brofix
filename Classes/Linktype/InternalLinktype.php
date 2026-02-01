@@ -478,7 +478,16 @@ class InternalLinktype extends AbstractLinktype
         }
 
         $siteFinder = $this->siteFinder;
-        $pageId = (int)($row['table_name'] === 'pages' ? $row['record_uid'] : $row['record_pid']);
+
+        $pageId = (int)($row['record_pageid'] ?? 0);
+        /**
+         * @todo remove this part, record_pageid should always contain page id in the future
+         */
+        // legacy BEGIN (fallback for missing record_pageid)
+        if ($pageId === 0) {
+            $pageId = (int)($row['table_name'] === 'pages' ? $row['record_uid'] : $row['record_pid']);
+        }
+        // legacy END
 
         /**
          * @var Site

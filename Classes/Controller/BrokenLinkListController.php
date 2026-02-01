@@ -55,19 +55,15 @@ class BrokenLinkListController extends AbstractBrofixController
     public const DEFAULT_VIEW_MODE_VALUE = self::VIEW_MODE_VALUE_COMPLEX;
 
     protected const ORDER_BY_VALUES = [
-        // there is an inaccuracy here because for table 'pages', the page is record_uid and
-        // record_pid is actually the parent page, while for tables != 'pages' record_pid
-        // -> this means records on the page and record on the content will not necessarily be
-        //    grouped together
-        // contains the page id
-        // todo: add actual page id to table instead of record_pid
         'page' => [
-            ['record_pid', 'ASC'],
+            // ['record_pid', 'ASC'],
+            ['record_pageid', 'ASC'],
             ['language', 'ASC'],
             ['record_uid', 'ASC'],
         ],
         'page_reverse' => [
-            ['record_pid', 'DESC'],
+            //['record_pid', 'DESC'],
+            ['record_pageiid', 'DESC'],
             ['language', 'DESC'],
             ['record_uid', 'DESC'],
         ],
@@ -993,7 +989,17 @@ class BrokenLinkListController extends AbstractBrofixController
         }
 
         // page title / uid / path
-        $pageId = (int)($table === 'pages' ? $row['record_uid'] : $row['record_pid']);
+        $pageId = (int)($row['record_pageid'] ?? 0);
+
+        /**
+         * @todo remove this part, record_pageid should always contain page id in the futuer
+         */
+        // legacy BEGIN (fallback for missing record_pageid)
+        if ($pageId === 0) {
+            $pageId = (int)($table === 'pages' ? $row['record_uid'] : $row['record_pid']);
+        }
+        // legacy END
+
         $variables['pageId'] = $pageId;
         $path = $this->pagesRepository->getPagePath($pageId, 50);
         $variables['path'] = $path[1];

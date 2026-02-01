@@ -15,6 +15,21 @@ Changelog
    `commit messages <https://github.com/sypets/brofix/commits/main/>`__
    in the GitHub repository: https://github.com/sypets/brofix
 
+7.0
+===
+
+.. important::
+
+   When updating to version >= 7.0.0, you should perform DB schema updates
+   and execute upgrade wizard *brofix_copyPidToPageid*!
+
+.. toctree::
+   :glob:
+   :titlesonly:
+
+   Entries/7.0/*
+
+
 6.2
 ===
 

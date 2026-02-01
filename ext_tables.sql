@@ -6,6 +6,7 @@ CREATE TABLE tx_brofix_broken_links (
   crdate int(11) DEFAULT '0' NOT NULL,
 	record_uid int(11) DEFAULT '0' NOT NULL,
 	record_pid int(11) DEFAULT '0' NOT NULL,
+	record_pageid  int(11) DEFAULT '0' NOT NULL,
 	language int(11) DEFAULT '-1' NOT NULL,
 	headline varchar(255) DEFAULT '' NOT NULL,
 	field varchar(255) DEFAULT '' NOT NULL,

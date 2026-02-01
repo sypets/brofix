@@ -518,6 +518,8 @@ class LinkAnalyzer implements LoggerAwareInterface
 
                 $record['record_pid'] = (int)$entryValue['row']['pid'];
                 $record['record_uid'] = (int)$entryValue['uid'];
+                // always add the id of the page
+                $record['record_pageid'] = $table === 'pages' ? $record['record_uid'] : $record['record_pid'];
                 $record['table_name'] = $table;
                 $record['link_type'] = $key;
                 $record['link_title'] = $entryValue['link_title'] ?? '';
@@ -610,7 +612,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 continue;
             }
 
-            $max = (int)($this->brokenLinkRepository->getMaxBindParameters() /2 - 4);
+            $max = $this->brokenLinkRepository->getMaxBindParameters();
             foreach (array_chunk($this->pids ?? [], $max) as $pageIdsChunk) {
                 $constraints = [];
                 $queryBuilder = $this->connectionPool
