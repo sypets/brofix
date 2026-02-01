@@ -181,7 +181,7 @@ class PagesRepository
         array $doNotCheckPageTypes = [],
         array $doNotTraversePageTypes = [],
         int $traverseMaxNumberOfPages = 0,
-        bool $useCache = true
+        bool $useCache = false
     ): array {
         foreach ($startPages as $key => $startPage) {
             if (in_array($startPage, $excludedPages)) {

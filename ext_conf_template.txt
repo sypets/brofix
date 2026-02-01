@@ -37,16 +37,16 @@ recheckLinksOnEditing = 0
 traverseMaxNumberOfPagesInBackend = 10000
 
 # cat=report; type=boolean; label=Use cache for pagetree list: This is recommended for large number of pages to improve performance, default is off (0).
-useCacheForPageList = 1
+useCacheForPageList = 0
+
+# cat=report; type=boolean; label=Show control to disable / enable cache for pagetree list: Will only be shown if cache is used (useCacheForPageList=1), default is off (0).
+form.control.enableCacheForPageList = 0
 
 # cat=report; type=boolean; label=Show control to select how to traverse (via pages or all / all mountpoints): Default is on (1).
 form.control.howToTraverse = 1
 
 # cat=report; type=boolean; label=Show control to select simplified or full view: Default is on (1).
 form.control.selectView = 1
-
-# cat=report; type=boolean; label=Show control to disable / enable cache for pagetree list: Will only be shown if cache is used (useCacheForPageList=1), default is off (0).
-form.control.enableCacheForPageList = 0
 
 # cat=report; type=options[Both=both, Edit field=field, Edit full=full]; label=LLL:EXT:brofix/Resources/Private/Language/locallang_extconf.xlf:showEditButtons
 showEditButtons = both

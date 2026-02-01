@@ -52,7 +52,7 @@ class Configuration
 
     public const SHOW_EDIT_BUTTONS_DEFAULT_VALUE = self::SHOW_EDIT_BUTTONS_BOTH;
 
-    public const USE_CACHE_FOR_PAGELIST_DEFAULT = true;
+    public const USE_CACHE_FOR_PAGELIST_DEFAULT = false;
     public const ENABLE_CACHE_FOR_PAGELIST_BUTTON_DEFAULT = false;
 
     public const TRAVERSE_MAX_NUMBER_OF_PAGES_IN_BACKEND_DEFAULT = 1000;
