@@ -39,9 +39,21 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $this->maxBindParameters = PlatformInformation::getMaxBindParameters($connection->getDatabasePlatform());
     }
 
+    /**
+     * Returns maximum number of pages we can use as parameters in prepared statement
+     */
+    public function getMaxNumberOfPagesForDbQuery(): int
+    {
+        return $this->getMaxBindParameters() - 4;
+    }
+
+    /**
+     * Return information about the maximum number of bound parameters supported on this platform (depends on database
+     * server / engine / doctrine/dbal)
+     */
     public function getMaxBindParameters(): int
     {
-        return $this->maxBindParameters;
+        return $this->maxBindParameters - 4;
     }
 
     /**
@@ -76,10 +88,10 @@ class BrokenLinkRepository implements LoggerAwareInterface
         }
 
         /**
-         * array_chunk the pids here because otherwise we might get exceptions such as "Too many params in prepared statement". If not using prepared statements, we run
-         * into other limit.
+         * array_chunk the pids here because otherwise we might get exceptions such as "Too many params in prepared
+         * statement". If not using prepared statements, we run into other limit.
          */
-        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        $max = $this->getMaxNumberOfPagesForDbQuery();
         foreach (array_chunk($pageList ?? [1], $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
@@ -99,27 +111,19 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     self::TABLE,
                     'pages',
                     'pages',
-                    // @todo record_pid is not always page id
-                    $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
+                    // we  ise record_pageid now instead of record_pid
+                    $queryBuilder->expr()->eq(
+                        self::TABLE . '.record_pageid',
+                        $queryBuilder->quoteIdentifier('pages.uid')
+                    )
                 );
             if ($pageList) {
+                // now use only one field 'record_pageid' instead of record_uid for table pages and record_pid for not table pages
                 $queryBuilder
                     ->where(
-                        $queryBuilder->expr()->or(
-                            $queryBuilder->expr()->and(
-                                $queryBuilder->expr()->in(
-                                    self::TABLE . '.record_uid',
-                                    $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                                ),
-                                $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                            ),
-                            $queryBuilder->expr()->and(
-                                $queryBuilder->expr()->in(
-                                    self::TABLE . '.record_pid',
-                                    $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                                ),
-                                $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
-                            )
+                        $queryBuilder->expr()->in(
+                            self::TABLE . '.record_pageid',
+                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                         )
                     );
             }
@@ -330,22 +334,13 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $stmt = $queryBuilder
             ->count('uid')
             ->from(self::TABLE)
-            ->where($queryBuilder->expr()->or(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        self::TABLE . '.record_uid',
-                        $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                ),
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        self::TABLE . '.record_pid',
-                        $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->neq('table_name', $queryBuilder->createNamedParameter('pages'))
+            // now use record_pageid instead of having to check for table and use record_uid for pages and record_pid for others
+            ->where(
+                $queryBuilder->expr()->eq(
+                    self::TABLE . '.record_pageid',
+                    $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
                 )
-            ));
+            );
 
         if ($withStatus !== -1) {
             $stmt->andWhere($queryBuilder->expr()->eq('check_status', $withStatus));
@@ -368,7 +363,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     public function getLinkCounts(array $pageIds, array $linkTypes = [], array $searchFields = []): array
     {
         $markerArray = [];
-        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        $max = $this->getMaxNumberOfPagesForDbQuery();
         foreach (array_chunk($pageIds, $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
             $queryBuilder->getRestrictions()->removeAll();
@@ -393,21 +388,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
                     $queryBuilder->expr()->eq(self::TABLE . '.record_pid', $queryBuilder->quoteIdentifier('pages.uid'))
                 )
                 ->where(
-                    $queryBuilder->expr()->or(
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                self::TABLE . '.record_uid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->eq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
-                        ),
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                self::TABLE . '.record_pid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->neq(self::TABLE . '.table_name', $queryBuilder->createNamedParameter('pages'))
-                        )
+                    $queryBuilder->expr()->in(
+                        self::TABLE . '.record_pageid',
+                        $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                     )
                 )
                 ->groupBy(self::TABLE . '.link_type')
@@ -444,27 +427,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $constraints = [];
 
         if ($tableName === 'pages') {
-            $constraints[] = $queryBuilder->expr()->or(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'record_uid',
-                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->eq(
-                        'table_name',
-                        $queryBuilder->createNamedParameter('pages')
-                    )
-                ),
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'record_pid',
-                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->neq(
-                        'table_name',
-                        $queryBuilder->createNamedParameter('pages')
-                    )
-                )
+            $constraints[] = $queryBuilder->expr()->eq(
+                'record_pageid',
+                $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
             );
         } else {
             $constraints[] = $queryBuilder->expr()->eq(
@@ -489,27 +454,9 @@ class BrokenLinkRepository implements LoggerAwareInterface
         $queryBuilder = $this->generateQueryBuilder(static::TABLE);
 
         if ($tableName === 'pages') {
-            $constraints[] = $queryBuilder->expr()->or(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'record_uid',
-                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->eq(
-                        'table_name',
-                        $queryBuilder->createNamedParameter('pages')
-                    )
-                ),
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'record_pid',
-                        $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->neq(
-                        'table_name',
-                        $queryBuilder->createNamedParameter('pages')
-                    )
-                )
+            $constraints[] = $queryBuilder->expr()->eq(
+                'record_pageid',
+                $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
             );
         } else {
             $constraints[] = $queryBuilder->expr()->eq(
@@ -566,30 +513,15 @@ class BrokenLinkRepository implements LoggerAwareInterface
      */
     public function removeAllBrokenLinksForPagesBeforeTime(array $pageIds, array $linkTypes, int $time): void
     {
-        $max = (int)($this->getMaxBindParameters() /2 - 4);
+        $max = $this->getMaxNumberOfPagesForDbQuery();
         foreach (array_chunk($pageIds, $max) as $pageIdsChunk) {
             $queryBuilder = $this->generateQueryBuilder(self::TABLE);
 
             $queryBuilder->delete(self::TABLE)
                 ->where(
-                    $queryBuilder->expr()->or(
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                'record_uid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->eq('table_name', $queryBuilder->createNamedParameter('pages'))
-                        ),
-                        $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->in(
-                                'record_pid',
-                                $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                            ),
-                            $queryBuilder->expr()->neq(
-                                'table_name',
-                                $queryBuilder->createNamedParameter('pages')
-                            )
-                        )
+                    $queryBuilder->expr()->in(
+                        'record_pageid',
+                        $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
                     ),
                     $queryBuilder->expr()->in(
                         'link_type',

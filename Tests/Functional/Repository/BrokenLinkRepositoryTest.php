@@ -367,6 +367,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 1,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -384,6 +385,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 2,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'header_link',
@@ -401,6 +403,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 3,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -418,6 +421,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 5,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -470,6 +474,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 1,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -487,6 +492,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 3,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -504,6 +510,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 5,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -533,6 +540,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 1,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -550,6 +558,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 2,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'header_link',
@@ -567,6 +576,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 3,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -584,6 +594,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 5,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -613,6 +624,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 1,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
@@ -643,6 +655,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
                 [
                     'record_uid' => 1,
                     'record_pid' => 1,
+                    'record_pageid' => 1,
                     'language' => 0,
                     'headline' => '',
                     'field' => 'bodytext',
