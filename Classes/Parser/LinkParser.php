@@ -159,7 +159,10 @@ class LinkParser
             // Get all links/references
             foreach ($fields as $field) {
                 // use the processedTca to also  get overridden configuration (e.g. columnsOverrides)
-                $fieldConfig = $tableTca['columns'][$field]['config'];
+                $fieldConfig = $tableTca['columns'][$field]['config'] ?? false;
+                if ($fieldConfig === false) {
+                    continue;
+                }
                 $valueField = htmlspecialchars_decode((string)($record[$field]));
                 if ($valueField === '') {
                     continue;
