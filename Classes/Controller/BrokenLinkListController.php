@@ -445,6 +445,9 @@ class BrokenLinkListController extends AbstractBrofixController
         } else {
             $this->paginationCurrentPage = 1;
         }
+        if ($this->paginationCurrentPage < 1) {
+            $this->paginationCurrentPage = 1;
+        }
     }
 
     /**
