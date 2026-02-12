@@ -136,11 +136,6 @@ class BrokenLinkListController extends AbstractBrofixController
     protected string $viewMode = self::DEFAULT_VIEW_MODE_VALUE;
 
     /**
-     * @var array<string,mixed>
-     */
-    protected array $pageinfo = [];
-
-    /**
      * @var string
      */
     protected $route = '';
@@ -349,13 +344,15 @@ class BrokenLinkListController extends AbstractBrofixController
 
         if ($this->id !== 0) {
             $this->resolveSiteLanguages($this->id);
-            $this->pageinfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW));
+            //$this->pageinfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW));
             $this->configuration->loadPageTsConfig($this->id);
 
             $this->pageRecord = BackendUtility::readPageAccess(
                 $this->id,
                 $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW)
-            );
+            ) ?: [];
+        } else {
+            $this->pageRecord = [];
         }
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->getSettingsFromQueryParameters($request);
@@ -578,7 +575,7 @@ class BrokenLinkListController extends AbstractBrofixController
             } else {
                 // todo: do we need to check rootline for hidden? Was already checked in checking for broken links!
                 // @extensionScannerIgnoreLine problem with getRootLineIsHidden
-                $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageinfo);
+                $rootLineHidden = $this->pagesRepository->getRootLineIsHidden($this->pageRecord);
                 if ($rootLineHidden && !$this->configuration->isCheckHidden()) {
                     $shouldShow = false;
                 }
