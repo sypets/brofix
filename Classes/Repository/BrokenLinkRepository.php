@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Repository;
 
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\Result;
 use Hoa\File\Link\Link;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -12,9 +13,11 @@ use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetResponse\LinkTargetResponse;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
+use Sypets\Brofix\Controller\Pagination\PaginateInfo;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Platform\PlatformInformation;
+use TYPO3\CMS\Core\Database\Query\BulkInsertQuery;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -59,6 +62,103 @@ class BrokenLinkRepository implements LoggerAwareInterface
     /**
      * Get broken links.
      *
+     * Will chunk array of pages if over max DB can handle as parameters in prepared statement.
+     *
+     *
+     * Will only return broken links which the current user has edit access to.
+     *
+     * @param int[] $pageList Pages to check for broken links. If null, do not constrain
+     * @param string[] $linkTypes Link types to validate
+     * @param array<string,array<string>> $searchFields
+     * @param array<array<string>> $orderBy
+     * @param BrokenLinkListFilter $filter
+     * @param array<mixed> $orderBy
+     * @return mixed[]
+     *
+     * @see LinkTargetResponse
+     *
+     * @deprecated This is deprecated. On the one hand, we do not strictly need to use prepared statements and
+     *  quoting for security reasons, we get an array of ints. Additionally, this is a problem, if we want
+     *  to fetch only a max number (e.g. if paginating).
+     */
+    public function getBrokenLinksWithArrayChunking(
+        ?array $pageList,
+        array $linkTypes,
+        array $searchFields,
+        BrokenLinkListFilter $filter,
+        Configuration $configuration,
+        array $orderBy = [],
+        ?PaginateInfo $paginateInfo = null
+    ): array
+    {
+        $results = [];
+
+        if ($pageList === []) {
+            return [];
+        }
+
+        /**
+         * array_chunk the pids here because otherwise we might get exceptions such as "Too many params in prepared
+         * statement". If not using prepared statements, we run into other limit.
+         */
+        $max = $this->getMaxNumberOfPagesForDbQuery();
+        foreach (array_chunk($pageList ?? [1], $max) as $pageIdsChunk) {
+            $results = array_merge($results,
+                getBrokenLinks(
+                    $pageIdsChunk,
+                    $linkTypes,
+                    $searchFields,
+                    $filter,
+                    $configuration,
+                    $orderBy = [],
+                    $paginateInfo)
+            );
+        }
+        return $results;
+
+    }
+
+    protected function createTemporaryTable(Connection $connection, string $tableName): Connection
+    {
+        $connection->executeStatement('CREATE TEMPORARY TABLE ' . $tableName . ' (id INT PRIMARY KEY)');
+        return $connection;
+    }
+
+    protected function removeTemporaryTable(Connection $connection, string $tableName): Connection
+    {
+        $connection->executeStatement('DROP TABLE ' . $tableName);
+        return $connection;
+    }
+
+    public function insertPagesIntoTemporaryTable(Connection $connection, string $tableName, array $pageIds): void
+    {
+        $connection->beginTransaction();
+        $this->createTemporaryTable($connection, $tableName);
+
+        try {
+            // use bulk insert: https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Database/DoctrineDbal/Connection/Index.html#bulkinsert
+            $connection->bulkInsert(
+                $tableName,
+                [$pageIds],
+                [
+                    'id'
+                ],
+                [
+                    Connection::PARAM_INT
+                ],
+            );
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollBack();
+            throw $e;
+        }
+    }
+
+
+
+    /**
+     * Get broken links.
+     *
      * Will only return broken links which the current user has edit access to.
      *
      * @param int[] $pageList Pages to check for broken links. If null, do not constrain
@@ -79,227 +179,299 @@ class BrokenLinkRepository implements LoggerAwareInterface
         array $searchFields,
         BrokenLinkListFilter $filter,
         Configuration $configuration,
-        array $orderBy = []
-    ): array {
-        $results = [];
-
+        array $orderBy = [],
+        ?PaginateInfo $paginateInfo = null,
+        string $tmpTable = null
+    ): Result
+    {
         if ($pageList === []) {
             return [];
         }
+        $queryBuilder = $this->getBrokenLinksQueryBuilder($pageList,$linkTypes, $searchFields,
+                    $filter, $configuration,$orderBy, $paginateInfo, $tmpTable);
+        if ($tmpTable !== null) {
+            $connection = $queryBuilder->getConnection();
+            $this->insertPagesIntoTemporaryTable($connection, $tmpTable, $pageList);
+            // join with tmp table
+            $queryBuilder->join(
+                self::TABLE,
+                $tmpTable,
+                'tmp_pages',
+                $queryBuilder->expr()->eq(
+                    self::TABLE . '.record_pageid',
+                    $queryBuilder->quoteIdentifier('tmp_pages.id')
+                )
+            );
+        }
 
-        /**
-         * array_chunk the pids here because otherwise we might get exceptions such as "Too many params in prepared
-         * statement". If not using prepared statements, we run into other limit.
-         */
-        $max = $this->getMaxNumberOfPagesForDbQuery();
-        foreach (array_chunk($pageList ?? [1], $max) as $pageIdsChunk) {
-            $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+        $queryBuilder->select(self::TABLE . '.*');
+        $result = $queryBuilder->executeQuery();
 
-            if (!$GLOBALS['BE_USER']->isAdmin()) {
-                /**
-                 * @var EditableRestriction $editableRestriction
-                 */
-                $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
-                $queryBuilder->getRestrictions()
-                    ->add($editableRestriction);
-            }
+        if ($tmpTable !== null) {
+            $this->removeTemporaryTable($connection, $tmpTable);
+        }
+        return $result;
+    }
 
+    public function getBrokenLinksCount(
+        ?array $pageList,
+        array $linkTypes,
+        array $searchFields,
+        BrokenLinkListFilter $filter,
+        Configuration $configuration,
+        string $tmpTable = null
+    ): int
+    {
+        if ($pageList === []) {
+            return 0;
+        }
+        $queryBuilder = $this->getBrokenLinksQueryBuilder($pageList,$linkTypes, $searchFields,
+            $filter, $configuration);
+        if ($tmpTable !== null) {
+            $connection = $queryBuilder->getConnection();
+            $this->insertPagesIntoTemporaryTable($connection, $tmpTable, $pageList);
+            // join with tmp table
+            $queryBuilder->join(
+                self::TABLE,
+                $tmpTable,
+                'tmp_pages',
+                $queryBuilder->expr()->eq(
+                    self::TABLE . '.record_pageid',
+                    $queryBuilder->quoteIdentifier('tmp_pages.id')
+                )
+            );
+        }
+        $queryBuilder->count(self::TABLE . '.uid');
+        $result = $queryBuilder->executeQuery()->fetchOne();
+        if ($tmpTable !== null) {
+            $this->removeTemporaryTable($connection, $tmpTable);
+        }
+        return $result;
+    }
+
+    /**
+     * Build the QueryBuilder for fetching list of broken links or count of broken links.
+     * This QueryBuilder can be used with a count or select query.
+     *
+     * In order to use, you must add the select and also the executeQuery and fetch...
+     */
+    public function getBrokenLinksQueryBuilder(
+        ?array $pageList,
+        array $linkTypes,
+        array $searchFields,
+        BrokenLinkListFilter $filter,
+        Configuration $configuration,
+        array $orderBy = [],
+        ?PaginateInfo $paginateInfo = null,
+        string $tmpTable = null
+    ): QueryBuilder
+    {
+
+        $queryBuilder = $this->generateQueryBuilder(self::TABLE);
+
+        if (!$GLOBALS['BE_USER']->isAdmin()) {
+            /**
+             * @var EditableRestriction $editableRestriction
+             */
+            $editableRestriction = GeneralUtility::makeInstance(EditableRestriction::class, $searchFields, $queryBuilder);
+            $queryBuilder->getRestrictions()
+                ->add($editableRestriction);
+        }
+
+        $queryBuilder
+            //->select(self::TABLE . '.*')
+            ->from(self::TABLE)
+            ->join(
+                self::TABLE,
+                'pages',
+                'pages',
+                // we  ise record_pageid now instead of record_pid
+                $queryBuilder->expr()->eq(
+                    self::TABLE . '.record_pageid',
+                    $queryBuilder->quoteIdentifier('pages.uid')
+                )
+            );
+        if ($tmpTable !== null) {
+
+        }
+        if ($pageList && !$tmpTable) {
+            // now use only one field 'record_pageid' instead of record_uid for table pages and record_pid for not table pages
             $queryBuilder
-                ->select(self::TABLE . '.*')
-                ->from(self::TABLE)
-                ->join(
-                    self::TABLE,
-                    'pages',
-                    'pages',
-                    // we  ise record_pageid now instead of record_pid
-                    $queryBuilder->expr()->eq(
+                ->where(
+                    $queryBuilder->expr()->in(
                         self::TABLE . '.record_pageid',
-                        $queryBuilder->quoteIdentifier('pages.uid')
+                        $queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
                     )
                 );
-            if ($pageList) {
-                // now use only one field 'record_pageid' instead of record_uid for table pages and record_pid for not table pages
-                $queryBuilder
-                    ->where(
-                        $queryBuilder->expr()->in(
-                            self::TABLE . '.record_pageid',
-                            $queryBuilder->createNamedParameter($pageIdsChunk, Connection::PARAM_INT_ARRAY)
-                        )
-                    );
-            }
+        }
 
-            if ($filter->getUidFilter() != '') {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), Connection::PARAM_INT))
-                );
-            }
+        if ($filter->getUidFilter() != '') {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::TABLE . '.record_uid', $queryBuilder->createNamedParameter($filter->getUidFilter(), Connection::PARAM_INT))
+            );
+        }
 
-            if ($filter->getTypeFilter() != '') {
-                $parts = explode('.', $filter->getTypeFilter());
-                $table_name = $parts[0];
-                $field = $parts[1] ?? '';
+        if ($filter->getTypeFilter() != '') {
+            $parts = explode('.', $filter->getTypeFilter());
+            $table_name = $parts[0];
+            $field = $parts[1] ?? '';
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(
+                    self::TABLE . '.table_name',
+                    $queryBuilder->createNamedParameter($table_name)
+                )
+            );
+            if ($field) {
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->eq(
-                        self::TABLE . '.table_name',
-                        $queryBuilder->createNamedParameter($table_name)
+                        self::TABLE . '.field',
+                        $queryBuilder->createNamedParameter($field)
                     )
                 );
-                if ($field) {
-                    $queryBuilder->andWhere(
-                        $queryBuilder->expr()->eq(
-                            self::TABLE . '.field',
-                            $queryBuilder->createNamedParameter($field)
-                        )
-                    );
-                }
             }
+        }
 
-            // errorFilter, might be 'custom:13' or 'custom:13|httpErrorCode:404' etc. Several combinations, separated
-            // by '|', each combination with <errortype>:<errno>
+        // errorFilter, might be 'custom:13' or 'custom:13|httpErrorCode:404' etc. Several combinations, separated
+        // by '|', each combination with <errortype>:<errno>
 
-            $errorFilter = $filter->getErrorFilter();
-            $errorConstraintsOr = [];
-            if ($errorFilter !== '') {
-                $errorCombinations = explode('|', $errorFilter);
-                foreach ($errorCombinations as $errorCombination) {
-                    $parts = explode(':', $errorCombination);
-                    if (count($parts) === 2) {
-                        $errorType = $parts[0];
-                        $errno = (int)$parts[1];
-                        $errorConstraintsOr[] = $queryBuilder->expr()->and(
-                            $queryBuilder->expr()->eq(
-                                self::TABLE . '.error_type',
-                                $queryBuilder->createNamedParameter($errorType)
-                            ),
-                            $queryBuilder->expr()->eq(
-                                self::TABLE . '.errno',
-                                $queryBuilder->createNamedParameter($errno, Connection::PARAM_INT)
-                            )
-                        );
-                    } elseif (count($parts) === 1) {
-                        $errorType = $parts[0];
-                        $errorConstraintsOr[] = $queryBuilder->expr()->eq(
+        $errorFilter = $filter->getErrorFilter();
+        $errorConstraintsOr = [];
+        if ($errorFilter !== '') {
+            $errorCombinations = explode('|', $errorFilter);
+            foreach ($errorCombinations as $errorCombination) {
+                $parts = explode(':', $errorCombination);
+                if (count($parts) === 2) {
+                    $errorType = $parts[0];
+                    $errno = (int)$parts[1];
+                    $errorConstraintsOr[] = $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->eq(
                             self::TABLE . '.error_type',
                             $queryBuilder->createNamedParameter($errorType)
-                        );
-                    }
+                        ),
+                        $queryBuilder->expr()->eq(
+                            self::TABLE . '.errno',
+                            $queryBuilder->createNamedParameter($errno, Connection::PARAM_INT)
+                        )
+                    );
+                } elseif (count($parts) === 1) {
+                    $errorType = $parts[0];
+                    $errorConstraintsOr[] = $queryBuilder->expr()->eq(
+                        self::TABLE . '.error_type',
+                        $queryBuilder->createNamedParameter($errorType)
+                    );
                 }
             }
-            if ($errorConstraintsOr) {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->or(...$errorConstraintsOr)
-                );
-            }
-
-            $urlFilter = $filter->getUrlFilter();
-            if ($urlFilter != '') {
-                switch ($filter->getUrlFilterMatch()) {
-                    case 'partial':
-                        $urlFilters = explode('|', $filter->getUrlFilter());
-                        $urlFilterConstraints =  [];
-                        foreach ($urlFilters as $urlFilter) {
-                            $urlFilterConstraints[] = $queryBuilder->expr()->like(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
-                            );
-                        }
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->or(...$urlFilterConstraints)
-                        );
-                        break;
-                    case 'exact':
-                        $urlFilters = explode('|', $filter->getUrlFilter());
-                        $urlFilterConstraints =  [];
-                        foreach ($urlFilters as $urlFilter) {
-                            $urlFilterConstraints[] = $queryBuilder->expr()->eq(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter($urlFilter)
-                            );
-                        }
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->or(...$urlFilterConstraints)
-                        );
-                        break;
-                    case 'partialnot':
-                        $urlFilters = explode('|', $filter->getUrlFilter());
-                        $urlFilterConstraints =  [];
-                        foreach ($urlFilters as $urlFilter) {
-                            $urlFilterConstraints[] = $queryBuilder->expr()->notLike(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
-                            );
-                        }
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->and(...$urlFilterConstraints)
-                        );
-                        break;
-                    case 'exactnot':
-                        /*
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->neq(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter(mb_substr($urlFilter, 1))
-                            )
-                        );
-                        */
-                        $urlFilters = explode('|', $filter->getUrlFilter());
-                        $urlFilterConstraints =  [];
-                        foreach ($urlFilters as $urlFilter) {
-                            $urlFilterConstraints[] = $queryBuilder->expr()->neq(
-                                self::TABLE . '.url',
-                                $queryBuilder->createNamedParameter($urlFilter)
-                            );
-                        }
-                        $queryBuilder->andWhere(
-                            $queryBuilder->expr()->and(...$urlFilterConstraints)
-                        );
-                        break;
-                }
-            }
-            $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
-            if ($linktypeFilter != 'all') {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.link_type', $queryBuilder->createNamedParameter($linktypeFilter))
-                );
-            }
-
-            if ($configuration->isShowAllLinks()) {
-                $checkStatus = $filter->getCheckStatusFilter();
-            } else {
-                // default is show error only
-                $checkStatus = LinkTargetResponse::RESULT_BROKEN;
-            }
-            if ($checkStatus !== LinkTargetResponse::RESULT_ALL) {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->eq(self::TABLE . '.check_status', $queryBuilder->createNamedParameter($checkStatus, Connection::PARAM_INT))
-                );
-            }
-
-            if ($orderBy !== []) {
-                $values = array_shift($orderBy);
-                if ($values && is_array($values) && count($values) === 2) {
-                    $queryBuilder->orderBy($values[0], $values[1]);
-                    foreach ($orderBy as $values) {
-                        if (!is_array($values) || count($values) != 2) {
-                            break;
-                        }
-                        $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
-                    }
-                }
-            }
-
-            if (!empty($linkTypes)) {
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->in(
-                        self::TABLE . '.link_type',
-                        $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
-                    )
-                );
-            }
-
-            $results = array_merge($results, $queryBuilder->executeQuery()->fetchAllAssociative());
         }
-        return $results;
+        if ($errorConstraintsOr) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->or(...$errorConstraintsOr)
+            );
+        }
+
+        $urlFilter = $filter->getUrlFilter();
+        if ($urlFilter != '') {
+            switch ($filter->getUrlFilterMatch()) {
+                case 'partial':
+                    $urlFilters = explode('|', $filter->getUrlFilter());
+                    $urlFilterConstraints =  [];
+                    foreach ($urlFilters as $urlFilter) {
+                        $urlFilterConstraints[] = $queryBuilder->expr()->like(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
+                        );
+                    }
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->or(...$urlFilterConstraints)
+                    );
+                    break;
+                case 'exact':
+                    $urlFilters = explode('|', $filter->getUrlFilter());
+                    $urlFilterConstraints =  [];
+                    foreach ($urlFilters as $urlFilter) {
+                        $urlFilterConstraints[] = $queryBuilder->expr()->eq(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter($urlFilter)
+                        );
+                    }
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->or(...$urlFilterConstraints)
+                    );
+                    break;
+                case 'partialnot':
+                    $urlFilters = explode('|', $filter->getUrlFilter());
+                    $urlFilterConstraints =  [];
+                    foreach ($urlFilters as $urlFilter) {
+                        $urlFilterConstraints[] = $queryBuilder->expr()->notLike(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($urlFilter) . '%')
+                        );
+                    }
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->and(...$urlFilterConstraints)
+                    );
+                    break;
+                case 'exactnot':
+                    $urlFilters = explode('|', $filter->getUrlFilter());
+                    $urlFilterConstraints =  [];
+                    foreach ($urlFilters as $urlFilter) {
+                        $urlFilterConstraints[] = $queryBuilder->expr()->neq(
+                            self::TABLE . '.url',
+                            $queryBuilder->createNamedParameter($urlFilter)
+                        );
+                    }
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->and(...$urlFilterConstraints)
+                    );
+                    break;
+            }
+        }
+        $linktypeFilter = $filter->getLinkTypeFilter() ?: 'all';
+        if ($linktypeFilter != 'all') {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::TABLE . '.link_type', $queryBuilder->createNamedParameter($linktypeFilter))
+            );
+        }
+
+        if ($configuration->isShowAllLinks()) {
+            $checkStatus = $filter->getCheckStatusFilter();
+        } else {
+            // default is show error only
+            $checkStatus = LinkTargetResponse::RESULT_BROKEN;
+        }
+        if ($checkStatus !== LinkTargetResponse::RESULT_ALL) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq(self::TABLE . '.check_status', $queryBuilder->createNamedParameter($checkStatus, Connection::PARAM_INT))
+            );
+        }
+
+        if ($orderBy !== []) {
+            $values = array_shift($orderBy);
+            if ($values && is_array($values) && count($values) === 2) {
+                $queryBuilder->orderBy($values[0], $values[1]);
+                foreach ($orderBy as $values) {
+                    if (!is_array($values) || count($values) != 2) {
+                        break;
+                    }
+                    $queryBuilder->addOrderBy(self::TABLE . '.' . $values[0], $values[1]);
+                }
+            }
+        }
+
+        if (!empty($linkTypes)) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->in(
+                    self::TABLE . '.link_type',
+                    $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+                )
+            );
+        }
+
+        if ($paginateInfo) {
+            $queryBuilder->setFirstResult($paginateInfo->getCurrentItemNumber())
+                ->setMaxResults($paginateInfo->getItemsPerPage());
+        }
+
+        return $queryBuilder;
     }
 
     /**
@@ -351,7 +523,7 @@ class BrokenLinkRepository implements LoggerAwareInterface
     }
 
     /**
-     * Fill a marker array with the number of links found in a list of pages
+     * Fill a marker array with the number of links found by link type in a list of pages
      *
      * @param array<string|int> $pageIds page uids
      * @param array<string> $linkTypes
