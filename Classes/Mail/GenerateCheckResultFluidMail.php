@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Mail;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
@@ -30,7 +31,7 @@ class GenerateCheckResultFluidMail implements SingletonInterface
      */
     protected $messageId;
 
-    public function __construct(Mailer $mailer)
+    public function __construct(Mailer $mailer, protected readonly LoggerInterface $logger)
     {
         $this->mailer = $mailer;
     }
@@ -72,7 +73,6 @@ class GenerateCheckResultFluidMail implements SingletonInterface
                 7661484439
             );
         }
-
         // to: can be Address|string or ...array in Symfony\Component\Mime\Email
         $fluidEmail->to(...$recipients)
             // from: can be Address|string in Symfony\Component\Mime\Email
@@ -95,7 +95,30 @@ class GenerateCheckResultFluidMail implements SingletonInterface
             $fluidEmail->subject($subject);
         }
 
-        $this->mailer->send($fluidEmail);
+        try {
+            $this->mailer->send($fluidEmail);
+            $this->logger->debug(
+                sprintf(
+                    'Email successfully sent to=<%s> from=<%s> subject=<%s> pageId=<%d>',
+                    $this->convertEmailAdressesToString($recipients),
+                    $from,
+                    $subject,
+                    $pageId
+                )
+            );
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                sprintf(
+                    'Exception sending mail Exception message=<%s> to=<%s> from=<%s> subject=<%s> pageId=<%d>',
+                    $e->getMessage(),
+                    $this->convertEmailAdressesToString($recipients),
+                    $from,
+                    $subject,
+                    $pageId
+                )
+            );
+            throw $e;
+        }
 
         /**
          * @var SentMessage
@@ -104,5 +127,21 @@ class GenerateCheckResultFluidMail implements SingletonInterface
         $this->messageId = $sentMessage->getMessageId();
 
         return true;
+    }
+
+    /**
+     * @param Address[] $emails
+     * @return string
+     */
+    protected function convertEmailAdressesToString(array $emails): string
+    {
+        $adresses = [];
+        foreach ($emails as $email) {
+            $adresses[] = $email->getAddress();
+        }
+        if (empty($adresses)) {
+            return '';
+        }
+        return implode(', ', $adresses);
     }
 }
