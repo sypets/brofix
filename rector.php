@@ -51,7 +51,7 @@ return RectorConfig::configure()
     ->withConfiguredRule(ExtEmConfRector::class, [
         // TYPO3 v12: PHP 8.1-8.4
         ExtEmConfRector::PHP_VERSION_CONSTRAINT => '8.1.0-8.4.99',
-        ExtEmConfRector::TYPO3_VERSION_CONSTRAINT => '12.4.0-12.4.99',
+        ExtEmConfRector::TYPO3_VERSION_CONSTRAINT => '12.4.0-13.4.99',
         ExtEmConfRector::ADDITIONAL_VALUES_TO_BE_REMOVED => [],
     ])
     // If you use withImportNames(), you should consider excluding some TYPO3 files.
