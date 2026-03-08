@@ -59,7 +59,7 @@ CREATE TABLE tx_brofix_exclude_link_target (
     editlock tinyint(4) DEFAULT '0' NOT NULL,
     deleted tinyint(4) DEFAULT '0' NOT NULL,
     hidden tinyint(4) DEFAULT '0' NOT NULL,
-    linktarget text DEFAULT '' NOT NULL,
+    linktarget text,
     link_type varchar(20) DEFAULT '' NOT NULL,
     match varchar(20) DEFAULT '' NOT NULL,
     reason int(4) DEFAULT '0' NOT NULL,
