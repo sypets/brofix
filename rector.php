@@ -38,7 +38,7 @@ return RectorConfig::configure()
     ->withSets([
         Typo3SetList::CODE_QUALITY,
         Typo3SetList::GENERAL,
-        Typo3LevelSetList::UP_TO_TYPO3_12,
+        Typo3LevelSetList::UP_TO_TYPO3_13,
         // To migrate to Doctrine Dbal 4, uncomment the following line
         //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40,
     ])
