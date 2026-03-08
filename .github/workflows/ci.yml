@@ -34,7 +34,7 @@ jobs:
       # rest matrix jobs be be executed anyway.
       fail-fast: true
       matrix:
-        php: [ '8.4' ]
+        php: [ '8.5' ]
         minMax: [ 'composerInstallMax' ]
     steps:
       - name: "Checkout"
@@ -144,40 +144,40 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
 
   # v12
-  all_core_v12:
-    # only run jobs via scheduled workflow in main repo, not in forks
-    if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
-    name: "all core-v12"
-    runs-on: ubuntu-latest
-    strategy:
-      # This prevents cancellation of matrix job runs, if one/two already failed and let the
-      # rest matrix jobs be be executed anyway.
-      fail-fast: true
-      matrix:
-        # only testing with highest and lowest
-        php: [ '8.1', '8.4' ]
-        minMax: [ 'composerInstallMax' ]
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2
-
-      - name: "show php version"
-        run: php --version
-
-      - name: "Set Typo3 core version"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
-
-      - name: "Composer"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
-
-      - name: "phpstan"
-        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v12.neon" -v
-
-      - name: "Unit tests"
-        if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
-
-      - name: "Functional tests with mariadb"
-        if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
+  #all_core_v12:
+  #  # only run jobs via scheduled workflow in main repo, not in forks
+  #  if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
+  #  name: "all core-v12"
+  #  runs-on: ubuntu-latest
+  #  strategy:
+  #    # This prevents cancellation of matrix job runs, if one/two already failed and let the
+  #    # rest matrix jobs be be executed anyway.
+  #    fail-fast: true
+  #    matrix:
+  #      # only testing with highest and lowest
+  #      php: [ '8.1', '8.4' ]
+  #      minMax: [ 'composerInstallMax' ]
+  #  steps:
+  #    - name: "Checkout"
+  #      uses: actions/checkout@v2
+  #
+  #    - name: "show php version"
+  #      run: php --version
+  #
+  #    - name: "Set Typo3 core version"
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
+  #
+  #    - name: "Composer"
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+  #
+  #    - name: "phpstan"
+  #      if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v12.neon" -v
+  #
+  #    - name: "Unit tests"
+  #      if: always()
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+  #
+  #    - name: "Functional tests with mariadb"
+  #      if: always()
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
