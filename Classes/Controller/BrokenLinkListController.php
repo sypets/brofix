@@ -938,7 +938,7 @@ class BrokenLinkListController extends AbstractBrofixController
         // column "Element"
         $variables['elementHeadline'] = htmlspecialchars($row['headline']);
         $variables['record_uid'] = $row['record_uid'];
-        $variables['elementIcon'] = $this->iconFactory->getIconForRecord($table, $row, Icon::SIZE_SMALL)->render();
+        $variables['elementIcon'] = $this->iconFactory->getIconForRecord($table, $row, \TYPO3\CMS\Core\Imaging\IconSize::SMALL)->render();
 
         // langIcon
         if (isset($row['language'])) {
