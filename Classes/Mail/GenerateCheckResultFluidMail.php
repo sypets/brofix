@@ -10,9 +10,11 @@ use Symfony\Component\Mime\Address;
 use Sypets\Brofix\CheckLinks\CheckLinksStatistics;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Mail\FluidEmail;
 use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 
@@ -21,19 +23,47 @@ use TYPO3\CMS\Fluid\View\TemplatePaths;
  */
 class GenerateCheckResultFluidMail implements SingletonInterface
 {
-    /**
-     * @var Mailer
-     */
-    protected $mailer;
+    protected Mailer $mailer;
 
     /**
      * @var string
      */
     protected $messageId;
 
-    public function __construct(Mailer $mailer, protected readonly LoggerInterface $logger)
+    public function __construct(protected readonly LoggerInterface $logger)
     {
-        $this->mailer = $mailer;
+        $this->mailer = $this->instantiateMailer();
+    }
+
+    /**
+     * Consider different constructor of pluswerk/mail-logger MailerExtender (which XCLASSes Mailer)
+     */
+    protected function instantiateMailer(): Mailer
+    {
+        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
+        if ($typo3Version->getMajorVersion() > 12
+            && ExtensionManagementUtility::isLoaded('mail_logger')
+            && isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][Mailer::class]['className'])
+            /**
+             * even in a plain PHP file where it works, ::class doesn't require the class to exist - it just
+             * resolves the name based on the current namespace and use statements, and substitutes in the resulting string
+             *
+             * Use string here because otherwise phpstan will complain.
+             */
+            && $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][Mailer::class]['className'] === 'Pluswerk\\MailLogger\\Logging\\MailerExtender'
+        ) {
+            /** @phpstan-ignore-next-line  */
+            $loggingTransportFactory = GeneralUtility::makeInstance('Pluswerk\\MailLogger\\Logging\\LoggingTransportFactory');
+            /** @phpstan-ignore-next-line  */
+            if (!$loggingTransportFactory) {
+                $this->logger->error('Could not instantiate pluswerk/mail_logger: LoggingTransportFactory');
+                throw new \RuntimeException('Could not instantiate pluswerk/mail_logger: LoggingTransportFactory', 4056014818);
+            }
+            $mailer = GeneralUtility::makeInstance(Mailer::class, $loggingTransportFactory);
+        } else {
+            $mailer = GeneralUtility::makeInstance(Mailer::class);
+        }
+        return $mailer;
     }
 
     public function getMessageId(): string
