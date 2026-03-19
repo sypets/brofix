@@ -20,6 +20,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -61,7 +62,8 @@ class LinkAnalyzer implements LoggerAwareInterface
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
         PagesRepository $pagesRepository,
-        protected ConnectionPool $connectionPool
+        protected ConnectionPool $connectionPool,
+        protected Typo3Version $typo3Version
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
@@ -742,7 +744,9 @@ class LinkAnalyzer implements LoggerAwareInterface
         }
         if ($table === 'tt_content') {
             $defaultFields[] = 'colPos';
-            $defaultFields[] = 'list_type';
+            if ($this->typo3Version->getMajorVersion() < 14) {
+                $defaultFields[] = 'list_type';
+            }
         }
         foreach ($selectFields as $field) {
             // field must have TCA configuration
