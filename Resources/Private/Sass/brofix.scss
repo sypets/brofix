@@ -32,8 +32,31 @@ Info > Brofix (Broken Link Fixer)
 }
 
 /** mark table row of last checked record */
-#brofix-broken-links-table tr.brofix-lastchecked, #brofix-broken-links-table tr.brofix-lastchecked td  {
-    background-color: #ace9ff;
+#brofix-broken-links-table tr.brofix-lastchecked, #brofix-broken-links-table tr.brofix-lastchecked td {
+    background-color: var(--typo3-table-row-highlight-bg, #ace9ff);
+}
+html[data-bs-theme="dark"] #brofix-broken-links-table tr.brofix-lastchecked,
+html[data-bs-theme="dark"] #brofix-broken-links-table tr.brofix-lastchecked td {
+    background-color: #22364a;
+    color: var(--typo3-text-color, inherit);
+}
+
+html[data-bs-theme="dark"] #brofix-broken-links-table tr.brofix-lastchecked a,
+html[data-bs-theme="dark"] #brofix-broken-links-table tr.brofix-lastchecked td a {
+    color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-bs-theme]) #brofix-broken-links-table tr.brofix-lastchecked,
+    html:not([data-bs-theme]) #brofix-broken-links-table tr.brofix-lastchecked td {
+        background-color: #22364a;
+        color: var(--typo3-text-color, inherit);
+    }
+
+    html:not([data-bs-theme]) #brofix-broken-links-table tr.brofix-lastchecked a,
+    html:not([data-bs-theme]) #brofix-broken-links-table tr.brofix-lastchecked td a {
+        color: inherit;
+    }
 }
 
 #brofix-broken-links-table tr td .inline-action {
