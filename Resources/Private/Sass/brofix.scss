@@ -59,6 +59,17 @@ html[data-bs-theme="dark"] #brofix-broken-links-table tr.brofix-lastchecked td a
     }
 }
 
+/* contraste des erreurs en dark mode */
+html[data-bs-theme="dark"] #brofix-broken-links-table td span.error {
+    color: #eb705a;
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-bs-theme]) #brofix-broken-links-table td span.error {
+        color: #eb705a;
+    }
+}
+
 #brofix-broken-links-table tr td .inline-action {
     margin-top: 5px;
     border-top: 2px solid white;
