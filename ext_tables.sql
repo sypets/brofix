@@ -30,6 +30,7 @@ CREATE TABLE tx_brofix_broken_links (
 	exclude_link_targets_pid int(11) DEFAULT '0' NOT NULL,
 
 	KEY url_combined (url_hash,link_type,check_status),
+	KEY pageid (record_pageid),
 	PRIMARY KEY (uid)
 );
 
