@@ -17,6 +17,8 @@ use Sypets\Brofix\Repository\BrokenLinkRepository;
 use Sypets\Brofix\Repository\ContentRepository;
 use Sypets\Brofix\Repository\PagesRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -58,17 +60,22 @@ class LinkAnalyzer implements LoggerAwareInterface
 
     protected LinkParser $linkParser;
 
+    protected FrontendInterface $runtimeCache;
+
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
         PagesRepository $pagesRepository,
         protected ConnectionPool $connectionPool,
-        protected Typo3Version $typo3Version
+        protected Typo3Version $typo3Version,
+        ?CacheManager $cacheManager = null
     ) {
         $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
         $this->contentRepository = $contentRepository;
         $this->pagesRepository = $pagesRepository;
+        $this->runtimeCache = ($cacheManager ?? GeneralUtility::makeInstance(CacheManager::class))
+            ->getCache('runtime');
     }
 
     /**
@@ -684,6 +691,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     );
 
                 $result = $queryBuilder->executeQuery();
+                $processed = 0;
                 while ($row = $result->fetchAssociative()) {
                     $results = [];
 
@@ -700,7 +708,19 @@ class LinkAnalyzer implements LoggerAwareInterface
                     );
 
                     $this->checkLinks($results, $linkTypes);
+
+                    // Free TYPO3 runtime cache periodically inside the loop. BackendUtility::getRecord(),
+                    // BEgetRootLine() and getPagesTSconfig() (called via isRecordsOnPageShouldBeChecked()
+                    // and downstream) accumulate entries in the TransientMemoryBackend that are never
+                    // freed, which causes OOM in CLI runs over large site trees. Flushing per-chunk is
+                    // not enough on installations where one array_chunk fits the whole site tree.
+                    if (++$processed % 1000 === 0) {
+                        $this->runtimeCache->flush();
+                    }
                 }
+
+                // Final flush per chunk to release any remaining entries.
+                $this->runtimeCache->flush();
             }
         }
 
