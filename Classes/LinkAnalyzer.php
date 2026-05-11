@@ -714,7 +714,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     // and downstream) accumulate entries in the TransientMemoryBackend that are never
                     // freed, which causes OOM in CLI runs over large site trees. Flushing per-chunk is
                     // not enough on installations where one array_chunk fits the whole site tree.
-                    if (++$processed % 1000 === 0) {
+                    if ($table !== 'pages' && ++$processed % 1000 === 0) {
                         $this->runtimeCache->flush();
                     }
                 }
