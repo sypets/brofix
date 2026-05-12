@@ -1,5 +1,3 @@
-[![TYPO3 11](https://img.shields.io/badge/TYPO3-11-orange.svg)](https://get.typo3.org/version/11)
-[![TYPO3 12](https://img.shields.io/badge/TYPO3-12-orange.svg)](https://get.typo3.org/version/12)
 [![Crowdin](https://badges.crowdin.net/typo3-extension-brofix/localized.svg)](https://crowdin.com/project/typo3-extension-brofix)
 [![CI Status](https://github.com/sypets/brofix/workflows/CI/badge.svg)](https://github.com/sypets/brofix/actions)
 [![Downloads](https://img.shields.io/packagist/dt/sypets/brofix)](https://packagist.org/packages/sypets/brofix)
@@ -22,8 +20,9 @@ it was forked from the source code. So it was based on earlier work.
 Thanks go to the original authors and maintainers in the core, without
 whom this work would not have been possible.
 
-|                  | URL                                                |
-|------------------|----------------------------------------------------|
-| **Repository:**  | https://github.com/sypets/brofix                   |
-| **Read online:** | https://docs.typo3.org/p/sypets/brofix/main/en-us/ |
-| **TER:**         | https://extensions.typo3.org/extension/brofix      |
+|                                       | URL                                                |
+|---------------------------------------|----------------------------------------------------|
+| **Repository:**                       | https://github.com/sypets/brofix                   |
+| **Documentation:**                    | https://docs.typo3.org/p/sypets/brofix/main/en-us/ |
+| **TYPO3 Extension repository (TER):** | https://extensions.typo3.org/extension/brofix      |
+| **Packagist:**                        | https://packagist.org/packages/sypets/brofix       |
