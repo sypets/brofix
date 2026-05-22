@@ -220,6 +220,9 @@ class LinkParser
                 . ' stack trace:'
                 . $e->getTraceAsString()
             );
+            if ($this->configuration->getBehaviourOnCheckError() === Configuration::BEHAVIOR_ON_CHECK_ABORT) {
+                throw $e;
+            }
         } catch (\Throwable $e) {
             // log exception with more context and throw again so that errors are not obscured
             // @extensionScannerIgnoreLine problem with ->error()
@@ -229,7 +232,9 @@ class LinkParser
                 . ' stack trace:'
                 . $e->getTraceAsString()
             );
-            throw $e;
+            if ($this->configuration->getBehaviourOnCheckError() === Configuration::BEHAVIOR_ON_CHECK_ABORT) {
+                throw $e;
+            }
         }
         return $fields;
     }

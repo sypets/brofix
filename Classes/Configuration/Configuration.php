@@ -63,6 +63,11 @@ class Configuration
 
     public const SHOW_URL_CHECKER_DEFAULT = self::SHOW_URL_CHECKER_OFF;
 
+    public const BEHAVIOR_ON_CHECK_ABORT = 'abort';
+    public const BEHAVIOR_ON_CHECK_CONTINUE = 'continue';
+    public const BEHAVIOR_ON_CHECK_INTELLIGENT = 'intelligent';
+    public const BEHAVIOR_ON_CHECK_DEFAULT = self::BEHAVIOR_ON_CHECK_INTELLIGENT;
+
     public const DEFAULT_TSCONFIG = [
         'searchFields.' => [
             'pages' => 'media,url',
@@ -180,6 +185,8 @@ class Configuration
 
     protected int $showUrlChecker = self::SHOW_URL_CHECKER_DEFAULT;
 
+    protected string $behaviourOnCheckError = self::BEHAVIOR_ON_CHECK_DEFAULT;
+
     /**
      * Configuration constructor.
      * @param array<mixed> $extConfArray ExtensionConfiguration array
@@ -206,6 +213,7 @@ class Configuration
         $this->enableSelectViewControl = (bool)($extConfArray['form']['control']['selectView'] ?? true);
         $this->enableHowToTraverseControl = (bool)($extConfArray['form']['control']['howToTraverse'] ?? true);
         $this->showUrlChecker = (int)($extConfArray['showUrlChecker'] ?? self::SHOW_URL_CHECKER_DEFAULT);
+        $this->behaviourOnCheckError = (string)($extConfArray['behaviourOnCheckError'] ?? self::BEHAVIOR_ON_CHECK_DEFAULT);
 
         // initialize from global configuration
         // Hook to handle own checks
@@ -829,5 +837,15 @@ class Configuration
     public function isShowUrlCheckerAdminOnly(): bool
     {
         return $this->showUrlChecker === self::SHOW_URL_CHECKER_ADMIN_ONLY;
+    }
+
+    public function getBehaviourOnCheckError(): string
+    {
+        return $this->behaviourOnCheckError;
+    }
+
+    public function setBehaviourOnCheckError(string $behaviourOnCheckError): void
+    {
+        $this->behaviourOnCheckError = $behaviourOnCheckError;
     }
 }

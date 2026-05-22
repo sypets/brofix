@@ -147,7 +147,9 @@ class GenerateCheckResultFluidMail implements SingletonInterface
                     $pageId
                 )
             );
-            throw $e;
+            if ($config->getBehaviourOnCheckError() === Configuration::BEHAVIOR_ON_CHECK_ABORT) {
+                throw $e;
+            }
         }
 
         /**

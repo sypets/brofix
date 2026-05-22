@@ -690,20 +690,33 @@ class LinkAnalyzer implements LoggerAwareInterface
                 $result = $queryBuilder->executeQuery();
                 while ($row = $result->fetchAssociative()) {
                     $results = [];
+                    $idRecord = (int)($row['uid'] ?? 0);
 
-                    if ($table !== 'pages' && $this->isRecordsOnPageShouldBeChecked($table, $row) === false) {
-                        continue;
+                    try {
+                        if ($table !== 'pages' && $this->isRecordsOnPageShouldBeChecked($table, $row) === false) {
+                            continue;
+                        }
+                        $this->linkParser->findLinksForRecord(
+                            $results,
+                            $table,
+                            $fields,
+                            $row,
+                            $request,
+                            LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
+                        );
+
+                        $this->checkLinks($results, $linkTypes);
+                    } catch (\Throwable $e) {
+                        $this->error(
+                            "Exception in while loop of generateBrokenLinkRecords: table=$table, uid=$idRecord, exception="
+                            . $e->getMessage()
+                            . ' stack trace:'
+                            . $e->getTraceAsString()
+                        );
+                        if ($this->configuration->getBehaviourOnCheckError() === Configuration::BEHAVIOR_ON_CHECK_ABORT) {
+                            throw $e;
+                        }
                     }
-                    $this->linkParser->findLinksForRecord(
-                        $results,
-                        $table,
-                        $fields,
-                        $row,
-                        $request,
-                        LinkParser::MASK_CONTENT_CHECK_ALL - LinkParser::MASK_CONTENT_CHECK_IF_RECORDs_ON_PAGE_SHOULD_BE_CHECKED
-                    );
-
-                    $this->checkLinks($results, $linkTypes);
                 }
             }
         }

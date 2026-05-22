@@ -7,6 +7,9 @@
 
 ### checking ###
 
+# cat=checking; type=options[continue=continue,abort=abort,intelligent=intelligent]; label=How to handle errors and exceptions: Continue (and log error) on or throw exception and aborting? To continue will prioritize finishing the check but possibly obscure errors. Default is "intelligents" where brofix decides on case by case basis.
+behaviourOnCheckError = intelligent
+
 # cat=checking; type=string; label=Do not use these softreference parsers (comma separated list) when parsing content: This is a workaround for a TYPO3 core bug. The default is "url".
 excludeSoftrefs = url
 
