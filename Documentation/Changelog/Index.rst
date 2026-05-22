@@ -15,8 +15,8 @@ Changelog
    `commit messages <https://github.com/sypets/brofix/commits/main/>`__
    in the GitHub repository: https://github.com/sypets/brofix
 
-7.0
-===
+7.x.x
+=====
 
 .. important::
 
@@ -27,7 +27,7 @@ Changelog
    :glob:
    :titlesonly:
 
-   Entries/7.0/*
+   Entries/7.x.x/*
 
 
 6.2
