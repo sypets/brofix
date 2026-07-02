@@ -65,7 +65,6 @@ class LinkAnalyzer implements LoggerAwareInterface
         protected ConnectionPool $connectionPool,
         protected Typo3Version $typo3Version
     ) {
-        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->brokenLinkRepository = $brokenLinkRepository;
         $this->contentRepository = $contentRepository;
         $this->pagesRepository = $pagesRepository;
