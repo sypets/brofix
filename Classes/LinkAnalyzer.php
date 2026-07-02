@@ -626,7 +626,8 @@ class LinkAnalyzer implements LoggerAwareInterface
                 }
 
                 $selectFields = $this->getSelectFields($table, $fields);
-
+                // only use fields of pages if joined with pages
+                $pagesFields = [];
                 if ($table === 'pages') {
                     if ($this->pids) {
                         $constraints = [
@@ -665,17 +666,21 @@ class LinkAnalyzer implements LoggerAwareInterface
                         $tmpFields[] = $table . '.' . $field . ' AS ' . $field;
                     }
                     // add l18n_cfg to check for option: Hide default language of page
-                    $tmpFields[] = 'p.l18n_cfg';
-                    $selectFields = $tmpFields;
+                    $pagesFields[] = 'p.l18n_cfg';
+                    $pagesFields[] = 'p.doktype';
+                    $selectFields = array_merge($tmpFields, $pagesFields);
                 }
 
                 // todo: for tcaProcessing 'full', we get entire record even though it is inefficient, optimize this
                 // problem is we might need some fields for TCA parsing. In particular, when adding flexforms an exception might be thrown.
                 if ($this->configuration->getTcaProcessing() === Configuration::TCA_PROCESSING_FULL) {
-                    $queryBuilder->select($table . '.*');
-                } else {
-                    $queryBuilder->select(...$selectFields);
+                    // fetch all fields if TCA processing is full
+                    $selectFields = [$table . '.*'];
+                    // add pages fields
+                    $selectFields = array_merge($selectFields, $pagesFields);
                 }
+                $queryBuilder->select(...$selectFields);
+
                 $queryBuilder
                     ->from($table)
                     ->where(
@@ -686,7 +691,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                 while ($row = $result->fetchAssociative()) {
                     $results = [];
 
-                    if ($this->isRecordsOnPageShouldBeChecked($table, $row) === false) {
+                    if ($table !== 'pages' && $this->isRecordsOnPageShouldBeChecked($table, $row) === false) {
                         continue;
                     }
                     $this->linkParser->findLinksForRecord(
@@ -783,18 +788,11 @@ class LinkAnalyzer implements LoggerAwareInterface
             return false;
         }
 
-        // todo: this is inefficient can we pass these fields for the page in $record (we are joining with pages before)
-        // we need pages.(doktype|l18n_cfg)
-        // todo: we need also the language, can be determined previously and passed as parameter
-        $pageRow = BackendUtility::getRecord('pages', $pageUid, '*', '', false);
-        if (!$pageRow) {
-            return false;
-        }
-        $doktype = (int)($pageRow['doktype'] ?? 0);
+        $doktype = (int)($record['doktype'] ?? 0);
         if ($doktype === 3 || $doktype === 4) {
             return false;
         }
-        $l18nCfg = (int)($pageRow['l18n_cfg'] ?? 0);
+        $l18nCfg = (int)($record['l18n_cfg'] ?? 0);
         $languageField =  $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '';
         $lang = 0;
         if ($languageField) {
@@ -803,12 +801,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         if ((($l18nCfg & 1) === 1) && $lang === 0) {
             return false;
         }
-        // todo: this is inefficient, we should not need to do this as the page tree has already been fetched
-        // however fetching the page list does not check if current start page is subpage of hidden / extendToSubpages
-        // should be fixed there
-        if ($this->pagesRepository->getRootLineIsHidden($pageRow)) {
-            return false;
-        }
+
         return true;
     }
 
