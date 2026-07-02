@@ -7,6 +7,9 @@
 
 ### checking ###
 
+# cat=checking; type=options[never=never,always=always,intelligent=intelligent]; label=Whether to reolve cert chains (fetching intermediate certificates), this may reduce the number of false-positives with external links
+resolveCertChains = intelligent
+
 # cat=checking; type=options[continue=continue,abort=abort,intelligent=intelligent]; label=How to handle errors and exceptions: Continue (and log error) on or throw exception and aborting? To continue will prioritize finishing the check but possibly obscure errors. Default is "intelligents" where brofix decides on case by case basis.
 behaviourOnCheckError = intelligent
 
@@ -29,7 +32,7 @@ linkTargetCacheExpiresLow = 0
 linkTargetCacheExpiresHigh = 0
 
 # cat=checking; type=string;label=If an error code / type / exception matches this, the URL is non-checkable: This can be a regex if it starts with regex (separated by colon), otherwise it matches by start of string.
-combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: unable to get local issuer certificate)/
+combinedErrorNonCheckableMatch = regex:/^(httpStatusCode:(401|403):|libcurlErrno:60:SSL certificate problem: Not existing error as example)/
 
 # cat=checking; type=boolean; label=After editing a record, recheck links; This is NOT recommended as it may result in excessive checking and delays when editing. It is already checked if links still exist in record.
 recheckLinksOnEditing = 0

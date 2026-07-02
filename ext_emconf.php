@@ -10,7 +10,8 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => '',
     'state' => 'stable',
     // already incremented major version because of upgrade wizard
-    'version' => '7.0.1-dev',
+    // already imcremented minor version to 7.1 due to certificate chain resolver
+    'version' => '7.1.0-dev',
     'constraints' => [
         'depends' => [
             'typo3' => '13.4.0-14.4.99',

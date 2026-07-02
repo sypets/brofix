@@ -14,6 +14,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Sypets\Brofix\CheckLinks\CertificateChainResolver\CertificateChainResolverInterface;
+use Sypets\Brofix\CheckLinks\CertificateChainResolver\StayAliveCertificateChainResolver;
 use Sypets\Brofix\CheckLinks\CrawlDelay;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetCacheInterface;
@@ -84,6 +86,11 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     protected $crawlDelay;
 
     /**
+     * @var CertificateChainResolverInterface
+     */
+    protected $certificateChainResolver;
+
+    /**
      * @var array<int,array{from:string, to:string}>
      */
     protected array $redirects = [];
@@ -95,12 +102,14 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         ?RequestFactory $requestFactory = null,
         ?ExcludeLinkTarget $excludeLinkTarget = null,
         ?LinkTargetCacheInterface $linkTargetCache = null,
-        ?CrawlDelay $crawlDelay = null
+        ?CrawlDelay $crawlDelay = null,
+        ?CertificateChainResolverInterface $certificateChainResolver = null,
     ) {
         $this->requestFactory = $requestFactory ?: GeneralUtility::makeInstance(RequestFactory::class);
         $this->excludeLinkTarget = $excludeLinkTarget ?: GeneralUtility::makeInstance(ExcludeLinkTarget::class);
         $this->linkTargetCache = $linkTargetCache ?: GeneralUtility::makeInstance(LinkTargetPersistentCache::class);
         $this->crawlDelay = $crawlDelay ?: GeneralUtility::makeInstance(CrawlDelay::class);
+        $this->certificateChainResolver = $certificateChainResolver ?: GeneralUtility::makeInstance(StayAliveCertificateChainResolver::class);
     }
 
     public function setConfiguration(Configuration $configuration): void
@@ -223,8 +232,37 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 }
             }
 
+            // resolve cert chain based on config
+            $resolveCertChain = false;
+            $resolveChainOnlyForHTTPSOnly = false;
+            if ($this->configuration->isResolveCertChainAlways()) {
+                $resolveCertChain = true;
+                /** since we always resolve cert chain we should do it only for HTTPS urls because some sites may
+                 * not have HTTPS support
+                 */
+                $resolveChainOnlyForHTTPSOnly = true;
+            }
+            if ($resolveCertChain) {
+                $certChainFile = $this->certificateChainResolver->resolveCertChain($url, $resolveChainOnlyForHTTPSOnly);
+                if ($certChainFile) {
+                    $options['verify'] = $certChainFile;
+                }
+            }
+
             // first check HEAD and if ERROR, also check GET
             $linkTargetResponse = $this->requestUrl($url, 'HEAD', $options);
+            // if certChainResolving is set to intelligent, only apply it if libcurlerror and errno=60
+            if (!$resolveCertChain && $this->configuration->isResolveCertChainIntelligent()
+                && $linkTargetResponse->isError()
+                && $linkTargetResponse->getErrorType() === self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO
+                && $linkTargetResponse->getErrno() === 60
+            ) {
+                $resolveCertChain = true;
+                $certChainFile = $this->certificateChainResolver->resolveCertChain($url, $resolveChainOnlyForHTTPSOnly);
+                if ($certChainFile) {
+                    $options['verify'] = $certChainFile;
+                }
+            }
             if ($linkTargetResponse->isError()) {
                 // HEAD was not allowed or threw an error, now trying GET
                 $options['headers']['Range'] = 'bytes=0-4048';
@@ -251,6 +289,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
         $responseHeaders = [];
         try {
             $this->redirects = [];
+
             $response = $this->requestFactory->request($url, $method, $options);
 
             if ($response->getStatusCode() >= 300) {
@@ -470,9 +509,16 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
             case self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO:
                 $message = '';
-                if ($errno > 0) {
+                if ($errno > 0 && $errno != 60) {
                     // get localized error message
                     $message = $lang->sL('LLL:EXT:brofix/Resources/Private/Language/Module/locallang.xlf:list.report.error.libcurl.' . $errno);
+                }
+                /**
+                 * Temporary workaround to show the original exception message for erroor code 60, needs better handling in the future
+                 * @see https://github.com/sypets/brofix/issues/493
+                 */
+                if ($errno === 60) {
+                    $message = $exception;
                 }
                 if (!$message) {
                     // fallback to  generic error message and show exception

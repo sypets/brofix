@@ -688,6 +688,7 @@ class LinkAnalyzer implements LoggerAwareInterface
                     );
 
                 $result = $queryBuilder->executeQuery();
+                $processed = 0;
                 while ($row = $result->fetchAssociative()) {
                     $results = [];
                     $idRecord = (int)($row['uid'] ?? 0);

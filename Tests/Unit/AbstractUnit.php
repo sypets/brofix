@@ -24,6 +24,9 @@ abstract class AbstractUnit extends UnitTestCase
         'excludeSoftrefs' => 'url',
         'excludeSoftrefsInFields' => 'tt_content.bodytext',
         'traverseMaxNumberOfPagesInBackend' => 100,
+
+        // disable certificate chain resolving
+        'resolveCertChains' => 'never'
     ];
 
     /**

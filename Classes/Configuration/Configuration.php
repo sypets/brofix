@@ -68,6 +68,11 @@ class Configuration
     public const BEHAVIOR_ON_CHECK_INTELLIGENT = 'intelligent';
     public const BEHAVIOR_ON_CHECK_DEFAULT = self::BEHAVIOR_ON_CHECK_INTELLIGENT;
 
+    public const RESOLVE_CERT_CHAINS_ALWAYS = 'always';
+    public const RESOLVE_CERT_CHAINS_NEVER = 'never';
+    public const RESOLVE_CERT_CHAINS_INTELLIGENT = 'intelligent';
+    public const RESOLVE_CERT_CHAINS_DEFAULT = self::RESOLVE_CERT_CHAINS_INTELLIGENT;
+
     public const DEFAULT_TSCONFIG = [
         'searchFields.' => [
             'pages' => 'media,url',
@@ -186,6 +191,8 @@ class Configuration
     protected int $showUrlChecker = self::SHOW_URL_CHECKER_DEFAULT;
 
     protected string $behaviourOnCheckError = self::BEHAVIOR_ON_CHECK_DEFAULT;
+
+    protected string $resolveCertChains = self::RESOLVE_CERT_CHAINS_DEFAULT;
 
     /**
      * Configuration constructor.
@@ -847,5 +854,30 @@ class Configuration
     public function setBehaviourOnCheckError(string $behaviourOnCheckError): void
     {
         $this->behaviourOnCheckError = $behaviourOnCheckError;
+    }
+
+    public function getResolveCertChains(): string
+    {
+        return $this->resolveCertChains;
+    }
+
+    public function setResolveCertChains(string $resolveCertChains): void
+    {
+        $this->resolveCertChains = $resolveCertChains;
+    }
+
+    public function isResolveCertChainAlways(): bool
+    {
+        return $this->resolveCertChains === self::RESOLVE_CERT_CHAINS_ALWAYS;
+    }
+
+    public function isResolveCertChainNever(): bool
+    {
+        return $this->resolveCertChains === self::RESOLVE_CERT_CHAINS_NEVER;
+    }
+
+    public function isResolveCertChainIntelligent(): bool
+    {
+        return $this->resolveCertChains === self::RESOLVE_CERT_CHAINS_INTELLIGENT;
     }
 }
