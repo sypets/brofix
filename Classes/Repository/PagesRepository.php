@@ -187,6 +187,17 @@ class PagesRepository
             if (in_array($startPage, $excludedPages)) {
                 // do not add page, if in list of excluded pages
                 unset($startPages[$key]);
+                continue;
+            }
+            $pageRow = BackendUtility::getRecord('pages', $startPage, '*', '', true);
+            if (!$pageRow) {
+                unset($startPages[$key]);
+                continue;
+            }
+            // check if page has hidden rootline (e.g. subpage of hidden=1 and extendToSubpages=1
+            if ($this->getRootLineIsHidden($pageRow)) {
+                unset($startPages[$key]);
+                continue;
             }
         }
         if (!$startPages) {
@@ -251,6 +262,8 @@ class PagesRepository
      *
      * @param mixed[] $pageInfo Array with uid, title, hidden, extendToSubpages from pages table
      * @return bool TRUE if rootline contains a hidden page, FALSE if not
+     *
+     * @todo Use rootline functionality from TYPO3?
      */
     public function getRootLineIsHidden(array $pageInfo)
     {
@@ -266,7 +279,7 @@ class PagesRepository
         $queryBuilder->getRestrictions()->removeAll();
 
         $row = $queryBuilder
-            ->select('uid', 'title', 'hidden', 'extendToSubpages')
+            ->select('uid', 'pid', 'title', 'hidden', 'extendToSubpages')
             ->from('pages')
             ->where(
                 $queryBuilder->expr()->eq(
