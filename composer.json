@@ -35,6 +35,7 @@
 	},
 	"require": {
 		"php": "^8.2",
+		"stayallive/certificate-chain-resolver": "^1.0",
 		"typo3/cms-backend": "^13.4 || ^14",
 		"typo3/cms-core": "^13.4 || ^14",
 		"typo3/cms-fluid": "^13.4 || ^14",
