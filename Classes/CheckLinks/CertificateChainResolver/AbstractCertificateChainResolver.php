@@ -16,11 +16,11 @@ abstract class AbstractCertificateChainResolver implements CertificateChainResol
 
     protected function initializeTmpDir(): string
     {
-        $tmpdir = Environment::getVarPath() . '/transient';
-        if (!is_dir($tmpdir)) {
-            mkdir($tmpdir);
+        $this->tmpDir = Environment::getVarPath() . '/transient';
+        if (!is_dir($this->tmpDir)) {
+            mkdir($this->tmpDir);
         }
-        return $tmpdir;
+        return $this->tmpDir;
     }
 
     public function getTmpDir(): string
