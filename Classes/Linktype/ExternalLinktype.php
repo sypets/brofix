@@ -39,7 +39,12 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     public const ERROR_TYPE_HTTP_STATUS_CODE = 'httpStatusCode';
     // An error occurred in lowlevel handler and a cURL error code can be found in $errorParams->errno
     public const ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO = 'libcurlErrno';
+
+    /** @todo Use type ERROR_TYPE_GENERAL for this type and set the error with errno */
     public const ERROR_TYPE_TOO_MANY_REDIRECTS = 'tooManyRedirects';
+    /** @todo Use type ERROR_TYPE_GENERAL for this type and set the error with errno */
+    public const ERROR_TYPE_REDIRECT_LOOP = 'loop';
+    /** @todo Use type ERROR_TYPE_GENERAL for this type and set the error with errno */
     public const ERROR_TYPE_UNABLE_TO_PARSE = 'unableToParseUri';
     public const ERROR_TYPE_UNKNOWN = 'unknown';
     // Generic error : todo handle
@@ -145,134 +150,142 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             return $linkTargetResponse;
         }
 
-        // use URL from cache, if available
-        if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE) === 0)
-            //&& $this->linkTargetCache->hasEntryForUrl($origUrl, 'external', true, $this->configuration->getLinkTargetCacheExpires($flags))
-        ) {
-            /**
-             *  'valid' => bool,
-             *  'isExcluded' => bool,
-             *  'errorParams' => array
-             *  'lastChecked' => int
-             */
-            $urlResponse = $this->linkTargetCache->getUrlResponseForUrl(
-                $origUrl,
-                'external',
-                $this->configuration->getLinkTargetCacheExpires($flags)
-            );
-            if ($urlResponse) {
-                $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
-                if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE_ON_ERROR) !== 0)
-                    && $urlResponse->getStatus() === LinkTargetResponse::RESULT_BROKEN) {
-                    // make sure result is fresh if invalid URL
-                    // skip cache result here and continue checking
-                } else {
-                    return $urlResponse;
-                }
-            }
-        }
-
-        $cookieJar = GeneralUtility::makeInstance(CookieJar::class);
-
         $this->redirects = [];
 
-        $onRedirect = function (
-            RequestInterface $request,
-            ResponseInterface $response,
-            UriInterface $uri
-        ) {
-            $this->redirects[] = [
-                'from' => (string)$request->getUri(),
-                'to' => (string)$uri,
-            ];
-        };
+        $url = $origUrl;
+        $loop = 0;
 
-        $options = [
-            'cookies' => $cookieJar,
-            'allow_redirects' => [
-                /** Strict RFC compliant redirects mean that POST redirect requests are sent as
-                 *  POST requests vs. doing what most browsers do which is redirect POST requests
-                 *  with GET requests.
-                 *
-                 * We don't really do POST request, only HEAD and GET
-                 */
-                'strict' => true,
-                /** Set to false to disable adding the Referer
-                 * header when redirecting.
-                 */
-                'referer' => true,
-                'max' => $this->configuration->getLinktypesConfigExternalRedirects(),
+        // start loop here, follow redirects manually, in order to resolve certificate chains for each domain individually
+        while ($url) {
+            ++$loop;
 
-                /**  on_redirect: (callable) PHP callable that is invoked when a redirect
-                 * is encountered. The callable is invoked with the original request and the
-                 * redirect response that was received. Any return value from the on_redirect
-                 * function is ignored.
-                 * @see https://docs.guzzlephp.org/en/stable/request-options.html
-                 */
-                'on_redirect' => $onRedirect,
-            ],
-            'headers'         => $this->configuration->getLinktypesConfigExternalHeaders(),
-            'timeout' => $this->configuration->getLinktypesConfigExternalTimeout(),
-
-        ];
-
-        $url = $this->preprocessUrl($origUrl);
-        if (!empty($url)) {
-            if (($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY) === 0) {
-                $continueChecking = $this->crawlDelay->crawlDelay($this->domain);
-                if (!$continueChecking) {
-                    /*
-                    $this->logger->debug('crawl delay: stop checking for URL=' . $url);
-                    $linkTargetResponse->setStatus(LinkTargetResponse::RESULT_CANNOT_CHECK);
-                    $linkTargetResponse->setReasonCannotCheck(LinkTargetResponse::REASON_CANNOT_CHECK_429);
-                    return $linkTargetResponse;
-                    */
-                    // we return null in this case, because this is a temporary error code
-                    return null;
-                }
-            }
-
-            // resolve cert chain based on config
-            $resolveCertChain = false;
-            $resolveChainOnlyForHTTPSOnly = false;
-            if ($this->configuration->isResolveCertChainAlways()) {
-                $resolveCertChain = true;
-                /** since we always resolve cert chain we should do it only for HTTPS urls because some sites may
-                 * not have HTTPS support
-                 */
-                $resolveChainOnlyForHTTPSOnly = true;
-            }
-            if ($resolveCertChain) {
-                $certChainFile = $this->certificateChainResolver->resolveCertChain($url, $resolveChainOnlyForHTTPSOnly);
-                if ($certChainFile) {
-                    $options['verify'] = $certChainFile;
-                }
-            }
-
-            // first check HEAD and if ERROR, also check GET
-            $linkTargetResponse = $this->requestUrl($url, 'HEAD', $options);
-            // if certChainResolving is set to intelligent, only apply it if libcurlerror and errno=60
-            if (!$resolveCertChain && $this->configuration->isResolveCertChainIntelligent()
-                && $linkTargetResponse->isError()
-                && $linkTargetResponse->getErrorType() === self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO
-                && $linkTargetResponse->getErrno() === 60
+            // use URL from cache, if available
+            if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE) === 0)
+                //&& $this->linkTargetCache->hasEntryForUrl($origUrl, 'external', true, $this->configuration->getLinkTargetCacheExpires($flags))
             ) {
-                $resolveCertChain = true;
-                $certChainFile = $this->certificateChainResolver->resolveCertChain($url, $resolveChainOnlyForHTTPSOnly);
-                if ($certChainFile) {
-                    $options['verify'] = $certChainFile;
+                /**
+                 *  'valid' => bool,
+                 *  'isExcluded' => bool,
+                 *  'errorParams' => array
+                 *  'lastChecked' => int
+                 */
+                $urlResponse = $this->linkTargetCache->getUrlResponseForUrl(
+                    $origUrl,
+                    'external',
+                    $this->configuration->getLinkTargetCacheExpires($flags)
+                );
+                if ($urlResponse) {
+                    $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
+                    if ((($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CACHE_ON_ERROR) !== 0)
+                        && $urlResponse->getStatus() === LinkTargetResponse::RESULT_BROKEN) {
+                        // make sure result is fresh if invalid URL
+                        // skip cache result here and continue checking
+                    } else {
+                        return $urlResponse;
+                    }
                 }
             }
-            if ($linkTargetResponse->isError()) {
-                // HEAD was not allowed or threw an error, now trying GET
-                $options['headers']['Range'] = 'bytes=0-4048';
-                $linkTargetResponse = $this->requestUrl($url, 'GET', $options);
-            }
-            $this->crawlDelay->setLastCheckedTime($this->domain);
-        }
-        $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
-        $this->insertIntoLinkTargetCache($url, $linkTargetResponse);
 
+            $cookieJar = GeneralUtility::makeInstance(CookieJar::class);
+
+            /*
+            $this->redirects = [];
+
+            $onRedirect = function (
+                RequestInterface $request,
+                ResponseInterface $response,
+                UriInterface $uri
+            ) {
+                $this->redirects[] = [
+                    'from' => (string)$request->getUri(),
+                    'to' => (string)$uri,
+                ];
+            };
+            */
+
+            $options = [
+                'cookies' => $cookieJar,
+                'allow_redirects' => false,
+                'headers' => $this->configuration->getLinktypesConfigExternalHeaders(),
+                'timeout' => $this->configuration->getLinktypesConfigExternalTimeout(),
+
+            ];
+
+            $url = $this->preprocessUrl($url);
+            if (!empty($url)) {
+                if (($flags & AbstractLinktype::CHECK_LINK_FLAG_NO_CRAWL_DELAY) === 0) {
+                    $continueChecking = $this->crawlDelay->crawlDelay($this->domain);
+                    if (!$continueChecking) {
+                        // we return null in this case, because this is a temporary error code
+                        return null;
+                    }
+                }
+
+                // resolve cert chain based on config
+                $resolveCertChain = false;
+                $resolveChainOnlyForHTTPSOnly = false;
+                if ($this->configuration->isResolveCertChainAlways()) {
+                    $resolveCertChain = true;
+                    /** since we always resolve cert chain we should do it only for HTTPS urls because some sites may
+                     * not have HTTPS support
+                     */
+                    $resolveChainOnlyForHTTPSOnly = true;
+                }
+                if ($resolveCertChain) {
+                    $certChainFile = $this->certificateChainResolver->resolveCertChain(
+                        $url,
+                        $resolveChainOnlyForHTTPSOnly
+                    );
+                    if ($certChainFile) {
+                        $options['verify'] = $certChainFile;
+                    }
+                }
+
+                // first check HEAD and if ERROR, also check GET
+                $linkTargetResponse = $this->requestUrl($url, 'HEAD', $options);
+                // if certChainResolving is set to intelligent, only apply it if libcurlerror and errno=60
+                if (!$resolveCertChain && $this->configuration->isResolveCertChainIntelligent()
+                    && $linkTargetResponse->isError()
+                    && $linkTargetResponse->getErrorType() === self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO
+                    && $linkTargetResponse->getErrno() === 60
+                ) {
+                    $resolveCertChain = true;
+                    $certChainFile = $this->certificateChainResolver->resolveCertChain(
+                        $url,
+                        $resolveChainOnlyForHTTPSOnly
+                    );
+                    if ($certChainFile) {
+                        $options['verify'] = $certChainFile;
+                    }
+                }
+
+                // check if redirect
+                if ($linkTargetResponse->isError()
+                    && $linkTargetResponse->getErrorType() === self::ERROR_TYPE_HTTP_STATUS_CODE
+                    && $linkTargetResponse->getErrno() >= 301 && $linkTargetResponse->getErrno() < 400
+                ) {
+                    $url = $linkTargetResponse->getEffectiveUrl();
+                    $linkTargetResponse = null;
+                    if ($loop > 10) {
+                        $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                            self::ERROR_TYPE_TOO_MANY_REDIRECTS,
+                            0
+                        );
+                    }
+                    continue;
+                }
+
+                if ($linkTargetResponse->isError()) {
+                    // HEAD was not allowed or threw an error, now trying GET
+                    $options['headers']['Range'] = 'bytes=0-4048';
+                    $linkTargetResponse = $this->requestUrl($url, 'GET', $options);
+                }
+                $this->crawlDelay->setLastCheckedTime($this->domain);
+            }
+            $linkTargetResponse->setUrlChecker(self::URL_CHECKER_NAME);
+            $this->insertIntoLinkTargetCache($url, $linkTargetResponse);
+            break;
+        }
         return $linkTargetResponse;
     }
 
@@ -287,12 +300,33 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     protected function requestUrl(string $url, string $method, array $options): LinkTargetResponse
     {
         $responseHeaders = [];
+
         try {
-            $this->redirects = [];
+            //$this->redirects = [];
 
             $response = $this->requestFactory->request($url, $method, $options);
 
-            if ($response->getStatusCode() >= 300) {
+            if ($response->getStatusCode() >= 300 && $response->getStatusCode() < 400) {
+                // redirect
+                $newUrl = $response->getHeaderLine('Location');
+                if ($url === $newUrl) {
+                    // redirect loop
+                    $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                        self::ERROR_TYPE_REDIRECT_LOOP,
+                        0
+                    );
+                } else {
+                    $this->redirects[] = [
+                        'to' => $newUrl,
+                        'from' => $url
+                    ];
+                    $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                        self::ERROR_TYPE_HTTP_STATUS_CODE,
+                        $response->getStatusCode()
+                    );
+                    $linkTargetResponse->setEffectiveUrl($newUrl);
+                }
+            } elseif ($response->getStatusCode() >= 300) {
                 $linkTargetResponse = LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_HTTP_STATUS_CODE,
                     $response->getStatusCode()
@@ -383,8 +417,6 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             );
         }
 
-        // phpstan doesn't realize, $this->redirects can be set in on_redirect callback
-        // @phpstan-ignore-next-line
         if ($this->redirects) {
             $linkTargetResponse->setRedirects($this->redirects);
         }

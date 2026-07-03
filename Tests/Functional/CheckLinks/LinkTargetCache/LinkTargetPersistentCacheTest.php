@@ -96,6 +96,7 @@ final class LinkTargetPersistentCacheTest extends AbstractFunctional
             'reasonCannotCheck' => '',
             'redirects' => [],
             'urlChecker' => '',
+            'effectiveUrl' => ''
 
         ];
 

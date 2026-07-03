@@ -47,6 +47,8 @@ class LinkTargetResponse
      */
     protected array $redirects = [];
 
+    protected string $effectiveUrl = '';
+
     /**
      * @param int $status
      * @param int $lastChecked
@@ -292,8 +294,16 @@ class LinkTargetResponse
         return $result;
     }
 
+    public function setEffectiveUrl(string $effectiveUrl): void
+    {
+        $this->effectiveUrl = $effectiveUrl;
+    }
+
     public function getEffectiveUrl(): string
     {
+        if ($this->effectiveUrl) {
+            return $this->effectiveUrl;
+        }
         if ($this->redirects) {
             return(string)(end($this->redirects)['to'] ?? '');
         }
