@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Sypets\Brofix\Configuration\Configuration;
 use Sypets\Brofix\LinkAnalyzer;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 
 class LinkAnalyzerTest extends AbstractFunctional
 {
+    protected $typo3Version;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,20 +27,7 @@ class LinkAnalyzerTest extends AbstractFunctional
         );
         //Bootstrap::initializeLanguageObject();
         self::initializeLanguageObject();
-    }
-
-    /**
-     * @param int $uid
-     * @param non-empty-string $fixtureFile
-     * @param string $groupFixtureFile
-     */
-    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
-    {
-        if ($groupFixtureFile) {
-            $this->importCSVDataSet($groupFixtureFile);
-        }
-        $this->backendUserFixture = $fixtureFile;
-        $this->setUpBackendUserFromFixture($uid);
+        $this->typo3Version = $this->get(Typo3Version::class);
     }
 
     /**
@@ -95,13 +87,13 @@ class LinkAnalyzerTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider findAllBrokenLinksDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
+    #[DataProvider('findAllBrokenLinksDataProvider')]
+    #[Test]
     public function testGenerateBrokenLinkRecordsFindAllBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['db', 'file', 'external'];
@@ -147,13 +139,13 @@ class LinkAnalyzerTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider findFindOnlyFileBrokenLinksDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
+    #[DataProvider('findFindOnlyFileBrokenLinksDataProvider')]
+    #[Test]
     public function testGetLinkStatisticsFindOnlyFileBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['file'];
@@ -199,14 +191,14 @@ class LinkAnalyzerTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider findFindOnlyPageBrokenLinksDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      *
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
+    #[DataProvider('findFindOnlyPageBrokenLinksDataProvider')]
+    #[Test]
     public function testGetLinkStatisticsFindOnlyPageBrokenLinks(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['db'];
@@ -252,13 +244,13 @@ class LinkAnalyzerTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider findFindOnlyExternalBrokenLinksDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
+    #[DataProvider('findFindOnlyExternalBrokenLinksDataProvider')]
+    #[Test]
     public function testGetLinkStatisticsFindOnlyExternalBrokenLinksInBodytext(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $linkTypes = ['external'];
@@ -303,13 +295,13 @@ class LinkAnalyzerTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider getLinkStatisticsDoNotDetectCorrectLinksAsBrokenDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
+    #[DataProvider('getLinkStatisticsDoNotDetectCorrectLinksAsBrokenDataProvider')]
+    #[Test]
     public function testGetLinkStatisticsDoNotDetectCorrectLinksAsBroken(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         // setup
@@ -338,13 +330,13 @@ class LinkAnalyzerTest extends AbstractFunctional
                     $pidList1,
                     __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
-            'Test with one broken link in pages.url and doktype=1. Expected: no broken links' =>
+            'Test with one broken link in pages.link and doktype=1. Expected: no broken links' =>
                 [
                     __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_1.csv',
                     $pidList1,
                     __DIR__ . '/Fixtures/expected_output_none.csv'
                 ],
-            'Test with one broken link in pages.url and doktype=3. Expected: 1 broken link' =>
+            'Test with one broken link in pages.link and doktype=3. Expected: 1 broken link' =>
                 [
                     __DIR__ . '/Fixtures/input_page_with_broken_link_in_url_doktype_3.csv',
                     $pidList1,
@@ -354,14 +346,14 @@ class LinkAnalyzerTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider checkContentByTypeDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param array<string|int> $pidList
      * @param string $expectedOutputFile
      *
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
+    #[DataProvider('checkContentByTypeDataProvider')]
+    #[Test]
     public function testGetLinkStatisticsCheckOnlyContentByType(string $inputFile, array $pidList, string $expectedOutputFile): void
     {
         $searchFields = [
@@ -369,13 +361,33 @@ class LinkAnalyzerTest extends AbstractFunctional
                 'bodytext'
             ],
             'pages' => [
-                'url'
+                'link'
             ]
         ];
 
         $linkTypes = [
             'external'
         ];
+
+        /**
+         * for version < 14 the field is pages.url, for later versions it is pages.link
+         * @see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Breaking-17406-FieldUrlInTablePagesHasBeenRemoved.html
+         */
+        if ($this->typo3Version->getMajorVersion() < 14) {
+            unset($searchFields['pages']['link']);
+            $searchFields['pages'][] = 'url';
+
+            if (str_ends_with($inputFile, 'input_page_with_broken_link_in_url_doktype_1.csv')) {
+                $inputFile = str_replace('input_page_with_broken_link_in_url_doktype_1.csv', 'input_page_with_broken_link_in_url_doktype_1_v13.csv', $inputFile);
+            }
+            if (str_ends_with($inputFile, 'input_page_with_broken_link_in_url_doktype_3.csv')) {
+                $inputFile = str_replace('input_page_with_broken_link_in_url_doktype_3.csv', 'input_page_with_broken_link_in_url_doktype_3_v13.csv', $inputFile);
+            }
+
+            if (str_ends_with($expectedOutputFile, 'expected_output_page_with_broken_link_url.csv')) {
+                $expectedOutputFile = str_replace('expected_output_page_with_broken_link_url.csv', 'expected_output_page_with_broken_link_url_v13.csv', $expectedOutputFile);
+            }
+        }
 
         // setup
         $this->importCSVDataSet($inputFile);

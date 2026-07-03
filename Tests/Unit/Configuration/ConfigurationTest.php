@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit\Configuration;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Mime\Address;
 use Sypets\Brofix\Tests\Unit\AbstractUnit;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -20,9 +21,6 @@ class ConfigurationTest extends AbstractUnit
         $this->initializeConfiguration();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function overrideSearchFieldsSetsCorrectValues(): void
     {
@@ -54,9 +52,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function setSearchFieldsSetsCorrectValues(): void
     {
@@ -80,9 +75,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getExcludedCtypesIsCorrectDefault(): void
     {
@@ -95,9 +87,6 @@ class ConfigurationTest extends AbstractUnit
         self::assertEquals($expected, $ctypes, 'Default excluded ctypes');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailFromEmailIsCorrectDefault(): void
     {
@@ -110,9 +99,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailFromEmailUsesSystemDefault(): void
     {
@@ -127,9 +113,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailFromEmailReturnsCorrectTsconfig(): void
     {
@@ -150,9 +133,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailFromNameIsCorrectDefault(): void
     {
@@ -165,7 +145,6 @@ class ConfigurationTest extends AbstractUnit
 
     /**
      * @throws \Exception
-     * @test
      */
     #[Test]
     public function getMailFromNameReturnsCorrectTsconfig(): void
@@ -187,9 +166,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailRecipientsIsCorrectDefault(): void
     {
@@ -201,9 +177,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailRecipientsReturnsCorrectValue(): void
     {
@@ -225,9 +198,6 @@ class ConfigurationTest extends AbstractUnit
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function getMailRecipientsReturnsCorrectValuesMultiple(): void
     {

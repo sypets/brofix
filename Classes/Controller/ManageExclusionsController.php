@@ -144,7 +144,6 @@ class ManageExclusionsController extends AbstractBrofixController
 
     protected function initialize(ServerRequestInterface $request): void
     {
-        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
         $this->id = (int)($request->getParsedBody()['id'] ?? $request->getQueryParams()['id'] ?? 0);
         $this->storagePid = $this->isAdmin() ? -1 : $this->configuration->getExcludeLinkTargetStoragePid();
         $this->resolveSiteLanguages($this->id);
@@ -356,23 +355,6 @@ class ManageExclusionsController extends AbstractBrofixController
     }
 
     /**
-     * This Function to Generate an array for CSV Header file
-     *
-     * @param array<string> $itemsArray
-     *
-     * @return array<string>
-     */
-    protected function generateCsvHeaderArray(array $itemsArray): array
-    {
-        $headerCsv = [];
-        $count = count($itemsArray);
-        for ($i = 0; $i < $count; $i++) {
-            $headerCsv[] = $this->charsetConverter->conv($itemsArray[$i], 'utf-8', 'iso-8859-15');
-        }
-        return $headerCsv;
-    }
-
-    /**
      * This Function to Generate the CSV file for the excluded links records
      */
     public function exportExcludedLinks(): Response
@@ -395,7 +377,7 @@ class ManageExclusionsController extends AbstractBrofixController
         $LangArrayHeader = ['Page', 'Link target', 'Link type', 'isHidden', 'Excluding date', 'Reason'];
 
         //CSV HEADERS Using Translate File and respecting UTF-8 Charset for Special Char
-        $headerCsv = $this->generateCsvHeaderArray($LangArrayHeader);
+        $headerCsv = $LangArrayHeader;
 
         //Render Excluded Links
         $excludedLinks = $this->excludeLinkTargetRepository->getExcludedBrokenLinks(new ManageExclusionsFilter(), self::ORDER_BY_VALUES[$this->orderBy] ?? []);

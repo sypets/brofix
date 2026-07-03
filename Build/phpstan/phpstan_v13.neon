@@ -1,9 +1,10 @@
+# regenerate baseline with: Build/Scripts/runTests.sh -s phpstanGenerateBaseline
+#  Build/Scripts/runTests.sh -p 8.5 -s phpstanGenerateBaseline -e "--error-format=github -c Build/phpstan/phpstan_v13.neon"
+# mv Build/phpstan/phpstan-baseline.neon Build/phpstan/phpstan-baseline_v13.neon
+
 includes:
-  # regenerate baseline with: Build/Scripts/runTests.sh -s phpstanGenerateBaseline
   - phpstan-baseline_v13.neon
-  #- ../../.Build/vendor/jangregor/phpstan-prophecy/extension.neon
   - ../../.Build/vendor/bnf/phpstan-psr-container/extension.neon
-  #- ../../.Build/vendor/friendsoftypo3/phpstan-typo3/extension.neon
   - ../../.Build/vendor/phpstan/phpstan-phpunit/extension.neon
   - ../../.Build/vendor/phpstan/phpstan-phpunit/rules.neon
 

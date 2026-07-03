@@ -6,6 +6,7 @@ namespace Sypets\Brofix\Tests\Unit\Linktype;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\CheckLinks\LinkTargetCache\LinkTargetPersistentCache;
@@ -23,9 +24,6 @@ class ExternalLinktypeTest extends AbstractUnit
         $this->inializeLanguageServiceMock();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function checkLinkWithExternalUrlNotFoundReturnsCorrectStatus(): void
     {
@@ -54,9 +52,6 @@ class ExternalLinktypeTest extends AbstractUnit
         self::assertTrue($linkTargetResponse->isError());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function checkLinkWithExternalUrlNotFoundResultsNotFoundErrorType(): void
     {

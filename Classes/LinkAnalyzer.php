@@ -56,14 +56,13 @@ class LinkAnalyzer implements LoggerAwareInterface
      */
     protected ?CheckLinksStatistics $statistics = null;
 
-    protected LinkParser $linkParser;
-
     public function __construct(
         BrokenLinkRepository $brokenLinkRepository,
         ContentRepository $contentRepository,
         PagesRepository $pagesRepository,
         protected ConnectionPool $connectionPool,
-        protected Typo3Version $typo3Version
+        protected Typo3Version $typo3Version,
+        protected LinkParser $linkParser
     ) {
         $this->brokenLinkRepository = $brokenLinkRepository;
         $this->contentRepository = $contentRepository;
@@ -81,7 +80,7 @@ class LinkAnalyzer implements LoggerAwareInterface
         $this->searchFields = $this->configuration->getSearchFields();
         $this->pids = $pidList;
         $this->statistics = new CheckLinksStatistics();
-        $this->linkParser = LinkParser::initialize($this->configuration);
+        $this->linkParser->setConfiguration($this->configuration);
     }
 
     /**

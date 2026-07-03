@@ -4,12 +4,12 @@
 Feature - Resolve Certificate Chain
 ===================================
 
-*since verion 7.1.0*
+*since verion 8.0.0*
 
 `Link to Issue 486 <https://github.com/sypets/brofix/issues/494>`
 
 This introduces a new class StayAliveCertificateChainResolver to resolve
-certificate chains. This is relevant only for external links with HTTPS.0
+certificate chains. This is relevant only for external links with HTTPS.
 
 This class requires the package stayallive/certificate-chain-resolver (which is
 now required in composer.json).

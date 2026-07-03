@@ -152,6 +152,42 @@ services:
           bin/phpunit -c ../Build/phpunit/FunctionalTests.xml ${EXTRA_TEST_OPTIONS} ${TEST_FILE};
         fi
       "
+  functional_mysql:
+    image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
+    user: ${HOST_UID}
+    links:
+      - mysql
+    volumes:
+      - ${ROOT_DIR}:${ROOT_DIR}
+    environment:
+      typo3DatabaseName: func_test
+      typo3DatabaseUsername: root
+      typo3DatabasePassword: funcp
+      typo3DatabaseHost: mysql
+    working_dir: ${ROOT_DIR}/.Build
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      /bin/sh -c "
+        if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
+          set -x
+        fi
+        echo Waiting for database start...;
+        while ! nc -z mysql 3306; do
+          sleep 1;
+        done;
+        echo Database is up;
+        php -v | grep '^PHP';
+        if [ ${PHP_XDEBUG_ON} -eq 0 ]; then
+          XDEBUG_MODE=\"off\" \
+          bin/phpunit -c ../Build/phpunit/FunctionalTests.xml ${EXTRA_TEST_OPTIONS} ${TEST_FILE};
+        else
+          XDEBUG_MODE=\"debug,develop\" \
+          XDEBUG_TRIGGER=\"foo\" \
+          XDEBUG_CONFIG=\"client_port=${PHP_XDEBUG_PORT} client_host=host.docker.internal\" \
+          bin/phpunit -c ../Build/phpunit/FunctionalTests.xml ${EXTRA_TEST_OPTIONS} ${TEST_FILE};
+        fi
+      "
 
   functional_postgres:
     image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest

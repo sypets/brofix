@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Strict comparison using \=\=\= between '''' and '''' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: ../../Classes/LinkAnalyzer.php
+
+		-
+			message: '#^Method TYPO3\\CMS\\Core\\Configuration\\FlexForm\\FlexFormTools\:\:cleanFlexFormXML\(\) invoked with 3 parameters, 4 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../../Classes/Util/TcaUtil.php

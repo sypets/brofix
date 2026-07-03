@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Sypets\Brofix\Configuration\Configuration;
 use TYPO3\CMS\Core\Localization\LanguageService;

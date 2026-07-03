@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Sypets\Brofix\Repository\PagesRepository;
 use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -143,9 +145,9 @@ class PagesRepositoryTest extends AbstractFunctional
      * @param bool $considerHidden
      * @param array<int,int> $excludedPages
      * @param array<int,int> $expectedResult
-     *
-     * @dataProvider getPageListReturnsCorrectPagesDataProvider()
      */
+    #[DataProvider('getPageListReturnsCorrectPagesDataProvider')]
+    #[Test]
     public function testGetPageListReturnsCorrectPages(
         string $fixture,
         int $startPage,

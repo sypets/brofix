@@ -18,14 +18,6 @@
 
 <!-- todo
      should set beStrictAboutTestsThatDoNotTestAnything to true, but assertCSVDataSet does not seem to count as assertion
-
-     removed following attributes for phpunit because seem not supported anymore (set displayDetailsOnTestsThatTriggerWarnings="true" to true and shows output
-     - convertErrorsToExceptions="true"
-     - convertWarningsToExceptions="true"
-     - convertDeprecationsToExceptions="true"
-     - convertNoticesToExceptions="true"
-     - forceCoversAnnotation="false"
-     - verbose="true"
 -->
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -34,11 +26,17 @@
     bootstrap="FunctionalTestsBootstrap.php"
     cacheResult="false"
     colors="true"
+    convertErrorsToExceptions="true"
+    convertWarningsToExceptions="true"
+    convertDeprecationsToExceptions="true"
+    convertNoticesToExceptions="true"
+    forceCoversAnnotation="false"
     processIsolation="false"
     stopOnError="false"
     stopOnFailure="true"
     stopOnIncomplete="true"
     stopOnSkipped="true"
+    verbose="true"
     beStrictAboutTestsThatDoNotTestAnything="false"
     failOnWarning="true"
     failOnRisky="true"

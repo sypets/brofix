@@ -87,6 +87,19 @@ abstract class AbstractFunctional extends FunctionalTestCase
     }
 
     /**
+     * @param int $uid
+     * @param non-empty-string $fixtureFile
+     * @param string $groupFixtureFile
+     */
+    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
+    {
+        if ($groupFixtureFile) {
+            $this->importCSVDataSet($groupFixtureFile);
+        }
+        $this->setUpBackendUserFromFixture($uid, $fixtureFile);
+    }
+
+    /**
      * Copied from typo3/testing-framework FunctionalTestCase::setUpBackendUserFromFixture(),
      * has been removed since:
      *  "deprecated This method together with property $this->backendUserFixture and the functional test
@@ -101,9 +114,9 @@ abstract class AbstractFunctional extends FunctionalTestCase
      * @return BackendUserAuthentication
      * @throws \TYPO3\TestingFramework\Core\Exception
      */
-    protected function setUpBackendUserFromFixture(int $userUid): BackendUserAuthentication
+    protected function setUpBackendUserFromFixture(int $userUid, string $backendUserFixture): BackendUserAuthentication
     {
-        $this->importCSVDataSet($this->backendUserFixture);
+        $this->importCSVDataSet($backendUserFixture);
         return $this->setUpBackendUser($userUid);
     }
 
