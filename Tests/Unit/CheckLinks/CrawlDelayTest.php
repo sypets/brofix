@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace Sypets\Brofix\Tests\Unit\Configuration;
 
+use PHPUnit\Framework\Attributes\Test;
 use Sypets\Brofix\CheckLinks\CrawlDelay;
 use Sypets\Brofix\Tests\Unit\AbstractUnit;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -25,9 +26,6 @@ class CrawlDelayTest extends AbstractUnit
         return GeneralUtility::makeInstance(CrawlDelay::class);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function crawlDelayReturnsTrueForNewDomain(): void
     {
@@ -37,9 +35,6 @@ class CrawlDelayTest extends AbstractUnit
         self::assertTrue($result, 'Result should be true');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function crawlDelayNoWaitTimeForNewDomain(): void
     {
@@ -53,8 +48,6 @@ class CrawlDelayTest extends AbstractUnit
     /**
      * Make sure that the crawl delay from the second domain is
      * independant (both should not delay).
-     *
-     * @test
      */
     #[Test]
     public function crawlDelayDoesNotDelayForOtherDomain(): void
@@ -70,8 +63,6 @@ class CrawlDelayTest extends AbstractUnit
     /**
      * Call crawlDelay for the same domain twice: Should delay
      * the second time.
-     *
-     * @test
      */
     #[Test]
     public function crawlDelayDoesDelayForDomainTwice(): void

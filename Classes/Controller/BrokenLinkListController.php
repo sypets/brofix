@@ -354,7 +354,7 @@ class BrokenLinkListController extends AbstractBrofixController
         } else {
             $this->pageRecord = [];
         }
-        $this->getLanguageService()->includeLLFile('EXT:brofix/Resources/Private/Language/Module/locallang.xlf');
+
         $this->getSettingsFromQueryParameters($request);
         $this->initializeLinkTypes();
 
@@ -1188,7 +1188,7 @@ class BrokenLinkListController extends AbstractBrofixController
     {
         $dbMounts = (int)($this->getBackendUser()->uc['pageTree_temporaryMountPoint'] ?? 0);
         if (!$dbMounts) {
-            $dbMounts = array_map(intval(...), $this->getBackendUser()->returnWebmounts());
+            $dbMounts = array_map(intval(...), $this->getBackendUser()->getWebmounts());
 
             $dbMounts = array_unique($dbMounts);
         } else {

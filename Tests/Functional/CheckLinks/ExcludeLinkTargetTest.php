@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional\CheckLinks;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Sypets\Brofix\CheckLinks\ExcludeLinkTarget;
 use Sypets\Brofix\Tests\Functional\AbstractFunctional;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -44,13 +46,13 @@ final class ExcludeLinkTargetTest extends AbstractFunctional
     }
 
     /**
-     * @dataProvider isExcludedDataProvider
-     *
      * @param non-empty-string $inputFile
      * @param non-empty-string $url
      * @param non-empty-string $linkType
      * @param bool $expectedResult
      */
+    #[DataProvider('isExcludedDataProvider')]
+    #[Test]
     public function testIsExcludedChecksUrlIsExcluded(string $inputFile, string $url, string $linkType, bool $expectedResult): void
     {
         /**

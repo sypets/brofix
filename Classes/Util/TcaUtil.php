@@ -4,10 +4,16 @@ declare(strict_types=1);
 namespace Sypets\Brofix\Util;
 
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
+use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TcaUtil
 {
+    public function __construct(protected TcaSchemaFactory $tcaSchemaFactory, protected Typo3Version $typo3Version)
+    {
+    }
+
     /**
      * @param string $table
      * @param string $field
@@ -15,7 +21,7 @@ class TcaUtil
      * @param array<mixed> $processedTca
      * @return array<mixed>
      */
-    public static function getFlexformFieldsWithConfig(string $table, string $field, array $row, array $processedTca): array
+    public function getFlexformFieldsWithConfig(string $table, string $field, array $row, array $processedTca): array
     {
         if (!$row || !$processedTca) {
             return [];
@@ -23,16 +29,24 @@ class TcaUtil
         $results = [];
 
         $flexFormTools = GeneralUtility::makeInstance(FlexFormTools::class);
-        $cleanedFlexformString = $flexFormTools->cleanFlexFormXML($table, $field, $row);
+        if ($this->typo3Version->getMajorVersion() >= 14) {
+            if (!$this->tcaSchemaFactory->has($table)) {
+                throw new \RuntimeException('No tcaSchema available for table ' . $table, 8450653819);
+            }
+            $schema = $this->tcaSchemaFactory->get($table);
+            $cleanedFlexformString = $flexFormTools->cleanFlexFormXML($table, $field, $row, $schema);
+        } else {
+            $cleanedFlexformString = $flexFormTools->cleanFlexFormXML($table, $field, $row);
+        }
         $flexformArray = GeneralUtility::xml2array($cleanedFlexformString);
 
         if (!($flexformArray['data'] ?? false)) {
             return [];
         }
 
-        self::traverseFlexformArray($processedTca['ds'], $results);
+        $this->traverseFlexformArray($processedTca['ds'], $results);
         foreach ($results as $flexformField => $values) {
-            $value = self::traverseFlexformArrayForValues($flexformField, $flexformArray['data']);
+            $value = $this->traverseFlexformArrayForValues($flexformField, $flexformArray['data']);
             if ($value) {
                 $results[$flexformField]['value'] = $value;
             }
@@ -46,14 +60,14 @@ class TcaUtil
      * @param array<mixed> $data
      * @return string
      */
-    public static function traverseFlexformArrayForValues(string $fieldName, array $data): string
+    public function traverseFlexformArrayForValues(string $fieldName, array $data): string
     {
         foreach ($data as $key => $values) {
             if ($key === $fieldName) {
                 return (string)$values['vDEF'];
             }
             if ($values && is_array($values)) {
-                $value = self::traverseFlexformArrayForValues($fieldName, $values);
+                $value = $this->traverseFlexformArrayForValues($fieldName, $values);
                 if ($value) {
                     return $value;
                 }
@@ -66,7 +80,7 @@ class TcaUtil
      * @param array<mixed> $flex
      * @param array<mixed> $results
      */
-    public static function traverseFlexformArray(array $flex, array &$results): void
+    public function traverseFlexformArray(array $flex, array &$results): void
     {
         if (!$flex) {
             return;
@@ -82,7 +96,7 @@ class TcaUtil
                 $results[$key] = $value;
                 continue;
             }
-            self::traverseFlexformArray($flex[$key], $results);
+            $this->traverseFlexformArray($flex[$key], $results);
         }
     }
 }

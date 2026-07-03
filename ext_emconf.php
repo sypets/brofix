@@ -9,12 +9,11 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'sypets@gmx.de',
     'author_company' => '',
     'state' => 'stable',
-    // already incremented major version because of upgrade wizard
-    // already imcremented minor version to 7.1 due to certificate chain resolver
-    'version' => '7.1.0-dev',
+    // bumped up release to 8 for dropping support for version v12
+    'version' => '8.0.0-dev',
     'constraints' => [
         'depends' => [
-            'typo3' => '13.4.0-14.4.99',
+            'typo3' => '13.4.0-14.3.99',
         ],
         'conflicts' => [],
         'suggests' => [

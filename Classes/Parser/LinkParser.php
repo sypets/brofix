@@ -54,53 +54,20 @@ class LinkParser
     protected ?FormDataCompiler $formDataCompiler;
     protected ?FormDataGroupInterface $formDataGroup;
     protected Configuration $configuration;
-    protected SoftReferenceParserFactory $softReferenceParserFactory;
-    protected ContentRepository $contentRepository;
 
     /**
      * @var array<mixed> $processedFormData;
      */
     protected array $processedFormData;
 
-    /**
-     * static reference to $this (singleton)
-     * @var LinkParser|null
-     */
-    protected static ?LinkParser $instance = null;
-
     public function __construct(
-        ?SoftReferenceParserFactory $softReferenceParserFactory = null,
-        ?ContentRepository $contentRepository = null
+        protected SoftReferenceParserFactory $softReferenceParserFactory,
+        protected ContentRepository $contentRepository,
+        protected TcaUtil $tcaUtil
     ) {
-        if ($softReferenceParserFactory === null) {
-            $softReferenceParserFactory = GeneralUtility::makeInstance(SoftReferenceParserFactory::class);
-        }
-        $this->softReferenceParserFactory = $softReferenceParserFactory;
-        if ($contentRepository === null) {
-            $contentRepository = GeneralUtility::makeInstance(ContentRepository::class);
-        }
-        $this->contentRepository = $contentRepository;
-
-        self::$instance = $this;
     }
 
-    /**
-     * Serves as initialization function to inialize some objects dynamically.
-     *
-     * @param Configuration $configuration
-     * @return LinkParser
-     */
-    public static function initialize(Configuration $configuration): LinkParser
-    {
-        if (self::$instance === null) {
-            self::$instance = GeneralUtility::makeInstance(LinkParser::class);
-        }
-        self::$instance->setConfiguration($configuration);
-
-        return self::$instance;
-    }
-
-    protected function setConfiguration(Configuration $configuration): void
+    public function setConfiguration(Configuration $configuration): void
     {
         $this->configuration = $configuration;
 
@@ -169,7 +136,7 @@ class LinkParser
                 }
                 $type = $fieldConfig['type'] ?? '';
                 if ($type === 'flex') {
-                    $flexformFields = TcaUtil::getFlexformFieldsWithConfig($table, $field, $record, $fieldConfig);
+                    $flexformFields = $this->tcaUtil->getFlexformFieldsWithConfig($table, $field, $record, $fieldConfig);
                     foreach ($flexformFields as $flexformField => $flexformData) {
                         $valueField = htmlspecialchars_decode($flexformData['value'] ?? '');
                         $flexformFieldConfig = $flexformData['config'] ?? [];

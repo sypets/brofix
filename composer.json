@@ -36,19 +36,19 @@
 	"require": {
 		"php": "^8.2",
 		"stayallive/certificate-chain-resolver": "^1.0",
-		"typo3/cms-backend": "^13.4 || ^14",
-		"typo3/cms-core": "^13.4 || ^14",
-		"typo3/cms-fluid": "^13.4 || ^14",
-		"typo3/cms-install": "^13.4 || ^14"
+		"typo3/cms-backend": "^13.4 || ^14.3",
+		"typo3/cms-core": "^13.4 || ^14.3",
+		"typo3/cms-fluid": "^13.4 || ^14.3",
+		"typo3/cms-install": "^13.4 || ^14.3"
 	},
 	"require-dev": {
 		"bnf/phpstan-psr-container": "^1.1",
 		"friendsofphp/php-cs-fixer": "^3.72",
 		"phpstan/phpdoc-parser": "^1.30 || ^2.3.1",
 		"phpstan/phpstan": "^1.8.2 || ^2",
-		"phpstan/phpstan-phpunit": "^1 || ^2.0.12",
+		"phpstan/phpstan-phpunit": "^1 || ^2",
 		"ssch/typo3-rector": "^2 ||^3",
-		"typo3/testing-framework": "^8"
+		"typo3/testing-framework": "^8 || ^9"
 	},
 	"suggest": {
 		"sypets/page-callouts": "^3.0.0"
@@ -92,10 +92,16 @@
 			"@ci:phpcgl:check"
 		],
 		"ci:phplint": [
-			"Build/Scripts/runTests.sh  -s phpstan -e \"-c ../Build/phpstan.neon\""
+			"Build/Scripts/runTests.sh  -s lint"
 		],
 		"ci:phpstan": [
 			"Build/Scripts/runTests.sh  -s phpstan -e \"-c ../Build/phpstan.neon\""
+		],
+		"ci:phpstan:v13": [
+			"Build/Scripts/runTests.sh  -s phpstan -e \"-c ../Build/phpstan_v13.neon\""
+		],
+		"ci:phpstan:v14": [
+			"Build/Scripts/runTests.sh  -s phpstan -e \"-c ../Build/phpstan_v14.neon\""
 		],
 		"rector:check": [
 			"@php .Build/bin/rector --dry-run"

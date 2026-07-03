@@ -20,7 +20,6 @@ use TYPO3\CMS\Core\Routing\SiteMatcher;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * @internal This class may change without further warnings or increment of major version.
@@ -61,12 +60,6 @@ abstract class AbstractBrofixController
      * @var ModuleTemplateFactory
      */
     protected $moduleTemplateFactory;
-
-    /**
-     * @var StandaloneView
-     * @deprecated not used?
-     */
-    protected $view;
 
     /**
      * @var Configuration

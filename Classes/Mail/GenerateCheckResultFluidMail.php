@@ -82,7 +82,11 @@ class GenerateCheckResultFluidMail implements SingletonInterface
      */
     public function generateMail(Configuration $config, CheckLinksStatistics $stats, int $pageId): bool
     {
-        $templatePaths = new TemplatePaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']);
+        $templatePaths = new TemplatePaths();
+
+        $templatePaths->setTemplateRootPaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths']);
+        $templatePaths->setPartialRootPaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']['partialRootPaths']);
+        $templatePaths->setLayoutRootPaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']['layoutRootPaths']);
 
         $this->errorMessage = '';
 

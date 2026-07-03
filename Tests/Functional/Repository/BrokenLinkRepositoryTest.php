@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional\Repository;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Sypets\Brofix\Controller\Filter\BrokenLinkListFilter;
 use Sypets\Brofix\LinkAnalyzer;
 use Sypets\Brofix\Repository\BrokenLinkRepository;
@@ -189,9 +191,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
      * @param array<int,int> $pidList
      * @param array<string,int> $expectedOutput
      * @throws \TYPO3\TestingFramework\Core\Exception
-     *
-     * @dataProvider getLinkCountsForPagesAndLinktypesReturnsCorrectCountForUserDataProvider
      */
+    #[DataProvider('getLinkCountsForPagesAndLinktypesReturnsCorrectCountForUserDataProvider')]
+    #[Test]
     public function testGetLinkCountsForPagesAndLinktypesReturnsCorrectCountForUser(
         array $beuser,
         string $inputFile,
@@ -207,6 +209,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture'] ?? '');
+        self::initializeLanguageObject();
         $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         // @extensionScannerIgnoreLine
@@ -315,8 +318,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
      * @param array<int,int> $pidList
      * @param int $expectedCount
      * @throws \TYPO3\TestingFramework\Core\Exception
-     * @dataProvider getBrokenLinksReturnsCorrectCountForUserDataProvider
      */
+    #[DataProvider('getBrokenLinksReturnsCorrectCountForUserDataProvider')]
+    #[Test]
     public function testGetBrokenLinksReturnsCorrectCountForUser(
         array $beuser,
         string $inputFile,
@@ -332,6 +336,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
+        self::initializeLanguageObject();
         $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
@@ -680,8 +685,9 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
      * @param array<int,int> $pidList
      * @param array<string,mixed> $expectedResult
      * @throws \TYPO3\TestingFramework\Core\Exception
-     * @dataProvider getBrokenLinksReturnsCorrectValuesForUserDataProvider
      */
+    #[DataProvider('getBrokenLinksReturnsCorrectValuesForUserDataProvider')]
+    #[Test]
     public function testGetBrokenLinksReturnsCorrectValuesForUser(
         array $beuser,
         string $inputFile,
@@ -697,6 +703,7 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->configuration->setSearchFields($searchFields);
         $this->configuration->setLinkTypes($linkTypes);
         $this->setupBackendUserAndGroup($beuser['uid'], $beuser['fixture'], $beuser['groupFixture']);
+        self::initializeLanguageObject();
         $this->importCSVDataSet($inputFile);
         $linkAnalyzer = $this->get(LinkAnalyzer::class);
         $linkAnalyzer->init($pidList, $this->configuration);
@@ -715,21 +722,6 @@ class BrokenLinkRepositoryTest extends AbstractFunctional
         $this->normalizeBrokenLinksResults($expectedResult);
         $this->normalizeBrokenLinksResults($results);
         self::assertEquals($expectedResult, $results);
-    }
-
-    /**
-     * @param int $uid
-     * @param non-empty-string $fixtureFile
-     * @param string $groupFixtureFile
-     */
-    protected function setupBackendUserAndGroup(int $uid, string $fixtureFile, string $groupFixtureFile = ''): void
-    {
-        if ($groupFixtureFile) {
-            $this->importCSVDataSet($groupFixtureFile);
-        }
-        $this->backendUserFixture = $fixtureFile;
-        $this->setUpBackendUserFromFixture($uid);
-        self::initializeLanguageObject();
     }
 
     /**

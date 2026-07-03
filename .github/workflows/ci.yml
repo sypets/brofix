@@ -4,14 +4,13 @@
 #  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
 
 # current support is:
-# - TYPO3 v12
 # - TYPO3 v13
-# - PHP 8.1-8.4 (for TYPO3 v12)
-# - PHP 8.2-8.5 (for TYPO3 v13)
+# - TYPO3 v14
+# - PHP 8.2-8.5 (for TYPO3 v13 and v14)
 
 # PHP support in TYPO3:
-# - TYPO3 v12 : PHP 8.1 - 8.4
 # - TYPO3 v13 : PHP 8.2 - 8.5
+# - TYPO3 v14 : PHP 8.2 - 8.5
 
 # always force TYPO3 version, also for latest to make sure it runs with latest version
 
@@ -55,15 +54,15 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
       - name: "cgl"
-        if: ${{ matrix.php != '8.1' }}
+        if: ${{ matrix.php != '8.2' }}
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
 
       - name: "Composer validate"
         if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
-  # v13 / run only with latest PHP version
-  all_core_v13-lastest-php:
+  # rector: run only with one TYPO3 and PHP version
+  rector_typo3_v13-lastest-php:
     # only run jobs via scheduled workflow in main repo, not in forks
     if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
     name: "TYPO3 v13 / only latest PHP: rector"
@@ -89,8 +88,64 @@ jobs:
       - name: "Composer"
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
-      - name: "rector (apply v12 rules)"
+      - name: "rector"
         run: Build/Scripts/runTests.sh -s rector:check -p 8.5
+
+  # v14
+  all_core_v14:
+    # only run jobs via scheduled workflow in main repo, not in forks
+    if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
+    name: "all core v14"
+    runs-on: ubuntu-latest
+    strategy:
+      # This prevents cancellation of matrix job runs, if one/two already failed and let the
+      # rest matrix jobs be be executed anyway.
+      fail-fast: true
+      matrix:
+        # only testing with highest and lowest
+        php: [ '8.2', '8.5' ]
+        minMax: [ 'composerInstallMax' ]
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "show php version"
+        run: php --version
+
+      - name: "Set Typo3 core version"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^14.3" -s composerCoreVersion
+
+      - name: "Composer"
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+
+      - name: "Lint PHP"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
+
+      - name: "phpstan"
+        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v14.neon" -v
+
+      - name: "Unit tests"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+
+      - name: "Functional tests with mariadb"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
+
+      - name: "Functional tests with mysql"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mysql -s functional -v
+
+      - name: "Functional tests with sqlite (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d sqlite -s functional
+
+      - name: "Functional tests with postgres (nightly or pull_request)"
+        if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'pull_request' ) }}
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
+
 
   # v13
   all_core_v13:
@@ -125,13 +180,17 @@ jobs:
 
       - name: "phpstan"
         if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github" -v
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v13.neon" -v
 
       - name: "Unit tests"
         if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
 
       - name: "Functional tests with mariadb"
+        if: always()
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
+
+      - name: "Functional tests with mysql"
         if: always()
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
 

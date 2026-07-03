@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sypets\Brofix\Tests\Functional\Command;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 use Sypets\Brofix\Command\CheckLinksCommand;
 use Sypets\Brofix\Exceptions\MissingConfigurationException;

@@ -1,7 +1,8 @@
 mod.brofix {
 	searchFields {
 	  # check all links in table "pages", fields "media" and "url"
-		pages = media,url
+    # for v13 pages.url should be used and for >= v14 pages.link
+		pages = media,url,link
 		tt_content = bodytext,header_link,records
 	}
 	# do not check these tt_content CTypes (comma separated)
