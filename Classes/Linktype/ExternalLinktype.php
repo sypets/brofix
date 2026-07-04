@@ -266,7 +266,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 ) {
                     $url = $linkTargetResponse->getEffectiveUrl();
                     $linkTargetResponse = null;
-                    if ($loop > 10) {
+                    if ($loop > $this->configuration->getLinktypesConfigExternalRedirects()) {
                         $linkTargetResponse = LinkTargetResponse::createInstanceByError(
                             self::ERROR_TYPE_TOO_MANY_REDIRECTS,
                             0
@@ -279,6 +279,22 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                     // HEAD was not allowed or threw an error, now trying GET
                     $options['headers']['Range'] = 'bytes=0-4048';
                     $linkTargetResponse = $this->requestUrl($url, 'GET', $options);
+
+                    // check if redirect
+                    if ($linkTargetResponse->isError()
+                        && $linkTargetResponse->getErrorType() === self::ERROR_TYPE_HTTP_STATUS_CODE
+                        && $linkTargetResponse->getErrno() >= 301 && $linkTargetResponse->getErrno() < 400
+                    ) {
+                        $url = $linkTargetResponse->getEffectiveUrl();
+                        $linkTargetResponse = null;
+                        if ($loop > 10) {
+                            $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                                self::ERROR_TYPE_TOO_MANY_REDIRECTS,
+                                0
+                            );
+                        }
+                        continue;
+                    }
                 }
                 $this->crawlDelay->setLastCheckedTime($this->domain);
             }
