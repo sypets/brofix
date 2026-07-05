@@ -28,7 +28,8 @@ class GenerateCheckResultFluidMail implements SingletonInterface
     /**
      * @var string
      */
-    protected $messageId;
+    protected $messageId = '';
+    protected string $errorMessage = '';
 
     public function __construct(protected readonly LoggerInterface $logger)
     {
@@ -83,6 +84,8 @@ class GenerateCheckResultFluidMail implements SingletonInterface
     {
         $templatePaths = new TemplatePaths($GLOBALS['TYPO3_CONF_VARS']['MAIL']);
 
+        $this->errorMessage = '';
+
         /**
          * @var FluidEmail
          */
@@ -124,6 +127,7 @@ class GenerateCheckResultFluidMail implements SingletonInterface
         if ($subject) {
             $fluidEmail->subject($subject);
         }
+        $hasSentMessage = false;
 
         try {
             $this->mailer->send($fluidEmail);
@@ -136,29 +140,34 @@ class GenerateCheckResultFluidMail implements SingletonInterface
                     $pageId
                 )
             );
+            $hasSentMessage = true;
         } catch (\Throwable $e) {
-            $this->logger->error(
-                sprintf(
-                    'Exception sending mail Exception message=<%s> to=<%s> from=<%s> subject=<%s> pageId=<%d>',
-                    $e->getMessage(),
-                    $this->convertEmailAdressesToString($recipients),
-                    $from,
-                    $subject,
-                    $pageId
-                )
+            $this->errorMessage = sprintf(
+                'Exception sending mail Exception message=<%s> to=<%s> from=<%s> subject=<%s> pageId=<%d>',
+                $e->getMessage(),
+                $this->convertEmailAdressesToString($recipients),
+                $from,
+                $subject,
+                $pageId
             );
+
             if ($config->getBehaviourOnCheckError() === Configuration::BEHAVIOR_ON_CHECK_ABORT) {
                 throw $e;
             }
+            $this->logger->error(
+                $this->errorMessage
+            );
         }
 
-        /**
-         * @var SentMessage
-         */
-        $sentMessage = $this->mailer->getSentMessage();
-        $this->messageId = $sentMessage->getMessageId();
-
-        return true;
+        if ($hasSentMessage) {
+            /**
+             * @var SentMessage
+             */
+            $sentMessage = $this->mailer->getSentMessage();
+            $this->messageId = $sentMessage->getMessageId();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -175,5 +184,10 @@ class GenerateCheckResultFluidMail implements SingletonInterface
             return '';
         }
         return implode(', ', $adresses);
+    }
+
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
     }
 }
