@@ -373,16 +373,20 @@ class CheckLinksCommand extends Command
                     break;
                 case Configuration::SEND_EMAIL_ALWAYS:
                     $this->io->writeln('Send email');
-                    $this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId);
+                    if (!$this->generateCheckResultMail->generateMail($this->configuration, $this->statistics[$pageId], $pageId)) {
+                        $this->io->error('Error sending mail: ' . $this->generateCheckResultMail->getErrorMessage());
+                    }
                     break;
                 case Configuration::SEND_EMAIL_ANY:
                     if ($stats->getCountBrokenLinks()) {
                         $this->io->writeln('Broken links found, send email');
-                        $this->generateCheckResultMail->generateMail(
+                        if (!$this->generateCheckResultMail->generateMail(
                             $this->configuration,
                             $this->statistics[$pageId],
                             $pageId
-                        );
+                        )) {
+                            $this->io->error('Error sending mail: ' . $this->generateCheckResultMail->getErrorMessage());
+                        }
                     } else {
                         $this->io->writeln('No broken links found, do not send email');
                     }
@@ -392,11 +396,13 @@ class CheckLinksCommand extends Command
                     $newBrokenLinks = $stats->getCountNewBrokenLinks();
                     if ($newBrokenLinks) {
                         $this->io->writeln($newBrokenLinks . ' new broken links found, send email');
-                        $this->generateCheckResultMail->generateMail(
+                        if (!$this->generateCheckResultMail->generateMail(
                             $this->configuration,
                             $this->statistics[$pageId],
                             $pageId
-                        );
+                        )) {
+                            $this->io->error('Error sending mail: ' . $this->generateCheckResultMail->getErrorMessage());
+                        }
                     } else {
                         $this->io->writeln('No new broken links found, do not send email');
                     }
