@@ -306,6 +306,27 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
     }
 
     /**
+     * Must possible create full URL from relative URL
+     */
+    protected function evaluationNextUrlFromLocation(string $url, string $location): string
+    {
+        if (str_starts_with($location, 'http://') || str_starts_with($location, 'https://')) {
+            return $location;
+        }
+        $parsedUrl = parse_url($url);
+        $scheme = $parsedUrl['scheme'] ?? 'https';
+        $port = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
+        $host = $parsedUrl['host'] ?? '';
+
+        if (str_starts_with($location, '/')) {
+            return $scheme . '://' . $host . $port . $location;
+        }
+        $path = $parsedUrl['path'] ?? '/';
+        $dir = substr($path, 0, strrpos($path, '/') + 1);
+        return $scheme . '://' . $host . $port . $dir . $location;
+    }
+
+    /**
      * Check URL using the specified request methods
      *
      * @param string $url
@@ -324,7 +345,7 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
 
             if ($response->getStatusCode() >= 300 && $response->getStatusCode() < 400) {
                 // redirect
-                $newUrl = $response->getHeaderLine('Location');
+                $newUrl = $this->evaluationNextUrlFromLocation($url, $response->getHeaderLine('Location'));
                 if ($url === $newUrl) {
                     // redirect loop
                     $linkTargetResponse = LinkTargetResponse::createInstanceByError(
