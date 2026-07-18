@@ -10,7 +10,7 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => '',
     'state' => 'stable',
     // bumped up release to 8 for dropping support for version v12
-    'version' => '8.0.0',
+    'version' => '8.0.1-dev',
     'constraints' => [
         'depends' => [
             'typo3' => '13.4.0-14.3.99',
