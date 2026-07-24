@@ -54,7 +54,8 @@
 		"sypets/page-callouts": "^3.0.0"
 	},
 	"conflict": {
-		"typo3/cms": "*"
+		"typo3/cms": "*",
+		"pluswerk/mail-logger": "<5.0.6"
 	},
 	"extra": {
 		"typo3/cms": {
