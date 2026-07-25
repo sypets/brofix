@@ -18,7 +18,7 @@ if ($typo3Version->getMajorVersion() >= 14) {
             'config' => [
                 'type' => 'check',
                 'renderType' => 'checkboxToggle',
-                'default' => '0',
+                'default' => '1',
             ],
         ],
         //'after:emailMeAtLogin'

@@ -20,7 +20,8 @@ class PageCalloutsHook implements SingletonInterface
         ExtensionConfiguration $extensionConfiguration,
         protected readonly UriBuilder $uriBuilder
     ) {
-        $this->showPageCalloutBrokenLinksExist = (bool)$extensionConfiguration->get('brofix', 'showPageCalloutBrokenLinksExist');
+        $extensionConfigurationArray = $extensionConfiguration->get('brofix');
+        $this->showPageCalloutBrokenLinksExist = (bool)($extensionConfigurationArray['showPageCalloutBrokenLinksExist'] ?? true);
     }
 
     /**
@@ -51,7 +52,7 @@ class PageCalloutsHook implements SingletonInterface
             return [];
         }
         // check user settings (default is 1)
-        if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? false)) === false) {
+        if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? true)) === false) {
             return [];
         }
 
