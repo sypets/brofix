@@ -8,7 +8,13 @@ defined('TYPO3') or die();
 
 $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
 
-if ($typo3Version->getMajorVersion() < 14) {
+/**
+ * is moved to Configuration/TCA/Overrides/be_users.php for TYPO3 >= v14
+ * @todo Remove here when support for TYPO3 v13 is dropped
+ */
+// directly access extension configuration so class does not need to be initialized
+$showPageCalloutBrokenLinksExist = (int)($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['brofix']['showPageCalloutBrokenLinksExist'] ?? 1);
+if ($showPageCalloutBrokenLinksExist === 1 && $typo3Version->getMajorVersion() < 14) {
     // BE user settings
     // ----------------
 
@@ -17,7 +23,7 @@ if ($typo3Version->getMajorVersion() < 14) {
     $GLOBALS['TYPO3_USER_SETTINGS']['columns']['tx_brofix_showPageCalloutBrokenLinksExist'] = [
         'label' => $lll . ':usersettings.pagemodule.showPageCalloutBrokenLinksExist',
         'type' => 'check',
-        'default' => '0',
+        'default' => '1',
     ];
     ExtensionManagementUtility::addFieldsToUserSettings(
         '--div--;' . $lll . ':usersettings.brofix.tab,tx_brofix_showPageCalloutBrokenLinksExist',
