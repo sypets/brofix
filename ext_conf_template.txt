@@ -68,5 +68,5 @@ showUrlChecker = 0
 
 ### page module ###
 
-# cat=page module; type=boolean;label=Show message in page module if broken links exist on page: Has small performance impact, requires the extension page_callouts, can be further configured in BE user settings
+# cat=page module; type=options[Never=0, Depends on user settings=1, Always=2];label=Show message in page module if broken links exist on page: Has small performance impact, requires the extension page_callouts, can be further configured in BE user settings
 showPageCalloutBrokenLinksExist = 1

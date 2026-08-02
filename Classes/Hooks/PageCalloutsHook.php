@@ -11,9 +11,17 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
+/**
+ * Show broken links in page module.
+ *
+ * Requirements:
+ * - sypets/page-callouts installed
+ * - extension configuration showPageCalloutBrokenLinksExist is 2
+ *   or showPageCalloutBrokenLinksExist is 1 and user setting tx_brofix_showPageCalloutBrokenLinksExist is 1
+ */
 class PageCalloutsHook implements SingletonInterface
 {
-    protected bool $showPageCalloutBrokenLinksExist = false;
+    protected int $showPageCalloutBrokenLinksExist = 1;
 
     public function __construct(
         protected BrokenLinkRepository $brokenLinkRepository,
@@ -21,7 +29,7 @@ class PageCalloutsHook implements SingletonInterface
         protected readonly UriBuilder $uriBuilder
     ) {
         $extensionConfigurationArray = $extensionConfiguration->get('brofix');
-        $this->showPageCalloutBrokenLinksExist = (bool)($extensionConfigurationArray['showPageCalloutBrokenLinksExist'] ?? true);
+        $this->showPageCalloutBrokenLinksExist = (int)($extensionConfigurationArray['showPageCalloutBrokenLinksExist'] ?? 1);
     }
 
     /**
@@ -32,9 +40,26 @@ class PageCalloutsHook implements SingletonInterface
      */
     public function addMessages(array $pageInfo): array
     {
-        // check extension configuration
-        if (!$this->showPageCalloutBrokenLinksExist) {
+        /** @var BackendUserAuthentication $beUser */
+        $beUser = $GLOBALS['BE_USER'];
+        if (!$beUser->isAdmin() && !$beUser->check('modules', 'web_brofix')) {
+            // no output in case the user does not have access to the "brofix" module
             return [];
+        }
+
+        // check extension configuration:
+        // if 0: do not show
+        // if 1: only show if user setting is also true
+        // if 2 : always show
+        switch ($this->showPageCalloutBrokenLinksExist) {
+            case 0:
+                return [];
+            case 1:
+                if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? true)) === false) {
+                    // do not show broken links in page module
+                    return [];
+                }
+                // case 2: continue
         }
 
         if (!$pageInfo) {
@@ -42,17 +67,6 @@ class PageCalloutsHook implements SingletonInterface
         }
         $pageId = (int)($pageInfo['uid']);
         if ($pageId === 0) {
-            return [];
-        }
-
-        /** @var BackendUserAuthentication $beUser */
-        $beUser = $GLOBALS['BE_USER'];
-        if (!$beUser->isAdmin() && !$beUser->check('modules', 'web_brofix')) {
-            // no output in case the user does not have access to the "brofix" module
-            return [];
-        }
-        // check user settings (default is 1)
-        if (((bool)($beUser->uc['tx_brofix_showPageCalloutBrokenLinksExist'] ?? true)) === false) {
             return [];
         }
 
