@@ -29,4 +29,3 @@ if ($showPageCalloutBrokenLinksExist === 1) {
         '--div--;' . $lll . ':usersettings.brofix.tab,tx_brofix_showPageCalloutBrokenLinksExist',
     );
 }
-
