@@ -144,40 +144,43 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d postgres -s functional
 
   # v12
-  all_core_v12:
-    # only run jobs via scheduled workflow in main repo, not in forks
-    if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
-    name: "all core-v12"
-    runs-on: ubuntu-latest
-    strategy:
-      # This prevents cancellation of matrix job runs, if one/two already failed and let the
-      # rest matrix jobs be be executed anyway.
-      fail-fast: true
-      matrix:
-        # only testing with highest and lowest
-        php: [ '8.1', '8.4' ]
-        minMax: [ 'composerInstallMax' ]
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2
-
-      - name: "show php version"
-        run: php --version
-
-      - name: "Set Typo3 core version"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
-
-      - name: "Composer"
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
-
-      - name: "phpstan"
-        if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v12.neon" -v
-
-      - name: "Unit tests"
-        if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
-
-      - name: "Functional tests with mariadb"
-        if: always()
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
+  # deactivate v12 pipeline because it is no longer in LTS and now requires ELTS to install latest security patches
+  # Problem 1
+  #    - Root composer.json requires typo3/cms-core ^12.4, found typo3/cms-core[v12.4.0, ..., v12.4.45] but these were not loaded, because they are affected by security advisories ("PKSA-2yr3-by9d-r1gh", "PKSA-q3vc-jr63-rrrj", "PKSA-gj1k-954p-nhmk", "PKSA-gr4f-6g49-cg8v", "PKSA-32mm-z25f-2ysj", "PKSA-vbrn-fwpj-xmx5", "PKSA-bzt2-2962-49bj", "PKSA-s3vj-chpj-8wrn", "PKSA-6jfs-jhtj-72x7", "PKSA-ghx2-mc2z-fx6x", "PKSA-rtck-8z1q-gn5s", "PKSA-ns26-fz7n-2jm8", "PKSA-pz1k-khnw-3j7j", "PKSA-rwv7-ff55-f18g", "PKSA-2ssc-6m7w-s9xh", "PKSA-q3vc-nbpk-d1gk", "PKSA-6d7x-2gs8-wr59", "PKSA-b5m3-ttcx-cz18", "PKSA-3gg2-48j5-46ky", "PKSA-tm11-834c-1wbq", "PKSA-443h-dk5w-qm2g", "PKSA-8vkj-4d3h-x586", "PKSA-prgj-sgzn-q6cs", "PKSA-zz7z-6zsy-d2hc", "PKSA-99mg-htb6-c272", "PKSA-h5xk-8nxx-znp4", "PKSA-d551-hdqh-5mmf", "PKSA-jbhx-knzt-5y6m", "PKSA-jp7z-h3vv-yr4s", "PKSA-83hy-ynvj-7pfq"). Go to https://packagist.org/security-advisories/ to find advisory details. To ignore the advisories, add their IDs to the "policy.advisories.ignore-id" config or add the package to "policy.advisories.ignore". To turn the feature off entirely, you can set "policy.advisories.block" to false.
+  #all_core_v12:
+  #  # only run jobs via scheduled workflow in main repo, not in forks
+  #  if: (github.event_name == 'schedule' && github.repository == 'sypets/brofix') || (github.event_name != 'schedule')
+  #  name: "all core-v12"
+  #  runs-on: ubuntu-latest
+  #  strategy:
+  #    # This prevents cancellation of matrix job runs, if one/two already failed and let the
+  #    # rest matrix jobs be be executed anyway.
+  #    fail-fast: true
+  #    matrix:
+  #      # only testing with highest and lowest
+  #      php: [ '8.1', '8.4' ]
+  #      minMax: [ 'composerInstallMax' ]
+  #  steps:
+  #    - name: "Checkout"
+  #      uses: actions/checkout@v2
+  #
+  #    - name: "show php version"
+  #      run: php --version
+  #
+  #    - name: "Set Typo3 core version"
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -t "^12.4" -s composerCoreVersion
+  #
+  #    - name: "Composer"
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
+  #
+  #    - name: "phpstan"
+  #      if: ${{ always() && matrix.minMax == 'composerInstallMax' }}
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s phpstan -e "--error-format=github -c Build/phpstan/phpstan_v12.neon" -v
+  #
+  #    - name: "Unit tests"
+  #      if: always()
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit -v
+  #
+  #    - name: "Functional tests with mariadb"
+  #      if: always()
+  #      run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -d mariadb -s functional -v
