@@ -72,7 +72,7 @@ Options:
             - composerInstallMax: "composer update", with no platform.php config.
             - composerInstallMin: "composer update --prefer-lowest", with platform.php set to PHP version x.x.0.
             - composerValidate: "composer validate"
-            - composerCoreVersion: "composer require --no-install typo3/minimal:"coreVersion"
+            - composerCoreVersion: "composer require --no-install typo3/cms-core:"coreVersion"
             - cgl: test and fix all core php files
             - cglGit: test and fix latest committed patch for CGL compliance
             - lint: PHP linting
@@ -85,8 +85,8 @@ Options:
 
     -t <composer-core-version-constraint>
         Only with -s composerCoreVersion
-        Specifies the Typo3 core version to be used
-            - '^11.5' (default)
+        Specifies the Typo3 core version to be used, e.g.
+            - '^12.4'
             - ...
 
     -d <mariadb|mysql|postgres|sqlite>

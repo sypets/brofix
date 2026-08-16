@@ -37,7 +37,7 @@ services:
         if [ ${SCRIPT_VERBOSE} -eq 1 ]; then
           set -x
         fi
-        composer require --no-progress --no-interaction --no-install typo3/minimal:"${CORE_VERSION}";
+        composer require --no-progress --no-interaction --no-install typo3/cms-core:"${CORE_VERSION}";
       "
   composer_install:
     image: ${IMAGE_PREFIX}core-testing-${DOCKER_PHP_IMAGE}:latest
