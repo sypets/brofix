@@ -389,19 +389,19 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 '',
                 $e->getMessage()
             );
+            /**
+             * @todo In the future, use ResponseException here instead of ClientException | ServerException (since guzzlehttp/guzzle 8.2)
+             * @see https://github.com/guzzle/guzzle/commit/3223f7e816c4f0fcf23af17debcf22cc0299669a
+             */
         } catch (ClientException | ServerException $e) {
             // ClientException - A GuzzleHttp\Exception\ClientException is thrown for 400 level errors if the http_errors request option is set to true.
             // ServerException - A GuzzleHttp\Exception\ServerException is thrown for 500 level errors if the http_errors request option is set to true.
-            if ($e->hasResponse()) {
-                $linkTargetResponse = LinkTargetResponse::createInstanceByError(
-                    self::ERROR_TYPE_HTTP_STATUS_CODE,
-                    $e->getResponse()->getStatusCode()
-                );
-                $responseHeaders = $e->getResponse()->getHeaders();
-            } else {
-                $linkTargetResponse = LinkTargetResponse::createInstanceByError(self::ERROR_TYPE_UNKNOWN);
-            }
 
+            $linkTargetResponse = LinkTargetResponse::createInstanceByError(
+                self::ERROR_TYPE_HTTP_STATUS_CODE,
+                $e->getResponse()->getStatusCode()
+            );
+            $responseHeaders = $e->getResponse()->getHeaders();
             $linkTargetResponse->setExceptionMessage($e->getMessage());
         } catch (ConnectException | RequestException $e) {
             // RequestException - In the event of a networking error (connection timeout, DNS errors, etc.), a GuzzleHttp\Exception\RequestException is thrown.
@@ -413,19 +413,18 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
             // * couple you to a specific handler, but can give more debug information
             // * when needed.
             $exceptionMessage = $e->getMessage();
-            $handlerContext = $e->getHandlerContext();
-            if ((($handlerContext['errno'] ?? 0) !== 0) && (strncmp(
-                $e->getMessage(),
-                'cURL error',
-                strlen('cURL error')
-            ) === 0)) {
-                // use shorter error message
-                if (isset($handlerContext['error'])) {
-                    $exceptionMessage = $handlerContext['error'];
-                }
+
+            // In Guzzle 8.0, the method getHandlerContext() has been completely removed from RequestException and ConnectException
+            // we now parse for "cURL error <code>: ..." and fall back to non-curl generic error
+            $matches = [];
+            if (preg_match('#^cURL error ([0-9]+): (.*)$#', $exceptionMessage, $matches)) {
+                // matches:
+                // 0 - all
+                // 1 - code
+                // 2 - message
                 $linkTargetResponse = LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_LOWLEVEL_LIBCURL_ERRNO,
-                    (int)($handlerContext['errno']),
+                    (int)$matches[1],
                     '',
                     $exceptionMessage
                 );

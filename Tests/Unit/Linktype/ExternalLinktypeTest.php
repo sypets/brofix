@@ -36,7 +36,6 @@ class ExternalLinktypeTest extends AbstractUnit
         $responseMock->method('getHeaders')->willReturn([]);
 
         $exceptionMock = $this->createMock(ClientException::class);
-        $exceptionMock->method('hasResponse')->willReturn(true);
         $exceptionMock->method('getResponse')->willReturn($responseMock);
 
         $requestFactoryMock = $this->createMock(RequestFactory::class);
@@ -64,8 +63,6 @@ class ExternalLinktypeTest extends AbstractUnit
         $responseMock->method('getHeaders')->willReturn([]);
 
         $exceptionMock = $this->createMock(ClientException::class);
-        $exceptionMock->method('hasResponse')
-            ->willReturn(true);
         $exceptionMock->method('getResponse')
             ->willReturn($responseMock);
 
