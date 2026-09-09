@@ -389,10 +389,15 @@ class ExternalLinktype extends AbstractLinktype implements LoggerAwareInterface
                 '',
                 $e->getMessage()
             );
+        /**
+         * @todo In the future, use ResponseException here instead of ClientException | ServerException (since guzzlehttp/guzzle 8.2) and remove the check if getResponse() exists
+         *    we currently cannot do that to be backwards compatible
+         * @see https://github.com/guzzle/guzzle/commit/3223f7e816c4f0fcf23af17debcf22cc0299669a
+         */
         } catch (ClientException | ServerException $e) {
             // ClientException - A GuzzleHttp\Exception\ClientException is thrown for 400 level errors if the http_errors request option is set to true.
             // ServerException - A GuzzleHttp\Exception\ServerException is thrown for 500 level errors if the http_errors request option is set to true.
-            if ($e->hasResponse()) {
+            if (method_exists($e, 'getResponse')) {
                 $linkTargetResponse = LinkTargetResponse::createInstanceByError(
                     self::ERROR_TYPE_HTTP_STATUS_CODE,
                     $e->getResponse()->getStatusCode()
