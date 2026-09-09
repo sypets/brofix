@@ -37,8 +37,8 @@ class StayAliveCertificateChainResolver extends AbstractCertificateChainResolver
      */
     public function resolveCertChain(string $url, bool $onlyForHttpsUrls = false): string
     {
-        if (!class_exists('\Stayallive\CertificateChain\Certificate')
-            || !class_exists('\Stayallive\CertificateChain\Resolver')) {
+        if (!class_exists(\Stayallive\CertificateChain\Certificate::class)
+            || !class_exists(\Stayallive\CertificateChain\Resolver::class)) {
             return '';
         }
 
