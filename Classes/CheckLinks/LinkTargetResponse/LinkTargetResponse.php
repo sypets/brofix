@@ -191,7 +191,10 @@ class LinkTargetResponse
 
     public function toJson(): string
     {
-        return json_encode($this->toArray());
+        // Exception messages can quote raw bytes sent by a remote server (e.g. a Latin-1
+        // Location header), and json_encode() returns false on invalid UTF-8 - which
+        // violates the return type and aborts the whole link check run.
+        return json_encode($this->toArray(), JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}';
     }
 
     public function isOk(): bool
